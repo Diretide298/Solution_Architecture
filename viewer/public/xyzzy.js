@@ -32,6 +32,13 @@
  * it is deliberately not in git, see .gitignore — the sequence does nothing at
  * all rather than opening a tab onto a 404.
  *
+ * `redirect: 'manual'` is the other half of quiet, and it is not optional. The
+ * page sits behind the gate, so a signed-out reader is sent to `/login.html`
+ * — which is public and answers 200. A following fetch therefore reports the
+ * payload as present, and the sequence opens a tab onto the sign-in door: not
+ * silence, and not the page. Left manual, the 302 arrives as an opaque
+ * redirect whose `ok` is false, and a reader who may not have it gets nothing.
+ *
  * `window.open` returns null here because of `noopener`, which is the spec and
  * not a failure; the tab opens regardless. Do not "fix" that null.
  */
@@ -61,7 +68,7 @@ addEventListener('keydown', (event) => {
   if (step < ORDER.length) return;
 
   step = 0;
-  fetch(SHELL, { method: 'HEAD' })
+  fetch(SHELL, { method: 'HEAD', redirect: 'manual' })
     .then((res) => { if (res.ok) window.open(SHELL, '_blank', 'noopener'); })
     .catch(() => { /* not deployed here; say nothing */ });
 });

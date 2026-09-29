@@ -55,6 +55,13 @@ const PUBLIC = new Set([
   // the journey diagrams' built bundle (viewer/landing-app → public/landing-journey)
   '/landing-journey/journey.js',
   '/landing-journey/journey.css',
+  // The key-sequence listener, which is on the two signed-out pages and so
+  // has to be readable by a stranger. It reads nothing and sends nothing: it
+  // counts five keystrokes and asks whether one file is there. Leaving it out
+  // is how it silently did nothing on exactly the two pages it was added for
+  // — a module that 302s to the sign-in page is a module the browser
+  // refuses to parse, and nothing in the console says so.
+  '/xyzzy.js',
 ]);
 
 /**
