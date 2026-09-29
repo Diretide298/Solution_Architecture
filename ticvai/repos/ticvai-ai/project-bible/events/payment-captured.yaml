@@ -1,0 +1,43 @@
+# payment.captured v1 — published by orders
+# Added 29 September (system-design review SD-033, SD-034). Checked by tools/check-states.py.
+
+name: payment.captured
+version: 1
+publisher: orders
+description: Money was taken against an order, by a till, the guest web, or a provider webhook confirming a
+  3-D Secure or terminal payment. One event per captured payment, whether or not the order is now paid in full.
+aggregate: order
+emittedWhen: A payment moves to captured (createPayment, capturePayment, payments.receivePaymentProviderWebhook)
+emittedBy:
+- orders.createPayment
+- orders.capturePayment
+- payments.receivePaymentProviderWebhook
+payload:
+- field: paymentId
+  type: string
+- field: orderId
+  type: string
+- field: tender
+  type: string
+- field: amount
+  type: Money
+- field: providerReference
+  type: string
+  required: false
+- field: capturedAt
+  type: timestamp
+consumers:
+- context: reporting
+  purpose: Payment performance and tender mix read model
+  idempotencyKey: paymentId
+  onFailure: retry
+  isCritical: false
+- context: ai
+  purpose: Risk velocity and chargeback features on the guest, device and channel
+  idempotencyKey: paymentId
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication
+notes: '**Not the trigger for tickets or revenue**: those follow `order.paid`, which is written in the same
+  transaction when this payment completes the order. No state model emits this: the payment state model is
+  not in states/, so the operations above are its emitters.'

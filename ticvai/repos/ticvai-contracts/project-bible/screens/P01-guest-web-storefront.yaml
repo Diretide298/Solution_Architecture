@@ -22,7 +22,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 49
+  screenCount: 50
   app: guest-web
   appStatus: scaffolded
   packages:
@@ -112,10 +112,13 @@ screens:
     - WEB-045
     - WEB-046
     - WEB-049
+    - WEB-050
     transitions:
     - to: WEB-002
       trigger: Event & Attraction Listing
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
+      carries:
+      - eventId
     - to: WEB-003
       trigger: Search Results
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
@@ -237,6 +240,9 @@ screens:
       trigger: Book a trip (a transport venue)
       provenance: 'decided 29 September, rev 3 REV3-21: transport ticketing is in scope; the transport
         venue''s home call to action opens the route and schedule screen'
+    - to: WEB-050
+      trigger: Plan your visit (header)
+      provenance: decided 29 September 2026 (P29), MOB-6; web build Plan your visit
     - to: WEB-004
       trigger: Opens a product and decides
       provenance: flow F01 step 1→2
@@ -250,16 +256,21 @@ screens:
     public and cacheable.
 
 
-    **Rev 3 (decided 29 September).** Category cards render as a grid or as one scrolling row per `BookingFlowConfig.categoryDisplay`
-    (default `grid`; 23SEP-18). The event banner lists dates only when `BookingFlowConfig.eventBannerDates`
-    is on (default off; 23SEP-19); the date picker always sits at the top of the booking step. The venue
-    picked here (audit R267) is the venue whose booking-flow settings apply on every booking screen, and
-    the booking screens'' *Booking at* bar changes it (REV3-18). Every booking-flow setting named here
-    is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267):
-    the tenant''s values with that venue''s `venueOverrides` entry laid over field by field (decided 29
-    September, rev 3 CFG-11). The UI preset stays `BookingFlowConfig.preset` (CFG-1, no change); the search
-    box in the banner is off by default (`searchInBanner` default false, CFG-6). The in-venue notifications
-    link is live again: WEB-046 is back in the first release (GAP-C1, reversing audit R242).'
+    **Rev 3 (decided 29 September).** Category cards render as a grid or as one scrolling row per `BookingFlowConfig.cardLayout`
+    (the retired `categoryDisplay` of 23SEP-18 is removed, W7). The event banner lists dates only when
+    `BookingFlowConfig.eventBannerDates` is on (default off; 23SEP-19); the date picker always sits at
+    the top of the booking step. The venue picked here (audit R267) is the venue whose booking-flow settings
+    apply on every booking screen, and the booking screens'' *Booking at* bar changes it (REV3-18). Every
+    booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue
+    the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid
+    over field by field (decided 29 September, rev 3 CFG-11). The UI preset stays `BookingFlowConfig.preset`
+    (CFG-1, no change); the search box in the banner is off by default (`searchInBanner` default false,
+    CFG-6). The in-venue notifications link is live again: WEB-046 is back in the first release (GAP-C1,
+    reversing audit R242).
+
+
+    **29 September.** *Plan your visit* in the header opens WEB-050 full screen (MOB-6). W7: `categoryDisplay`
+    is retired.'
   density: compact
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getTenantAppStatus` reads one of them — list,
@@ -553,16 +564,20 @@ screens:
 
     **Rev 3 (decided 29 September).** Categories: tiles from `listProductCategories`, then `listProducts?categoryId=`,
     or one flat list, per `BookingFlowConfig.ticketCategories` (REV3-16); tiles as a grid or a row per
-    `categoryDisplay` (23SEP-18). **Info-only products** (`Product.guestListing` `infoOnly`) are listed
-    with `notBookableLabel` (default *Info only / Not bookable online*) and open their details instead
-    of adding to the basket; they are hidden when `BookingFlowConfig.showInfoOnly` is off (REV3-14). Each
-    card shows the product''s own primary image (`Product.media` `isPrimary`, `searchCatalogue` `primaryMedia`;
+    `cardLayout` (`categoryDisplay` retired, W7). **Info-only products** (`Product.guestListing` `infoOnly`)
+    are listed with `notBookableLabel` (default *Info only / Not bookable online*) and open their details
+    instead of adding to the basket; they are hidden when `BookingFlowConfig.showInfoOnly` is off (REV3-14).
+    Each card shows the product''s own primary image (`Product.media` `isPrimary`, `searchCatalogue` `primaryMedia`;
     23SEP-4). **Book** opens the ticket counters (WEB-005) as a side panel on this listing rather than
     a new page (23SEP-5). Card layout, size and density are the enums `cardLayout` [stackedRows, splitRows,
     cardsAcross, posterCards], `cardSize` [compact, standard, large, extraLarge] and `density` [compact,
     standard, roomy] (DG-6). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`,
     resolved for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
-    entry laid over field by field (decided 29 September, rev 3 CFG-11).'
+    entry laid over field by field (decided 29 September, rev 3 CFG-11).
+
+
+    **29 September.** W4: Help me choose filters this list, with *Show everything*. W3: view-only products
+    show Call sales / Email sales. W7: `categoryDisplay` retired.'
   density: compact
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -579,7 +594,8 @@ screens:
         bindsTo: ProductCategory
         notes: 'Shown when `BookingFlowConfig.ticketCategories` is `categoryThenSubcategory` (the default):
           the category tiles (name, image) first, then that category''s products through `listProducts?categoryId=`.
-          `flatList` skips the tiles. Tiles lay out as a grid or one scrolling row per `BookingFlowConfig.categoryDisplay`.'
+          `flatList` skips the tiles. Tiles lay out as a grid or one scrolling row per `BookingFlowConfig.cardLayout`
+          (W7).'
         operation: listProductCategories
         provenance: decided 29 September, rev 3 REV3-16, 23SEP-18
       - kind: textField
@@ -653,6 +669,24 @@ screens:
         bindsTo: Product[]
         notes: Cursor pagination. Infinite scroll with an explicit load-more fallback
         provenance: carried from the previous definition
+      - kind: banner
+        label: Help me choose
+        operation: getPublishedGuidedChoice
+        notes: '**The answers filter the list** (W4): sent as `guidedAnswerIds` to `listProducts` (and
+          `searchCatalogue`), so web, app and kiosk filter the same way on the server.'
+        provenance: decided 29 September 2026 (P29), W4
+      - kind: secondaryButton
+        label: Show everything
+        operation: listProducts
+        notes: Clears the Help me choose filter (W4).
+        provenance: decided 29 September 2026 (P29), W4
+      - kind: cardList
+        label: Contact sales
+        bindsTo: Product.salesContact
+        operation: listProducts
+        notes: '**View-only products** (W3): Call sales / Email sales from `Product.salesContact` instead
+          of Book.'
+        provenance: decided 29 September 2026 (P29), W3
     - name: contextPanel
       slot: selection
       components:
@@ -732,10 +766,17 @@ screens:
     contract: catalogue
     purpose: 'The category tiles (a tree: parentId, displayOrder, image)'
     trigger: onLoad
+  - operationId: getPublishedGuidedChoice
+    contract: white-label
+    purpose: 'Help me choose: the questions whose answers filter this list (W4)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W4
   entryState:
     params:
     - name: eventId
       from: deepLink
+    - name: venueId
+      from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -752,15 +793,11 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-002
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (29 September build)
+      verified: '2026-09-29'
       match: exact
       view: Header 'What's on'
-      differences: Prototype adds a right-hand quick-book preview ('list.pick' aside with ticket counters
-        and Continue) that YAML leaves to WEB-004/WEB-005, and shows each card's booking-flow label and
-        live queue time (getWaitTimes is in the YAML). Empty-results copy 'Everything is still on sale
-        — the filter is what narrowed it.'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -988,7 +1025,12 @@ screens:
     as a strip at its top (WEB-007, 23SEP-16, REV3-4); a product placed on a venue map opens the map booking
     (WEB-047, REV3-15); a product sold by the hour opens the space booking (WEB-048, REV3-13). The event
     banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off, 23SEP-19). Help
-    me choose sits on the booking step (WEB-005), where the prototype draws it, not here (REV3-11).'
+    me choose sits on the booking step (WEB-005), where the prototype draws it, not here (REV3-11).
+
+
+    **29 September.** W3: view-only products show Call sales / Email sales instead of Book. M18-13: in
+    single-event mode, a banner or video hero and only the next seven days, with a calendar for later
+    dates (M17-08).'
   density: compact
   pattern: listDetail
   patternReason: '`listPerformances` reads the population and `getProduct` reads one of them — list, select,
@@ -1053,6 +1095,19 @@ screens:
         notes: Read more opens on the primary video or photo (`Product.media`, `isPrimary`).
         operation: getProduct
         provenance: decided 29 September, rev 3 23SEP-4
+      - kind: secondaryButton
+        label: Call sales / Email sales
+        bindsTo: Product.salesContact
+        operation: getProduct
+        notes: '**View-only product** (W3): no Book; the sales contact from `Product.salesContact` (phone,
+          email, note; the venue contact when absent).'
+        provenance: decided 29 September 2026 (P29), W3
+      - kind: datePicker
+        label: Next 7 days
+        operation: listPerformances
+        notes: '**Single-event page** (M18-13): banner or video hero, a brief description, and a date
+          strip of the next `dateStripDays` days (default 7) with a calendar icon for later dates (M17-08).'
+        provenance: decided 29 September 2026 (P29), M18-13, M17-08
     - name: contextPanel
       slot: selection
       components:
@@ -1192,9 +1247,9 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-004
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (29 September build)
+      verified: '2026-09-29'
       match: partial
       view: Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read
         more' dialog; or a listing card's preview aside
@@ -1233,10 +1288,14 @@ screens:
       trigger: Change date or time (the dated flow picks them first)
       provenance: 'decided 29 September, rev 3 REV3-2: date → time → ticket; WEB-006 now comes before
         this screen (flow F01 step 3→4)'
+      carries:
+      - eventId
     - to: WEB-007
       trigger: Interactive Seat Selection
+      carries:
+      - eventId
       provenance: derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-005
-        holds none of them, so the edge carries nothing and WEB-007 opens cold
+        holds eventId, so an edge into it carries them
     - to: WEB-008
       trigger: Add-ons & Upsell
       provenance: derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them,
@@ -1254,6 +1313,11 @@ screens:
       - cartId
       provenance: 'decided 29 September, rev 3 REV3-3: `BookingFlowConfig.signInAt` `afterAddOns`; the
         basket is kept'
+    - to: WEB-006
+      trigger: Workshop chosen, then date and time (product-first flow)
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), W8
   density: compact
   pattern: listDetail
   patternReason: '`listProductVariants` reads a population and nothing reads one of them; the detail is
@@ -1297,7 +1361,10 @@ screens:
         notes: 'The venue''s published Help me choose, if any (404 = none, and nothing shows). `mode`
           `button`: a button on this step; `popupOnArrival`: the pop-up also opens once on the first arrival
           (a seen flag on the device only); `showBanner`: a dark banner under the products (*Choose from
-          the experiences above or let us help you decide*). Opens the Help me choose pop-up.'
+          the experiences above or let us help you decide*). Opens the Help me choose pop-up. **29 September
+          (W4): the answers filter the list** (`guidedAnswerIds` on `listProducts`); *Show everything*
+          clears it. Not a consent step: a swimmer answer pre-fills the REV3-26 swim consent, which the
+          guest still confirms.'
         operation: getPublishedGuidedChoice
         provenance: decided 29 September, rev 3 REV3-11
       - kind: iconButton
@@ -1328,6 +1395,20 @@ screens:
         notes: Shows near-miss offers — "add one more for the family rate". Uses the rejected list, which
           exists precisely so this can be said
         provenance: carried from the previous definition
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A
+          step the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+      - kind: secondaryButton
+        label: Show everything
+        operation: listProducts
+        notes: Clears the Help me choose filter (W4).
+        provenance: decided 29 September 2026 (P29), W4
     - name: contextPanel
       slot: selection
       components:
@@ -1391,6 +1472,11 @@ screens:
     contract: white-label
     purpose: The venue's published Help me choose (404 = none)
     trigger: onLoad
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: productId
@@ -1486,7 +1572,19 @@ screens:
     `cartSideInRtl` is `mirror`. Card layout, size and density are enums (DG-6). Every booking-flow setting
     named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit
     R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field by field (decided
-    29 September, rev 3 CFG-11).'
+    29 September, rev 3 CFG-11).
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.
+
+
+    **29 September.** W4: Help me choose filters. W8: in a product-first flow (workshop) this step comes
+    first and the date follows. W5: surf levels appear only after a time slot.'
 - id: WEB-006
   name: Date & Performance Selection
   module: Booking & Selection
@@ -1556,7 +1654,21 @@ screens:
     contracts keep `Performance`. Floating basket icon and cart side (REV3-10). Every booking-flow setting
     named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit
     R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field by field (decided
-    29 September, rev 3 CFG-11).'
+    29 September, rev 3 CFG-11).
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.
+
+
+    **29 September.** M17-08: the date strip shows the next seven days, with a calendar for later dates.
+    W5: surf products (beginner, intermediate …) only after a time slot. W8: the date-first default no
+    longer overrides product-first flows: order comes from the flow. W11: tours stay date → language →
+    time slot, unchanged.'
   density: compact
   pattern: statusTracker
   patternReason: '`getAvailability` reads one record and nothing reads a population — the screen is about
@@ -1602,10 +1714,11 @@ screens:
         operation: listPerformances
         provenance: decided 29 September, rev 3 REV3-17
       - kind: datePicker
-        label: Four-day calendar
-        notes: 'Surf-style layout: four days side by side, each time with places left and the price per
-          person; the experience and level filters of WEB-005 apply. A layout of the same data, no package
-          change.'
+        label: Next 7 days
+        notes: '**Date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31)
+          with a calendar icon for the full month (M17-08). Surf-style layout: four days side by side,
+          each time with places left and the price per person; the experience and level filters of WEB-005
+          apply. A layout of the same data, no package change.'
         operation: listPerformances
         provenance: decided 29 September, rev 3 REV3-19
       - kind: iconButton
@@ -1647,6 +1760,15 @@ screens:
         - Performance.seatMapId
         operation: getPerformance
         provenance: contract catalogue.yaml GET /performances/{performanceId}
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (date and time) highlighted.
+          A step the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
   states:
     loading: The date session selection, read by `getPerformance`.
     error: Could not load. Names which read failed and leaves the date session selection untouched.
@@ -1694,6 +1816,11 @@ screens:
     trigger: onAction
     invalidates:
     - getCart
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   wireframe:
     status: review
     provenance: client-verified
@@ -1720,6 +1847,8 @@ screens:
       from: navigation
     - name: eventId
       from: WEB-004
+    - name: venueId
+      from: session
   overlays:
   - id: formCheckBookingEligibility
     component: modal
@@ -1841,7 +1970,19 @@ screens:
     map is no longer this screen:** a cabana, lounger or other spot placed on a venue map is booked on
     WEB-047 (REV3-15, GAP-C2). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`,
     resolved for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
-    entry laid over field by field (decided 29 September, rev 3 CFG-11).'
+    entry laid over field by field (decided 29 September, rev 3 CFG-11).
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.
+
+
+    **29 September (W2).** Sections first, zoom into a section, scroll or pinch out (or *Whole map*) back
+    to the full map; held seats are kept.'
   density: compact
   boardFrames:
   - Seat Board 3.dc.html#seat-3b
@@ -1877,7 +2018,9 @@ screens:
           has to say which it is rather than showing an empty frame. **At most `VenueSettings.seating.maxSeatsPerGuestOrder`
           seats per booking** on the guest channel (default 10, bounds 1-50): a `422 seat-limit-exceeded`
           from `createSeatHold` reads *Up to {maxSeats} seats per booking*, and the basket lists each
-          seat (decided 29 September, rev 3 REV3-7). Section zoom happens on the same map (23SEP-16).'
+          seat (decided 29 September, rev 3 REV3-7). Section zoom happens on the same map (23SEP-16).
+          **Sections first** (W2): tap a section to zoom in and see its seats; scroll or pinch out, or
+          *← Whole map*, to return and compare sections, keeping held seats.'
         provenance: minute 2026-08-03 §Ticket Flow Variations by Product Type
       - kind: selectField
         label: Time bar
@@ -1902,6 +2045,15 @@ screens:
           (bottom default, right, left, top) on wide screens; always below the map on narrow screens.'
         operation: getSeatAvailability
         provenance: decided 29 September, rev 3 23SEP-14, REV3-5
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step
+          the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
     - name: actionBar
       slot: rowActions
       components:
@@ -1952,6 +2104,11 @@ screens:
     purpose: Release the seats held for the old performance when the guest switches time on the time bar
       (decided 29 September, rev 3 REV3-6); a guest releases only their own hold
     trigger: onAction
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: performanceId
@@ -1960,6 +2117,8 @@ screens:
       from: WEB-006
     - name: holdId
       from: navigation
+    - name: venueId
+      from: session
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
   wireframe:
@@ -1967,17 +2126,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-007
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (29 September build)
+      verified: '2026-09-29'
       match: exact
       view: Union Arena → 'Flow 1 · Fixed date → zone → seat map' or 'Flow 2 · Choose date & time → seat
         map'; Grand Playhouse → Flow 1 / Flow 2
-      differences: Prototype adds a 3D/2D bowl, seat-view box position (Config 'Seat view box'), time
-        bar to switch performance (releases held seats), date & time pop-up on the map, standing zones
-        sold by quantity, up to 10 seats. Best-available is a separate flow ('Best available (no map)')
-        rather than recommendSeats on this screen. Also reused as a cabana map (Coastal Aqua) and dinner-event
-        table map.
     derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -2104,7 +2258,15 @@ screens:
     on (WEB-016); the basket is kept. With `atPayment` the gate is at WEB-012. Floating basket icon and
     cart side (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`,
     resolved for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
-    entry laid over field by field (decided 29 September, rev 3 CFG-11).'
+    entry laid over field by field (decided 29 September, rev 3 CFG-11).
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.'
   density: compact
   pattern: statusTracker
   patternReason: '`getUpsellSuggestions` reads one record and nothing reads a population — the screen
@@ -2168,6 +2330,15 @@ screens:
         - BundleSummary.appliedByWorkstations
         operation: listCatalogueBundles
         provenance: contract catalogue.yaml GET /catalogue/bundles
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A
+          step the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
     - name: actionBar
       slot: rowActions
       components:
@@ -2213,12 +2384,19 @@ screens:
     purpose: Report what happened to recommended items
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: cartId
       from: session
     - name: bundleId
       from: navigation
+    - name: venueId
+      from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
     status: review
@@ -2458,15 +2636,21 @@ screens:
       - orderId
       provenance: derived — WEB-013 declares entryState.params orderId and WEB-010 holds orderId, so an
         edge into it carries them
-    - to: WEB-011
-      trigger: Enters contact details and answers consent
-      provenance: flow F01 step 5→6, F02 step 3→4, F55 step 1→2
     - to: WEB-016
       trigger: Login / Register
       carries:
       - subjectId
       provenance: derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-010 holds
         subjectId, so an edge into it carries them
+    - to: WEB-012
+      trigger: 'Guest code proved or signed in: straight to payment (details skipped)'
+      provenance: decided 29 September 2026 (P29), W1
+      carries:
+      - orderId
+      - paymentId
+    - to: WEB-011
+      trigger: Answers attendee forms and consent, only where the cart needs them
+      provenance: flow F01 step 5→6, F02 step 3→4, F55 step 1→2
     - to: WEB-030
       trigger: They transfer three tickets
       provenance: flow F55 step 3→4
@@ -2554,6 +2738,15 @@ screens:
           confirmation.'
         operation: getPerformance
         provenance: decided 29 September, rev 3 23SEP-9
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (cart) highlighted. A step
+          the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
     - name: actionBar
       slot: rowActions
       components:
@@ -2756,6 +2949,11 @@ screens:
     contract: resources
     purpose: The countdown of a cabana or spot held on the venue map (`expiresAt`)
     trigger: onInterval
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: cartId
@@ -2769,6 +2967,8 @@ screens:
       optional: true
     - name: holdId
       from: navigation
+    - name: venueId
+      from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -2801,7 +3001,15 @@ screens:
     (WEB-006 pop-up, or WEB-011 for a flow with no date step). Promo code and abandon are declared (`applyCartPromoCode`,
     `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getTenantConfig`
     `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
-    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).'
+    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.'
 - id: WEB-011
   name: Guest Details & Attendee Forms
   module: Cart & Checkout
@@ -2840,6 +3048,9 @@ screens:
     - to: WEB-012
       trigger: Pays
       provenance: flow F01 step 6→7, F02 step 4→5
+    - to: WEB-012
+      trigger: 'Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)'
+      provenance: decided 29 September 2026 (P29), W1
     - to: WEB-010
       trigger: They check out
       provenance: flow F55 step 2→3
@@ -2853,7 +3064,20 @@ screens:
 
     **Rev 3 (decided 29 September).** Booking consent questions not yet answered are asked here (REV3-26).
     The sign-in gate may already have been passed at the Add-ons exit (`signInAt` `afterAddOns`, REV3-3);
-    a guest who signed in there arrives with their details filled.'
+    a guest who signed in there arrives with their details filled.
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.
+
+
+    **29 September (W1).** **Skipped after the guest code, and when signed in**, unless the cart needs
+    attendee forms or unanswered consent questions: no name, email or phone is asked again. The profile
+    is created and completed later (WEB-020).'
   density: compact
   pattern: listDetail
   patternReason: '`listGuestDevices` reads the population and `getWishlist` reads one of them — list,
@@ -2923,6 +3147,15 @@ screens:
           go to `recordConsentAnswers`. Distinct from marketing consent above.'
         operation: getCart
         provenance: decided 29 September, rev 3 REV3-26
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (details) highlighted. A
+          step the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
     - name: contextPanel
       slot: selection
       components:
@@ -3203,6 +3436,11 @@ screens:
     trigger: onAction
     invalidates:
     - getCart
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: deviceId
@@ -3212,6 +3450,8 @@ screens:
     - name: subjectId
       from: session
     - name: cartId
+      from: session
+    - name: venueId
       from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
@@ -3255,6 +3495,7 @@ screens:
     entryFrom:
     - WEB-011
     - WEB-016
+    - WEB-010
     exitTo:
     - WEB-001
     - WEB-010
@@ -3300,7 +3541,19 @@ screens:
 
     **Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowConfig.signInAt` `atPayment` the
     sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and
-    declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).'
+    declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.
+
+
+    **29 September.** W1: a guest who proved the contact with the code arrives here from the cart (WEB-011
+    skipped) and only ticks the T&Cs. M18-15: unticked marketing opt-in.'
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -3340,6 +3593,26 @@ screens:
       - kind: cartPanel
         notes: Order summary stays visible throughout. Never collapsed behind a link
         provenance: carried from the previous definition
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A
+          step the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+      - kind: consentBlock
+        label: Terms and conditions
+        operation: createOrder
+        notes: After the code the guest goes straight to the T&Cs tick and completes (W1).
+        provenance: decided 29 September 2026 (P29), W1
+      - kind: toggle
+        label: Send me offers and news
+        operation: createOrder
+        notes: 'Marketing opt-in beside the T&Cs, **never pre-ticked** (M18-15): `marketingConsents[]`
+          on the order, bound to the verified contact.'
+        provenance: decided 29 September 2026 (P29), M18-15
     - name: actionBar
       slot: rowActions
       components:
@@ -3395,12 +3668,19 @@ screens:
     contract: orders
     purpose: Ask what happened to a payment that did not answer
     trigger: onAction
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: orderId
       from: deepLink
     - name: paymentId
       from: navigation
+    - name: venueId
+      from: session
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
@@ -3485,6 +3765,9 @@ screens:
       - walletAuthorisationId
       - deviceId
     provenance: client-verified
+  x-ticvai-make-or-break: 'M18-15: may a guest-checkout customer be sent marketing on an opt-in taken
+    at checkout (law and the client''s marketing policy)? Until the client confirms, the opt-in is shown
+    unticked and nothing is sent without it.'
 - id: WEB-013
   name: Booking Confirmation
   module: Cart & Checkout
@@ -4056,7 +4339,12 @@ screens:
     **The venue in context is sent** (decided 29 September, rev 3 GAP-B1, per venue): `verifyGuestOtp`,
     `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin` and `createMfaChallenge` take an optional
     `venueId`, the venue the app or booking is in, so the second factor is asked only where that venue
-    has guest two-step verification on.'
+    has guest two-step verification on.
+
+
+    **29 September (W1).** The guest pop-up asks only `guestContactFields` (Email only / + name / + mobile)
+    and the code; after the code nothing is asked again and the guest returns to the cart and on to the
+    T&Cs.'
   density: compact
   pattern: form
   patternReason: '**A sign-in form, not a list.** Four ways in (a one-time code, a password, Apple or
@@ -4078,7 +4366,8 @@ screens:
       - kind: textField
         label: Email or mobile number
         operation: requestGuestOtp
-        notes: One field for both routes below; the same identifier goes to `requestGuestOtp` and to `guestPasswordLogin`.
+        notes: '**Guest checkout asks only the configured fields** (W1): `BookingFlowSettings.guestContactFields`
+          (email, mobile, name).'
         provenance: contract identity.yaml POST /auth/guest/otp
       - kind: primaryButton
         label: Send me a code
@@ -5330,10 +5619,13 @@ screens:
       trigger: My Tickets
       provenance: derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-020 holds
         none of them, so the edge carries nothing and WEB-018 opens cold
-  notes: Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose
+  notes: 'Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose
     derived from the screen name and its operations on 17 August, not from a requirement. Profile and
     Preferences. **Wishlist and device operations removed; profile, consent and email verification added.**
     Deep listed exactly these. **Rewired on the 20 August review.**
+
+
+    **29 September (W1).** *Complete your details* for a profile created by guest checkout.'
   density: compact
   pattern: listDetail
   patternReason: '`listConsentPurposes` reads the population and `getGuestProfile` reads one of them —
@@ -5358,6 +5650,12 @@ screens:
         - ConsentPurposeConfig.expiresAfterMonths
         operation: listConsentPurposes
         provenance: contract marketing-crm.yaml GET /consent-purposes
+      - kind: banner
+        label: Complete your details
+        operation: updateMyProfile
+        notes: 'For a profile created by guest checkout (W1): asks for what the pop-up did not; never
+          blocks.'
+        provenance: decided 29 September 2026 (P29), W1
     - name: contextPanel
       slot: selection
       components:
@@ -11215,7 +11513,13 @@ screens:
     and unavailable spots are greyed. Tapping a free spot calls `createResourceHold` and starts the *Remaining
     time* counter from the hold''s `expiresAt` (8 minutes, extendable to 30 in all, audit R169); Add to
     basket sends `addCartLine` with the spot''s price-band `variantId` and the `resourceHoldId`, e.g.
-    *Cabana B09 · Large cabana · Beach, AED 1,855*. Picking another spot releases the first hold (`relinquishResourceHold`).'
+    *Cabana B09 · Large cabana · Beach, AED 1,855*. Picking another spot releases the first hold (`relinquishResourceHold`).
+
+
+    **29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana:
+    pick on map* (WEB-047) or *Cabana: by size* (capacity) as its booking flow (CMS-103), and the resource
+    selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map
+    back end as F&B and locations.'
   density: compact
   pattern: listDetail
   patternReason: '`getMapResourceAvailability` reads the population of spots and a tap holds one of them
@@ -11440,7 +11744,12 @@ screens:
     {startsAt, endsAt}, `endsAt` being the start plus the length, and `allocateResources` picks the room
     at checkout (26 August minute). Add-ons are lines with `parentLineId`. `422 windowLengthMismatch`,
     `windowRequired` and `windowNotAllowed` are programming errors; `409 windowUnavailable` says the time
-    filled and offers the next free start.'
+    filled and offers the next free start.
+
+
+    **29 September (W9).** Availability is checked against date, start time and length together (`listProductStartTimes`
+    with `variantId` = length); changing any of the three re-checks every room, and a busy room shows
+    *free from*. Starts every 15 minutes where the venue sets `stepMinutes` 15.'
   density: compact
   pattern: multiStepForm
   patternReason: A staged booking — date, start time, length, room type, attendees, add-ons — ending in
@@ -11845,3 +12154,203 @@ screens:
       label: Keep it
       discards: []
     provenance: client-verified
+- id: WEB-050
+  name: Plan Your Visit
+  module: Discovery & Browse
+  requiresModule: ticketing
+  wave: 1
+  capability: AI-35
+  implementation:
+    app: guest-web
+    route: /plan-your-visit
+    component: apps/guest-web/src/routes/PlanYourVisit.tsx
+    status: notStarted
+  navigation:
+    inferred: false
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-010
+    - WEB-001
+    - WEB-004
+    transitions:
+    - to: WEB-010
+      trigger: Book this plan
+      operation: bookVisitPlan
+      carries:
+      - cartId
+      onFailure:
+      - when: an item sold out since the plan was made
+        to: WEB-050
+        note: Names it and offers a swap; the rest of the plan is kept.
+      provenance: 'decided 29 September 2026 (P29), MOB-6; web build: Book this plan goes straight into
+        booking'
+    - to: WEB-004
+      trigger: Opens an item on the plan
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), MOB-6
+    - to: WEB-001
+      trigger: Back to tickets
+      provenance: decided 29 September 2026 (P29), MOB-6
+  notes: '**Added 29 September (P29)**: the 29 September web build has *Plan your visit* in the header,
+    opening the planner full screen, and *Book this plan* goes straight into booking. The web twin of
+    the Plan tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`,
+    `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`). Block A (29 September
+    re-plan, superseding R187 and GAP-C3). Rules-based; the AI planner chat is app-only for now. Hidden
+    when the venue turns module `visitPlanner` off.'
+  density: compact
+  pattern: multiStepForm
+  patternReason: 'The Visit Planner prototype: six questions, then the plan with Book this plan'
+  purpose: 'Plan a visit on the website: answer six questions, get a day-by-day plan, edit it, and book
+    it in one go.'
+  layout:
+    template: fullscreen
+    regions:
+    - name: progress
+      slot: progress
+      components:
+      - kind: progressIndicator
+        label: Plan your visit · n of 6
+        notes: Who, heights (skipped with no children), days (up to 3), pace, interests, lunch.
+        provenance: decided 29 September 2026 (P29), MOB-6; Visit Planner prototype
+    - name: fields
+      slot: fields
+      components:
+      - kind: numberField
+        label: Adults and children
+        notes: Adults 1-8 (12+), children 0-8 (3-11).
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: selectField
+        label: How tall are the children?
+        operation: listProducts
+        notes: Per child; rides over the limit are left out (`ProductEligibilityRule`).
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: multiSelect
+        label: Which days are you visiting?
+        notes: Up to three.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: selectField
+        label: How busy should each day be?
+        notes: Packed, Balanced or Relaxed.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: multiSelect
+        label: What are you most interested in?
+        operation: listProducts
+        notes: Interest tags of the venue.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: selectField
+        label: What would you like for lunch?
+        notes: Cuisines of the outlets.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: primaryButton
+        label: Make my plan
+        operation: generateVisitPlan
+        notes: Runs the rules planner.
+        provenance: decided 29 September 2026 (P29), MOB-6
+    - name: review
+      slot: review
+      components:
+      - kind: timeline
+        label: Your plan
+        bindsTo: VisitPlanItem
+        operation: getVisitPlan
+        notes: Day tabs; arrival, timed items and lunch.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Swap / + Add something
+        operation: listVisitPlanAlternatives
+        notes: Candidates that suit everyone in the group.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Remove / Undo changes
+        operation: updateVisitPlan
+        notes: Each change is a new version.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: toggle
+        label: Add Fast Track
+        operation: updateVisitPlan
+        notes: Per guest, with the queuing time saved.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: detailPanel
+        label: Estimated total
+        operation: getVisitPlan
+        notes: Estimate for the group; confirmed in booking.
+        provenance: decided 29 September 2026 (P29), MOB-6
+    - name: submit
+      slot: submit
+      components:
+      - kind: primaryButton
+        label: Book this plan
+        operation: bookVisitPlan
+        notes: Cart lines from the plan; opens the cart.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Change answers
+        notes: Back to the questions.
+        provenance: decided 29 September 2026 (P29), MOB-6
+  states:
+    loading: The plan builds in place; the answers stay on screen.
+    error: Could not build or load the plan. Names what failed; the answers are kept.
+    emptyFirstRun: 'No plan yet: the first question is shown.'
+    emptyNoResults: 'Nothing suits the whole group on that day: says which answer ruled everything out
+      and offers to change it.'
+    emptyNoAccess: A guest holds no permission. Anyone can build a plan; signing in is asked only to save
+      it, and booking follows the cart's own sign-in gate.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
+  apis:
+  - operationId: listProducts
+    contract: catalogue
+    purpose: Interests and height limits of what the planner may include
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: generateVisitPlan
+    contract: venue-map
+    purpose: Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: getVisitPlan
+    contract: venue-map
+    purpose: 'The plan: days, timed items and add-on suggestions, at its current version'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: updateVisitPlan
+    contract: venue-map
+    purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: listVisitPlanAlternatives
+    contract: venue-map
+    purpose: Swap candidates for one item that suit everyone in the party
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: bookVisitPlan
+    contract: venue-map
+    purpose: 'Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart'
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: planId
+      from: deepLink
+      optional: true
+    - name: itemId
+      from: navigation
+      optional: true
+    coldEntry: Starts at the first question; a saved-plan link opens the plan, or says it has passed and
+      offers to plan again. `itemId` is the plan item the guest taps Swap on, picked on this screen.
+  wireframe:
+    status: notStarted
+    provenance: client-verified
+    board: wireframes/P01 Guest Web.dc.html#web-050
+    prototype:
+      file: sources/designs/guest-rev3-29-september/TICVAI Visit Planner.dc.html
+      rev: Visit Planner (29 September build)
+      verified: '2026-09-29'
+      match: exact
+      view: 'Header *Plan your visit* (web build), or the Visit Planner file: questions, then Your plan
+        and Book this plan'

@@ -55,9 +55,9 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 526
+  operationCalls: 540
 - service: CatalogueService
-  operationCalls: 393
+  operationCalls: 395
 - service: TenancyService
   operationCalls: 364
 - service: AccessService
@@ -69,15 +69,15 @@ servicesCalled:
 - service: WalletService
   operationCalls: 174
 - service: FnbService
-  operationCalls: 96
+  operationCalls: 97
 - service: InventoryService
-  operationCalls: 94
+  operationCalls: 97
 - service: ReportingService
   operationCalls: 91
 - service: AiService
   operationCalls: 83
 - service: PlatformService
-  operationCalls: 77
+  operationCalls: 81
 - service: LedgerService
   operationCalls: 75
 - service: IdentityService
@@ -85,7 +85,7 @@ servicesCalled:
 - service: RetailService
   operationCalls: 18
 - service: WhiteLabelService
-  operationCalls: 12
+  operationCalls: 15
 coverage:
   screens: 1186
   inAFlow: 1101
@@ -331,6 +331,7 @@ screens:
   - createProduct
   - getProduct
   - listAlternativeCodes
+  - listBookingFlows
   - listMenus
   - listMerchandise
   - listProductVariants
@@ -349,6 +350,7 @@ screens:
   offlineState: false
   entryParams:
   - productId<-deepLink
+  - venueId<-session
   goesTo:
   - BO-008
   - BO-009
@@ -374,6 +376,7 @@ screens:
   - assessProductChange
   - cloneProduct
   - getProduct
+  - listBookingFlows
   - listConsentQuestions
   - listProductVariants
   - listProductVersions
@@ -515,6 +518,7 @@ screens:
   - getLatestBundle
   - listCatalogueBundles
   - listCommercialCampaigns
+  - listMenus
   - publishBundle
   - reportBundleApplied
   - setComboSlots
@@ -2415,11 +2419,15 @@ screens:
   - cancelWorkOrder
   - closeWorkOrder
   - completeWorkOrder
+  - createVendorServiceRequest
   - createWorkOrder
   - getWorkOrder
+  - listVendorServiceRequests
   - listWorkOrders
   - pauseWorkOrder
   - rejectWorkOrder
+  - suggestWorkOrderAssignee
+  - updateVendorServiceRequest
   - updateWorkOrder
   states:
   - emptyFirstRun
@@ -2430,6 +2438,7 @@ screens:
   offlineState: false
   entryParams:
   - workOrderId<-deepLink
+  - vendorServiceRequestId<-navigation
   goesTo:
   - BO-030
   - BO-031
@@ -3169,7 +3178,10 @@ screens:
   operations:
   - getVenueMap
   - getVenueMapGraph
+  - listCatalogueBundles
+  - listProducts
   - publishVenueMap
+  - searchMedia
   - setPathClosure
   - setPlacedResource
   - setVenuePoint
@@ -3948,6 +3960,7 @@ screens:
   wave: 2
   density: compact
   operations:
+  - listBookingFlows
   - listProductCategories
   - listSaleBoards
   - requestSuggestion
@@ -15042,9 +15055,15 @@ screens:
   density: compact
   operations:
   - attachWorkOrderEvidence
+  - createVendorServiceRequest
   - createWorkOrder
   - getWorkOrder
+  - getWorkOrderPriorityPolicy
+  - listVendorServiceRequests
   - listWorkOrders
+  - setWorkOrderPriorityPolicy
+  - suggestWorkOrderAssignee
+  - updateVendorServiceRequest
   - updateWorkOrder
   states:
   - emptyFirstRun
@@ -15055,6 +15074,7 @@ screens:
   offlineState: false
   entryParams:
   - workOrderId<-navigation
+  - vendorServiceRequestId<-navigation
   goesTo:
   - BO-574
   boardFrames: null
@@ -15093,7 +15113,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createStockReservation
+  - listStockReservations
   - recordWorkOrderParts
+  - releaseStockReservation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15103,6 +15126,7 @@ screens:
   offlineState: false
   entryParams:
   - workOrderId<-navigation
+  - stockReservationId<-navigation
   goesTo:
   - BO-574
   boardFrames: null
@@ -21730,6 +21754,7 @@ screens:
   - cloneResource
   - createResource
   - getResource
+  - getResourceAvailability
   - getResourceQualifications
   - setResourceLifecycleState
   - updateResource
@@ -21958,8 +21983,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getResourceAvailability
   - getResourceSchedule
   - setResourceSchedule
+  - updateResource
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -26994,6 +27021,8 @@ screens:
   operations:
   - createApiClient
   - listApiClients
+  - listApiScopes
+  - listProductionAccessRequests
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -29488,6 +29517,8 @@ screens:
   operations:
   - createApiClient
   - listAccessPolicies
+  - listApiScopes
+  - listProductionAccessRequests
   states:
   - emptyFirstRun
   - emptyNoAccess

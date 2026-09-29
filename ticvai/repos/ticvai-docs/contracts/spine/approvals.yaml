@@ -345,6 +345,8 @@ paths:
         - "P08 BO-085 Approval Request"
         - "P08 BO-368 AI Decision Support"
         - "P09 ADM-337 Routing Simulator & Conflict Detection"
+        - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
+        - "P09 ADM-532 Conditional Approval & Approval Conditions"
       x-ticvai-audience:
       - staff
       summary: Does this need approval, and from whom
@@ -587,6 +589,7 @@ paths:
         - "P08 BO-370 Escalated Approval Center"
         - "P08 BO-393 AI SLA & Escalation Advisor"
         - "P08 BO-641 Escalation & Exception Management"
+        - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
       x-ticvai-audience:
       - staff
       summary: Move it up a level
@@ -690,6 +693,8 @@ paths:
         - "P09 ADM-242 Approval Matrix & Multi-Level Approval Configuration"
         - "P09 ADM-329 Approval Matrix Command Center"
         - "P09 ADM-338 AI Routing Advisor & Matrix Optimization"
+        - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
+        - "P09 ADM-532 Conditional Approval & Approval Conditions"
       x-ticvai-audience:
       - staff
       summary: What requires approval here
@@ -743,6 +748,7 @@ paths:
         - "P09 ADM-333 Venue & Tenant Approval Matrix"
         - "P09 ADM-334 Value & Threshold Routing"
         - "P09 ADM-335 Risk-Based & Conditional Routing"
+        - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
       x-ticvai-audience:
       - staff
       summary: Configure what requires approval
@@ -845,6 +851,7 @@ paths:
         - "P08 BO-385 Delegation Management"
         - "P08 BO-386 Temporary Delegation & Availability Calendar"
         - "P09 ADM-243 Roles, Authority, Delegation & Approval Limits"
+        - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
       x-ticvai-audience:
       - staff
       summary: Who is standing in for whom
@@ -871,6 +878,7 @@ paths:
         - "P08 BO-087 Approval Delegations"
         - "P08 BO-385 Delegation Management"
         - "P09 ADM-243 Roles, Authority, Delegation & Approval Limits"
+        - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
       x-ticvai-audience:
       - staff
       summary: Delegate approval authority
@@ -2673,6 +2681,7 @@ paths:
         - "P08 BO-389 Reminder & Breach Notification Rules"
         - "P08 BO-390 Escalation Policy Builder"
         - "P08 BO-809 SLA Policy Configuration"
+        - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
       summary: How long a decision may take, and what happens when it does not
       description: 'Approvals boards 5.5 and 5.6. **`listSlaEscalationReminder` could read them and
         nothing set them.** The policy is the pair: a target, and the reminder and breach behaviour that
@@ -3328,6 +3337,7 @@ paths:
         pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: recordExternalApprovalDecision
+      x-ticvai-api-scope: core.write
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (decision callback into the approval); our build
         plan; shape follows decideApprovalRequest'
       x-ticvai-no-screen: machine-to-machine callback from a registered external workflow system; people

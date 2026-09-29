@@ -1,5 +1,5 @@
 id: LLD-venue-map
-title: venue-map — 15 operations
+title: venue-map — 20 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -38,6 +38,31 @@ operations:
   - cache:idempotency
   - venuemap.path
   - venuemap.point
+- operation: bookVisitPlan
+  verb: POST
+  path: /visit-plans/{planId}/booking
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.channel_capacity
+  - catalogue.performance
+  - catalogue.product
+  - catalogue.variant
+  - orders.cart
+  - orders.cart_line
+  - promotions.bundle
+  - venuemap.visit_plan
+  - venuemap.visit_plan_item
+  writes:
+  - cache:idempotency
+  - catalogue.inventory_hold
+  - orders.cart
+  - orders.cart_line
+  - venuemap.visit_plan
 - operation: createVenueMap
   verb: POST
   path: /venue-maps
@@ -54,6 +79,30 @@ operations:
   writes:
   - cache:idempotency
   - venuemap.map
+- operation: generateVisitPlan
+  verb: POST
+  path: /visit-plans
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.performance
+  - catalogue.product
+  - catalogue.product_eligibility_rule
+  - catalogue.variant
+  - queue.reading
+  - venuemap.map
+  - venuemap.path
+  - venuemap.point
+  - venuemap.visit_plan
+  - venuemap.visit_plan_item
+  writes:
+  - cache:idempotency
+  - venuemap.visit_plan
+  - venuemap.visit_plan_item
 - operation: getVenueMap
   verb: GET
   path: /venue-maps/{mapId}
@@ -111,6 +160,18 @@ operations:
   - venuemap.map
   - venuemap.point
   writes: []
+- operation: getVisitPlan
+  verb: GET
+  path: /visit-plans/{planId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - venuemap.visit_plan
+  - venuemap.visit_plan_item
+  writes: []
 - operation: importVenueGeometry
   verb: POST
   path: /venue-maps/{mapId}/import
@@ -152,6 +213,24 @@ operations:
   offline: false
   reads:
   - venuemap.map
+  writes: []
+- operation: listVisitPlanAlternatives
+  verb: GET
+  path: /visit-plans/{planId}/items/{itemId}/alternatives
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - catalogue.performance
+  - catalogue.product
+  - catalogue.product_eligibility_rule
+  - queue.reading
+  - venuemap.path
+  - venuemap.point
+  - venuemap.visit_plan
+  - venuemap.visit_plan_item
   writes: []
 - operation: publishVenueMap
   verb: POST
@@ -211,14 +290,37 @@ operations:
   offline: false
   reads:
   - access.access_point
+  - assets.media_asset
   - cache:idempotency
   - catalogue.product
   - platform.outlet
+  - promotions.bundle
   - venuemap.map
   - venuemap.point
   writes:
   - cache:idempotency
   - venuemap.point
+- operation: updateVisitPlan
+  verb: PUT
+  path: /visit-plans/{planId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.performance
+  - catalogue.product_eligibility_rule
+  - queue.reading
+  - venuemap.path
+  - venuemap.point
+  - venuemap.visit_plan
+  - venuemap.visit_plan_item
+  writes:
+  - cache:idempotency
+  - venuemap.visit_plan
+  - venuemap.visit_plan_item
 - operation: validateVenueMapGraph
   verb: POST
   path: /venue-maps/{mapId}/validate-graph

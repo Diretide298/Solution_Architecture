@@ -4130,6 +4130,29 @@ screens:
         label: Verify work order
         operation: verifyWorkOrder
         provenance: contract maintenance.yaml POST /work-orders/{workOrderId}/verify
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: dataTable
+        label: Parts reserved for this task
+        bindsTo: InventoryStockReservation
+        columns:
+        - InventoryStockReservation.itemId
+        - InventoryStockReservation.quantity
+        - InventoryStockReservation.status
+        operation: listStockReservations
+        notes: '**Reserved in the general inventory** (decided 17 September, M17-02), `sourceType` workOrder.
+          *Record work order parts* issues from the reservation first. Needs signal: stock depletes in
+          real time, so the reserve action is hidden offline.'
+        provenance: contract inventory.yaml GET /stock-reservations
+      - kind: secondaryButton
+        label: Reserve parts
+        operation: createStockReservation
+        provenance: contract inventory.yaml POST /stock-reservations
+      - kind: secondaryButton
+        label: Release reserved parts
+        operation: releaseStockReservation
+        provenance: contract inventory.yaml POST /stock-reservations/{stockReservationId}/release
   overlays:
   - id: confirmCancelWorkOrder
     component: confirmDialog
@@ -4294,6 +4317,25 @@ screens:
       to support with the wrong question.
     offline: Editable offline. Findings and photos queue
   apis:
+  - operationId: listStockReservations
+    contract: inventory
+    purpose: Parts reserved for the task (M17-02)
+    trigger: onAction
+    provenance: decided 17 September, M17-02 (P29)
+  - operationId: createStockReservation
+    contract: inventory
+    purpose: Reserve parts for the task (M17-02)
+    trigger: onAction
+    provenance: decided 17 September, M17-02 (P29)
+    invalidates:
+    - listStockReservations
+  - operationId: releaseStockReservation
+    contract: inventory
+    purpose: Give reserved parts back (M17-02)
+    trigger: onAction
+    provenance: decided 17 September, M17-02 (P29)
+    invalidates:
+    - listStockReservations
   - operationId: getWorkOrder
     contract: maintenance
     purpose: Read a work order
@@ -4384,6 +4426,8 @@ screens:
     params:
     - name: workOrderId
       from: deepLink
+    - name: stockReservationId
+      from: navigation
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -12623,6 +12667,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: listTableReservations
+        notes: Reservations by hour; agenda view on the handheld. Day, week, month and agenda views; the
+          day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: textField
         label: Outlet id
         operation: listTableReservations

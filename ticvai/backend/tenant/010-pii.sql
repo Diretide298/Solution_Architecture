@@ -3,8 +3,7 @@
 
 -- The IP address and user agent a cookie decision was made from, kept only where the published
 -- banner design has record_ip_address on (ADR-0023). Held in pii and pointed at the decision,
--- never beside it, so the consent log can be read and reported without reading personal data.
--- Reached by: 0 operations read it and 1 write it.
+-- never beside it, so the consent log can be read and reported without reading personal data
 CREATE TABLE IF NOT EXISTS pii.consent_identifier (
     id                                uuid PRIMARY KEY,
     device_consent_id                 uuid NOT NULL,

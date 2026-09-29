@@ -96,6 +96,9 @@ paths:
       operationId: createCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       summary: Start a cart
@@ -140,6 +143,8 @@ paths:
                 locale:
                   type: string
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '201':
           headers:
             X-Consistency-Token:
@@ -155,6 +160,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-019 Order History"
         - "P02 GST-019 Order History"
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       summary: The orders this guest placed
       description: '**Raised in review 24 August** against `GST-019` and `WEB-019`. `listOrders` was on
         both screens and it is the staff-scoped one — a guest reading their own history through an operation
@@ -175,6 +183,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       - name: since
         in: query
         required: false
@@ -266,6 +275,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -274,6 +284,8 @@ paths:
             schema:
               $ref: '#/components/schemas/FraudRuleSet'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -456,6 +468,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -464,6 +477,8 @@ paths:
             schema:
               $ref: '#/components/schemas/DepositPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -491,6 +506,9 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
         - "P08 BO-026 Group Bookings"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: A group, its leader and its name-capture duty
       description: 'BL-028. **`orders.group_booking` had ten columns and nothing read it** — a table built
         and never surfaced.
@@ -545,6 +563,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -553,6 +572,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateGroupBookingRequest'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -586,6 +607,9 @@ paths:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
         - "P09 ADM-593 Payment Link Distribution & Customer Journey Manager\t74"
+      security:
+      - guestAuth: []
+      - {}
       summary: What a guest holding a link is being asked to pay for
       description: 'BL-072. **The operation the link needed and did not have.** `createPaymentLink` was
         contracted and nothing could open one.
@@ -662,6 +686,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
+      security:
+      - guestAuth: []
+      - {}
       summary: Pay for a booking taken at a till
       description: 'BL-072. **Payment against the link, by somebody with no account.**
 
@@ -707,6 +734,8 @@ paths:
 
                     '
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
           headers:
             X-Consistency-Token:
@@ -802,6 +831,9 @@ paths:
         pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: convertToTermProduct
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Turn a visit into a membership or season pass
       description: 'BL-031. **Not a line exchange, because the price treatment differs.** An exchange
         swaps one product for another at a price difference; a conversion **credits what the guest paid
@@ -1083,6 +1115,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-072 Share & Group Booking"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Let somebody else use this, without giving it away
       description: 'BL-014. **Transfer is contracted and sharing is not, and they are different acts.**
         A transfer changes the holder; a share lets a second person present the same entitlement while
@@ -1159,6 +1194,9 @@ paths:
         format: uuid
     post:
       operationId: revokeEntitlementShare
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Take back a share
       description: '**The other half of `shareEntitlement`.** Its description promised *"the owner can
         revoke"* and no operation did, so a share could only end by expiring.
@@ -1202,6 +1240,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-018 Add to Calendar / Reminders"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Generate an Apple or Google wallet pass
       description: 'BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF is
         that it updates — a changed gate, a cancelled performance, a time that moved.
@@ -1358,6 +1399,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1366,6 +1408,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ResaleFeePolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1381,6 +1425,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-067 Refunds & Resale"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: List an entitlement for resale
       description: 'BL-060. **A resale is a transfer with money attached, and the venue stays in the middle**
         — **the virtual ticket ID is kept and only the owner and the media change** (decided MoM 1 Sep
@@ -1451,6 +1498,9 @@ paths:
         - "P09 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
         - "P09 ADM-654 Membership & Pass Upgrade Engine"
         - "P09 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: What an upgrade costs, pro-rata
       description: 'BL-092. **`proRataListPrice` splits a bundle''s discount across components and `prorate`
         on a subscription is time-based against a plan** — neither computes the price of moving a ticket
@@ -1660,6 +1710,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1668,6 +1719,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TicketTemplateRequest'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1910,6 +1963,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1918,6 +1972,8 @@ paths:
             schema:
               $ref: '#/components/schemas/SetPaymentProviderRequest'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1933,6 +1989,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: A guest's saved payment methods
       description: '**Masked, always.** The last four digits and the brand — enough to choose between
         two saved cards and not enough to use one.
@@ -1971,6 +2030,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Save a payment method for future use
       description: 'BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-click
         checkout and payment links all wait on this, and none could be designed until it existed.
@@ -2244,6 +2306,18 @@ paths:
       operationId: authoriseStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
+      x-ticvai-note: >-
+        **One wallet debit path** (system-design review SD-027, 29 September). For a platform wallet this is a
+        reference to a WalletService hold: authorising calls `wallet.holdWalletFunds` (guarded decrement of
+        `wallet.balance.available` under a row lock) and capturing calls `wallet.captureWalletHold`, each writing
+        a `wallet.wallet_transaction` with its `walletId` in the same transaction. The order service never
+        writes a wallet balance. An external stored-value card (`StoredValueKind`) keeps its provider path.
+      x-ticvai-calls:
+      - wallet.holdWalletFunds
+      - wallet.captureWalletHold
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Hold a balance on any stored-value instrument
       description: 'CF-126. **`authoriseWalletSpend` did this for the retail wallet and for nothing else**,
         so a guest with 200 game credits starting a play the machine then failed had no held balance —
@@ -2329,6 +2403,19 @@ paths:
       operationId: captureStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
+      x-ticvai-note: >-
+        **One wallet debit path** (system-design review SD-027, 29 September). For a platform wallet this is a
+        reference to a WalletService hold: authorising calls `wallet.holdWalletFunds` (guarded decrement of
+        `wallet.balance.available` under a row lock) and capturing calls `wallet.captureWalletHold`, each writing
+        a `wallet.wallet_transaction` with its `walletId` in the same transaction. The order service never
+        writes a wallet balance. An external stored-value card (`StoredValueKind`) keeps its provider path.
+      x-ticvai-calls:
+      - wallet.holdWalletFunds
+      - wallet.captureWalletHold
+      security:
+      - apiKeyAuth: []
+      - serviceAuth: []
+      - bearerAuth: []
       summary: Take some or all of a held balance
       description: 'Partial capture is the normal case, not the exception — **a tab authorised at 200
         and settled at 140**, or an arcade play that cost less than the hold.
@@ -2403,6 +2490,10 @@ paths:
       operationId: relinquishStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
+      security:
+      - apiKeyAuth: []
+      - serviceAuth: []
+      - bearerAuth: []
       summary: Give a hold back
       description: 'The play failed, the guest left, the tab closed short. **Released holds return immediately**
         — and expiry releases automatically, because a hold nobody releases is a guest whose balance is
@@ -2454,10 +2545,18 @@ paths:
         - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
-        - "P02 GST-053 Build Your Own Itinerary"
+        - "P02 GST-053 Your Plan"
         - "P04 POS-010 Add to Existing Ticket"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.read
+      x-ticvai-latency-budget-ms: 200
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       - partner
@@ -2477,6 +2576,8 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
           description: The cart
           content:
@@ -2497,6 +2598,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       summary: Empty it deliberately
@@ -2560,7 +2664,6 @@ paths:
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-048 Upsell / Cross-Sell"
         - "P02 GST-050 Resource Booking – Cabana"
-        - "P02 GST-053 Build Your Own Itinerary"
         - "P02 GST-056 Bundle Package"
         - "P02 GST-070 Reserve a Table"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
@@ -2574,6 +2677,23 @@ paths:
         - "P05 KSK-006 Review"
         - "P05 KSK-017 Shop"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.write
+      x-ticvai-note: >-
+        **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
+        29 September). The order service takes the cart's hold with `catalogue.acquireInventoryHold`
+        (`holderKind: cart`, the cart's id), changes it with `renewInventoryHold`, and gives it back with
+        `relinquishInventoryHold`; the guarded decrement and the row lock live there (ADR-0037). The hold
+        converts to sold units only when the order is paid (`catalogue.convertInventoryHold`, called by
+        `createPayment` or `capturePayment` in the order transaction).
+      x-ticvai-calls:
+      - catalogue.acquireInventoryHold
+      - catalogue.renewInventoryHold
+      - catalogue.relinquishInventoryHold
+      x-ticvai-latency-budget-ms: 400
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       - partner
@@ -2658,6 +2778,8 @@ paths:
             schema:
               $ref: '#/components/schemas/AddCartLineRequest'
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
           headers:
             X-Consistency-Token:
@@ -2714,6 +2836,23 @@ paths:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.write
+      x-ticvai-note: >-
+        **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
+        29 September). The order service takes the cart's hold with `catalogue.acquireInventoryHold`
+        (`holderKind: cart`, the cart's id), changes it with `renewInventoryHold`, and gives it back with
+        `relinquishInventoryHold`; the guarded decrement and the row lock live there (ADR-0037). The hold
+        converts to sold units only when the order is paid (`catalogue.convertInventoryHold`, called by
+        `createPayment` or `capturePayment` in the order transaction).
+      x-ticvai-calls:
+      - catalogue.acquireInventoryHold
+      - catalogue.renewInventoryHold
+      - catalogue.relinquishInventoryHold
+      x-ticvai-latency-budget-ms: 400
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       - partner
@@ -2733,6 +2872,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2748,6 +2888,10 @@ paths:
                   minimum: 0
                   description: The new quantity. 0 removes the line (audit R123 (1)).
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
           headers:
             X-Consistency-Token:
@@ -2769,6 +2913,23 @@ paths:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.write
+      x-ticvai-note: >-
+        **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
+        29 September). The order service takes the cart's hold with `catalogue.acquireInventoryHold`
+        (`holderKind: cart`, the cart's id), changes it with `renewInventoryHold`, and gives it back with
+        `relinquishInventoryHold`; the guarded decrement and the row lock live there (ADR-0037). The hold
+        converts to sold units only when the order is paid (`catalogue.convertInventoryHold`, called by
+        `createPayment` or `capturePayment` in the order transaction).
+      x-ticvai-calls:
+      - catalogue.acquireInventoryHold
+      - catalogue.renewInventoryHold
+      - catalogue.relinquishInventoryHold
+      x-ticvai-latency-budget-ms: 400
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       - partner
@@ -2805,6 +2966,21 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
+      x-ticvai-note: >-
+        **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
+        29 September). The order service takes the cart's hold with `catalogue.acquireInventoryHold`
+        (`holderKind: cart`, the cart's id), changes it with `renewInventoryHold`, and gives it back with
+        `relinquishInventoryHold`; the guarded decrement and the row lock live there (ADR-0037). The hold
+        converts to sold units only when the order is paid (`catalogue.convertInventoryHold`, called by
+        `createPayment` or `capturePayment` in the order transaction).
+      x-ticvai-calls:
+      - catalogue.acquireInventoryHold
+      - catalogue.renewInventoryHold
+      - catalogue.relinquishInventoryHold
+      x-ticvai-latency-budget-ms: 400
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       summary: Give the guest more time
@@ -2829,6 +3005,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
           headers:
             X-Consistency-Token:
@@ -2858,6 +3036,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-041 Checkout Entry"
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       summary: Attach an anonymous cart to a guest
@@ -2879,6 +3060,8 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
           headers:
             X-Consistency-Token:
@@ -2910,6 +3093,28 @@ paths:
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.write
+      x-ticvai-note: >-
+        **The sale path end to end** (system-design review SD-023 and SD-026, 29 September). Checkout keeps the
+        cart's holds (they now name the order) and writes the order `pending` with an `order.created` outbox row.
+        Nothing is sold yet: the units stay `leased`. **Checkout checks every line's hold is still `active`**
+        and re-acquires one that lapsed (`catalogue.acquireInventoryHold`); a line whose units are gone is refused
+        and the cart kept. An order that is fully paid at checkout (zero to pay, or a voucher covering it)
+        converts its holds here with `catalogue.convertInventoryHold`. When `createPayment` (or `capturePayment`, or the provider
+        webhook `payments.receivePaymentProviderWebhook`) takes the order to `paid`, that one transaction converts
+        every hold (`catalogue.convertInventoryHold`, idempotent on the order id), writes the cash-receipt posting,
+        and writes `order.paid` to the outbox. AccessService issues the tickets from `order.paid`
+        (`access.issueOrderEntitlements`); `entitlement.issued` for every line completes the order.
+      x-ticvai-emits:
+      - order.created
+      x-ticvai-calls:
+      - catalogue.acquireInventoryHold
+      - catalogue.convertInventoryHold
+      x-ticvai-latency-budget-ms: 400
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       - partner
@@ -3006,6 +3211,41 @@ paths:
                   description: The guest the order is for. A guest caller may name only themselves
                     (`guestAuth` never widens to another subject); omitted, the cart's own `subjectId`
                     is used.
+                marketingConsents:
+                  type: array
+                  description: '**Marketing opt-ins given at checkout** (29 September, M18-15). Shown unticked beside
+                    the terms; one entry per channel and purpose the guest ticked. Bound to the new order and to the
+                    verified contact (ADR-0045), recorded as consent records by marketing (`recordCheckoutConsents`, the
+                    `order.created` consumer, source `checkout`), and attached to the profile when the contact matches one. Omitted or empty, no marketing consent is recorded: never inferred
+                    from the purchase.'
+                  x-ticvai-make-or-break: 'M18-15: whether a guest-checkout customer''s opt-in, given against a verified
+                    contact without an account, is sufficient marketing consent under PDPL for the venue. No precedent
+                    confirmed; the client decides.'
+                  items:
+                    type: object
+                    required:
+                    - channel
+                    - purpose
+                    - granted
+                    properties:
+                      channel:
+                        type: string
+                        enum:
+                        - email
+                        - sms
+                        - whatsapp
+                        - push
+                      purpose:
+                        type: string
+                        maxLength: 60
+                        description: The consent purpose code (marketing ConsentPurpose), for example `marketing`.
+                      granted:
+                        type: boolean
+                        description: True only when the guest ticked it. Never pre-ticked.
+                      noticeVersion:
+                        type: string
+                        maxLength: 40
+                        description: The version of the consent notice shown.
                 attendees:
                   type: array
                   description: The named holder for each cart line that needs one. Becomes
@@ -3023,6 +3263,8 @@ paths:
                       holderName:
                         type: string
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '201':
           headers:
             X-Consistency-Token:
@@ -3342,6 +3584,10 @@ paths:
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
         - "P16 ANL-009 AI Assistant & Action Center"
+      x-ticvai-api-scope: ticketing.read
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3435,6 +3681,11 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.write
+      x-ticvai-latency-budget-ms: 400
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3556,6 +3807,12 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.read
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -3589,6 +3846,9 @@ paths:
       operationId: getOrderCalendarEvent
       x-ticvai-consumed-by:
         - "P02 GST-018 Add to Calendar / Reminders"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: The visit as a calendar entry
       description: '**`GST-018 Add to Calendar / Reminders` had no calendar operation**, only the order
         and a wallet pass, so the screen named after a calendar could not put anything in one.
@@ -3638,6 +3898,8 @@ paths:
       operationId: getVisitReminder
       x-ticvai-consumed-by:
         - "P02 GST-018 Add to Calendar / Reminders"
+      security:
+      - guestAuth: []
       summary: The guest's reminder for this booking
       description: Returns the reminder, or one with `enabled` false when the guest has never set one.
       tags:
@@ -3663,6 +3925,8 @@ paths:
       operationId: setVisitReminder
       x-ticvai-consumed-by:
         - "P02 GST-018 Add to Calendar / Reminders"
+      security:
+      - guestAuth: []
       summary: Turn a visit reminder on or off
       description: '**The reminders half of `GST-018` had nothing behind it.** A guest can ask to be
         reminded a chosen time before each dated line of the booking, on the channels they pick.
@@ -3683,6 +3947,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -3691,6 +3956,8 @@ paths:
             schema:
               $ref: '#/components/schemas/VisitReminder'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -3728,6 +3995,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -3826,6 +4094,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -3897,6 +4166,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -3971,6 +4241,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -4069,6 +4340,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -4117,6 +4389,7 @@ paths:
         - "P09 ADM-616 Payment Adjustment & Financial Correction Manager\t123"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -4462,6 +4735,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4470,6 +4744,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RefundPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -4509,6 +4785,44 @@ paths:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
         - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-api-scope: ticketing.write
+      x-ticvai-note: >-
+        **Order, payment, ticket: the saga** (system-design review SD-026, 29 September). When this payment
+        takes the order to `paid`, the same transaction (1) converts each line's inventory hold with
+        `catalogue.convertInventoryHold` (SD-023; a hold refused `409 hold-not-active` because it lapsed is
+        re-acquired with `catalogue.acquireInventoryHold` before the payment is taken, and the payment is refused
+        if the units are gone, so nothing is sold against a hold the order does not hold), (2) writes the **cash-receipt entry only** to the ledger
+        (Dr the tender's received account, Cr the guest-order clearing account, from `finance.setAccountMappings`),
+        and (3) writes `payment.captured` and `order.paid` to `platform.outbox`. **Revenue and tax are posted once,
+        by LedgerService from `order.paid`** (`finance.postOrderRevenue`, idempotent on the order id), which clears
+        the clearing account; this operation never posts revenue. **This operation never issues tickets**:
+        AccessService owns `access.entitlement` and issues from `order.paid` (`access.issueOrderEntitlements`,
+        idempotent on order id + line id). A dead-lettered `order.paid` pages (the guest paid and holds nothing)
+        and is replayed; it is never compensated by refunding automatically.
+        
+        **Provider integration** (SD-034). A card-not-present payment goes through the provider adapter
+        (authorise, capture, refund, void, inquire, parseWebhook; Stripe and Network International). The idempotency
+        key sent to the provider is this payment's `id`, stored as `providerIdempotencyKey`; the provider's own id is
+        `providerReference`. **3-D Secure or a hosted page**: the payment returns `pendingConfirmation` with
+        `nextAction` (`kind: redirect`, the `url` to send the browser to); the provider returns the guest to
+        `returnUrl`, and the outcome arrives by `payments.receivePaymentProviderWebhook` (polling
+        `inquirePaymentStatus` is the fallback, not the path). **At the till, a card payment names `terminalId`**:
+        the server instructs the terminal over its ECR integration, the payment is `pendingConfirmation` with
+        `nextAction.kind: terminal`, and the terminal's result arrives by webhook or inquiry.
+        
+        **A wallet tender debits through WalletService** (SD-027): the payment names the wallet hold
+        (`wallet.holdWalletFunds`) and capture calls `wallet.captureWalletHold`; this operation writes no wallet table.
+      x-ticvai-emits:
+      - payment.captured
+      - order.paid
+      x-ticvai-calls:
+      - catalogue.convertInventoryHold
+      - catalogue.acquireInventoryHold
+      - wallet.captureWalletHold
+      x-ticvai-latency-budget-ms: 8000
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -4554,6 +4868,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CreatePaymentRequest'
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '201':
           headers:
             X-Consistency-Token:
@@ -4598,6 +4914,10 @@ paths:
         - "P09 ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79"
         - "P09 ADM-615 Refund Processing, Provider Status & Recovery Center\t122"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-api-scope: ticketing.write
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -4655,6 +4975,7 @@ paths:
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -4738,6 +5059,40 @@ paths:
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-api-scope: ticketing.write
+      x-ticvai-note: >-
+        **Order, payment, ticket: the saga** (system-design review SD-026, 29 September). When this payment
+        takes the order to `paid`, the same transaction (1) converts each line's inventory hold with
+        `catalogue.convertInventoryHold` (SD-023; a hold refused `409 hold-not-active` because it lapsed is
+        re-acquired with `catalogue.acquireInventoryHold` before the payment is taken, and the payment is refused
+        if the units are gone, so nothing is sold against a hold the order does not hold), (2) writes the **cash-receipt entry only** to the ledger
+        (Dr the tender's received account, Cr the guest-order clearing account, from `finance.setAccountMappings`),
+        and (3) writes `payment.captured` and `order.paid` to `platform.outbox`. **Revenue and tax are posted once,
+        by LedgerService from `order.paid`** (`finance.postOrderRevenue`, idempotent on the order id), which clears
+        the clearing account; this operation never posts revenue. **This operation never issues tickets**:
+        AccessService owns `access.entitlement` and issues from `order.paid` (`access.issueOrderEntitlements`,
+        idempotent on order id + line id). A dead-lettered `order.paid` pages (the guest paid and holds nothing)
+        and is replayed; it is never compensated by refunding automatically.
+        
+        **Provider integration** (SD-034). A card-not-present payment goes through the provider adapter
+        (authorise, capture, refund, void, inquire, parseWebhook; Stripe and Network International). The idempotency
+        key sent to the provider is this payment's `id`, stored as `providerIdempotencyKey`; the provider's own id is
+        `providerReference`. **3-D Secure or a hosted page**: the payment returns `pendingConfirmation` with
+        `nextAction` (`kind: redirect`, the `url` to send the browser to); the provider returns the guest to
+        `returnUrl`, and the outcome arrives by `payments.receivePaymentProviderWebhook` (polling
+        `inquirePaymentStatus` is the fallback, not the path). **At the till, a card payment names `terminalId`**:
+        the server instructs the terminal over its ECR integration, the payment is `pendingConfirmation` with
+        `nextAction.kind: terminal`, and the terminal's result arrives by webhook or inquiry.
+        
+        **A wallet tender debits through WalletService** (SD-027): the payment names the wallet hold
+        (`wallet.holdWalletFunds`) and capture calls `wallet.captureWalletHold`; this operation writes no wallet table.
+      x-ticvai-emits:
+      - payment.captured
+      - order.paid
+      x-ticvai-calls:
+      - catalogue.convertInventoryHold
+      - catalogue.acquireInventoryHold
+      - wallet.captureWalletHold
       x-ticvai-audience:
       - staff
       - partner
@@ -4847,11 +5202,30 @@ paths:
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P08 BO-132 Offline Transaction Monitor & Sync Queue"
+      x-ticvai-note: >-
+        **Ingest, per entry** (system-design review SD-028, 29 September; supersedes "stopping at the first entry").
+        Entries are taken in `sequence` order. For each: validate and re-price; write the order, its lines and
+        payments; post any price variance to the variance account; report consumed units against the till's
+        hold (`catalogue.renewInventoryHold` / `relinquishInventoryHold`); and write `order.paid` to the outbox
+        for a paid order, so tickets and revenue follow the same saga as an online sale. **An entry refused on its
+        merits is quarantined, not blocking**: it is written to `sync.rejection` (with `sync.rejectionRaised` to
+        the outbox), its result is `rejected` with the `rejectionId`, and the batch continues. **An entry that
+        depends on a rejected one** (a void, refund or payment for the same order) is `blockedByRejection` and
+        quarantined with it, so a void is never evaluated before its sale. **Only a transient failure stops the
+        batch** (a database or provider error): `stoppedAtSequence` names it and the till retries from there.
+        A bad sale therefore never halts the till.
+      x-ticvai-emits:
+      - order.paid
+      - sync.rejectionRaised
+      x-ticvai-calls:
+      - catalogue.renewInventoryHold
+      - catalogue.relinquishInventoryHold
       x-ticvai-audience:
       - staff
       summary: Replay orders recorded offline
-      description: 'Ordered batch, processed in `sequence` order, stopping at the first entry that cannot
-        be accepted. A void must never be evaluated before the sale it voids.
+      description: 'Ordered batch, processed in `sequence` order. An entry refused on its merits is
+        quarantined in `sync.rejection` and the batch continues; only a transient failure stops it (SD-028,
+        29 September). A void must never be evaluated before the sale it voids.
 
         Every line is re-priced on ingest. Variances are returned per order and posted to the variance
         account; the client surfaces nothing to the cashier.
@@ -4889,7 +5263,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Batch processed, wholly or up to the first rejection
+          description: Batch processed; entries refused on their merits are quarantined, and only a
+            transient failure stops it (SD-028)
           content:
             application/json:
               schema:
@@ -5046,6 +5421,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -5231,6 +5607,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -5310,6 +5687,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -5413,6 +5791,10 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.write
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -5761,6 +6143,7 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -6032,6 +6415,7 @@ paths:
         - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -6062,6 +6446,7 @@ paths:
         - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -6078,6 +6463,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -6101,6 +6487,8 @@ paths:
                   minLength: 3
                   maxLength: 500
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -6124,6 +6512,7 @@ paths:
         - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -6307,8 +6696,11 @@ paths:
             schema:
               $ref: '#/components/schemas/UpgradeConversionPathBuilderInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -6503,8 +6895,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ProRataResidualValueEntitlementCreditConfigurationInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -7010,6 +7405,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: VM close-out; pack label on BO-266 (Event Organizer); shape follows updateGroupBooking'
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -7018,6 +7414,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupCustomerOrganizationInput'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -7110,8 +7508,11 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupPackageExperienceBuilderInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -7161,8 +7562,11 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupQuotationBuilderProposalGenerationInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -7253,8 +7657,11 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupDiscountExceptionApprovalWorkflowInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -7352,8 +7759,11 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupBooking360HandoverWorkspaceInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -7442,8 +7852,11 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupOperationalPlanningTaskWorkspaceInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -8053,8 +8466,11 @@ paths:
             schema:
               $ref: '#/components/schemas/OrderDetailTransactionWorkspaceInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           description: Order Detail & Transaction Workspace
           content:
@@ -8102,8 +8518,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ReservationHoldPolicyConfigurationInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -8151,8 +8570,11 @@ paths:
             schema:
               $ref: '#/components/schemas/OrderReservationStatusLifecycleConfigurationInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -8256,8 +8678,11 @@ paths:
             schema:
               $ref: '#/components/schemas/CustomerGuestAccountAssignmentInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -8606,8 +9031,11 @@ paths:
             schema:
               $ref: '#/components/schemas/OrderAmendmentWorkspaceInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -8657,8 +9085,11 @@ paths:
             schema:
               $ref: '#/components/schemas/AmendmentEligibilityPolicyRuleBuilderInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -8715,8 +9146,11 @@ paths:
             schema:
               $ref: '#/components/schemas/CancellationPartialCancellationPolicyConfigurationInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -8860,8 +9294,11 @@ paths:
             schema:
               $ref: '#/components/schemas/AfterSalesFinancialSettlementAdjustmentWorkspaceInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           description: After-Sales Financial Settlement & Adjustment Workspace
           content:
@@ -8905,8 +9342,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ApprovalExceptionServiceRecoveryManagementInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -9165,8 +9605,11 @@ paths:
             schema:
               $ref: '#/components/schemas/MultiPaymentSplitTenderPaymentAllocationConfiguratioInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -9740,8 +10183,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ResaleEligibilityRuleConfigurationInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -9985,8 +10431,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ListingApprovalModerationInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -10124,8 +10573,11 @@ paths:
             schema:
               $ref: '#/components/schemas/AiResaleConfigurationMarketplaceRecommendationsInput'
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -11414,6 +11866,11 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
+      x-ticvai-api-scope: ticketing.write
+      security:
+      - guestAuth: []
+      - bearerAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       - partner
@@ -11445,6 +11902,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ApplyCartPromoCodeRequest'
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
           headers:
             X-Consistency-Token:
@@ -11703,6 +12162,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-276 (Manual Entry, CSV/Excel Import, Customer Upload, API); shape follows updateGroupBooking'
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -11711,6 +12171,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ParticipantGuestListInput'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -11770,6 +12232,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-277 (Milestone Payment, Final Balance, Custom Schedule); shape follows updateGroupBooking'
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -11778,6 +12241,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupPaymentScheduleInput'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -11841,6 +12306,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-278 (Individual Ticket, Bulk Ticket, Named Ticket, Quantity-Based Ticket, Zone Allocation, Keep group together, VIP allocation); shape follows updateGroupBooking'
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -11849,6 +12315,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupTicketAllocationInput'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -11909,6 +12377,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-279 (POS Print, Physical Collection); shape follows updateGroupBooking'
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -11917,6 +12386,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GroupTicketFulfillmentInput'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -11963,6 +12434,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-318 (Full Refund, Partial Refund, Percentage Refund, Pro-Rata Refund, Original Value Less Fees, Wallet Credit, Voucher/Credit Note); shape follows setRefundPolicy'
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -11971,6 +12443,8 @@ paths:
             schema:
               $ref: '#/components/schemas/RefundCalculationPolicyInput'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -12301,6 +12775,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: writers pass; MoM 1 Sep 4.14 (admin-configured resale price range; own B2C site, hosted white-label portal, or API); pack Resale screens ADM-280/ADM-282; shape follows setResaleFeePolicy'
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -12309,6 +12784,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ResaleMarketplaceConfig'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -17250,7 +17727,7 @@ components:
           description: '**The partition key** (ADR-0005). Operations write it at `venue` scope.'
     DiningDepositPolicy:
       type: object
-      x-ticvai-persistence: orders.deposit_policy (dining_* columns)
+      x-ticvai-persistence: none — embedded as the dining jsonb column of orders.deposit_policy
       description: >
         **The table deposit hold: a venue option, off unless the venue enables it** (decided 29 September,
         rev 3 REV3-8b, superseding audit R077 (a) "no table deposit in the first release"; the capability
@@ -19986,7 +20463,12 @@ components:
     OrderLine:
       # `eligibilityDeclaration` (from CreateOrderLine) is an array of objects — one per declared guest
       # — so it is the rows of its own child table rather than a column of order_line.
-      x-ticvai-persistence: orders.order_line + orders.order_line_eligibility
+      # `discounts` is the applied discounts, one row each in orders.order_line_discount (SD-008).
+      x-ticvai-persistence: orders.order_line + orders.order_line_eligibility + orders.order_line_discount
+      x-ticvai-retired-columns:
+      - promotion_id
+      - name
+      - reason
       allOf:
       - $ref: '#/components/schemas/CreateOrderLine'
       - type: object
@@ -20032,6 +20514,53 @@ components:
             readOnly: true
             description: How many times this line's tickets were reprinted or resent. `reprintOrder`
               increments it; repeated reprints are the signal worth surfacing.
+          venueId:
+            type: string
+            format: uuid
+            readOnly: true
+            description: The order's venue, copied onto the line (ADR-0044's own example; system-design
+              review SD-008, 29 September) so a line is scoped and partitionable without its order.
+          discounts:
+            type: array
+            readOnly: true
+            description: '**The discounts applied to this line, one row each** (system-design review SD-008,
+              29 September). Until then a discount object was flattened into the line as
+              `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no
+              discount has none.'
+            items:
+              $ref: '#/components/schemas/OrderLineDiscount'
+    OrderLineDiscount:
+      type: object
+      description: One discount applied to one order line (SD-008). Rows of `orders.order_line_discount`.
+      required:
+      - id
+      - amount
+      - source
+      properties:
+        id:
+          type: string
+          format: uuid
+        promotionId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: promotions.promotion
+          description: The promotion that gave it. Null for a manual discount.
+        source:
+          type: string
+          enum:
+          - promotion
+          - promoCode
+          - manual
+          - bundle
+          - member
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        reason:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: A cashier's reason for a manual discount.
     CartStatus:
       type: string
       enum:
@@ -20271,9 +20800,11 @@ components:
           readOnly: true
           description: >
             **The consent questions this cart's products and flow ask** (decided 29 September, rev 3
-            REV3-26), computed on read at their current version as **the union of the booking flow's
-            `white-label.BookingFlowConfig.consentQuestionIds`** (resolved for the cart's venue through
-            `venueOverrides`) **and every line's `catalogue.Product.consentQuestionIds`, each question once**:
+            REV3-26), computed on read at their current version as **the union of each line's published
+            booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow
+            `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's
+            flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's
+            `catalogue.Product.consentQuestionIds`, each question once**:
             the flow's first, in its order, then each product's in cart-line order, a question already
             listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and
             sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or
@@ -21050,6 +21581,23 @@ components:
           type: string
           nullable: true
           description: Cross-cell wallet hold, where the guest's home cell is elsewhere.
+        walletHoldId:
+          type: string
+          format: uuid
+          nullable: true
+          description: For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture
+            debits it; the order service writes no wallet table.
+        returnUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: Where the provider returns the guest after a 3-D Secure challenge or hosted page
+            (SD-034). Required for a card payment from the guest web or app.
+        terminalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The card terminal to instruct, for a card payment at a till (ECR flow, SD-034).
         deviceId:
           type: string
           format: uuid
@@ -21140,6 +21688,41 @@ components:
         providerReference:
           type: string
           nullable: true
+          description: The provider's own id for the charge (Stripe PaymentIntent, NI order reference).
+            What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034).
+        providerIdempotencyKey:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29
+            September). A retried provider call cannot charge twice.
+        terminalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The card terminal a till payment ran on (ECR flow, SD-034).
+        nextAction:
+          type: object
+          nullable: true
+          x-ticvai-persisted: false
+          description: '**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29
+            September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider
+            returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal
+            has been instructed; wait for its result. Null once the payment has an outcome.'
+          properties:
+            kind:
+              type: string
+              enum:
+              - redirect
+              - terminal
+            url:
+              type: string
+              format: uri
+              nullable: true
+            expiresAt:
+              type: string
+              format: date-time
+              nullable: true
         lastInquiryAt:
           type: string
           format: date-time
@@ -21258,8 +21841,9 @@ components:
         stoppedAtSequence:
           type: integer
           nullable: true
-          description: 'First entry that could not be processed. Null when the batch succeeded. The client
-            retries from here and never past it.
+          description: 'First entry that hit a **transient** failure (SD-028, 29 September): a refusal on the
+            merits no longer stops the batch. Null when every entry was accepted, duplicate or quarantined. The
+            client retries from here and never past it.
 
             '
         results:
@@ -21283,6 +21867,10 @@ components:
                 - accepted
                 - duplicate
                 - rejected
+                - blockedByRejection
+                description: '`rejected`: refused on its merits and quarantined in `sync.rejection`; the batch
+                  continues. `blockedByRejection`: depends on a rejected entry for the same order (a void, a
+                  refund, a later payment) and is quarantined with it (SD-028, 29 September).'
               orderNumber:
                 type: string
                 nullable: true
@@ -21293,6 +21881,11 @@ components:
               varianceExceedsThreshold:
                 type: boolean
                 description: True when review is required per the venue's variance threshold.
+              rejectionId:
+                type: string
+                nullable: true
+                description: For a `rejected` or `blockedByRejection` entry, the `sync.rejection` row it was
+                  quarantined into (SD-028). The batch carried on past it.
               error:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
     SyncRejection:
@@ -29689,6 +30282,21 @@ components:
             - transactions
           description: Marketplace navigation
   securitySchemes:
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
     bearerAuth:
       type: http
       scheme: bearer

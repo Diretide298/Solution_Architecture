@@ -22,7 +22,7 @@ platform:
     deviceOwnership: tenant workstation
     networkAssumption: public internet
     releaseCadence: weekly
-  screenCount: 100
+  screenCount: 103
   designReferences:
   - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
     note: The CMS **is** the White Label Builder. These six boards are the design, not a reference for
@@ -93,9 +93,13 @@ screens:
     - CMS-071
     - CMS-081
     - CMS-091
+    - CMS-102
     inferred: true
     isEntryPoint: true
     transitions:
+    - to: CMS-102
+      trigger: Site Builder
+      provenance: authored 29 September, W12 and M24-05 (the step-based builder starts from the workspace)
     - to: CMS-002
       trigger: Brand Kit
       provenance: structural — CMS-001 is P13's home screen and its exits are its launcher
@@ -174,7 +178,12 @@ screens:
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: Land a tenant somewhere that shows what is live and what is not.
+  purpose: Land a tenant somewhere that shows what is live and what is not, and hold step 1 of the Site
+    Builder (venue and modules).
+  purposeNote: '**Step 1 of CMS-102 Site Builder (decided 29 September, W12).** The modules and feature
+    toggles here, including `guestCheckout` (which fields its pop-up asks is `guestContactFields` on CMS-016,
+    W1) and the new `visitPlanner` module, which shows or hides the mobile Plan tab and WEB-050 (MOB-1).
+    A Site Builder card leads new tenants into the seven steps.'
   states:
     loading: The tenant, read by `getTenantAppStatus`.
     error: Could not load. Names which read failed and leaves the tenant untouched.
@@ -769,7 +778,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getBrandIdentity` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Hold the marks every surface needs, at the sizes it needs them.
+  purpose: Hold the marks every surface needs, at the sizes it needs them, and the mobile app's intro
+    video (Site Builder steps 5 and 6).
   states:
     loading: The logo assets, read by `getBrandIdentity`.
     error: Could not load. Names which read failed and leaves the logo assets untouched.
@@ -821,7 +831,12 @@ screens:
         - BrandIdentity.splashBackgroundColour
         - BrandIdentity.showLoadingIndicator
         - BrandIdentity.splashChangeScope
+        - BrandIdentity.introVideoAssetRef
+        - BrandIdentity.introVideoMode
         operation: getBrandIdentity
+        notes: '**Intro video (decided 29 September, MOB-5).** Picked from the media library (CMS-010);
+          plays off, on first launch or on every launch, always with Skip introduction. Streamed, so it
+          needs no app build, unlike the splash and icons.'
         provenance: contract white-label.yaml GET /tenant-config/brand
       - kind: detailPanel
         label: The app icons
@@ -866,7 +881,8 @@ screens:
       `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading
       of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`,
       `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`,
-      `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.'
+      `splashChangeScope`, `introVideoAssetRef` and `introVideoMode` (off, first launch or every launch;
+      MOB-5). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: BrandIdentity
     confirm:
       label: Save brand identity
@@ -883,6 +899,8 @@ screens:
       - splashBackgroundColour
       - showLoadingIndicator
       - splashChangeScope
+      - introVideoAssetRef
+      - introVideoMode
     provenance: contract white-label.yaml PUT /tenant-config/brand
 - id: CMS-005
   name: Theme Editor
@@ -957,7 +975,11 @@ screens:
         - Theme.cornerRadius
         - Theme.surfaceStyle
         - Theme.buttonStyle
+        - Theme.componentColours
         operation: getTheme
+        notes: '**Per-element colours (decided 17 September, M17-11).** Pickers for the main call to action,
+          the pay button, add to cart, the Buy tickets button, links and badges, each with a live contrast
+          warning; left empty they follow the theme. The guest flow itself stays standard.'
         provenance: contract white-label.yaml GET /tenant-config/theme
     - name: actionBar
       slot: rowActions
@@ -1006,9 +1028,9 @@ screens:
     body: '**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`,
       `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle`
       (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided
-      29 September, rev 3 CFG-3). **A colour pair that fails contrast is refused** (`400 ContrastProblem`,
-      decided 28 September, audit R139 (a)): the modal stays open with the failing pairs marked. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      29 September, rev 3 CFG-3) and `componentColours` (M17-11). **A colour pair that fails contrast
+      is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)): the modal stays open
+      with the failing pairs marked. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: Theme
     confirm:
       label: Save theme
@@ -1025,6 +1047,7 @@ screens:
       - cornerRadius
       - surfaceStyle
       - buttonStyle
+      - componentColours
     provenance: contract white-label.yaml PUT /tenant-config/theme
 - id: CMS-006
   name: Component Preview
@@ -1320,6 +1343,10 @@ screens:
         - HomepageLayout.id
         - HomepageLayout.sections
         operation: getHomepageLayout
+        notes: '**Also the mobile Home editor (decided 29 September, MOB-3; Site Builder steps 5 and 6).**
+          The `venueOverview` section (description, opening hours, type tiles), the hero''s style (carousel,
+          video, poster or split) and 1 or 2 highlights for attractions, dining, what''s on and shop (`maxItems`).
+          The header and footer are set here too (`setHeader`, `setFooter`).'
         provenance: contract white-label.yaml GET /tenant-config/homepage
       - kind: detailPanel
         label: Modules the sections need
@@ -1578,7 +1605,7 @@ screens:
   pattern: listDetail
   patternReason: '`listPromoBlocks` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Define what a block can and cannot contain.
+  purpose: Define what a block can and cannot contain, and set the banners (Site Builder step 5).
   layout:
     template: split
     regions:
@@ -1890,7 +1917,8 @@ screens:
   density: compact
   pattern: listDetail
   patternReason: '`listMenus` reads the population and `getMenu` reads one of them — list, select, act'
-  purpose: Decide what appears in the header and the footer.
+  purpose: Decide what appears in the header, the footer and the mobile tab bar, with the Buy tickets
+    button (Site Builder steps 5 and 6).
   layout:
     template: split
     regions:
@@ -1936,9 +1964,29 @@ screens:
         - Menu.isActive
         operation: getMenu
         provenance: contract fnb.yaml GET /menus/{menuId}
+    - name: navigationEditor
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: Navigation and mobile tabs
+        bindsTo: NavigationConfig
+        columns:
+        - NavigationConfig.kind
+        - NavigationConfig.items
+        - NavigationConfig.buyButton
+        operation: getNavigation
+        notes: '**The mobile tab editor (decided 29 September, MOB-1 and MOB-2).** Which tabs, their order,
+          labels and icons; each tab is an `appSection` link. The default is Home, Explore, Plan and Tickets;
+          Map is optional; Plan needs the `visitPlanner` module. The Buy tickets button: raised in the
+          centre (default), floating, flat or hidden, and its label. At most five tabs are visible.'
+        provenance: contract white-label.yaml GET /tenant-config/navigation
     - name: actionBar
       slot: rowActions
       components:
+      - kind: secondaryButton
+        label: Save navigation and tabs
+        operation: setNavigation
+        provenance: contract white-label.yaml PUT /tenant-config/navigation
       - kind: primaryButton
         label: Create menu
         operation: createMenu
@@ -1962,6 +2010,10 @@ screens:
       permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support
       with the wrong question.
   apis:
+  - operationId: getNavigation
+    contract: white-label
+    purpose: The navigation and the mobile tab set (MOB-1)
+    trigger: onLoad
   - operationId: listMenus
     contract: fnb
     purpose: List menus
@@ -1990,8 +2042,10 @@ screens:
     - listMenus
   - operationId: setNavigation
     contract: white-label
-    purpose: Set main and overflow navigation
+    purpose: Save the navigation, the mobile tabs and the Buy tickets button (MOB-1, MOB-2)
     trigger: onAction
+    invalidates:
+    - getNavigation
     provenance: decided 29 September, VM close-out (venue management and configuration)
   entryState:
     params:
@@ -2016,6 +2070,23 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
   overlays:
+  - id: formSetNavigation
+    component: modal
+    trigger: Save navigation and tabs
+    body: '**Collects what `setNavigation` sends.** Required: `kind`, `items` (label, icon, target, visible,
+      order; a mobile tab targets an `appSection`). Optional: `buyButton` (`style`, `label`). Refused
+      `400` when a tab targets a disabled module or more than five are visible. Dismissing sends nothing.'
+    bindsTo: NavigationConfig
+    confirm:
+      label: Save navigation
+      operation: setNavigation
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - items
+      - buyButton
+    provenance: contract white-label.yaml PUT /tenant-config/navigation
   - id: formCreateMenu
     component: modal
     trigger: Create menu
@@ -2888,6 +2959,9 @@ screens:
     - CMS-002
     - CMS-003
     - CMS-015
+    - CMS-103
+    - CMS-104
+    - CMS-102
     inferred: true
     fromFlows: true
     transitions:
@@ -2905,6 +2979,17 @@ screens:
       - version
       provenance: derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and
         CMS-014 holds version, so an edge into it carries them
+    - to: CMS-103
+      trigger: Fix a booking flow
+      provenance: authored 29 September, W12 (an invalid flow blocks the publish)
+      carries:
+      - bookingFlowId
+    - to: CMS-104
+      trigger: Build the mobile app
+      provenance: authored 29 September, M24-08 (build-time changes reach guests with a store release)
+    - to: CMS-102
+      trigger: Back to the Site Builder
+      provenance: authored 29 September, W12 (step 7)
     - to: CMS-015
       trigger: Rolls back when something is wrong
       provenance: flow F22 step 5→6
@@ -2922,7 +3007,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: Move a change from draft to live, with someone accountable.
+  purpose: Move a change from draft to live, with someone accountable (Site Builder step 7).
   layout:
     template: detail
     regions:
@@ -2950,7 +3035,10 @@ screens:
       - kind: publishGate
         impliedBy: publishTenantConfig
         notes: 'Declares `publishTenantConfig`. **The gate names what the publish will affect before it
-          happens** — a disabled Publish with no reason is the state operators escalate.
+          happens** — a disabled Publish with no reason is the state operators escalate. **Booking flows
+          publish here with the rest of the site (decided 29 September, W12)**: the gate lists each venue
+          flow that changed, and an invalid one (`bookingFlowInvalid`) or a bookable kind with no flow
+          (`bookingFlowMissing`) blocks the publish with a link to CMS-103.
 
           '
         provenance: carried from the previous definition
@@ -2991,6 +3079,10 @@ screens:
     contract: white-label
     purpose: App status and recent changes
     trigger: onLoad
+  - operationId: listBookingFlows
+    contract: white-label
+    purpose: The venue's flows and whether each is valid, for the gate (W12)
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
@@ -3013,6 +3105,10 @@ screens:
       - note
       - scheduledFor
     provenance: contract white-label.yaml POST /tenant-config/publish
+  entryState:
+    params:
+    - name: venueId
+      from: session
 - id: CMS-015
   name: Version History
   module: White Label
@@ -3208,6 +3304,7 @@ screens:
     - CMS-017
     - CMS-018
     - CMS-101
+    - CMS-103
     inferred: false
     entryFrom:
     - CMS-001
@@ -3236,6 +3333,11 @@ screens:
       trigger: Consent & Legal
       provenance: derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds
         none of them, so the edge carries nothing and CMS-018 opens cold
+    - to: CMS-103
+      trigger: Booking flows
+      provenance: authored 29 September, W12 (flow-level settings and step order moved to CMS-103)
+      carries:
+      - bookingFlowId
     - to: CMS-101
       trigger: Help me choose
       provenance: authored 29 September, rev 3 REV3-11 — Help me choose sits on the booking page these
@@ -3247,8 +3349,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getTenantConfig` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: The values the whole site inherits from, and the booking-flow settings each venue may override
-    (decided 29 September, rev 3 CFG-11).
+  purpose: The values the whole site inherits from, and the venue-wide booking settings each venue may
+    override (decided 29 September, rev 3 CFG-11); the settings of one flow are on CMS-103 (W12).
   layout:
     template: detail
     regions:
@@ -3285,7 +3387,6 @@ screens:
         - BookingFlowConfig.cartLayout
         - BookingFlowConfig.cardLayout
         - BookingFlowConfig.cardSize
-        - BookingFlowConfig.extrasStep
         - BookingFlowConfig.seatPicker
         - BookingFlowConfig.mapView
         - BookingFlowConfig.density
@@ -3295,40 +3396,32 @@ screens:
         - BookingFlowConfig.singleEventPage
         - BookingFlowConfig.quantitiesOnAddOns
         - BookingFlowConfig.cartSideInRtl
-        - BookingFlowConfig.categoryDisplay
         - BookingFlowConfig.eventBannerDates
         - BookingFlowConfig.timesPerPage
         - BookingFlowConfig.dayPartFilter
         - BookingFlowConfig.dayPartBoundaries
-        - BookingFlowConfig.performanceReveal
-        - BookingFlowConfig.signInAt
-        - BookingFlowConfig.seatEventDateMode
         - BookingFlowConfig.seatViewPosition
         - BookingFlowConfig.seatTimeBar
         - BookingFlowConfig.ticketCategories
         - BookingFlowConfig.ticketTags
         - BookingFlowConfig.cardInfo
-        - BookingFlowConfig.quickTour
         - BookingFlowConfig.conciergeMascot
         - BookingFlowConfig.showInfoOnly
         - BookingFlowConfig.locationSwitcher
-        - BookingFlowConfig.consentQuestionIds
+        - BookingFlowConfig.guestContactFields
+        - BookingFlowConfig.dateStripDays
         - BookingFlowConfig.venueOverrides
         operation: getBookingFlowConfig
-        notes: '**The rev 3 booking rules, each with its default** (decided 29 September, rev 3). `timesPerPage`
-          8, 12, 24 or all (24) and `dayPartFilter` (on), with `dayPartBoundaries` afternoon from 12:00
-          and evening from 17:00 in the venue time zone (REV3-1); `performanceReveal` date, then time,
-          then tickets, or all at once (REV3-2); `signInAt` after add-ons or at payment (REV3-3); `seatEventDateMode`
-          an inline step or a pop-up on the seat map (REV3-4); `seatViewPosition` bottom, right, left
-          or top, web only (REV3-5); `seatTimeBar` (on, REV3-6); `cartLayout` gains `floatingIcon` and
-          `cartSideInRtl` keeps the basket right or mirrors it (REV3-10); `showInfoOnly` (on, REV3-14);
-          `ticketCategories` category then subcategory, or a flat list (REV3-16); `locationSwitcher` (REV3-18);
-          `quickTour` (off, REV3-20); `ticketTags` (on, 23SEP-3); `cardInfo` (on, 23SEP-6); `categoryDisplay`
-          grid or row strip (23SEP-18); `eventBannerDates` (off, 23SEP-19); `conciergeMascot` (on, CFG-5).
-          `cardLayout`, `cardSize` and `density` are fixed lists now: stacked rows, split rows, cards
-          across, poster cards; compact, standard, large, extra large; compact, standard, roomy (DG-6).
-          **There is no swim-consent toggle and no F&B-modifier toggle**: a consent question is attached
-          to the flow or the product (REV3-26), and modifiers show when an item has groups attached (REV3-9).'
+        notes: '**Venue-wide booking settings only (decided 29 September, W12).** The settings that belong
+          to one flow (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`,
+          the flow''s consent questions) moved to each flow on CMS-103, and `categoryDisplay` is gone
+          (W7, superseding 23SEP-18: `cardLayout` carries rows or grid). Here: `timesPerPage` and the
+          day-part chips (REV3-1); `seatViewPosition` (REV3-5); `seatTimeBar` (REV3-6); `cartLayout` and
+          `cartSideInRtl` (REV3-10); `showInfoOnly` (REV3-14); `ticketCategories` (REV3-16); `locationSwitcher`
+          (REV3-18); `ticketTags` (23SEP-3); `cardInfo` (23SEP-6); `eventBannerDates` (23SEP-19); `conciergeMascot`
+          (CFG-5); the card and density enums (DG-6); **`guestContactFields`**, what the guest-checkout
+          pop-up asks: email only, + name or + mobile (W1); **`dateStripDays`**, the days on the date
+          strip before the calendar icon, default 7 (M17-08).'
         provenance: contract white-label.yaml GET /tenant-config/booking-flow
       - kind: selectField
         label: Settings for
@@ -3351,16 +3444,6 @@ screens:
           a second row for the same venue, is refused `400` and the row is marked. An override kept for
           a closed venue is shown greyed: it has no effect.'
         provenance: contract white-label.yaml GET /tenant-config/booking-flow
-      - kind: multiSelect
-        label: Consent questions this booking flow asks
-        bindsTo: BookingFlowConfig.consentQuestionIds
-        operation: listConsentQuestions
-        notes: '**The questions every booking in this flow asks, whatever the product** (decided 29 September,
-          rev 3 REV3-26), e.g. a water park''s "Are you able to swim?". Options are the active questions
-          from `listConsentQuestions`, written on CMS-018; a product''s own questions are attached on
-          BO-008. The guest is asked the union, each question once. Overridable per venue like every other
-          setting here.'
-        provenance: contract marketing-crm.yaml GET /consent-questions
     - name: actionBar
       slot: rowActions
       components:
@@ -3391,10 +3474,6 @@ screens:
     contract: white-label
     purpose: Full working configuration
     trigger: onLoad
-  - operationId: listConsentQuestions
-    contract: marketing-crm
-    purpose: The venue's consent questions, to attach to the booking flow (rev 3 REV3-26)
-    trigger: onLoad
   - operationId: listOrgUnits
     contract: tenancy
     purpose: The tenant's venues, for the per-venue override picker (rev 3 CFG-11)
@@ -3421,12 +3500,12 @@ screens:
     component: modal
     trigger: Save booking flow config
     body: '**Collects what `setBookingFlowConfig` sends before it is called.** Nothing in the body is
-      required. Optional: `preset`, `stepIndicator`, `cartLayout`, `cardLayout`, `cardSize`, `extrasStep`,
-      `seatPicker`, `mapView`, `density`, `embedMode`, `heroBanner`, `searchInBanner`, `singleEventPage`,
-      `quantitiesOnAddOns`, the rev 3 booking rules on the panel above, `consentQuestionIds` and `venueOverrides`
-      (decided 29 September, rev 3 CFG-11). **The body is the tenant settings plus every venue override**:
-      saving a venue''s override sends the whole configuration with that venue''s row changed. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      required. Optional: `preset`, `stepIndicator`, `cartLayout`, `cardLayout`, `cardSize`, `seatPicker`,
+      `mapView`, `density`, `embedMode`, `heroBanner`, `searchInBanner`, `singleEventPage`, `quantitiesOnAddOns`,
+      the venue-wide rev 3 booking rules on the panel above, `guestContactFields` (W1), `dateStripDays`
+      (M17-08) and `venueOverrides` (decided 29 September, rev 3 CFG-11). **The body is the tenant settings
+      plus every venue override**: saving a venue''s override sends the whole configuration with that
+      venue''s row changed. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: BookingFlowConfig
     confirm:
       label: Save booking flow config
@@ -3439,7 +3518,6 @@ screens:
       - cartLayout
       - cardLayout
       - cardSize
-      - extrasStep
       - seatPicker
       - mapView
       - density
@@ -3449,24 +3527,20 @@ screens:
       - singleEventPage
       - quantitiesOnAddOns
       - cartSideInRtl
-      - categoryDisplay
       - eventBannerDates
       - timesPerPage
       - dayPartFilter
       - dayPartBoundaries
-      - performanceReveal
-      - signInAt
-      - seatEventDateMode
       - seatViewPosition
       - seatTimeBar
       - ticketCategories
       - ticketTags
       - cardInfo
-      - quickTour
       - conciergeMascot
       - showInfoOnly
       - locationSwitcher
-      - consentQuestionIds
+      - guestContactFields
+      - dateStripDays
       - venueOverrides
     provenance: contract white-label.yaml PUT /tenant-config/booking-flow
 - id: CMS-017
@@ -13897,8 +13971,10 @@ screens:
   navigation:
     entryFrom:
     - CMS-016
+    - CMS-102
     exitTo:
     - CMS-016
+    - CMS-102
     inferred: false
     notes: '**Reached from CMS-016 Site Settings**, beside the booking-flow settings, because Help me
       choose sits on the booking page those settings shape (decided 29 September, rev 3 REV3-11).'
@@ -13906,6 +13982,10 @@ screens:
     - to: CMS-016
       trigger: Back to Site Settings
       provenance: authored 29 September, rev 3 REV3-11
+      back: true
+    - to: CMS-102
+      trigger: Back to the Site Builder
+      provenance: authored 29 September, W12 (step 4)
       back: true
   notes: '**Added 29 September for rev 3 REV3-11: Help me choose is venue configuration, never hard-coded.**
     A venue sets up one or two questions, each with two to four answers (title, one-liner, icon, optional
@@ -13919,8 +13999,9 @@ screens:
   pattern: listDetail
   patternReason: '`listGuidedChoices` reads the venue''s set-ups and the editor acts on one of them —
     list, select, act'
-  purpose: Set up a venue's Help me choose, review what the assistant suggests from the venue's products,
-    preview it and publish it.
+  purpose: Set up a venue's Help me choose so its answers filter the catalogue, review the question set
+    the assistant proposes from the venue's products, preview the filtered list and publish it (Site Builder
+    step 4).
   layout:
     template: split
     regions:
@@ -13971,6 +14052,8 @@ screens:
         - GuidedChoice.name
         - GuidedChoice.mode
         - GuidedChoice.showBanner
+        - GuidedChoice.behaviour
+        - GuidedChoice.showEverything
         - GuidedChoice.questions
         - GuidedChoice.status
         - GuidedChoice.source
@@ -13983,14 +14066,23 @@ screens:
           One or two questions, two to four answers each: title, one-liner (140 characters), icon, badge
           (24 characters), target (a product, category, event or booking module, picked from `listProducts`,
           `listProductCategories` and `listEvents`) and the result card (title, body, image; absent fields
-          fall back to the target''s own). Every text in every tenant language.'
+          fall back to the target''s own). Every text in every tenant language.
+
+          **Help me choose filters (decided 29 September, W4).** `behaviour` filter (default) or recommend;
+          up to four questions, each of a kind: choice, yes/no, age, level or certification. **The filter
+          builder** sets what each answer keeps: products, categories, segment tags, an age range, swimmers
+          only or never, a certificate held or not; a target may also be a booking flow (`listBookingFlows`).
+          An answer may pre-fill a consent question, which the guest still confirms. The "Show everything"
+          link is on by default.'
         provenance: contract white-label.yaml GET /venues/{venueId}/guided-choices
       - kind: livePreview
         label: Preview
         notes: '**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each
           question and the result card, in each language and in both directions. Drawn from the record
           in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up
-          until Publish.'
+          until Publish. **Preview the filtered list**: for each combination of answers, the products
+          left (read with `listProducts` and the answer''s filter), so an answer that leaves nothing bookable
+          shows before it is published (W4).'
         provenance: authored 29 September, rev 3 REV3-11
       - kind: publishGate
         label: What publishing changes
@@ -14084,9 +14176,14 @@ screens:
     contract: catalogue
     purpose: Events an answer can open
     trigger: onAction
+  - operationId: listBookingFlows
+    contract: white-label
+    purpose: The venue's flows an answer can open (target kind bookingFlow, W12)
+    trigger: onAction
   - operationId: suggestGuidedChoice
     contract: ai
-    purpose: Suggest a Help me choose set-up from the venue's catalogue
+    purpose: Ask the assistant for a question set from product attributes (age and height rules, level
+      tags, certifications); it lands here as a draft through white-label proposeGuidedChoice (W4)
     trigger: onAction
     provenance: build, 29 September 2026
   - operationId: getGuidedChoiceSuggestion
@@ -14150,3 +14247,864 @@ screens:
     dismiss:
       label: Keep it
     provenance: contract white-label.yaml DELETE /guided-choices/{guidedChoiceId}
+- id: CMS-102
+  name: Site Builder
+  module: White Label
+  requiresModule: core
+  wave: 1
+  capability: C00
+  implementation:
+    app: venue-management-web
+    route: /white-label/site-builder
+    component: apps/venue-management-web/src/routes/white-label/SiteBuilder.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - CMS-001
+    exitTo:
+    - CMS-001
+    - CMS-103
+    - CMS-101
+    - CMS-007
+    - CMS-009
+    - CMS-002
+    - CMS-004
+    - CMS-008
+    - CMS-005
+    - CMS-003
+    - CMS-006
+    - CMS-012
+    - CMS-014
+    - CMS-015
+    - CMS-104
+    inferred: false
+    notes: '**The step-based CMS (decided 29 September, W12 and M24-05).** Each of the seven steps opens
+      the full screen for its details and comes back here; progress is saved on every return, so the builder
+      reopens where the operator left it.'
+    transitions:
+    - to: CMS-001
+      trigger: 1 Venue and modules
+      provenance: authored 29 September, W12 (step 1 reuses CMS-001 for modules, feature toggles and guest
+        checkout)
+      back: true
+    - to: CMS-103
+      trigger: 2 Ticketing flows
+      provenance: authored 29 September, W12 (steps 2 and 3 are CMS-103)
+      back: true
+      carries:
+      - bookingFlowId
+    - to: CMS-103
+      trigger: 3 Compose steps
+      carries:
+      - bookingFlowId
+      provenance: authored 29 September, W12 (step order and step settings)
+      back: true
+    - to: CMS-101
+      trigger: 4 Help me choose
+      provenance: authored 29 September, W12 and W4
+      back: true
+    - to: CMS-007
+      trigger: 5 Look and feel — header, footer and home
+      provenance: authored 29 September, W12 (header and footer on CMS-007 and CMS-009)
+      back: true
+    - to: CMS-009
+      trigger: 5 Look and feel — navigation and menus
+      provenance: authored 29 September, W12
+      back: true
+    - to: CMS-002
+      trigger: 5 Look and feel — brand kit
+      provenance: authored 29 September, W12 (logos on CMS-002 and CMS-004)
+      back: true
+    - to: CMS-004
+      trigger: 5 Look and feel — logos
+      provenance: authored 29 September, W12
+      back: true
+    - to: CMS-008
+      trigger: 5 Look and feel — banners
+      provenance: authored 29 September, W12
+      back: true
+    - to: CMS-005
+      trigger: 5 Look and feel — theme
+      provenance: authored 29 September, W12 (theme and fonts on CMS-005 and CMS-003)
+      back: true
+    - to: CMS-003
+      trigger: 5 Look and feel — fonts
+      provenance: authored 29 September, W12
+      back: true
+      carries:
+      - version
+    - to: CMS-009
+      trigger: 6 Mobile app — tabs and the Buy tickets button
+      provenance: authored 29 September, MOB-1 and MOB-2
+      back: true
+    - to: CMS-004
+      trigger: 6 Mobile app — intro video
+      provenance: authored 29 September, MOB-5
+      back: true
+    - to: CMS-007
+      trigger: 6 Mobile app — home sections
+      provenance: authored 29 September, MOB-3
+      back: true
+    - to: CMS-006
+      trigger: 7 Preview
+      provenance: authored 29 September, W12 (step 7 is CMS-006, CMS-012 and CMS-014)
+      back: true
+      carries:
+      - version
+    - to: CMS-012
+      trigger: 7 Preview right to left
+      provenance: authored 29 September, W12
+      back: true
+    - to: CMS-014
+      trigger: 7 Publish
+      provenance: authored 29 September, W12
+      back: true
+    - to: CMS-015
+      trigger: Roll back a version
+      provenance: authored 29 September, W12 (CMS-015 handles rollback)
+      back: true
+      carries:
+      - version
+    - to: CMS-104
+      trigger: Build the mobile app
+      precondition: the tenant has published at least once
+      provenance: authored 29 September, M24-08
+      back: true
+  notes: '**Added 29 September for W12 and M24-05: the CMS is a flow builder with a step-based shell.**
+    The configuration side panel of the rev 3 prototype is a reference tool only (W12). The builder is
+    the white-labelling builder M24-05 asks for, not a new set of editors: every step opens a screen that
+    already exists and holds its details.'
+  density: compact
+  pattern: multiStepForm
+  patternReason: '`getSiteSetupProgress` holds the seven steps and their state, and `setSiteSetupProgress`
+    saves each one — progress, fields per step, review, submit'
+  purpose: 'Build a working site in about 30 minutes: pick a preset, then walk seven saved steps (venue
+    and modules, ticketing flows, compose steps, Help me choose, look and feel, mobile app, preview and
+    publish), each opening the full screen for its details. **The preset keeps the minimum path short
+    (M24-05)**: it proposes the modules, the booking flows with their default step order, the home sections
+    and the mobile tabs, so the only things an operator must supply are a logo, four colours and a Publish;
+    everything else keeps the preset or the contract default and can be refined later.'
+  layout:
+    template: wizard
+    regions:
+    - name: progress
+      slot: progress
+      components:
+      - kind: progressIndicator
+        label: Seven steps
+        bindsTo: SiteSetupProgress
+        columns:
+        - SiteSetupProgress.currentStep
+        - SiteSetupProgress.steps
+        - SiteSetupProgress.minimumPathDone
+        operation: getSiteSetupProgress
+        notes: 1 Venue and modules · 2 Ticketing flows · 3 Compose steps · 4 Help me choose · 5 Look and
+          feel · 6 Mobile app · 7 Preview and publish. Each step shows not started, in progress, done
+          or skipped; steps 4 and 6 may be skipped. **Minimum path** (logo, colours, one valid flow, a
+          publish) is marked, so an operator in a hurry sees what is left before the site works.
+        provenance: contract white-label.yaml GET /tenant-config/site-setup
+    - name: fields
+      slot: fields
+      components:
+      - kind: selectField
+        label: Start from
+        bindsTo: SiteSetupProgress.presetKey
+        operation: setSiteSetupProgress
+        notes: 'Theme park, water park, museum, theatre and arena, single attraction, play centre, several
+          venues. **Proposes, never writes**: each step opens pre-filled from the preset, and nothing
+          changes until the operator saves that step.'
+        provenance: contract white-label.yaml PUT /tenant-config/site-setup
+      - kind: cardList
+        label: Flow types the preset proposes
+        bindsTo: BookingFlowType
+        columns:
+        - BookingFlowType.key
+        - BookingFlowType.name
+        - BookingFlowType.productKinds
+        operation: listBookingFlowTypes
+        notes: 'Step 2 in one tap: the preset''s flow types, ticked; **Add these flows** creates each
+          with the type''s default steps and order (`createBookingFlowDefinition`). Composing the order
+          is step 3, on CMS-103.'
+        provenance: contract white-label.yaml GET /booking-flow-types
+      - kind: dataTable
+        label: Flows this venue has
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.name
+        - BookingFlow.flowTypeKey
+        - BookingFlow.isDefaultForType
+        - BookingFlow.isValid
+        operation: listBookingFlows
+        notes: Steps 2 and 3 are done when every flow here is valid and each bookable product kind has
+          one.
+        provenance: contract white-label.yaml GET /venues/{venueId}/booking-flows
+    - name: review
+      slot: review
+      components:
+      - kind: detailPanel
+        label: What is live
+        bindsTo: TenantAppStatus
+        columns:
+        - TenantAppStatus.isPublished
+        - TenantAppStatus.publishedVersion
+        - TenantAppStatus.hasUnpublishedChanges
+        operation: getTenantAppStatus
+        provenance: contract white-label.yaml GET /tenant-config/status
+      - kind: banner
+        label: What still blocks a publish
+        bindsTo: ConfigValidationReport
+        columns:
+        - ConfigValidationReport.passed
+        - ConfigValidationReport.findings
+        operation: validateTenantConfig
+        notes: Each finding links to the step and screen that fixes it (a missing logo to CMS-004, an
+          invalid flow to CMS-103).
+        provenance: contract white-label.yaml POST /tenant-config/validate
+    - name: actionBar
+      slot: submit
+      components:
+      - kind: primaryButton
+        label: Save and continue
+        operation: setSiteSetupProgress
+        provenance: contract white-label.yaml PUT /tenant-config/site-setup
+      - kind: secondaryButton
+        label: Add these flows
+        operation: createBookingFlowDefinition
+        provenance: contract white-label.yaml POST /venues/{venueId}/booking-flows
+      - kind: secondaryButton
+        label: Check what blocks a publish
+        operation: validateTenantConfig
+        provenance: contract white-label.yaml POST /tenant-config/validate
+  states:
+    loading: The builder's progress, read by `getSiteSetupProgress`.
+    error: Could not load. Names which read failed and leaves the progress untouched.
+    emptyFirstRun: '**Nothing set up yet.** Opens on Start from, with every step not started, and says
+      the minimum path is a logo, four colours, the preset''s flows and a publish.'
+    emptyNoResults: The venue has no flow of a type the preset proposes yet; the flow list says so and
+      offers Add these flows rather than showing an empty table.
+    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getSiteSetupProgress` requires,
+      and names that permission. **Never an empty form** — that reads as *there is nothing to set up*.
+  apis:
+  - operationId: getSiteSetupProgress
+    contract: white-label
+    purpose: Where the operator is in the seven steps, and the preset picked
+    trigger: onLoad
+  - operationId: setSiteSetupProgress
+    contract: white-label
+    purpose: Save the preset and each step's state on every return
+    trigger: onAction
+    invalidates:
+    - getSiteSetupProgress
+  - operationId: listBookingFlowTypes
+    contract: white-label
+    purpose: The flow types the preset proposes for step 2
+    trigger: onLoad
+  - operationId: listBookingFlows
+    contract: white-label
+    purpose: The venue's flows, to mark steps 2 and 3 done
+    trigger: onLoad
+  - operationId: createBookingFlowDefinition
+    contract: white-label
+    purpose: Add the preset's flows with their default steps in one go
+    trigger: onAction
+    invalidates:
+    - listBookingFlows
+  - operationId: getTenantAppStatus
+    contract: white-label
+    purpose: Whether the site is live, for step 7
+    trigger: onLoad
+  - operationId: validateTenantConfig
+    contract: white-label
+    purpose: What still blocks a publish, each finding linked to its step
+    trigger: onAction
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    coldEntry: Resolves the tenant and venue from the session and opens on the current step, or on Start
+      from when nothing is saved.
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-102
+  apisNote: Authored 29 September 2026 (P29 pass, W12 and M24-05) from impact.md section b.
+  overlays:
+  - id: formAddPresetFlows
+    component: modal
+    trigger: Add these flows
+    body: '**Collects what `createBookingFlowDefinition` sends, once per ticked type.** Required: `flowTypeKey`,
+      `name` (pre-filled from the type). `isDefaultForType` on. Steps are left out, so each flow gets
+      the type''s default steps and order. Dismissing sends nothing.'
+    bindsTo: BookingFlow
+    confirm:
+      label: Add flows
+      operation: createBookingFlowDefinition
+    dismiss:
+      label: Cancel
+      discards:
+      - flowTypeKey
+      - name
+    provenance: contract white-label.yaml POST /venues/{venueId}/booking-flows
+- id: CMS-103
+  name: Booking Flows
+  module: White Label
+  requiresModule: core
+  wave: 1
+  capability: C00
+  implementation:
+    app: venue-management-web
+    route: /white-label/booking-flows
+    component: apps/venue-management-web/src/routes/white-label/BookingFlows.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - CMS-102
+    - CMS-016
+    - CMS-014
+    exitTo:
+    - CMS-102
+    - CMS-016
+    - CMS-101
+    - CMS-014
+    inferred: false
+    notes: '**Steps 2 and 3 of the Site Builder (decided 29 September, W12).** Also reached from Site
+      Settings, which now holds only the venue-wide settings, and from Publishing when a flow blocks the
+      publish.'
+    transitions:
+    - to: CMS-102
+      trigger: Back to the Site Builder
+      provenance: authored 29 September, W12
+      back: true
+    - to: CMS-016
+      trigger: Venue-wide booking settings
+      provenance: authored 29 September, W12 (the settings every flow shares stay on CMS-016)
+    - to: CMS-101
+      trigger: Help me choose
+      provenance: authored 29 September, W4 (an answer can point at a flow)
+    - to: CMS-014
+      trigger: Publish with the site
+      provenance: authored 29 September, W12 (flows publish through publishTenantConfig)
+  notes: '**Added 29 September for W12: operators pick their ticketing flows, see which steps are required,
+    optional or conditional, and set their own order.** The catalogue (`listBookingFlowTypes`) is the
+    same for every tenant: dated day pass, timed entry, open-dated, seated (fixed performance, or date
+    and time then seat map), experience or workshop (product first, W8), surf or session (time then level),
+    meeting room by the hour, cabana on a map or by size (W6), guided tour by language, transport, table
+    reservation, membership, gift card and several locations. Flows reach guests with the rest of the
+    site (`publishTenantConfig`); WEB-005..012, GST-007..009 and GST-041 order their steps from the published
+    flow.'
+  density: compact
+  pattern: listDetail
+  patternReason: '`listBookingFlows` reads the venue''s flows and `getBookingFlow` reads one of them to
+    compose — list, select, act'
+  purpose: Pick the venue's booking flows, turn optional steps on or off, set the step order within the
+    allowed limits with a live preview, assign flows to products and categories, and validate them before
+    they publish with the site.
+  layout:
+    template: split
+    regions:
+    - name: filters
+      slot: filters
+      components:
+      - kind: selectField
+        label: Venue
+        operation: listBookingFlows
+        notes: The venue whose flows are shown (path `venueId`); defaults to the session venue.
+        provenance: contract white-label.yaml GET /venues/{venueId}/booking-flows
+      - kind: selectField
+        label: Flow type
+        operation: listBookingFlows
+        notes: Sends `?flowTypeKey=`.
+        provenance: contract white-label.yaml GET /venues/{venueId}/booking-flows
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: The venue's flows
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.name
+        - BookingFlow.flowTypeKey
+        - BookingFlow.isDefaultForType
+        - BookingFlow.isEnabled
+        - BookingFlow.isValid
+        - BookingFlow.updatedAt
+        operation: listBookingFlows
+        notes: An invalid flow is marked and blocks the site's publish until it is fixed.
+        provenance: contract white-label.yaml GET /venues/{venueId}/booking-flows
+      - kind: cardList
+        label: Flow types to pick from
+        bindsTo: BookingFlowType
+        columns:
+        - BookingFlowType.key
+        - BookingFlowType.name
+        - BookingFlowType.description
+        - BookingFlowType.productKinds
+        - BookingFlowType.steps
+        operation: listBookingFlowTypes
+        notes: Each card lists the type's steps with their required, optional or conditional mark, so
+          the choice is made knowing what the guest will go through.
+        provenance: contract white-label.yaml GET /booking-flow-types
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: Compose the steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.name
+        - BookingFlow.flowTypeKey
+        - BookingFlow.isDefaultForType
+        - BookingFlow.isEnabled
+        - BookingFlow.steps
+        - BookingFlow.isValid
+        operation: getBookingFlow
+        notes: '**The step list, in the venue''s order.** Each step carries its mark: *Required* (locked
+          on), *Optional* (a switch) or *Conditional* (a switch, with the condition in words, e.g. "only
+          when the tenant has more than one venue"). Steps are dragged to reorder; **a drop that breaks
+          a constraint is refused before it lands** (`validateBookingFlow` with the proposed `steps`),
+          and the constraint is named ("payment is always last", "the seat map comes after date and time").
+          Each step opens its settings: the step''s own (`BookingFlowStep.settings`, e.g. the tour languages
+          or the room''s hours) and, read-only with a link to CMS-016, the venue-wide settings it uses.'
+        provenance: contract white-label.yaml GET /booking-flows/{bookingFlowId}
+      - kind: detailPanel
+        label: This flow's settings
+        bindsTo: BookingFlowLevelSettings
+        columns:
+        - BookingFlowLevelSettings.performanceReveal
+        - BookingFlowLevelSettings.signInAt
+        - BookingFlowLevelSettings.seatEventDateMode
+        - BookingFlowLevelSettings.extrasStep
+        - BookingFlowLevelSettings.quickTour
+        - BookingFlowLevelSettings.consentQuestionIds
+        operation: getBookingFlow
+        notes: '**Moved here from Site Settings on 29 September (W12)**, because they belong to one flow:
+          date, time then tickets or all at once (REV3-2); sign in after add-ons or at payment (REV3-3);
+          a seated event''s date inline or over the seat map (REV3-4, seated flows only); the extras step
+          auto, always or never; the quick tour (REV3-20); the flow''s consent questions (REV3-26).'
+        provenance: contract white-label.yaml GET /booking-flows/{bookingFlowId}
+      - kind: multiSelect
+        label: Consent questions this flow asks
+        bindsTo: BookingFlowLevelSettings.consentQuestionIds
+        operation: listConsentQuestions
+        notes: '**The questions every booking in this flow asks, whatever the product** (rev 3 REV3-26),
+          e.g. a water park''s "Are you able to swim?". Options are the active questions from `listConsentQuestions`,
+          written on CMS-018. A Help me choose answer may pre-fill one; the guest still confirms it (W4).'
+        provenance: contract marketing-crm.yaml GET /consent-questions
+      - kind: livePreview
+        label: Preview
+        notes: '**The flow as a guest meets it, step by step, on web and on mobile**, redrawn on every
+          change and drawn from the record in hand. Calls nothing and publishes nothing; guests keep the
+          published flow (`getPublishedBookingFlow`, shown beside it for comparison) until the site is
+          published.'
+        provenance: authored 29 September, W12
+      - kind: dataTable
+        label: Products and categories using this flow
+        bindsTo: Product
+        columns:
+        - Product.name
+        - Product.kind
+        - Product.categoryId
+        - Product.bookingFlowId
+        operation: listProducts
+        notes: Assign the flow to a product (`updateProduct` `bookingFlowId`) or a category (`setProductCategories`,
+          the category's `bookingFlowId`). A product naming no flow uses its category's, then the venue's
+          default for its kind. Set up also on BO-007/BO-008 and BO-115.
+        provenance: contract catalogue.yaml GET /products
+      - kind: banner
+        label: Why this flow cannot publish
+        bindsTo: BookingFlowValidation
+        columns:
+        - BookingFlowValidation.valid
+        - BookingFlowValidation.problems
+        operation: validateBookingFlow
+        notes: A required step turned off, a step out of its allowed order, a condition that can never
+          hold, each naming the step and the fix.
+        provenance: contract white-label.yaml POST /booking-flows/{bookingFlowId}/validate
+      - kind: publishGate
+        label: What publishing changes
+        impliedBy: publishTenantConfig
+        notes: '**Flows publish with the whole site**, never alone: the gate names every venue flow that
+          changed since the last version and the products whose steps will change for guests, and says
+          the rest of the draft (theme, pages, navigation) goes live with it. Refused while any enabled
+          flow is invalid (`409`, `bookingFlowInvalid`). Needs `TENANT_PUBLISH`.'
+        provenance: contract white-label.yaml POST /tenant-config/publish
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Add a flow
+        operation: createBookingFlowDefinition
+        provenance: contract white-label.yaml POST /venues/{venueId}/booking-flows
+      - kind: secondaryButton
+        label: Save flow
+        operation: updateBookingFlowDefinition
+        provenance: contract white-label.yaml PATCH /booking-flows/{bookingFlowId}
+      - kind: secondaryButton
+        label: Validate
+        operation: validateBookingFlow
+        provenance: contract white-label.yaml POST /booking-flows/{bookingFlowId}/validate
+      - kind: secondaryButton
+        label: Assign to product
+        operation: updateProduct
+        provenance: contract catalogue.yaml PATCH /products/{productId}
+      - kind: secondaryButton
+        label: Assign to category
+        operation: setProductCategories
+        provenance: contract catalogue.yaml PUT /product-categories
+      - kind: secondaryButton
+        label: Publish site
+        operation: publishTenantConfig
+        permission: TENANT_PUBLISH
+        provenance: contract white-label.yaml POST /tenant-config/publish
+      - kind: destructiveButton
+        label: Remove flow
+        operation: deleteBookingFlow
+        notes: Refused `409` while a product or category names the flow or it is the default for products
+          on sale; the refusal names them and offers to reassign.
+        provenance: contract white-label.yaml DELETE /booking-flows/{bookingFlowId}
+  states:
+    loading: The venue's flows and the flow-type catalogue, read by `listBookingFlows` and `listBookingFlowTypes`.
+    error: Could not load. Names which read failed and leaves the flows untouched.
+    emptyFirstRun: '**No flows at this venue yet.** Guests book through each type''s default order until
+      one is picked. Offers the flow-type cards and, from the Site Builder, the preset''s flows in one
+      step.'
+    emptyNoResults: The flow-type filter matched nothing and the venue's other flows are still there.
+      Names the filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires,
+      and names that permission. **Never an empty table** — that reads as *there are no flows*.
+  apis:
+  - operationId: listBookingFlows
+    contract: white-label
+    purpose: The venue's flows in the draft
+    trigger: onLoad
+  - operationId: listBookingFlowTypes
+    contract: white-label
+    purpose: The flow types to pick from, with their steps and order constraints
+    trigger: onLoad
+  - operationId: getBookingFlow
+    contract: white-label
+    purpose: One flow with every step, to compose
+    trigger: onAction
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: What guests book through now, beside the draft in the preview
+    trigger: onAction
+  - operationId: createBookingFlowDefinition
+    contract: white-label
+    purpose: Pick a flow type for the venue
+    trigger: onAction
+    invalidates:
+    - listBookingFlows
+  - operationId: updateBookingFlowDefinition
+    contract: white-label
+    purpose: Save the step order, the optional steps and the flow's settings
+    trigger: onAction
+    invalidates:
+    - listBookingFlows
+    - getBookingFlow
+  - operationId: validateBookingFlow
+    contract: white-label
+    purpose: Check a proposed order before it is dropped, or the saved flow
+    trigger: onAction
+  - operationId: deleteBookingFlow
+    contract: white-label
+    purpose: Remove a flow nothing uses
+    trigger: onAction
+    invalidates:
+    - listBookingFlows
+  - operationId: publishTenantConfig
+    contract: white-label
+    purpose: Publish the site, flows included
+    trigger: onAction
+  - operationId: listConsentQuestions
+    contract: marketing-crm
+    purpose: The consent questions a flow can ask (rev 3 REV3-26)
+    trigger: onLoad
+  - operationId: listProducts
+    contract: catalogue
+    purpose: The products a flow is assigned to
+    trigger: onAction
+  - operationId: updateProduct
+    contract: catalogue
+    purpose: Assign the flow to a product (`bookingFlowId`)
+    trigger: onAction
+    invalidates:
+    - listProducts
+  - operationId: listProductCategories
+    contract: catalogue
+    purpose: The categories a flow can be assigned to
+    trigger: onAction
+  - operationId: setProductCategories
+    contract: catalogue
+    purpose: Assign the flow to a category (`bookingFlowId`)
+    trigger: onAction
+    invalidates:
+    - listProductCategories
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: bookingFlowId
+      from: CMS-102
+      optional: true
+    - name: productId
+      from: navigation
+    coldEntry: Resolves the venue from the session and opens on the flow list, or on the flow named in
+      the link.
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-103
+  apisNote: Authored 29 September 2026 (P29 pass, W12, W6, W8) from impact.md section b.
+  overlays:
+  - id: formCreateBookingFlowDefinition
+    component: modal
+    trigger: Add a flow
+    body: '**Collects what `createBookingFlowDefinition` sends.** Required: `flowTypeKey` (from the cards),
+      `name`. Optional: `isDefaultForType`, `steps` (left out, the type''s defaults), `settings`. Dismissing
+      sends nothing.'
+    bindsTo: BookingFlow
+    confirm:
+      label: Add flow
+      operation: createBookingFlowDefinition
+    dismiss:
+      label: Cancel
+      discards:
+      - flowTypeKey
+      - name
+      - isDefaultForType
+      - steps
+      - settings
+    provenance: contract white-label.yaml POST /venues/{venueId}/booking-flows
+  - id: confirmDeleteBookingFlow
+    component: confirmDialog
+    trigger: Remove flow
+    body: Names the flow and says guests keep it until the next publish. Refused `409` while products
+      or categories name it, and names them.
+    confirm:
+      label: Remove
+      operation: deleteBookingFlow
+    dismiss:
+      label: Keep it
+    provenance: contract white-label.yaml DELETE /booking-flows/{bookingFlowId}
+  - id: confirmPublishSite
+    component: confirmDialog
+    trigger: Publish site
+    body: '**Names what goes live**: the changed flows and the products whose booking steps change, with
+      the rest of the draft. Asks for the publish note `publishTenantConfig` requires.'
+    confirm:
+      label: Publish
+      operation: publishTenantConfig
+    dismiss:
+      label: Cancel
+    provenance: contract white-label.yaml POST /tenant-config/publish
+- id: CMS-104
+  name: App Build & Store Publishing
+  module: White Label
+  requiresModule: core
+  wave: 1
+  capability: C00
+  implementation:
+    app: venue-management-web
+    route: /white-label/app-publishing
+    component: apps/venue-management-web/src/routes/white-label/AppPublishing.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - CMS-102
+    - CMS-014
+    exitTo:
+    - CMS-102
+    - CMS-004
+    - CMS-014
+    inferred: false
+    notes: Reached from the Site Builder after the first publish, and from Publishing when a change is
+      build-time.
+    transitions:
+    - to: CMS-102
+      trigger: Back to the Site Builder
+      provenance: authored 29 September, M24-08
+      back: true
+    - to: CMS-004
+      trigger: App icons and splash
+      provenance: authored 29 September, M24-08 (build-time assets)
+    - to: CMS-014
+      trigger: Publish the configuration first
+      provenance: authored 29 September, M24-08 (a build is made from a published version)
+  notes: '**Added 29 September for M24-08.** TICVAI never publishes a client''s app under its own developer
+    account: each client opens and owns its Apple Developer account (with a D-U-N-S number) and its Google
+    Play account, builds its app here from the published configuration, and uploads it, or lets us submit
+    it with its own API credential. The accounts are make-or-break client inputs (`setStoreAccounts`).'
+  density: compact
+  pattern: listDetail
+  patternReason: '`listAppBuilds` reads the builds and `getAppBuild` reads one — list, select, act; the
+    checklist sits above the list'
+  purpose: Get the tenant's own app into the App Store and Google Play under the client's own accounts
+    — checklist, store listing, request a build, download or submit it, follow its review — with a guide
+    for the steps only the client can take.
+  layout:
+    template: split
+    regions:
+    - name: filters
+      slot: filters
+      components:
+      - kind: detailPanel
+        label: Before the first build
+        bindsTo: StorePublishingChecklist
+        columns:
+        - StorePublishingChecklist.items
+        - StorePublishingChecklist.accounts
+        operation: getStoreAccounts
+        notes: Apple D-U-N-S number, Apple Developer account, Google Play developer account (**the client's
+          to open; we cannot open them for them**), store listing, app icons, a published configuration.
+          Each open item says what to do next.
+        provenance: contract white-label.yaml GET /tenant-config/store-accounts
+      - kind: selectField
+        label: Platform
+        operation: listAppBuilds
+        notes: Sends `?platform=`, iOS or Android.
+        provenance: contract white-label.yaml GET /tenant-config/app-builds
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Builds
+        bindsTo: AppBuild
+        columns:
+        - AppBuild.platform
+        - AppBuild.versionName
+        - AppBuild.buildNumber
+        - AppBuild.configVersion
+        - AppBuild.status
+        - AppBuild.requestedAt
+        - AppBuild.finishedAt
+        operation: listAppBuilds
+        provenance: contract white-label.yaml GET /tenant-config/app-builds
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected build
+        bindsTo: AppBuild
+        columns:
+        - AppBuild.status
+        - AppBuild.failureReason
+        - AppBuild.packageAssetRef
+        - AppBuild.releaseNotes
+        - AppBuild.submitToStore
+        operation: getAppBuild
+        notes: Download the signed package to upload it in App Store Connect or the Play Console; with
+          a credential recorded, the store review status follows here (submitted, in review, approved,
+          rejected, released).
+        provenance: contract white-label.yaml GET /tenant-config/app-builds/{appBuildId}
+      - kind: assistantPanel
+        label: App publishing guide
+        operation: sendAiMessage
+        notes: '**The in-platform guide M24-08 asks for**: how to get a D-U-N-S number, open each account,
+          fill the listing and answer store review. Grounded on a store-publishing knowledge source, no
+          tenant data. `unavailable` until the ai "app publishing guide" assistant profile exists; the
+          checklist guidance works without it.'
+        provenance: authored 29 September, M24-08
+      - kind: publishGate
+        label: What a build and a submission do
+        impliedBy: requestAppBuild
+        notes: Names the configuration version built, the build-time changes it carries (icons, splash,
+          fonts, wallet and payment integrations) and the account it is signed for; with **Submit to the
+          store**, says it goes to the client's store review under the client's account. Needs `TENANT_PUBLISH`.
+        provenance: contract white-label.yaml POST /tenant-config/app-builds
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Request a build
+        operation: requestAppBuild
+        permission: TENANT_PUBLISH
+        provenance: contract white-label.yaml POST /tenant-config/app-builds
+      - kind: secondaryButton
+        label: Save store accounts and listing
+        operation: setStoreAccounts
+        provenance: contract white-label.yaml PUT /tenant-config/store-accounts
+  states:
+    loading: The checklist and the builds, read by `getStoreAccounts` and `listAppBuilds`.
+    error: Could not load. Names which read failed.
+    emptyFirstRun: '**No build yet.** Shows the checklist first: nothing can be built until the client''s
+      store account for the platform is recorded and a version is published.'
+    emptyNoResults: No build for the platform picked. Names it and offers the other.
+    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and
+      names that permission.
+  apis:
+  - operationId: getStoreAccounts
+    contract: white-label
+    purpose: The client's store accounts and the checklist
+    trigger: onLoad
+  - operationId: setStoreAccounts
+    contract: white-label
+    purpose: Record the client's own Apple and Google accounts and the store listing
+    trigger: onAction
+    invalidates:
+    - getStoreAccounts
+  - operationId: listAppBuilds
+    contract: white-label
+    purpose: The builds and their store status
+    trigger: onLoad
+  - operationId: getAppBuild
+    contract: white-label
+    purpose: One build, its package and its review status
+    trigger: onAction
+  - operationId: requestAppBuild
+    contract: white-label
+    purpose: Build the app from a published version, for the client's account
+    trigger: onAction
+    invalidates:
+    - listAppBuilds
+  - operationId: createAiConversation
+    contract: ai
+    purpose: Open a conversation with the app publishing guide
+    trigger: onAction
+  - operationId: sendAiMessage
+    contract: ai
+    purpose: Ask the app publishing guide a question
+    trigger: onAction
+  entryState:
+    params:
+    - name: appBuildId
+      from: navigation
+      optional: true
+    - name: conversationId
+      from: navigation
+    coldEntry: Resolves the tenant from the session and opens on the checklist and the newest build.
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-104
+  apisNote: Authored 29 September 2026 (P29 pass, M24-08) from impact.json.
+  overlays:
+  - id: formSetStoreAccounts
+    component: modal
+    trigger: Save store accounts and listing
+    body: '**Collects what `setStoreAccounts` sends**: per store, `accountHolderName`, `developerAccountId`,
+      `appIdentifier`, `dunsNumber` (Apple, nine digits), optional `apiCredentialSecretRef` and the `listing`
+      (name, subtitle, description and keywords in every tenant language, category, support and privacy
+      links, screenshots). Refused `400` for an Apple account without a D-U-N-S number. Dismissing sends
+      nothing.'
+    bindsTo: StoreAccount
+    confirm:
+      label: Save
+      operation: setStoreAccounts
+    dismiss:
+      label: Cancel
+      discards:
+      - accounts
+    provenance: contract white-label.yaml PUT /tenant-config/store-accounts
+  - id: confirmRequestAppBuild
+    component: confirmDialog
+    trigger: Request a build
+    body: '**Names the platform, the version built and the account it is signed for.** Optional release
+      notes and Submit to the store (needs a recorded credential). Refused `409` with the reason when
+      the account is missing, nothing is published, or a build is already running.'
+    confirm:
+      label: Build
+      operation: requestAppBuild
+    dismiss:
+      label: Cancel
+    provenance: contract white-label.yaml POST /tenant-config/app-builds

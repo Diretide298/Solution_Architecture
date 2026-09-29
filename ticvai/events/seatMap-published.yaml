@@ -7,6 +7,8 @@ publisher: seating
 description: A seat map version was published and is now the layout sold against.
 aggregate: seatMap
 emittedWhen: seat map validated to published, or archived to published (publishSeatMap)
+emittedBy:
+- publishSeatMap
 payload:
 - field: seatMapId
   type: uuid

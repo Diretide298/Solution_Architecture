@@ -1093,7 +1093,7 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.principal`, `identity.principal_credential`, `identity.password_policy` |
+| Reads | `cache:idempotency`, `identity.password_policy`, `identity.principal`, `identity.principal_credential` |
 | Writes | `cache:idempotency`, `identity.principal_credential`, `identity.session` |
 | Called by | POS-000 |
 
@@ -1530,8 +1530,8 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.session`, `identity.refresh_token` |
-| Writes | `cache:idempotency`, `identity.session`, `identity.refresh_token` |
+| Reads | `cache:idempotency`, `identity.refresh_token`, `identity.session` |
+| Writes | `cache:idempotency`, `identity.refresh_token`, `identity.session` |
 | Called by | GST-042, WEB-016 |
 
 **Parameters**
@@ -1836,6 +1836,7 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Sent, or verified |
 | 410 |  | The token expired or was already used. |
 

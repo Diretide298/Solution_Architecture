@@ -7,17 +7,18 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 100,
-  "operations": 156,
+  "screens": 103,
+  "operations": 176,
   "contracts": 10,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 115
+  "operationsWithNoScreen": 114
  },
  "waves": {
+  "wave1": 3,
   "wave2": 20,
   "wave3": 80
  },
@@ -38,8 +39,9 @@
   },
   {
    "module": "White Label",
-   "screens": 20,
+   "screens": 23,
    "waves": [
+    1,
     2
    ]
   }
@@ -47,7 +49,7 @@
  "contracts": [
   {
    "contract": "white-label",
-   "operations": 55
+   "operations": 71
   },
   {
    "contract": "marketing-crm",
@@ -59,19 +61,19 @@
   },
   {
    "contract": "ai",
-   "operations": 5
+   "operations": 7
   },
   {
    "contract": "fnb",
    "operations": 5
   },
   {
-   "contract": "identity",
-   "operations": 4
+   "contract": "catalogue",
+   "operations": 5
   },
   {
-   "contract": "catalogue",
-   "operations": 3
+   "contract": "identity",
+   "operations": 4
   },
   {
    "contract": "orders",
@@ -165,7 +167,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/navigation-menus",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -210,7 +212,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/publishing-workflow",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -228,7 +230,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/site-settings",
-   "operations": 7,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -984,7 +986,34 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/help-me-choose",
-   "operations": 11,
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "CMS-102",
+   "name": "Site Builder",
+   "module": "White Label",
+   "wave": 1,
+   "route": "/white-label/site-builder",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "CMS-103",
+   "name": "Booking Flows",
+   "module": "White Label",
+   "wave": 1,
+   "route": "/white-label/booking-flows",
+   "operations": 14,
+   "drawn": true
+  },
+  {
+   "id": "CMS-104",
+   "name": "App Build & Store Publishing",
+   "module": "White Label",
+   "wave": 1,
+   "route": "/white-label/app-publishing",
+   "operations": 7,
    "drawn": true
   }
  ],
@@ -1669,19 +1698,21 @@
     "summary": "A device reports interference"
    },
    {
-    "operation": "getNavigation",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read navigation"
-   },
-   {
     "operation": "publishContentBlock",
     "contract": "white-label",
     "verb": "POST",
     "summary": "Publish now, or schedule it"
    }
   ],
-  "modulesSplitAcrossWaves": [],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "White Label",
+    "waves": [
+     1,
+     2
+    ]
+   }
+  ],
   "screensNotDrawn": [],
   "flowsNamingAMissingScreen": []
  }

@@ -1,0 +1,56 @@
+# order.created v1 — published by orders
+# Added 29 September (system-design review SD-033).
+
+name: order.created
+version: 1
+publisher: orders
+description: An order exists, pending payment, from a checkout, a till or a replayed offline sale.
+aggregate: order
+emittedWhen: An order is written pending (checkoutCart, createOrder, syncOrders)
+emittedBy:
+- orders.checkoutCart
+- orders.createOrder
+- orders.syncOrders
+payload:
+- field: orderId
+  type: string
+- field: venueId
+  type: uuid
+- field: channel
+  type: string
+- field: subjectId
+  type: uuid
+  required: false
+- field: total
+  type: Money
+- field: createdAt
+  type: timestamp
+- field: verifiedContactRef
+  type: string
+  required: false
+  notes: The keyed hash of the verified checkout contact (ADR-0045); present on a guest checkout (M18-15)
+- field: marketingConsents
+  type: array
+  required: false
+  notes: checkoutCart marketingConsents[] as the guest left them (channel, purpose, granted, noticeVersion); never
+    defaulted to granted (M18-15, added 30 September)
+consumers:
+- context: reporting
+  purpose: Conversion funnel (orders created against orders paid)
+  idempotencyKey: orderId
+  onFailure: retry
+  isCritical: false
+- context: marketing
+  purpose: Abandoned-payment journeys when no order.paid follows
+  idempotencyKey: orderId
+  onFailure: retry
+  isCritical: false
+- context: marketing
+  purpose: Record the marketing opt-ins ticked at checkout as consent records, bound to the order and the verified
+    contact, attached to the profile on match (18 September minutes M18-15, added 30 September)
+  operation: marketing-crm.recordCheckoutConsents
+  idempotencyKey: orderId + channel + purpose
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: No state model emits this. The order is created already pending, so there is no from-state.

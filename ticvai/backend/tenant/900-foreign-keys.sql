@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 739 of 778 declared references. The ones that reach the
+-- 752 of 799 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -77,6 +77,9 @@ ALTER TABLE ai.governance_alert ADD CONSTRAINT governance_alert_release_id_fkey 
 ALTER TABLE ai.governance_policy_version ADD CONSTRAINT governance_policy_version_drafted_by_principal_id_fkey FOREIGN KEY (drafted_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE ai.governance_policy_version ADD CONSTRAINT governance_policy_version_policy_id_fkey FOREIGN KEY (policy_id) REFERENCES ai.governance_policy(id);
 ALTER TABLE ai.governance_policy_version ADD CONSTRAINT governance_policy_version_published_by_principal_id_fkey FOREIGN KEY (published_by_principal_id) REFERENCES identity.principal(id);
+ALTER TABLE ai.history_import ADD CONSTRAINT history_import_asset_id_fkey FOREIGN KEY (asset_id) REFERENCES assets.media_asset(id);
+ALTER TABLE ai.history_import ADD CONSTRAINT history_import_requested_by_principal_id_fkey FOREIGN KEY (requested_by_principal_id) REFERENCES identity.principal(id);
+ALTER TABLE ai.history_observation ADD CONSTRAINT history_observation_import_id_fkey FOREIGN KEY (import_id) REFERENCES ai.history_import(id);
 ALTER TABLE ai.incident ADD CONSTRAINT incident_owner_principal_id_fkey FOREIGN KEY (owner_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE ai.index_entry ADD CONSTRAINT index_entry_source_id_fkey FOREIGN KEY (source_id) REFERENCES ai.index_source(id);
 ALTER TABLE ai.index_job ADD CONSTRAINT index_job_source_id_fkey FOREIGN KEY (source_id) REFERENCES ai.index_source(id);
@@ -113,6 +116,8 @@ ALTER TABLE ai.risk_case ADD CONSTRAINT risk_case_opened_by_principal_id_fkey FO
 ALTER TABLE ai.risk_register ADD CONSTRAINT risk_register_owner_principal_id_fkey FOREIGN KEY (owner_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE ai.risk_strategy ADD CONSTRAINT risk_strategy_published_by_principal_id_fkey FOREIGN KEY (published_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE ai.signal_observation ADD CONSTRAINT signal_observation_source_id_fkey FOREIGN KEY (source_id) REFERENCES ai.signal_source(id);
+ALTER TABLE ai.training_run ADD CONSTRAINT training_run_backtest_run_id_fkey FOREIGN KEY (backtest_run_id) REFERENCES ai.eval_run(id);
+ALTER TABLE ai.training_run ADD CONSTRAINT training_run_release_id_fkey FOREIGN KEY (release_id) REFERENCES ai.release(id);
 ALTER TABLE approvals.decision ADD CONSTRAINT decision_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
 ALTER TABLE approvals.decision ADD CONSTRAINT decision_request_id_fkey FOREIGN KEY (request_id) REFERENCES approvals.request(id);
 ALTER TABLE approvals.decision_table_row ADD CONSTRAINT decision_table_row_decision_table_id_fkey FOREIGN KEY (decision_table_id) REFERENCES approvals.decision_table(id);
@@ -188,10 +193,11 @@ ALTER TABLE fnb.recipe_ingredient ADD CONSTRAINT recipe_ingredient_recipe_id_fke
 ALTER TABLE fnb.reservation_table ADD CONSTRAINT reservation_table_table_id_fkey FOREIGN KEY (table_id) REFERENCES fnb.dining_table(id);
 ALTER TABLE fnb.service_order ADD CONSTRAINT service_order_kitchen_ticket_id_fkey FOREIGN KEY (kitchen_ticket_id) REFERENCES fnb.kitchen_ticket(id);
 ALTER TABLE fnb.service_order ADD CONSTRAINT service_order_outlet_id_fkey FOREIGN KEY (outlet_id) REFERENCES platform.outlet(id);
+ALTER TABLE fnb.service_order ADD CONSTRAINT service_order_sales_order_id_fkey FOREIGN KEY (sales_order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE fnb.service_order ADD CONSTRAINT service_order_table_visit_id_fkey FOREIGN KEY (table_visit_id) REFERENCES fnb.table_visit(id);
+ALTER TABLE fnb.service_order_line ADD CONSTRAINT service_order_line_redeem_entitlement_id_fkey FOREIGN KEY (redeem_entitlement_id) REFERENCES access.entitlement(id);
 ALTER TABLE fnb.service_order_line ADD CONSTRAINT service_order_line_service_order_id_fkey FOREIGN KEY (service_order_id) REFERENCES fnb.service_order(id);
 ALTER TABLE fnb.sub_bill ADD CONSTRAINT sub_bill_bill_split_id_fkey FOREIGN KEY (bill_split_id) REFERENCES fnb.bill_split(id);
-ALTER TABLE fnb.table_reservation ADD CONSTRAINT table_reservation_deposit_id_fkey FOREIGN KEY (deposit_id) REFERENCES fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)(id);
 ALTER TABLE fnb.table_reservation ADD CONSTRAINT table_reservation_outlet_id_fkey FOREIGN KEY (outlet_id) REFERENCES platform.outlet(id);
 ALTER TABLE fnb.table_reservation ADD CONSTRAINT table_reservation_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE fnb.table_reservation ADD CONSTRAINT table_reservation_table_visit_id_fkey FOREIGN KEY (table_visit_id) REFERENCES fnb.table_visit(id);
@@ -366,6 +372,7 @@ ALTER TABLE marketing.challenge_progress ADD CONSTRAINT challenge_progress_chall
 ALTER TABLE marketing.challenge_progress ADD CONSTRAINT challenge_progress_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE marketing.consent_purpose ADD CONSTRAINT consent_purpose_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES platform.tenant(id);
 ALTER TABLE marketing.consent_purpose_channel ADD CONSTRAINT consent_purpose_channel_consent_purpose_id_fkey FOREIGN KEY (consent_purpose_id) REFERENCES marketing.consent_purpose(id);
+ALTER TABLE marketing.consent_record ADD CONSTRAINT consent_record_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE marketing.consent_record ADD CONSTRAINT consent_record_recorded_by_principal_id_fkey FOREIGN KEY (recorded_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE marketing.consent_record ADD CONSTRAINT consent_record_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE marketing.consent_record_channel ADD CONSTRAINT consent_record_channel_consent_record_id_fkey FOREIGN KEY (consent_record_id) REFERENCES marketing.consent_record(id);
@@ -430,8 +437,6 @@ ALTER TABLE orders.after_sale_request ADD CONSTRAINT after_sale_request_group_bo
 ALTER TABLE orders.b2b_credit ADD CONSTRAINT b2b_credit_account_id_fkey FOREIGN KEY (account_id) REFERENCES ledger.account(id);
 ALTER TABLE orders.cart ADD CONSTRAINT cart_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE orders.cart ADD CONSTRAINT cart_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
-ALTER TABLE orders.cart_line ADD CONSTRAINT cart_line_attributes_id_fkey FOREIGN KEY (attributes_id) REFERENCES embedded as attributes (jsonb) on orders.cart_line and orders.order_line(id);
-ALTER TABLE orders.cart_line ADD CONSTRAINT cart_line_booked_window_id_fkey FOREIGN KEY (booked_window_id) REFERENCES embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line(id);
 ALTER TABLE orders.cart_line ADD CONSTRAINT cart_line_cart_id_fkey FOREIGN KEY (cart_id) REFERENCES orders.cart(id);
 ALTER TABLE orders.cart_line ADD CONSTRAINT cart_line_inventory_hold_id_fkey FOREIGN KEY (inventory_hold_id) REFERENCES catalogue.inventory_hold(id);
 ALTER TABLE orders.cart_line ADD CONSTRAINT cart_line_performance_id_fkey FOREIGN KEY (performance_id) REFERENCES catalogue.performance(id);
@@ -451,7 +456,6 @@ ALTER TABLE orders.deposit_box ADD CONSTRAINT deposit_box_venue_id_fkey FOREIGN 
 ALTER TABLE orders.deposit_box ADD CONSTRAINT deposit_box_workstation_id_fkey FOREIGN KEY (workstation_id) REFERENCES platform.workstation(id);
 ALTER TABLE orders.deposit_box_foreign_holding ADD CONSTRAINT deposit_box_foreign_holding_deposit_box_id_fkey FOREIGN KEY (deposit_box_id) REFERENCES orders.deposit_box(id);
 ALTER TABLE orders.deposit_box_opening_denomination ADD CONSTRAINT deposit_box_opening_denomination_deposit_box_id_fkey FOREIGN KEY (deposit_box_id) REFERENCES orders.deposit_box(id);
-ALTER TABLE orders.deposit_policy ADD CONSTRAINT deposit_policy_dining_id_fkey FOREIGN KEY (dining_id) REFERENCES orders.deposit_policy (dining_* columns)(id);
 ALTER TABLE orders.discount ADD CONSTRAINT discount_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE orders.group_booking ADD CONSTRAINT group_booking_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE orders.group_customer_organization_contact ADD CONSTRAINT group_customer_organization_contact_group_custome_942e0f58_fkey FOREIGN KEY (group_customer_organization_id) REFERENCES orders.group_customer_organization(id);
@@ -478,12 +482,12 @@ ALTER TABLE orders.no_sale_event ADD CONSTRAINT no_sale_event_principal_id_fkey 
 ALTER TABLE orders.no_sale_event ADD CONSTRAINT no_sale_event_shift_id_fkey FOREIGN KEY (shift_id) REFERENCES orders.pos_shift(id);
 ALTER TABLE orders.no_sale_event ADD CONSTRAINT no_sale_event_workstation_id_fkey FOREIGN KEY (workstation_id) REFERENCES platform.workstation(id);
 ALTER TABLE orders.order_fee ADD CONSTRAINT order_fee_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
-ALTER TABLE orders.order_line ADD CONSTRAINT order_line_attributes_id_fkey FOREIGN KEY (attributes_id) REFERENCES embedded as attributes (jsonb) on orders.cart_line and orders.order_line(id);
-ALTER TABLE orders.order_line ADD CONSTRAINT order_line_booked_window_id_fkey FOREIGN KEY (booked_window_id) REFERENCES embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line(id);
 ALTER TABLE orders.order_line ADD CONSTRAINT order_line_inventory_hold_id_fkey FOREIGN KEY (inventory_hold_id) REFERENCES catalogue.inventory_hold(id);
 ALTER TABLE orders.order_line ADD CONSTRAINT order_line_performance_id_fkey FOREIGN KEY (performance_id) REFERENCES catalogue.performance(id);
 ALTER TABLE orders.order_line ADD CONSTRAINT order_line_sales_order_id_fkey FOREIGN KEY (sales_order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE orders.order_line ADD CONSTRAINT order_line_variant_id_fkey FOREIGN KEY (variant_id) REFERENCES catalogue.variant(id);
+ALTER TABLE orders.order_line_discount ADD CONSTRAINT order_line_discount_order_line_id_fkey FOREIGN KEY (order_line_id) REFERENCES orders.order_line(id);
+ALTER TABLE orders.order_line_discount ADD CONSTRAINT order_line_discount_promotion_id_fkey FOREIGN KEY (promotion_id) REFERENCES promotions.promotion(id);
 ALTER TABLE orders.order_line_eligibility ADD CONSTRAINT order_line_eligibility_order_line_id_fkey FOREIGN KEY (order_line_id) REFERENCES orders.order_line(id);
 ALTER TABLE orders.order_relationship ADD CONSTRAINT order_relationship_after_sale_request_id_fkey FOREIGN KEY (after_sale_request_id) REFERENCES orders.after_sale_request(id);
 ALTER TABLE orders.payment ADD CONSTRAINT payment_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
@@ -506,8 +510,6 @@ ALTER TABLE orders.resale_recommendation ADD CONSTRAINT resale_recommendation_re
 ALTER TABLE orders.resale_settlement ADD CONSTRAINT resale_settlement_resale_listing_id_fkey FOREIGN KEY (resale_listing_id) REFERENCES orders.resale_listing(id);
 ALTER TABLE orders.reservation ADD CONSTRAINT reservation_converted_order_id_fkey FOREIGN KEY (converted_order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE orders.reservation ADD CONSTRAINT reservation_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
-ALTER TABLE orders.reservation_line ADD CONSTRAINT reservation_line_attributes_id_fkey FOREIGN KEY (attributes_id) REFERENCES embedded as attributes (jsonb) on orders.cart_line and orders.order_line(id);
-ALTER TABLE orders.reservation_line ADD CONSTRAINT reservation_line_booked_window_id_fkey FOREIGN KEY (booked_window_id) REFERENCES embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line(id);
 ALTER TABLE orders.reservation_line ADD CONSTRAINT reservation_line_reservation_id_fkey FOREIGN KEY (reservation_id) REFERENCES orders.reservation(id);
 ALTER TABLE orders.sales_order ADD CONSTRAINT sales_order_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
 ALTER TABLE orders.sales_order ADD CONSTRAINT sales_order_shift_id_fkey FOREIGN KEY (shift_id) REFERENCES orders.pos_shift(id);
@@ -532,6 +534,7 @@ ALTER TABLE payments.payment_attempt ADD CONSTRAINT payment_attempt_provider_con
 ALTER TABLE payments.provider_cost ADD CONSTRAINT provider_cost_payment_id_fkey FOREIGN KEY (payment_id) REFERENCES orders.payment(id);
 ALTER TABLE payments.provider_cost ADD CONSTRAINT provider_cost_provider_connection_id_fkey FOREIGN KEY (provider_connection_id) REFERENCES payments.provider_connection(id);
 ALTER TABLE payments.provider_cost ADD CONSTRAINT provider_cost_settlement_id_fkey FOREIGN KEY (settlement_id) REFERENCES ledger.settlement(id);
+ALTER TABLE payments.provider_event ADD CONSTRAINT provider_event_payment_id_fkey FOREIGN KEY (payment_id) REFERENCES orders.payment(id);
 ALTER TABLE payments.terminal_certification_level3 ADD CONSTRAINT terminal_certification_level3_terminal_certification_id_fkey FOREIGN KEY (terminal_certification_id) REFERENCES payments.terminal_certification(id);
 ALTER TABLE payments.token ADD CONSTRAINT token_consent_purpose_id_fkey FOREIGN KEY (consent_purpose_id) REFERENCES marketing.consent_purpose(id);
 ALTER TABLE payments.token ADD CONSTRAINT token_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
@@ -564,6 +567,7 @@ ALTER TABLE platform.venue_settings ADD CONSTRAINT venue_settings_org_unit_id_fk
 ALTER TABLE platform.venue_settings ADD CONSTRAINT venue_settings_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
 ALTER TABLE platform.wallet_authorisation ADD CONSTRAINT wallet_authorisation_guest_link_id_fkey FOREIGN KEY (guest_link_id) REFERENCES platform.guest_link(guest_link_id);
 ALTER TABLE platform.wallet_authorisation ADD CONSTRAINT wallet_authorisation_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
+ALTER TABLE platform.wallet_authorisation ADD CONSTRAINT wallet_authorisation_wallet_hold_id_fkey FOREIGN KEY (wallet_hold_id) REFERENCES wallet.hold(id);
 ALTER TABLE platform.workstation ADD CONSTRAINT workstation_access_point_id_fkey FOREIGN KEY (access_point_id) REFERENCES access.access_point(id);
 ALTER TABLE platform.workstation ADD CONSTRAINT workstation_department_id_fkey FOREIGN KEY (department_id) REFERENCES platform.scope(id);
 ALTER TABLE platform.workstation ADD CONSTRAINT workstation_org_unit_id_fkey FOREIGN KEY (org_unit_id) REFERENCES platform.scope(id);
@@ -704,6 +708,13 @@ ALTER TABLE venuemap.point ADD CONSTRAINT point_access_point_id_fkey FOREIGN KEY
 ALTER TABLE venuemap.point ADD CONSTRAINT point_map_id_fkey FOREIGN KEY (map_id) REFERENCES venuemap.map(id);
 ALTER TABLE venuemap.point ADD CONSTRAINT point_outlet_id_fkey FOREIGN KEY (outlet_id) REFERENCES platform.outlet(id);
 ALTER TABLE venuemap.point ADD CONSTRAINT point_product_id_fkey FOREIGN KEY (product_id) REFERENCES catalogue.product(id);
+ALTER TABLE venuemap.visit_plan ADD CONSTRAINT visit_plan_cart_id_fkey FOREIGN KEY (cart_id) REFERENCES orders.cart(id);
+ALTER TABLE venuemap.visit_plan ADD CONSTRAINT visit_plan_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES marketing.guest_profile(id);
+ALTER TABLE venuemap.visit_plan_item ADD CONSTRAINT visit_plan_item_bundle_id_fkey FOREIGN KEY (bundle_id) REFERENCES promotions.bundle(id);
+ALTER TABLE venuemap.visit_plan_item ADD CONSTRAINT visit_plan_item_performance_id_fkey FOREIGN KEY (performance_id) REFERENCES catalogue.performance(id);
+ALTER TABLE venuemap.visit_plan_item ADD CONSTRAINT visit_plan_item_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES venuemap.visit_plan(id);
+ALTER TABLE venuemap.visit_plan_item ADD CONSTRAINT visit_plan_item_point_id_fkey FOREIGN KEY (point_id) REFERENCES venuemap.point(id);
+ALTER TABLE venuemap.visit_plan_item ADD CONSTRAINT visit_plan_item_product_id_fkey FOREIGN KEY (product_id) REFERENCES catalogue.product(id);
 ALTER TABLE wallet.configuration_version_snapshot ADD CONSTRAINT configuration_version_snapshot_configuration_version_id_fkey FOREIGN KEY (configuration_version_id) REFERENCES wallet.configuration_version(id);
 ALTER TABLE wallet.credit_lot ADD CONSTRAINT credit_lot_wallet_id_fkey FOREIGN KEY (wallet_id) REFERENCES wallet.wallet(id);
 ALTER TABLE wallet.gift_card ADD CONSTRAINT gift_card_subject_id_fkey FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
@@ -712,6 +723,8 @@ ALTER TABLE wallet.wallet ADD CONSTRAINT wallet_subject_id_fkey FOREIGN KEY (sub
 ALTER TABLE wallet.wallet_transaction ADD CONSTRAINT wallet_transaction_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders.sales_order(id);
 ALTER TABLE wallet.wallet_transaction ADD CONSTRAINT wallet_transaction_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
 ALTER TABLE wallet.wallet_transaction ADD CONSTRAINT wallet_transaction_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);
+ALTER TABLE wallet.wallet_transaction ADD CONSTRAINT wallet_transaction_wallet_hold_id_fkey FOREIGN KEY (wallet_hold_id) REFERENCES wallet.hold(id);
+ALTER TABLE wallet.wallet_transaction ADD CONSTRAINT wallet_transaction_wallet_id_fkey FOREIGN KEY (wallet_id) REFERENCES wallet.wallet(id);
 ALTER TABLE whitelabel.banner ADD CONSTRAINT banner_tenant_config_id_fkey FOREIGN KEY (tenant_config_id) REFERENCES whitelabel.tenant_config(id);
 ALTER TABLE whitelabel.config_version ADD CONSTRAINT config_version_published_by_principal_id_fkey FOREIGN KEY (published_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE whitelabel.faq_entry ADD CONSTRAINT faq_entry_faq_category_id_fkey FOREIGN KEY (faq_category_id) REFERENCES whitelabel.faq_category(id);

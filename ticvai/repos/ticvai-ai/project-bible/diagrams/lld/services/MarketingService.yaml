@@ -1,9 +1,9 @@
 id: LLD-MarketingService
-title: MarketingService — 263 operations, 132 tables
+title: MarketingService — 264 operations, 130 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
-why: '**263 operations and 132 tables — the biggest thing in the package, and probably two services
+why: '**264 operations and 130 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -12,20 +12,20 @@ why: '**263 operations and 132 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 263
+  operations: 264
   inAFlow: 102
   percent: 39%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 132
+  tables: 130
   stores:
   - postgres
   largestTable: marketing.waiver_requirement
 operationsByContract:
 - contract: marketing-crm
-  count: 263
+  count: 264
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -113,7 +113,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 2
+    reads: 1
     writes: 0
   - operation: awardBadge
     verb: POST
@@ -545,7 +545,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW
     offline: false
-    reads: 2
+    reads: 1
     writes: 0
   - operation: getSuppressionList
     verb: GET
@@ -569,7 +569,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW
     offline: false
-    reads: 2
+    reads: 1
     writes: 0
   - operation: getWishlist
     verb: GET
@@ -1395,6 +1395,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 2
+  - operation: recordCheckoutConsents
+    verb: POST
+    path: /consent-records/checkout
+    scope: venue
+    permission: null
+    offline: false
+    reads: 5
+    writes: 3
   - operation: recordConsent
     verb: POST
     path: /guests/{subjectId}/consents
@@ -1961,8 +1969,8 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 1
+    writes: 1
   - operation: setSlaPolicy
     verb: PUT
     path: /sla-policies
@@ -2546,7 +2554,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.consent_record
-  columns: 9
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2560,7 +2568,8 @@ tables:
   columns: 3
   store: postgres
   parent: marketing.consent_record
-  writtenBy: []
+  writtenBy:
+  - marketing-crm
   foreignWriters: null
 - table: marketing.contact_automation
   columns: 22
@@ -2981,14 +2990,14 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.privacy_request_deadline
-  columns: 3
+  columns: 8
   store: postgres
   parent: marketing.privacy_request_type
   writtenBy:
   - marketing-crm
   foreignWriters: null
 - table: marketing.privacy_request_type
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -3196,13 +3205,6 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
-- table: marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)
-  columns: 20
-  store: postgres
-  parent: null
-  writtenBy:
-  - marketing-crm
-  foreignWriters: null
 - table: marketing.waiver_signature
   columns: 15
   store: postgres
@@ -3229,12 +3231,6 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
-- table: marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)
-  columns: 15
-  store: postgres
-  parent: null
-  writtenBy: []
-  foreignWriters: null
 - table: marketing.wishlist_item
   columns: 12
   store: postgres
@@ -3254,12 +3250,32 @@ readsFrom:
 - service: PlatformService
   operations: 3
 - service: TenancyService
-  operations: 2
+  operations: 3
 - service: VenueOpsService
   operations: 2
 - service: WhiteLabelService
   operations: 1
 writesOutside:
+- service: TenancyService
+  operations: 4
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: claimDeviceConsent
+    tables:
+    - platform.outbox
+  - operation: handoverToAgent
+    tables:
+    - platform.outbox
+  - operation: recordCheckoutConsents
+    tables:
+    - platform.idempotency_record
+  - operation: recordDeviceConsent
+    tables:
+    - platform.outbox
 - service: IdentityService
   operations: 3
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3277,23 +3293,6 @@ writesOutside:
   - operation: updateMyProfile
     tables:
     - pii.subject
-- service: TenancyService
-  operations: 3
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event TenancyService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: claimDeviceConsent
-    tables:
-    - platform.outbox
-  - operation: handoverToAgent
-    tables:
-    - platform.outbox
-  - operation: recordDeviceConsent
-    tables:
-    - platform.outbox
 - service: OrderService
   operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3338,7 +3337,7 @@ screens:
 - P01:WEB-043 Loyalty & Rewards
 - P01:WEB-044 AI Concierge – Home
 - P01:WEB-046 In-Venue Notifications
-- P02:GST-001 Home – Default
+- P02:GST-001 Home
 - P02:GST-007 Select Date & Time
 - P02:GST-020 Saved Items / Wishlist
 - P02:GST-030 In-Venue Notifications
@@ -3531,7 +3530,6 @@ screens:
 - P12:SUP-027 Service Analytics & Root-Cause Intelligence
 - P12:SUP-028 AI Contact Center Intelligence & Automation Studio
 - P13:CMS-013 SEO & Metadata
-- P13:CMS-016 Site Settings
 - P13:CMS-018 Consent & Legal
 - P13:CMS-021 Privacy & Consent Configuration Command Center
 - P13:CMS-022 Data Processing Purpose & Lawful Basis Registry
@@ -3573,6 +3571,7 @@ screens:
 - P13:CMS-058 Compliance Evidence, Audit & Waiver Repository
 - P13:CMS-059 Waiver Analytics, Compliance & Operational Insights
 - P13:CMS-060 AI Waiver Compliance & Risk Intelligence Center
+- P13:CMS-103 Booking Flows
 - P16:ANL-007 Guest & Conversion Intelligence
 flows:
 - F01 Guest buys a ticket online

@@ -1,9 +1,9 @@
 id: LLD-FnbService
-title: FnbService — 120 operations, 50 tables
+title: FnbService — 120 operations, 49 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
-why: '**120 operations and 50 tables — the largest single domain after marketing.** Its own service
+why: '**120 operations and 49 tables — the largest single domain after marketing.** Its own service
   because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
   on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
@@ -16,7 +16,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 50
+  tables: 49
   stores:
   - postgres
   largestTable: fnb.table_reservation
@@ -30,7 +30,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 3
+    reads: 5
     writes: 2
   - operation: amendFnbOrder
     verb: PATCH
@@ -38,7 +38,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 3
+    reads: 5
     writes: 2
   - operation: applyMenuActions
     verb: POST
@@ -70,7 +70,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 3
+    reads: 5
     writes: 2
   - operation: chaseStation
     verb: POST
@@ -118,7 +118,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 4
+    reads: 6
     writes: 3
   - operation: compItem
     verb: POST
@@ -126,7 +126,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 5
+    reads: 7
     writes: 2
   - operation: completeProductionRun
     verb: POST
@@ -158,8 +158,8 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: true
-    reads: 3
-    writes: 3
+    reads: 6
+    writes: 6
   - operation: createGuestFnbOrder
     verb: POST
     path: /guest-orders
@@ -198,8 +198,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 5
-    writes: 4
+    reads: 4
+    writes: 3
   - operation: enterCountLine
     verb: POST
     path: /stock-counts/{countId}/lines
@@ -254,7 +254,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 2
+    reads: 4
     writes: 0
   - operation: getFnbReservationPolicy
     verb: GET
@@ -334,7 +334,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 3
+    reads: 5
     writes: 0
   - operation: holdCourse
     verb: POST
@@ -390,7 +390,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 2
+    reads: 4
     writes: 0
   - operation: listFnbRecommendations
     verb: GET
@@ -494,7 +494,7 @@ operationsByContract:
     scope: venue
     permission: FNB_OPERATE
     offline: true
-    reads: 4
+    reads: 3
     writes: 0
   - operation: listTemperatureCheckpoints
     verb: GET
@@ -534,7 +534,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 4
+    reads: 5
     writes: 3
   - operation: mergeTableVisits
     verb: POST
@@ -542,7 +542,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 4
+    reads: 6
     writes: 3
   - operation: moveTableVisit
     verb: POST
@@ -550,7 +550,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 6
+    reads: 7
     writes: 3
   - operation: notifyServer
     verb: POST
@@ -574,7 +574,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: true
-    reads: 4
+    reads: 6
     writes: 3
   - operation: planProductionRun
     verb: POST
@@ -622,7 +622,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 5
+    reads: 7
     writes: 2
   - operation: rebalanceStationLoad
     verb: POST
@@ -686,7 +686,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 4
+    reads: 6
     writes: 2
   - operation: requestRecount
     verb: POST
@@ -726,7 +726,7 @@ operationsByContract:
     scope: venue
     permission: FNB_OPERATE
     offline: true
-    reads: 5
+    reads: 4
     writes: 4
   - operation: sendBookingConfirmation
     verb: POST
@@ -870,7 +870,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 4
+    reads: 6
     writes: 2
   - operation: setSubstitutionRules
     verb: PUT
@@ -926,7 +926,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 5
+    reads: 7
     writes: 3
   - operation: transferTableVisit
     verb: POST
@@ -934,7 +934,7 @@ operationsByContract:
     scope: venue
     permission: FNB_SERVE
     offline: true
-    reads: 5
+    reads: 7
     writes: 2
   - operation: updateDeliveryLocation
     verb: PATCH
@@ -966,15 +966,15 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 4
-    writes: 4
+    reads: 3
+    writes: 3
   - operation: updateTableVisit
     verb: PATCH
     path: /table-visits/{visitId}
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 4
+    reads: 6
     writes: 3
   - operation: verifyAllergens
     verb: POST
@@ -1013,7 +1013,6 @@ tables:
   - completeProductionRun
   - createCombo
   - createDeliveryLocation
-  - createFnbOrder
   - createGuestFnbOrder
   - createMenu
   - createModifierGroup
@@ -1092,7 +1091,6 @@ tables:
   - completeProductionRun
   - createCombo
   - createDeliveryLocation
-  - createFnbOrder
   - createGuestFnbOrder
   - createMenu
   - createModifierGroup
@@ -1445,7 +1443,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.service_order_line
-  columns: 11
+  columns: 12
   store: postgres
   parent: fnb.service_order
   writtenBy:
@@ -1479,13 +1477,6 @@ tables:
   foreignWriters: null
 - table: fnb.table_reservation
   columns: 21
-  store: postgres
-  parent: null
-  writtenBy:
-  - fnb
-  foreignWriters: null
-- table: fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
-  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -1606,13 +1597,17 @@ writesOutside:
     tables:
     - orders.order_line
 - service: TenancyService
-  operations: 1
+  operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
     each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
+  - operation: createFnbOrder
+    tables:
+    - platform.idempotency_record
+    - platform.outbox
   - operation: setKitchenTicketStatus
     tables:
     - platform.outbox

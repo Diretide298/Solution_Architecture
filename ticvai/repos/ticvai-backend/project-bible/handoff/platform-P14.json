@@ -7,11 +7,11 @@
  "audience": "partner",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 8,
-  "operations": 22,
+  "operations": 28,
   "contracts": 1,
   "modules": 1,
   "undrawn": 0,
@@ -34,7 +34,7 @@
  "contracts": [
   {
    "contract": "public-api",
-   "operations": 22
+   "operations": 28
   }
  ],
  "screens": [
@@ -44,7 +44,7 @@
    "module": "Developer & API",
    "wave": 2,
    "route": "/developer/reference",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -62,7 +62,7 @@
    "module": "Developer & API",
    "wave": 2,
    "route": "/developer/clients",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -71,7 +71,7 @@
    "module": "Developer & API",
    "wave": 2,
    "route": "/developer/sandbox",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -89,7 +89,7 @@
    "module": "Developer & API",
    "wave": 2,
    "route": "/developer/usage",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -107,7 +107,7 @@
    "module": "Developer & API",
    "wave": 2,
    "route": "/developer/admin",
-   "operations": 4,
+   "operations": 7,
    "drawn": true
   }
  ],

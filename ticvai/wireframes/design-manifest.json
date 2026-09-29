@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -8,24 +8,41 @@
   "P04": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
  },
  "counts": {
-  "batches": 301,
-  "screens": 2440,
+  "batches": 303,
+  "screens": 2445,
   "framesOnDisk": 156,
   "byStatus": {
-   "pending": 262,
-   "partial": 0,
-   "drawn": 33,
+   "pending": 264,
+   "partial": 1,
+   "drawn": 32,
    "locked": 6
   },
   "screensByStatus": {
-   "pending": 2284,
-   "partial": 0,
-   "drawn": 126,
+   "pending": 2288,
+   "partial": 5,
+   "drawn": 122,
    "locked": 30
   },
-  "fullyDrawableBatches": 59
+  "fullyDrawableBatches": 61
  },
  "batches": [
+  {
+   "id": "P01-discovery-browse-01",
+   "kind": "module",
+   "label": "P01 · Discovery & Browse",
+   "platform": "P01",
+   "screens": [
+    "WEB-001",
+    "WEB-002",
+    "WEB-003",
+    "WEB-004",
+    "WEB-050"
+   ],
+   "drawable": 5,
+   "thin": 0,
+   "frames": 4,
+   "status": "partial"
+  },
   {
    "id": "P05-ai-01",
    "kind": "module",
@@ -667,6 +684,21 @@
    "status": "pending"
   },
   {
+   "id": "P13-white-label-03",
+   "kind": "module",
+   "label": "P13 · White Label (3 of 3)",
+   "platform": "P13",
+   "screens": [
+    "CMS-102",
+    "CMS-103",
+    "CMS-104"
+   ],
+   "drawable": 3,
+   "thin": 0,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "P14-developer-api-01",
    "kind": "module",
    "label": "P14 · Developer & API",
@@ -711,7 +743,7 @@
   {
    "id": "P16-analytics-01",
    "kind": "module",
-   "label": "P16 · Analytics",
+   "label": "P16 · Analytics (1 of 2)",
    "platform": "P16",
    "screens": [
     "ANL-001",
@@ -726,6 +758,19 @@
     "ANL-010"
    ],
    "drawable": 10,
+   "thin": 0,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "P16-analytics-02",
+   "kind": "module",
+   "label": "P16 · Analytics (2 of 2)",
+   "platform": "P16",
+   "screens": [
+    "ANL-071"
+   ],
+   "drawable": 1,
    "thin": 0,
    "frames": 0,
    "status": "pending"
@@ -1030,7 +1075,7 @@
   {
    "id": "P13-white-label-01",
    "kind": "module",
-   "label": "P13 · White Label (1 of 2)",
+   "label": "P13 · White Label (1 of 3)",
    "platform": "P13",
    "screens": [
     "CMS-001",
@@ -1312,7 +1357,7 @@
   {
    "id": "P13-white-label-02",
    "kind": "module",
-   "label": "P13 · White Label (2 of 2)",
+   "label": "P13 · White Label (2 of 3)",
    "platform": "P13",
    "screens": [
     "CMS-011",
@@ -1479,6 +1524,28 @@
     "ADM-055",
     "ADM-056",
     "ADM-057"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS38",
+   "kind": "workshop",
+   "label": "Pricing   Revenue Management board 5",
+   "platform": "P09",
+   "screens": [
+    "ADM-088",
+    "ADM-089",
+    "ADM-090",
+    "ADM-091",
+    "ADM-092",
+    "ADM-093",
+    "ADM-094",
+    "ADM-095",
+    "ADM-096",
+    "ADM-097"
    ],
    "drawable": 8,
    "thin": 2,
@@ -1950,28 +2017,6 @@
     "ADM-085",
     "ADM-086",
     "ADM-087"
-   ],
-   "drawable": 7,
-   "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS38",
-   "kind": "workshop",
-   "label": "Pricing   Revenue Management board 5",
-   "platform": "P09",
-   "screens": [
-    "ADM-088",
-    "ADM-089",
-    "ADM-090",
-    "ADM-091",
-    "ADM-092",
-    "ADM-093",
-    "ADM-094",
-    "ADM-095",
-    "ADM-096",
-    "ADM-097"
    ],
    "drawable": 7,
    "thin": 3,
@@ -2831,6 +2876,28 @@
    "status": "pending"
   },
   {
+   "id": "WS122",
+   "kind": "workshop",
+   "label": "AI Governance board 2",
+   "platform": "P09",
+   "screens": [
+    "ADM-529",
+    "ADM-530",
+    "ADM-531",
+    "ADM-532",
+    "ADM-533",
+    "ADM-534",
+    "ADM-535",
+    "ADM-536",
+    "ADM-537",
+    "ADM-538"
+   ],
+   "drawable": 6,
+   "thin": 4,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS129",
    "kind": "workshop",
    "label": "Event Management Configuration Backend Structure v1.0 board 5",
@@ -3191,6 +3258,28 @@
    "status": "pending"
   },
   {
+   "id": "WS96",
+   "kind": "workshop",
+   "label": "Rental Management board 9",
+   "platform": "P08",
+   "screens": [
+    "BO-574",
+    "BO-575",
+    "BO-576",
+    "BO-577",
+    "BO-578",
+    "BO-579",
+    "BO-580",
+    "BO-581",
+    "BO-582",
+    "BO-583"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS116",
    "kind": "workshop",
    "label": "AI Configuration Assistant board 1",
@@ -3289,6 +3378,28 @@
     "BO-920",
     "BO-921",
     "BO-922"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS163",
+   "kind": "workshop",
+   "label": "Resource Management Configuration board 9",
+   "platform": "P08",
+   "screens": [
+    "BO-933",
+    "BO-934",
+    "BO-935",
+    "BO-936",
+    "BO-937",
+    "BO-938",
+    "BO-939",
+    "BO-940",
+    "BO-941",
+    "BO-942"
    ],
    "drawable": 5,
    "thin": 5,
@@ -3736,28 +3847,6 @@
    "status": "pending"
   },
   {
-   "id": "WS96",
-   "kind": "workshop",
-   "label": "Rental Management board 9",
-   "platform": "P08",
-   "screens": [
-    "BO-574",
-    "BO-575",
-    "BO-576",
-    "BO-577",
-    "BO-578",
-    "BO-579",
-    "BO-580",
-    "BO-581",
-    "BO-582",
-    "BO-583"
-   ],
-   "drawable": 4,
-   "thin": 6,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS103",
    "kind": "workshop",
    "label": "Subscription Licensing AI Self Service board 6",
@@ -3904,21 +3993,21 @@
    "status": "pending"
   },
   {
-   "id": "WS163",
+   "id": "WS153",
    "kind": "workshop",
-   "label": "Resource Management Configuration board 9",
-   "platform": "P08",
+   "label": "Payment Payment Orchestration board 7",
+   "platform": "P09",
    "screens": [
-    "BO-933",
-    "BO-934",
-    "BO-935",
-    "BO-936",
-    "BO-937",
-    "BO-938",
-    "BO-939",
-    "BO-940",
-    "BO-941",
-    "BO-942"
+    "ADM-619",
+    "ADM-620",
+    "ADM-621",
+    "ADM-622",
+    "ADM-623",
+    "ADM-624",
+    "ADM-625",
+    "ADM-626",
+    "ADM-627",
+    "ADM-628"
    ],
    "drawable": 4,
    "thin": 6,
@@ -4403,21 +4492,21 @@
    "status": "pending"
   },
   {
-   "id": "WS122",
+   "id": "WS123",
    "kind": "workshop",
-   "label": "AI Governance board 2",
+   "label": "AI Governance board 3",
    "platform": "P09",
    "screens": [
-    "ADM-529",
-    "ADM-530",
-    "ADM-531",
-    "ADM-532",
-    "ADM-533",
-    "ADM-534",
-    "ADM-535",
-    "ADM-536",
-    "ADM-537",
-    "ADM-538"
+    "ADM-539",
+    "ADM-540",
+    "ADM-541",
+    "ADM-542",
+    "ADM-543",
+    "ADM-544",
+    "ADM-545",
+    "ADM-546",
+    "ADM-547",
+    "ADM-548"
    ],
    "drawable": 3,
    "thin": 7,
@@ -4440,28 +4529,6 @@
     "BO-811",
     "BO-812",
     "BO-813"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS153",
-   "kind": "workshop",
-   "label": "Payment Payment Orchestration board 7",
-   "platform": "P09",
-   "screens": [
-    "ADM-619",
-    "ADM-620",
-    "ADM-621",
-    "ADM-622",
-    "ADM-623",
-    "ADM-624",
-    "ADM-625",
-    "ADM-626",
-    "ADM-627",
-    "ADM-628"
    ],
    "drawable": 3,
    "thin": 7,
@@ -4688,28 +4755,6 @@
    "status": "pending"
   },
   {
-   "id": "WS123",
-   "kind": "workshop",
-   "label": "AI Governance board 3",
-   "platform": "P09",
-   "screens": [
-    "ADM-539",
-    "ADM-540",
-    "ADM-541",
-    "ADM-542",
-    "ADM-543",
-    "ADM-544",
-    "ADM-545",
-    "ADM-546",
-    "ADM-547",
-    "ADM-548"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS135",
    "kind": "workshop",
    "label": "Marketing CRM Configuration Reference v1.0 board 1",
@@ -4857,6 +4902,28 @@
     "BO-1050"
    ],
    "drawable": 0,
+   "thin": 8,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS177",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 13",
+   "platform": "P08",
+   "screens": [
+    "BO-1071",
+    "BO-1072",
+    "BO-1073",
+    "BO-1074",
+    "BO-1075",
+    "BO-1076",
+    "BO-1077",
+    "BO-1078",
+    "BO-1079",
+    "BO-1080"
+   ],
+   "drawable": 2,
    "thin": 8,
    "frames": 0,
    "status": "pending"
@@ -5213,28 +5280,6 @@
    "status": "pending"
   },
   {
-   "id": "WS177",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 13",
-   "platform": "P08",
-   "screens": [
-    "BO-1071",
-    "BO-1072",
-    "BO-1073",
-    "BO-1074",
-    "BO-1075",
-    "BO-1076",
-    "BO-1077",
-    "BO-1078",
-    "BO-1079",
-    "BO-1080"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS101",
    "kind": "workshop",
    "label": "Subscription Licensing AI Self Service board 4",
@@ -5505,22 +5550,6 @@
    "drawable": 5,
    "thin": 0,
    "frames": 5,
-   "status": "drawn"
-  },
-  {
-   "id": "P01-discovery-browse-01",
-   "kind": "module",
-   "label": "P01 · Discovery & Browse",
-   "platform": "P01",
-   "screens": [
-    "WEB-001",
-    "WEB-002",
-    "WEB-003",
-    "WEB-004"
-   ],
-   "drawable": 4,
-   "thin": 0,
-   "frames": 4,
    "status": "drawn"
   },
   {
@@ -5845,28 +5874,6 @@
    "status": "drawn"
   },
   {
-   "id": "P02-engagement-support-01",
-   "kind": "module",
-   "label": "P02 · Engagement & Support (1 of 2)",
-   "platform": "P02",
-   "screens": [
-    "GST-030",
-    "GST-031",
-    "GST-032",
-    "GST-033",
-    "GST-035",
-    "GST-040",
-    "GST-051",
-    "GST-052",
-    "GST-053",
-    "GST-054"
-   ],
-   "drawable": 9,
-   "thin": 1,
-   "frames": 10,
-   "status": "drawn"
-  },
-  {
    "id": "P02-high-demand-access-01",
    "kind": "module",
    "label": "P02 · High-Demand Access",
@@ -5923,6 +5930,28 @@
    "drawable": 3,
    "thin": 1,
    "frames": 4,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-engagement-support-01",
+   "kind": "module",
+   "label": "P02 · Engagement & Support (1 of 2)",
+   "platform": "P02",
+   "screens": [
+    "GST-030",
+    "GST-031",
+    "GST-032",
+    "GST-033",
+    "GST-035",
+    "GST-040",
+    "GST-051",
+    "GST-052",
+    "GST-053",
+    "GST-054"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 10,
    "status": "drawn"
   },
   {

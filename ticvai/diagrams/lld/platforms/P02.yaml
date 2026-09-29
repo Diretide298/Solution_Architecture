@@ -20,18 +20,16 @@ deployment:
 why: null
 modulesUsed:
 - module: ticketing
-  screens: 27
+  screens: 30
 - module: core
   screens: 12
 - module: marketing
   screens: 7
 - module: fnb
   screens: 7
-- module: queue
-  screens: 5
 - module: access
   screens: 4
-- module: ai
+- module: queue
   screens: 4
 - module: transport
   screens: 4
@@ -39,29 +37,31 @@ modulesUsed:
   screens: 2
 - module: seating
   screens: 2
+- module: ai
+  screens: 2
 - module: resources
   screens: 2
 - module: games
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 78
+  operationCalls: 77
 - service: CatalogueService
-  operationCalls: 58
+  operationCalls: 60
+- service: VenueOpsService
+  operationCalls: 54
 - service: MarketingService
   operationCalls: 46
-- service: VenueOpsService
-  operationCalls: 42
 - service: IdentityService
   operationCalls: 28
 - service: FnbService
   operationCalls: 25
 - service: AccessService
   operationCalls: 20
-- service: AiService
-  operationCalls: 14
 - service: WhiteLabelService
-  operationCalls: 12
+  operationCalls: 17
+- service: AiService
+  operationCalls: 16
 - service: WalletService
   operationCalls: 8
 - service: LedgerService
@@ -76,7 +76,7 @@ coverage:
     has found a defect.'
 screens:
 - screen: GST-001
-  name: Home – Default
+  name: Home
   module: Discovery & Browse
   requiresModule: marketing
   wave: 1
@@ -89,6 +89,8 @@ screens:
   - getTenantConfig
   - listAnalyticsProviders
   - listMyEntitlements
+  - listProductCategories
+  - listProducts
   - recordDeviceConsent
   - recordRecommendationEvents
   - recordStorefrontSessionEvents
@@ -98,6 +100,7 @@ screens:
   - emptyNoAccess
   - emptyNoResults
   - error
+  - introVideo
   - loading
   - offline
   offlineState: true
@@ -172,7 +175,7 @@ screens:
   wireframe: wireframes/P02 Guest App.dc.html#gst-001
   inFlows: null
 - screen: GST-002
-  name: Explore Categories
+  name: Explore
   module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
@@ -180,6 +183,7 @@ screens:
   operations:
   - listProductCategories
   - listProducts
+  - searchCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -193,16 +197,18 @@ screens:
   - GST-001
   - GST-003
   - GST-004
+  - GST-063
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-002
   inFlows: null
 - screen: GST-003
-  name: Event & Attraction Listing
+  name: Buy Tickets
   module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
   density: comfortable
   operations:
+  - getPublishedGuidedChoice
   - getWaitTimes
   - listPerformances
   - listProducts
@@ -217,24 +223,32 @@ screens:
   offlineState: true
   entryParams:
   - eventId<-deepLink
+  - venueId<-session
   goesTo:
   - GST-001
   - GST-002
   - GST-004
+  - GST-007
+  - GST-008
+  - GST-056
+  - GST-074
+  - GST-075
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-003
   inFlows:
   - F21 A ride queue fills and a guest is redirected
 - screen: GST-004
-  name: Attraction Details
+  name: Item Detail
   module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
   density: comfortable
   operations:
   - getAvailability
+  - getBundle
   - getProduct
   - getProductEligibilityRule
+  - getVenueMap
   - getWaitTimes
   - listPerformances
   states:
@@ -248,13 +262,17 @@ screens:
   entryParams:
   - productId<-deepLink
   - eventId<-deepLink
+  - mapId<-session
+  - bundleId<-navigation
   goesTo:
   - GST-001
   - GST-002
   - GST-003
   - GST-007
   - GST-008
+  - GST-038
   - GST-049
+  - GST-056
   - GST-074
   - GST-075
   boardFrames: null
@@ -288,7 +306,7 @@ screens:
   wireframe: wireframes/P02 Guest App.dc.html#gst-005
   inFlows: null
 - screen: GST-006
-  name: Event / Exhibition Details
+  name: Item Detail – Event / Exhibition
   module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
@@ -310,6 +328,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-007
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-006
   inFlows: null
@@ -324,6 +343,7 @@ screens:
   - checkBookingEligibility
   - getAvailability
   - getCart
+  - getPublishedBookingFlow
   - listPerformances
   - listProductCategories
   - listProducts
@@ -339,6 +359,7 @@ screens:
   entryParams:
   - eventId<-deepLink
   - cartId<-session
+  - venueId<-session
   goesTo:
   - GST-001
   - GST-002
@@ -356,6 +377,7 @@ screens:
   density: comfortable
   operations:
   - addCartLine
+  - getPublishedBookingFlow
   - getPublishedGuidedChoice
   - listProductCategories
   - listProductVariants
@@ -395,6 +417,7 @@ screens:
   - createPayment
   - getCart
   - getPaymentLink
+  - getPublishedBookingFlow
   - inquirePaymentStatus
   - payByLink
   - transferOrderTickets
@@ -410,6 +433,7 @@ screens:
   - orderId<-deepLink
   - paymentId<-deepLink
   - token<-deepLink
+  - venueId<-session
   goesTo:
   - GST-001
   - GST-002
@@ -1238,7 +1262,7 @@ screens:
   inFlows:
   - F53 A guest earns, sees and spends loyalty
 - screen: GST-038
-  name: Digital Companion Mode
+  name: At the Venue
   module: In-venue Services
   requiresModule: queue
   wave: 3
@@ -1259,6 +1283,12 @@ screens:
   goesTo:
   - GST-001
   - GST-002
+  - GST-021
+  - GST-022
+  - GST-023
+  - GST-024
+  - GST-026
+  - GST-029
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-038
   inFlows: null
@@ -1336,6 +1366,7 @@ screens:
   - extendCart
   - getCart
   - getPerformance
+  - getPublishedBookingFlow
   - getResourceHold
   - listProductVariants
   - removeCartLine
@@ -1354,13 +1385,16 @@ screens:
   - productId<-navigation
   - performanceId<-navigation
   - holdId<-navigation
+  - venueId<-session
   goesTo:
   - GST-001
   - GST-002
   - GST-042
+  - GST-059
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-041
-  inFlows: null
+  inFlows:
+  - F49 A guest plans a day and follows it
 - screen: GST-042
   name: Simple Registration & OTP
   module: Account & Self-Service
@@ -1598,12 +1632,13 @@ screens:
   wireframe: wireframes/P02 Guest App.dc.html#gst-050
   inFlows: null
 - screen: GST-051
-  name: Plan Your Adventure – Start
+  name: Plan
   module: Engagement & Support
-  requiresModule: queue
-  wave: 4
+  requiresModule: ticketing
+  wave: 1
   density: comfortable
   operations:
+  - generateVisitPlan
   - getWaitTimes
   - listProducts
   states:
@@ -1614,11 +1649,12 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - venueId<-session
   goesTo:
   - GST-001
-  - GST-002
   - GST-052
+  - GST-053
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-051
   inFlows:
@@ -1626,10 +1662,11 @@ screens:
 - screen: GST-052
   name: Suggested Itineraries
   module: Engagement & Support
-  requiresModule: ai
-  wave: 4
+  requiresModule: ticketing
+  wave: 1
   density: comfortable
   operations:
+  - generateVisitPlan
   - listCatalogueBundles
   - listProducts
   states:
@@ -1641,26 +1678,28 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - suggestionId<-deepLink
+  - venueId<-session
   goesTo:
   - GST-001
-  - GST-002
+  - GST-051
   - GST-053
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-052
-  inFlows:
-  - F49 A guest plans a day and follows it
+  inFlows: null
 - screen: GST-053
-  name: Build Your Own Itinerary
+  name: Your Plan
   module: Engagement & Support
   requiresModule: ticketing
-  wave: 4
+  wave: 1
   density: comfortable
   operations:
-  - addCartLine
+  - bookVisitPlan
   - getCart
+  - getVisitPlan
   - getWaitTimes
   - listProducts
+  - listVisitPlanAlternatives
+  - updateVisitPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1670,26 +1709,36 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - planId<-GST-051
+  - venueId<-session
+  - itemId<-navigation
   - cartId<-session
   goesTo:
   - GST-001
-  - GST-002
+  - GST-041
+  - GST-048
+  - GST-051
   - GST-054
+  - GST-059
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-053
   inFlows:
   - F49 A guest plans a day and follows it
 - screen: GST-054
-  name: AI Optimized Itinerary
+  name: AI Planner
   module: Engagement & Support
   requiresModule: ai
-  wave: 4
+  wave: 1
   density: comfortable
   operations:
+  - createAiConversation
+  - getVisitPlan
   - getWaitTimes
-  - listProducts
+  - requestSuggestion
   - sendAiMessage
+  - updateVisitPlan
   states:
+  - aiUnavailable
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
@@ -1698,11 +1747,12 @@ screens:
   - offline
   offlineState: true
   entryParams:
+  - planId<-GST-053
   - conversationId<-deepLink
-  - suggestionId<-deepLink
+  - venueId<-session
   goesTo:
   - GST-001
-  - GST-002
+  - GST-053
   - GST-059
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-054
@@ -1762,6 +1812,7 @@ screens:
   goesTo:
   - GST-001
   - GST-002
+  - GST-041
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-056
   inFlows: null
@@ -1816,14 +1867,16 @@ screens:
   wireframe: wireframes/P02 Guest App.dc.html#gst-058
   inFlows: null
 - screen: GST-059
-  name: Plan My Day – In Progress
+  name: Plan in Progress
   module: Engagement & Support
-  requiresModule: ai
-  wave: 4
+  requiresModule: ticketing
+  wave: 1
   density: comfortable
   operations:
+  - getVisitPlan
   - getWaitTimes
-  - listProducts
+  - listVisitPlanAlternatives
+  - updateVisitPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1833,10 +1886,13 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - suggestionId<-deepLink
+  - planId<-GST-053
+  - venueId<-session
+  - itemId<-navigation
   goesTo:
   - GST-001
-  - GST-002
+  - GST-038
+  - GST-053
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-059
   inFlows:
@@ -1890,7 +1946,7 @@ screens:
   inFlows:
   - F51 A guest shops in the venue and collects on the way out
 - screen: GST-063
-  name: Search
+  name: Explore – Search Results
   module: Discovery
   requiresModule: ticketing
   wave: 1
@@ -1907,6 +1963,8 @@ screens:
   entryParams: []
   goesTo:
   - GST-001
+  - GST-002
+  - GST-004
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-063
   inFlows: null

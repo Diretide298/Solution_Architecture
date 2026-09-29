@@ -4,17 +4,17 @@
 
 | | |
 |---|---|
-| Screens | 69 |
-| Operations | 78 |
+| Screens | 70 |
+| Operations | 84 |
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 123 |
-| Waves | wave3 69 |
+| Operations with no screen | 122 |
+| Waves | wave3 70 |
 
 ## Gaps
 
-### 123 operations with no screen here
+### 122 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -59,14 +59,14 @@
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
-| `listStockReservations` | inventory | GET | Soft holds on stock |
-| … | | | 83 more |
+| `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
+| … | | | 82 more |
 
 ## Modules
 
 | Module | Screens | Waves |
 |---|---|---|
-| Analytics | 69 | 3 |
+| Analytics | 70 | 3 |
 
 ## Screens
 
@@ -141,4 +141,5 @@
 | `ANL-068` | Embedded BI, Workspace & Tenant Administration | Analytics | 3 | 1 | yes |
 | `ANL-069` | Analytics Performance, Usage & Cost Monitor | Analytics | 3 | 1 | yes |
 | `ANL-070` | Analytics Governance, Security & Audit Center | Analytics | 3 | 1 | yes |
+| `ANL-071` | AI Maturity & Learning | Analytics | 3 | 6 | yes |
 

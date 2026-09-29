@@ -1009,11 +1009,6 @@ screens:
     - ACC-006
     - ACC-008
     transitions:
-    - to: ACC-005
-      trigger: The badge is issued
-      provenance: flow F23 step 2→3
-      carries:
-      - holderId
     - to: ACC-006
       trigger: Reviewer Queue
       provenance: derived — ACC-006 declares entryState.params  and ACC-007 holds none of them, so the
@@ -1022,6 +1017,11 @@ screens:
       trigger: Credential Register
       provenance: derived — ACC-008 declares entryState.params  and ACC-007 holds none of them, so the
         edge carries nothing and ACC-008 opens cold
+    - to: ACC-005
+      trigger: The badge is issued
+      provenance: flow F23 step 2→3
+      carries:
+      - holderId
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-application-detail

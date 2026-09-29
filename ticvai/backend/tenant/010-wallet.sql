@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS wallet.authentication_policy (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.auto_reload_setting (
     wallet_id                         uuid,
     subject_id                        uuid,
@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS wallet.dispute (
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.exit_settlement (
     id                                uuid PRIMARY KEY NOT NULL,
     wallet_id                         uuid NOT NULL,
@@ -410,6 +410,8 @@ CREATE TABLE IF NOT EXISTS wallet.wallet (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.wallet_transaction (
     id                                text PRIMARY KEY NOT NULL,
+    wallet_id                         uuid,
+    wallet_hold_id                    uuid,
     kind                              text NOT NULL CONSTRAINT wallet_transaction_kind_chk CHECK (kind IN ('topUp', 'spend', 'refund', 'adjustment', 'bonus', 'expiry', 'transfer')),
     amount                            numeric(18,4) NOT NULL,
     balance_after                     numeric(18,4) NOT NULL,

@@ -1,0 +1,33 @@
+# sync.rejectionRaised v1 — published by orders
+# Added 29 September (system-design review SD-033, SD-028).
+
+name: sync.rejectionRaised
+version: 1
+publisher: orders
+description: An entry replayed by an offline device was refused on its merits and quarantined.
+aggregate: syncRejection
+emittedWhen: syncOrders (or access syncScans) writes a sync.rejection row
+emittedBy:
+- orders.syncOrders
+payload:
+- field: rejectionId
+  type: string
+- field: workstationId
+  type: uuid
+- field: kind
+  type: string
+  notes: order, payment, refund, void, scan
+- field: entryId
+  type: string
+- field: problemType
+  type: string
+- field: rejectedAt
+  type: timestamp
+consumers:
+- context: platform
+  purpose: Raise an operator alert (BO-133 Offline Alerts) so the rejection is resolved, not lost
+  idempotencyKey: rejectionId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: No state model emits this. A quarantined sale is money the venue took and has not booked.

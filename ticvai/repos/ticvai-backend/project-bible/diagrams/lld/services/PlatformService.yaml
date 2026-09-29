@@ -1,9 +1,9 @@
 id: LLD-PlatformService
-title: PlatformService — 206 operations, 98 tables
+title: PlatformService — 212 operations, 102 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, two schemas, 98 tables.** Subscription, platform operations and the public
+why: '**Three contracts, two schemas, 102 tables.** Subscription, platform operations and the public
   API all write `control.*` — **they are one bounded context that was split into three contracts for
   API-surface reasons, not for data reasons.**
 
@@ -13,14 +13,14 @@ why: '**Three contracts, two schemas, 98 tables.** Subscription, platform operat
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 206
-  inAFlow: 87
-  percent: 42%
+  operations: 212
+  inAFlow: 91
+  percent: 43%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 75
+  tables: 79
   stores:
   - postgres
   largestTable: control.partner_agreement
@@ -1485,7 +1485,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: public-api
-  count: 25
+  count: 31
   operations:
   - operation: certifyIntegration
     verb: POST
@@ -1501,7 +1501,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_MANAGE
     offline: false
-    reads: 4
+    reads: 5
     writes: 2
   - operation: createSandbox
     verb: POST
@@ -1519,6 +1519,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: decideProductionAccess
+    verb: POST
+    path: /production-access-requests/{requestId}/decide
+    scope: tenant
+    permission: DEVELOPER_ADMIN
+    offline: false
+    reads: 3
+    writes: 3
   - operation: deprecateApiVersion
     verb: POST
     path: /api-versions/{version}/deprecate
@@ -1543,9 +1551,25 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: listApiAnomalies
+    verb: GET
+    path: /api-anomalies
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listApiClients
     verb: GET
     path: /api-clients
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApiScopes
+    verb: GET
+    path: /api-scopes
     scope: tenant
     permission: DEVELOPER_VIEW
     offline: false
@@ -1562,6 +1586,14 @@ operationsByContract:
   - operation: listIntegrationListings
     verb: GET
     path: /listings
+    scope: tenant
+    permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listProductionAccessRequests
+    verb: GET
+    path: /production-access-requests
     scope: tenant
     permission: DEVELOPER_VIEW
     offline: false
@@ -1615,6 +1647,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: requestProductionAccess
+    verb: POST
+    path: /api-clients/{clientId}/production-access
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 5
+    writes: 2
   - operation: resetSandbox
     verb: POST
     path: /sandboxes/{sandboxId}/reset
@@ -1636,6 +1676,14 @@ operationsByContract:
     path: /api-clients/{clientId}/credentials
     scope: tenant
     permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setApiAnomalyRule
+    verb: PUT
+    path: /api-anomaly-rules
+    scope: tenant
+    permission: DEVELOPER_ADMIN
     offline: false
     reads: 2
     writes: 2
@@ -1725,6 +1773,7 @@ tables:
   - createSandbox
   - createTenant
   - createWebhookSubscription
+  - decideProductionAccess
   - decommissionBurstEnvironment
   - decommissionCell
   - deprecateApiVersion
@@ -1754,6 +1803,7 @@ tables:
   - replayDeadLetter
   - replayEvents
   - requestBurstEnvironment
+  - requestProductionAccess
   - resetSandbox
   - resolveInvoiceDispute
   - rollbackMigrationRun
@@ -1762,6 +1812,7 @@ tables:
   - rotateApiCredential
   - scheduleTenantUpgrade
   - setAgreementContractTerm
+  - setApiAnomalyRule
   - setApiLicensing
   - setApiQuota
   - setChannelListing
@@ -1825,6 +1876,7 @@ tables:
   - createSandbox
   - createTenant
   - createWebhookSubscription
+  - decideProductionAccess
   - decommissionCell
   - deprecateApiVersion
   - disputeInvoice
@@ -1849,6 +1901,7 @@ tables:
   - rejectRelease
   - removeLicenceAddOn
   - replayEvents
+  - requestProductionAccess
   - resetSandbox
   - resolveInvoiceDispute
   - revokeApiCredential
@@ -1858,6 +1911,7 @@ tables:
   - rotateApiCredential
   - scheduleTenantUpgrade
   - setAgreementContractTerm
+  - setApiAnomalyRule
   - setApiLicensing
   - setApiQuota
   - setChannelListing
@@ -1913,15 +1967,28 @@ tables:
     or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
     are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
     the package alone.'
+- table: control.api_anomaly
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: control.api_anomaly_rule
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
 - table: control.api_client
-  columns: 10
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
   - public-api
   foreignWriters: null
 - table: control.api_licence
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -2038,7 +2105,7 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.integration_listing
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2308,6 +2375,13 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
+- table: control.production_access_request
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - public-api
+  foreignWriters: null
 - table: control.release
   columns: 12
   store: postgres
@@ -2378,6 +2452,14 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
+- table: control.tenant_domain
+  columns: 9
+  store: postgres
+  parent: control.tenant
+  writtenBy:
+  - tenancy
+  foreignWriters:
+  - tenancy
 - table: control.tenant_migration
   columns: 15
   store: postgres
@@ -2967,6 +3049,7 @@ flows:
 - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - F16 A venue opens for the first time
 - F27 A developer integrates
+- F36 A developer goes from sandbox to production
 - F77 A promotion is built, bundled, published and measured
 - F79 A workstation is registered, configured and rolled out
 - F96 A tenant is provisioned, licensed and its modules enabled

@@ -1,5 +1,5 @@
 id: LLD-finance
-title: finance — 71 operations
+title: finance — 72 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -656,6 +656,26 @@ operations:
   - ledger.tax_invoice
   - ledger.tax_invoice_line
   writes: []
+- operation: postOrderRevenue
+  verb: POST
+  path: /internal/order-postings
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - ledger.account
+  - ledger.journal_entry
+  - ledger.journal_line
+  - ledger.tax_code
+  - orders.order_line
+  - orders.sales_order
+  writes:
+  - ledger.journal_entry
+  - ledger.journal_line
+  - platform.idempotency_record
+  - platform.outbox
 - operation: recordDeposit
   verb: POST
   path: /deposits

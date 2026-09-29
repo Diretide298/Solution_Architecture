@@ -7,6 +7,8 @@ publisher: subscription
 description: A tenant has been suspended, in one of three modes.
 aggregate: tenant
 emittedWhen: TenantStatus active to suspended
+emittedBy:
+- suspendTenant
 payload:
 - field: tenantId
   type: uuid

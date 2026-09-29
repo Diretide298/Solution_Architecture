@@ -25,14 +25,14 @@
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
 | [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 10 |
-| [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 5 |
+| [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 6 |
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
-| [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 5 |
-| [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 7 |
-| [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 13 |
-| [WEB-011](#web-011-guest-details-attendee-forms) | Guest Details & Attendee Forms | Cart & Checkout | 1 | 13 |
-| [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 5 |
+| [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 6 |
+| [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 8 |
+| [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 14 |
+| [WEB-011](#web-011-guest-details-attendee-forms) | Guest Details & Attendee Forms | Cart & Checkout | 1 | 14 |
+| [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 6 |
 | [WEB-013](#web-013-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [WEB-014](#web-014-pay-for-a-booking) | Pay for a Booking | Cart & Checkout | 1 | 2 |
 | [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 14 |
@@ -45,8 +45,9 @@
 | [WEB-029](#web-029-error-sold-out-maintenance) | Error / Sold Out / Maintenance | System States | 1 | 1 |
 | [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 4 |
 | [WEB-035](#web-035-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
-| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 5 |
-| [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 2 | 5 |
+| [WEB-050](#web-050-plan-your-visit) | Plan Your Visit | Discovery & Browse | 1 | 6 |
+| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 6 |
+| [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 2 | 6 |
 | [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 2 | 3 |
 | [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 2 | 11 |
 | [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 2 | 4 |
@@ -117,7 +118,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-002 | Event & Attraction Listing |  |  |
+| WEB-002 | Event & Attraction Listing | eventId |  |
 | WEB-003 | Search Results |  |  |
 | WEB-016 | Login / Register |  |  |
 | WEB-036 | F&B – Browse & Order |  |  |
@@ -151,6 +152,7 @@
 | WEB-028 | Contact & Venue Information |  |  |
 | WEB-029 | Error / Sold Out / Maintenance |  |  |
 | WEB-049 | Book a trip (a transport venue) |  |  |
+| WEB-050 | Plan your visit (header) |  |  |
 | WEB-004 | Opens a product and decides | productId |  |
 
 ## WEB-002 Event & Attraction Listing
@@ -171,6 +173,7 @@
 | Parameter | From |
 |---|---|
 | eventId | deepLink |
+| venueId | session |
 
 **Operations**
 
@@ -181,6 +184,7 @@
 | `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The category tiles (a tree: parentId, displayOrder, image) | `PRODUCT_VIEW` |
+| `getPublishedGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedguidedchoice) | onLoad | Help me choose: the questions whose answers filter this list (W4) | `None` |
 
 **States**
 
@@ -319,6 +323,7 @@
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | Category tiles and the experience filter, with descriptions | `PRODUCT_VIEW` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | The tickets of a category or level (`categoryId`, `segmentTag`) | `PRODUCT_VIEW` |
 | `getPublishedGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedguidedchoice) | onLoad | The venue's published Help me choose (404 = none) | `None` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -335,11 +340,12 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-006 | Change date or time (the dated flow picks them first) |  |  |
-| WEB-007 | Interactive Seat Selection |  |  |
+| WEB-006 | Change date or time (the dated flow picks them first) | eventId |  |
+| WEB-007 | Interactive Seat Selection | eventId |  |
 | WEB-008 | Add-ons & Upsell |  |  |
 | WEB-010 | Shopping Cart | code, lineId |  |
 | WEB-016 | Continue, when sign-in is asked after add-ons and this booking has no add-ons step | cartId |  |
+| WEB-006 | Workshop chosen, then date and time (product-first flow) | productId |  |
 
 ## WEB-006 Date & Performance Selection
 
@@ -361,6 +367,7 @@
 | performanceId | navigation |
 | cartId | navigation |
 | eventId | WEB-004 |
+| venueId | session |
 
 **Operations**
 
@@ -373,6 +380,7 @@
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The times of the event for the picked date or range, filtered by `language` | `PRODUCT_VIEW` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onAction | The cart's `consentQuestions` after the time is added | `None` |
 | `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions | `ORDER_CREATE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -416,6 +424,7 @@
 | lineId | deepLink |
 | performanceId | navigation |
 | holdId | navigation |
+| venueId | session |
 
 **Operations**
 
@@ -434,6 +443,7 @@
 | `createCart` | [OrderService](../backend/OrderService.md#createcart) | onAction | Start a cart | `None` |
 | `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | The visit date and time of each line (`Performance.startsAt`) | `PRODUCT_VIEW` |
 | `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The countdown of a cabana or spot held on the venue map (`expiresAt`) | `ORDER_VIEW` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -451,8 +461,9 @@
 |---|---|---|---|
 | WEB-012 | Checkout — Payment | orderId, paymentId |  |
 | WEB-013 | Booking Confirmation | orderId |  |
-| WEB-011 | Enters contact details and answers consent |  |  |
 | WEB-016 | Login / Register | subjectId |  |
+| WEB-012 | Guest code proved or signed in: straight to payment (details skipped) | orderId, paymentId |  |
+| WEB-011 | Answers attendee forms and consent, only where the cart needs them |  |  |
 | WEB-030 | They transfer three tickets | orderId |  |
 
 ## WEB-011 Guest Details & Attendee Forms
@@ -476,6 +487,7 @@
 | itemId | deepLink |
 | subjectId | session |
 | cartId | session |
+| venueId | session |
 
 **Operations**
 
@@ -494,6 +506,7 @@
 | `uploadGuestDocument` | [MarketingService](../backend/MarketingService.md#uploadguestdocument) | onAction | Provide a document a booking requires | `GUEST_VIEW_PII` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart's consent questions still unanswered | `None` |
 | `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record answers to the booking's consent questions | `ORDER_CREATE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -513,6 +526,7 @@
 | WEB-016 | Chooses to sign in rather than continue as a guest | cartId | no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather than in front of the cart |
 | WEB-013 | Booking Confirmation |  |  |
 | WEB-012 | Pays |  |  |
+| WEB-012 | Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms) |  |  |
 | WEB-010 | They check out | cartId, performanceId |  |
 
 ## WEB-012 Checkout — Payment
@@ -534,6 +548,7 @@
 |---|---|
 | orderId | deepLink |
 | paymentId | navigation |
+| venueId | session |
 
 **Operations**
 
@@ -544,6 +559,7 @@
 | `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
 | `getOrder` | [OrderService](../backend/OrderService.md#getorder) | onLoad | Read an order | `ORDER_VIEW` |
 | `inquirePaymentStatus` | [OrderService](../backend/OrderService.md#inquirepaymentstatus) | onAction | Ask what happened to a payment that did not answer | `ORDER_CREATE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -1117,6 +1133,57 @@
 | WEB-030 | Ticket Transfer |  |  |
 | WEB-031 | My Reservations | productId |  |
 
+## WEB-050 Plan Your Visit
+
+**Plan a visit on the website: answer six questions, get a day-by-day plan, edit it, and book it in one go.**
+
+|  |  |
+|---|---|
+| Module | Discovery & Browse |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/plan-your-visit` |
+| Component | `apps/guest-web/src/routes/PlanYourVisit.tsx` |
+| Pattern | multiStepForm |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| planId | deepLink |
+| itemId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Interests and height limits of what the planner may include | `PRODUCT_VIEW` |
+| `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine) | `None` |
+| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version | `None` |
+| `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
+| `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
+| `bookVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#bookvisitplan) | onAction | Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The plan builds in place; the answers stay on screen. |
+| error | Could not build or load the plan. Names what failed; the answers are kept. |
+| emptyFirstRun | No plan yet: the first question is shown. |
+| emptyNoResults | Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it. |
+| emptyNoAccess | A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-010 | Book this plan | cartId |  |
+| WEB-004 | Opens an item on the plan | productId |  |
+| WEB-001 | Back to tickets |  |  |
+
 ## WEB-007 Interactive Seat Selection
 
 **Choose specific seats.**
@@ -1137,6 +1204,7 @@
 | performanceId | deepLink |
 | eventId | WEB-006 |
 | holdId | navigation |
+| venueId | session |
 
 **Operations**
 
@@ -1147,6 +1215,7 @@
 | `recommendSeats` | [CatalogueService](../backend/CatalogueService.md#recommendseats) | onAction | Recommend seats for a party | `PRODUCT_VIEW` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The event's other times, for the time bar and the date and time pop-up | `PRODUCT_VIEW` |
 | `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold | `ORDER_CREATE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -1187,6 +1256,7 @@
 |---|---|
 | cartId | session |
 | bundleId | navigation |
+| venueId | session |
 
 **Operations**
 
@@ -1197,6 +1267,7 @@
 | `listCatalogueBundles` | [CatalogueService](../backend/CatalogueService.md#listcataloguebundles) | onLoad | Which bundles apply here | `PRODUCT_VIEW` |
 | `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill a recommendation slot | `AI_USE` |
 | `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report what happened to recommended items | `AI_USE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 

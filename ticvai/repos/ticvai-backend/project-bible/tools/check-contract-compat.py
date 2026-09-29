@@ -18,13 +18,27 @@ while the major version is unchanged:
             a new enum value on a request field
   refused   an operation removed or moved (method or path), a parameter or field removed, a type
             changed, anything newly required in a request, a response field no longer required,
-            an enum value removed
+            an enum value removed, **a value added to a response enum**, and a change to what the
+            operation means: its `x-ticvai-permission`, `x-ticvai-conflict-policy`,
+            `x-ticvai-read-routing`, `security` or `x-ticvai-emits`
+
+**Semantics count, not only shapes** (system-design review SD-050 and 17 September minutes M17-14,
+added 30 September). A client built against a frozen contract switches on the enum values it was
+given, so a new response enum value lands in its `default` branch; and a permission, a conflict
+policy, a read routing, a security scheme or an emitted event that changes under it breaks it with
+every field still in place. Baselines frozen before this rule carry no `semantics` block and are
+compared on shapes only until re-frozen.
+
+`--changes <contract>` prints the diff against the frozen baseline as `ApiVersion.changes` rows
+(public-api: operationId, contract, kind added/changed/removed, breaking, summary), the developer
+changelog DEV-001 shows (ADR-0026).
 
 A breaking change goes out as a new major version: bump `info.version`, and the check says the
 baseline needs re-freezing instead of failing.
 
 Run: python3 tools/check-contract-compat.py            (gate; passes when nothing is frozen)
      python3 tools/check-contract-compat.py --freeze orders
+     python3 tools/check-contract-compat.py --changes orders   (ApiVersion.changes rows, JSON)
 """
 from __future__ import annotations
 
@@ -89,6 +103,19 @@ def fields(node, base: Path, prefix="", depth=0, seen=frozenset()) -> dict:
     return out
 
 
+SEMANTIC_KEYS = ("x-ticvai-permission", "x-ticvai-conflict-policy", "x-ticvai-read-routing", "security",
+                 "x-ticvai-emits")
+
+
+def semantics(op: dict, c: dict) -> dict:
+    """What an operation means beyond its fields (SD-050). `security` falls back to the contract's own."""
+    out = {}
+    for k in SEMANTIC_KEYS:
+        v = op.get(k, c.get("security") if k == "security" else None)
+        out[k] = json.dumps(v, sort_keys=True) if v is not None else None
+    return out
+
+
 def shape(contract_name: str) -> dict:
     f = next(ROOT.glob(f"contracts/*/{contract_name}.yaml"), None)
     if f is None:
@@ -121,7 +148,7 @@ def shape(contract_name: str) -> dict:
                         resp = fields(sch, rbase)
                     break
             ops[op["operationId"]] = {"verb": verb.upper(), "path": path, "params": params,
-                                      "request": req, "response": resp}
+                                      "request": req, "response": resp, "semantics": semantics(op, c)}
     return {"contract": contract_name, "version": str((c.get("info") or {}).get("version", "")),
             "operations": ops}
 
@@ -158,13 +185,38 @@ def compare(old: dict, new: dict) -> list[str]:
                 gone = set(x["enum"]) - set(y["enum"])
                 if gone:
                     bad.append(f"{o}: {where} `{k}` lost enum value(s) {sorted(gone)}")
-                if not inbound and set(y["enum"]) - set(x["enum"]):
-                    pass  # a new response enum value is additive; clients must tolerate unknowns
+                added_values = set(y["enum"]) - set(x["enum"])
+                if not inbound and added_values:
+                    # SD-050: breaking. A client switches on the values it was given; a new one falls
+                    # into its default branch, which is a behaviour change nobody reviewed.
+                    bad.append(f"{o}: response `{k}` gained enum value(s) {sorted(added_values)}")
             if inbound:
                 for k, y in fb.items():
                     if k not in fa and y["required"]:
                         bad.append(f"{o}: new required {where} `{k}`")
+        sa, sb = a.get("semantics"), b.get("semantics") or {}
+        if sa is not None:  # baselines frozen before SD-050 carry none
+            for k in SEMANTIC_KEYS:
+                if sa.get(k) != sb.get(k):
+                    bad.append(f"{o}: {k} changed {sa.get(k)} -> {sb.get(k)}")
     return bad
+
+
+def changes(old: dict, new: dict) -> list[dict]:
+    """The diff as `ApiVersion.changes` rows (public-api.yaml; M17-14)."""
+    rows = []
+    for o in sorted(set(new["operations"]) - set(old["operations"])):
+        rows.append({"operationId": o, "contract": new["contract"], "kind": "added", "breaking": False,
+                     "summary": "new operation"})
+    per_op: dict = {}
+    for line in compare(old, new):
+        o, _, why = line.partition(": ")
+        per_op.setdefault(o, []).append(why)
+    for o, whys in sorted(per_op.items()):
+        removed = any(w == "operation removed" for w in whys)
+        rows.append({"operationId": o, "contract": new["contract"], "kind": "removed" if removed else "changed",
+                     "breaking": True, "summary": "; ".join(whys)})
+    return rows
 
 
 def main() -> int:
@@ -174,6 +226,16 @@ def main() -> int:
             s = shape(name)
             (FROZEN / f"{name}.json").write_text(json.dumps(s, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             print(f"froze {name} at {s['version']}: {len(s['operations'])} operations")
+        return 0
+
+    if len(sys.argv) >= 3 and sys.argv[1] == "--changes":
+        rows = []
+        for name in sys.argv[2:]:
+            base = FROZEN / f"{name}.json"
+            if not base.exists():
+                raise SystemExit(f"{name} is not frozen; there is nothing to diff against")
+            rows += changes(json.loads(base.read_text(encoding="utf-8")), shape(name))
+        print(json.dumps(rows, indent=1))
         return 0
 
     baselines = sorted(FROZEN.glob("*.json")) if FROZEN.exists() else []

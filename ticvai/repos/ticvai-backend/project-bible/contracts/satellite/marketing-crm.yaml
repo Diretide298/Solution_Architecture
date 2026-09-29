@@ -136,6 +136,8 @@ paths:
         - "P02 GST-035 Feedback & Ratings"
         - "P02 GST-040 Help & Support"
         - "P08 BO-938 Employee Requests & Resource Support"
+      security:
+      - guestAuth: []
       summary: Report something — lost property, a complaint, a question
       description: '**Lost and found, a complaint and a query are one object.** That is what lets a single
         queue serve all three, and it is why `GST-034` and `GST-040` are the same mechanism at two entry
@@ -2074,6 +2076,8 @@ paths:
   /guests/me/profile:
     get:
       operationId: getMyProfile
+      security:
+      - guestAuth: []
       summary: A guest reading their own details
       description: '**The read `updateMyProfile` had none of**, so a guest correcting a phone number could
         not see the one on file first. The caller''s own profile, with their preferences.
@@ -2109,6 +2113,8 @@ paths:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-039 Profile"
+      security:
+      - guestAuth: []
       summary: A guest correcting their own details
       description: '**`updateGuestProfile` is staff-only, and the three screens calling it are the staff
         app, the back office and the CMS** — so to correct a phone number a guest had to ask somebody.
@@ -2874,6 +2880,9 @@ paths:
       operationId: endKioskAssist
       x-ticvai-consumed-by:
         - "P05 KSK-013 Call staff"
+      security:
+      - apiKeyAuth: []
+      - serviceAuth: []
       x-ticvai-audience:
       - device
       summary: Stop assisting
@@ -3169,7 +3178,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 BO-735 Guest Directory"
         - "P08 BO-738 Activity Timeline"
@@ -3420,6 +3429,99 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+  /consent-records/checkout:
+    post:
+      operationId: recordCheckoutConsents
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '29 September: 18 September minutes M18-15 (marketing opt-in at guest checkout, unticked, recorded as consent); the order.created consumer, shaped as access issueOrderEntitlements'
+      summary: Record the marketing opt-ins a guest ticked at checkout
+      description: '**The `order.created` consumer for checkout opt-ins** (18 September minutes M18-15, applied 30
+        September), modelled as an operation so it has lineage and a ticket. orders `checkoutCart` carries
+        `marketingConsents[]` (channel, purpose, granted, noticeVersion), shown unticked beside the terms; each
+        entry with `granted: true` becomes one append-only `ConsentRecord` with source `checkout`, decision
+        `granted`, the notice version shown, the order id and the verified contact (`verifiedContactRef`). An
+        entry left unticked records nothing: consent is never inferred from a purchase.
+
+
+        **Bound to the profile on match.** When the order has a guest (`subjectId`), the record is theirs. A
+        guest checkout without an account is matched by the venue''s `GuestMatchPolicy` on the verified contact:
+        a match attaches the record to that profile; no match keeps it against `verifiedContactRef`, and it is
+        attached when a profile later matches the same contact (the same claim rule as `claimDeviceConsent`).
+
+
+        **Idempotent on order id + channel + purpose**: a redelivered `order.created` finds the records already
+        written and returns them. Invoked by the event relay, never by a screen. Whether a guest-checkout
+        opt-in is sufficient consent is the client''s to confirm (make-or-break on `checkoutCart`).
+
+        '
+      tags:
+      - consent
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-consumes:
+      - order.created
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - orderId
+              - verifiedContactRef
+              - marketingConsents
+              properties:
+                eventId:
+                  type: string
+                  description: The `order.created` event id, for the consumer's inbox record.
+                orderId:
+                  type: string
+                subjectId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                verifiedContactRef:
+                  type: string
+                  maxLength: 128
+                marketingConsents:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - channel
+                    - purpose
+                    - granted
+                    - noticeVersion
+                    properties:
+                      channel:
+                        $ref: '#/components/schemas/MessageChannel'
+                      purpose:
+                        $ref: '#/components/schemas/ConsentPurpose'
+                      granted:
+                        type: boolean
+                      noticeVersion:
+                        type: string
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The consent records written now or already written; empty when nothing was ticked.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsentRecord'
   /guests/{subjectId}/consents/history:
     parameters:
     - name: subjectId
@@ -4794,6 +4896,7 @@ paths:
         - "P08 BO-561 Overdue Rental Management"
         - "P08 BO-679 Manual & Bulk Communication Center"
         - "P10 PTR-004 Notifications"
+      x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - service
       - partner
@@ -4817,7 +4920,8 @@ paths:
         '
       tags:
       - message
-      x-ticvai-permission: null
+      x-ticvai-permission: MARKETING_SEND
+      x-ticvai-permission-note: 'System-design review SD-056 (29 September): was null, so any partner token could message any guest. A partner or staff caller now needs MARKETING_SEND (the nearest existing permission; no MESSAGE_SEND was added); a service caller is authorised by its workload identity (serviceAuth), as every service-only operation is.'
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4876,6 +4980,7 @@ paths:
       operationId: getMessageStatus
       x-ticvai-consumed-by:
         - "P10 PTR-004 Notifications"
+      x-ticvai-api-scope: marketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -4911,6 +5016,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-api-scope: marketing.read
       x-ticvai-audience:
       - staff
       - guest
@@ -4977,6 +5083,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
       - guest
@@ -5034,6 +5141,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-api-scope: marketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -5064,6 +5172,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -5131,6 +5240,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -5204,6 +5314,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -5269,6 +5380,7 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -14628,8 +14740,8 @@ paths:
       operationId: listConsentQuestions
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
-        - "P13 CMS-016 Site Settings"
         - "P13 CMS-018 Consent & Legal"
+        - "P13 CMS-103 Booking Flows"
       x-ticvai-requires-module: core   # booking consent works without the marketing licence (decided 29 September, rev 3 REV3-26)
       x-ticvai-audience:
       - staff
@@ -15255,7 +15367,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
         - "P02 GST-066 Privacy & My Data"
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
@@ -15445,7 +15557,9 @@ paths:
       x-ticvai-audience:
       - anonymous
       - guest
-      security: []
+      security:
+      - consentKeyAuth: []
+      - guestAuth: []
       x-ticvai-agreed: '29 September: matrix 2.6.61 (review consent history, change preferences, withdraw); BL-073 design §4b; shape follows getConsentHistory'
       summary: A visitor's own cookie decisions, oldest first
       description: >
@@ -15456,6 +15570,12 @@ paths:
         **The key is the only credential**, so it travels in a header, not the URL. A key claimed by a
         guest answers 404: its decisions are that guest's now, and a shared browser must not show them
         to the next person.
+
+        **No longer open** (system-design review SD-056, 29 September): `security: []` let anyone who
+        guessed or copied a key read its history. The call now needs the device's own cookie-consent
+        token (`consentKeyAuth`: the `X-Consent-Key` the storefront issued to that browser or app, bound
+        to it, rotated when the visitor records a new decision) or a guest session, and answers only
+        for that one key: self-scoped to the device, never a lookup by someone else's key.
       tags:
       - consent
       x-ticvai-permission: null
@@ -15463,6 +15583,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
+      x-ticvai-self-scoped: device
       parameters:
       - name: X-Consent-Key
         in: header
@@ -15572,7 +15693,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
         - "P02 GST-066 Privacy & My Data"
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
@@ -20441,7 +20562,10 @@ components:
       - import
       - agentRecorded
       - cookieBanner
-      description: '`cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference
+      - checkout
+      description: '`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on
+        orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and
+        the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference
         centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the
         audit trail (2.6.56) has to tell the two apart.'
     GuestMatchPolicy:
@@ -20983,6 +21107,19 @@ components:
             type: string
             format: uuid
             nullable: true
+          orderId:
+            type: string
+            nullable: true
+            description: 'The order whose checkout carried the opt-in (source `checkout`, M18-15): the ULID
+              of orders.sales_order. Null for every other source.'
+            x-ticvai-references: orders.sales_order
+          verifiedContactRef:
+            type: string
+            nullable: true
+            maxLength: 128
+            description: 'The verified contact the checkout opt-in was given against (ADR-0045), as the keyed
+              hash the guest match policy uses; never the raw address. It is how a checkout consent given
+              without an account is attached to the profile when the contact later matches one.'
           supersededAt:
             type: string
             format: date-time
@@ -34794,6 +34931,27 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005), the requirement''s.'
   securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    consentKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Consent-Key
+      description: The cookie-consent key the storefront issued to one browser or app (SD-056). It proves only
+        that device; it reads that device's own consent history and nothing else.
     bearerAuth:
       type: http
       scheme: bearer

@@ -7,6 +7,8 @@ publisher: ledger
 description: A journal entry has been posted and is now immutable.
 aggregate: journalEntry
 emittedWhen: JournalStatus draft or pendingApproval to posted
+emittedBy:
+- approveJournalEntry
 payload:
 - field: journalEntryId
   type: string

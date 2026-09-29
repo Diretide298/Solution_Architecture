@@ -4,9 +4,9 @@
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS transport.departure (
-    id                                jsonb PRIMARY KEY NOT NULL,
-    route_id                          jsonb NOT NULL,
-    timetable_id                      jsonb NOT NULL,
+    id                                text PRIMARY KEY NOT NULL,
+    route_id                          text NOT NULL,
+    timetable_id                      text NOT NULL,
     performance_id                    uuid NOT NULL,
     service_date                      date NOT NULL,
     departs_at                        timestamptz NOT NULL,
@@ -19,9 +19,9 @@ CREATE TABLE IF NOT EXISTS transport.departure (
 -- Holds 5 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS transport.fare_matrix_cell (
-    fare_table_id                     jsonb NOT NULL,
-    from_station_id                   jsonb NOT NULL,
-    to_station_id                     jsonb NOT NULL,
+    fare_table_id                     text NOT NULL,
+    from_station_id                   text NOT NULL,
+    to_station_id                     text NOT NULL,
     fare                              numeric(18,4) NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS transport.fare_matrix_cell (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS transport.fare_passenger_type (
-    fare_table_id                     jsonb NOT NULL,
+    fare_table_id                     text NOT NULL,
     code                              text NOT NULL,
     name                              jsonb NOT NULL,
     description                       jsonb,
@@ -49,17 +49,17 @@ CREATE TABLE IF NOT EXISTS transport.fare_table (
     base_fare                         numeric(18,4),
     per_stop_fare                     numeric(18,4),
     effective_from                    timestamptz NOT NULL,
-    id                                jsonb PRIMARY KEY NOT NULL,
-    route_id                          jsonb NOT NULL
+    id                                text PRIMARY KEY NOT NULL,
+    route_id                          text NOT NULL
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS transport.favourite_route (
-    id                                jsonb PRIMARY KEY NOT NULL,
+    id                                text PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
-    from_station_id                   jsonb NOT NULL,
-    to_station_id                     jsonb NOT NULL,
+    from_station_id                   text NOT NULL,
+    to_station_id                     text NOT NULL,
     from_station_name                 text,
     to_station_name                   text,
     label                             text,
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS transport.favourite_route (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS transport.network_import (
-    id                                jsonb PRIMARY KEY NOT NULL,
+    id                                text PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
     format                            text NOT NULL CONSTRAINT network_import_format_chk CHECK (format IN ('csvBundle', 'gtfs')),
     source_ref                        uuid NOT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS transport.pass_type (
     validity_days                     integer NOT NULL,
     route_ids                         text[],
     sort_order                        integer DEFAULT 0,
-    id                                jsonb PRIMARY KEY NOT NULL,
+    id                                text PRIMARY KEY NOT NULL,
     is_active                         boolean NOT NULL DEFAULT true,
     catalogue_product_id              uuid
 );
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS transport.route (
     colour                            text,
     paired_route_id                   text,
     booking_cutoff_minutes            integer DEFAULT 5,
-    id                                jsonb PRIMARY KEY NOT NULL,
+    id                                text PRIMARY KEY NOT NULL,
     status                            text NOT NULL CONSTRAINT route_status_chk CHECK (status IN ('draft', 'active', 'suspended', 'retired')),
     total_minutes                     integer,
     catalogue_event_id                uuid,
@@ -120,12 +120,12 @@ CREATE TABLE IF NOT EXISTS transport.route (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS transport.route_stop (
-    route_id                          jsonb NOT NULL,
-    station_id                        jsonb NOT NULL,
+    route_id                          text NOT NULL,
+    station_id                        text NOT NULL,
     offset_minutes                    integer NOT NULL,
     is_boarding_allowed               boolean DEFAULT true,
     is_alighting_allowed              boolean DEFAULT true,
-    id                                jsonb PRIMARY KEY NOT NULL,
+    id                                text PRIMARY KEY NOT NULL,
     sequence                          integer NOT NULL
 );
 
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS transport.station (
     short_name                        jsonb,
     latitude                          numeric(18,4),
     longitude                         numeric(18,4),
-    id                                jsonb PRIMARY KEY NOT NULL,
+    id                                text PRIMARY KEY NOT NULL,
     is_active                         boolean NOT NULL DEFAULT true
 );
 
@@ -151,8 +151,8 @@ CREATE TABLE IF NOT EXISTS transport.timetable (
     release_horizon_days              integer DEFAULT 30,
     seat_capacity                     integer NOT NULL,
     seat_map_id                       uuid,
-    id                                jsonb PRIMARY KEY NOT NULL,
-    route_id                          jsonb NOT NULL,
+    id                                text PRIMARY KEY NOT NULL,
+    route_id                          text NOT NULL,
     status                            text NOT NULL CONSTRAINT timetable_status_chk CHECK (status IN ('draft', 'published', 'superseded', 'withdrawn')),
     published_at                      timestamptz,
     released_through                  date,
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS transport.timetable (
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS transport.timetable_run (
-    timetable_id                      jsonb NOT NULL,
+    timetable_id                      text NOT NULL,
     departs_at                        text NOT NULL,
     days                              text[] NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL

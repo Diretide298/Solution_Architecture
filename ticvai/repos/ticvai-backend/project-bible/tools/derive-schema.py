@@ -571,14 +571,22 @@ def main() -> int:
     for child, (parent_schema, parent_table) in sorted(child_of.items()):
         body = all_schemas.get(parent_schema) or {}
         # the array of objects on the parent — the rows of the child
+        # **A field that travels and is not stored is not a child's rows either** (SD-008, 29
+        # September): `Order.droppedPromotions` is `x-ticvai-persisted: false`, and because the
+        # match below scored names by shared *letters*, it beat `lines` and made
+        # `order_line.promotion_id NOT NULL` -- every line without a promotion failed to insert.
         arrays = [(k, v) for k, v in properties_of(body, all_schemas).items()
                   if isinstance(v, dict) and v.get("type") == "array"
-                  and isinstance(v.get("items"), dict)]
+                  and isinstance(v.get("items"), dict)
+                  and v.get("x-ticvai-persisted") is not False]
         if not arrays:
             continue
-        # the array whose name best matches the child's own name
+        # the array whose name matches the child's own name: exactly (`lines` for `order_line`,
+        # `discounts` for `order_line_discount`), then by prefix, then by the old letter overlap
         tail = child.split(".")[-1].replace(parent_table.split(".")[-1] + "_", "")
-        key, spec = max(arrays, key=lambda kv: len(set(snake(kv[0])) & set(tail)))
+        _exact = [kv for kv in arrays if snake(kv[0]).rstrip("s") in (tail, tail.split("_")[-1])]
+        _prefix = [kv for kv in arrays if snake(kv[0]).startswith(tail)]
+        key, spec = (_exact or _prefix or [max(arrays, key=lambda kv: len(set(snake(kv[0])) & set(tail)))])[0]
         items = spec["items"]
         if "$ref" in items:
             resolved = all_schemas.get(items["$ref"].split("/")[-1])
@@ -1178,6 +1186,22 @@ def main() -> int:
     for _d in _renamed_tables:
         print(f"     {_d}")
 
+    # **Only `<schema>.<table>` is a table** (SD-007, 29 September). Prose that leaked out of a
+    # `none — embedded as ...` tag through an authored lineage entry is dropped here, with every
+    # column that pointed at it, so derive-ddl never sees it.
+    _valid = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
+    _dropped = [t for t in existing if "." in t and ":" not in t and not _valid.match(t)]
+    for _t in _dropped:
+        existing.pop(_t, None)
+        for _k in ("storage", "store", "origin", "lineage"):
+            if isinstance(S.get(_k), dict):
+                S[_k].pop(_t, None)
+    for _t, _row in existing.items():
+        existing[_t] = [c for c in _row if not (
+            c.get("references") and "." in str(c["references"]) and ":" not in str(c["references"])
+            and not _valid.match(str(c["references"])))]
+    if _dropped:
+        print(f"  pseudo-tables dropped (not <schema>.<table>): {len(_dropped)}")
     S["cols"] = existing
     ref_path.write_text(json.dumps(S), encoding="utf-8")
 

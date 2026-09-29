@@ -809,13 +809,17 @@ CREATE TABLE IF NOT EXISTS catalogue.import_job (
 CREATE TABLE IF NOT EXISTS catalogue.inventory_hold (
     id                                text PRIMARY KEY NOT NULL,
     channel_capacity_id               uuid NOT NULL,
-    holder_workstation_id             uuid NOT NULL,
+    holder_kind                       text NOT NULL DEFAULT 'workstation' CONSTRAINT inventory_hold_holder_kind_chk CHECK (holder_kind IN ('workstation', 'cart')),
+    holder_workstation_id             uuid,
+    holder_cart_id                    uuid,
+    converted_order_id                uuid,
+    converted_at                      timestamptz,
     parent_lease_id                   text,
     requested_units                   integer,
     channel                           text,
     granted_units                     integer NOT NULL,
     consumed_units                    integer NOT NULL,
-    status                            text NOT NULL CONSTRAINT inventory_hold_status_chk CHECK (status IN ('active', 'expired', 'released', 'forceReleased')),
+    status                            text NOT NULL CONSTRAINT inventory_hold_status_chk CHECK (status IN ('active', 'expired', 'released', 'forceReleased', 'converted')),
     acquired_at                       timestamptz NOT NULL,
     expires_at                        timestamptz NOT NULL,
     released_at                       timestamptz,
@@ -1411,6 +1415,8 @@ CREATE TABLE IF NOT EXISTS catalogue.product (
     data_mask_values                  jsonb,
     guest_listing                     text DEFAULT 'bookable' CONSTRAINT product_guest_listing_chk CHECK (guest_listing IN ('bookable', 'infoOnly', 'hidden')),
     not_bookable_label                jsonb,
+    sales_contact                     jsonb,
+    booking_flow_id                   uuid,
     consent_question_ids              text[],
     requires_time_window              boolean DEFAULT false,
     product_owner_principal_id        uuid,
@@ -1439,6 +1445,7 @@ CREATE TABLE IF NOT EXISTS catalogue.product_category (
     display_order                     integer DEFAULT 100,
     image_asset_id                    uuid,
     description                       jsonb,
+    booking_flow_id                   uuid,
     is_active                         boolean DEFAULT true
 );
 
@@ -1481,6 +1488,7 @@ CREATE TABLE IF NOT EXISTS catalogue.product_eligibility_rule (
     is_waiver_required                boolean DEFAULT false,
     swim_ability                      text DEFAULT 'notRequired' CONSTRAINT product_eligibility_rule_swim_ability_chk CHECK (swim_ability IN ('notRequired', 'confident')),
     refundable_if_ineligible_at_gate  boolean DEFAULT false,
+    required_certification_code       text CONSTRAINT product_eligibility_rule_required_certification_code_chk CHECK (char_length(required_certification_code) <= 60),
     scope_path                        ltree NOT NULL
 );
 

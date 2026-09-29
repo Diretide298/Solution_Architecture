@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 96 |
-| Operations | 221 |
+| Operations | 224 |
 | Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 135 |
+| Operations with no screen | 134 |
 | Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
-### 135 operations with no screen here
+### 134 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
-| … | | | 95 more |
+| … | | | 94 more |
 
 ### 1 modules split across waves
 
@@ -85,7 +85,7 @@
 | `EMP-002` | Select venue & role | Operations | 1 | 5 | yes |
 | `EMP-003` | Home — on duty | Operations | 1 | 17 | yes |
 | `EMP-004` | Task list | Operations | 1 | 15 | yes |
-| `EMP-005` | Task detail | Operations | 1 | 15 | yes |
+| `EMP-005` | Task detail | Operations | 1 | 18 | yes |
 | `EMP-006` | Raise a task | Operations | 1 | 16 | yes |
 | `EMP-007` | Handover notes | Operations | 2 | 4 | yes |
 | `EMP-008` | Shift summary | Operations | 2 | 5 | yes |

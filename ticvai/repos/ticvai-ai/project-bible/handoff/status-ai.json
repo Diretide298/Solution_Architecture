@@ -33,52 +33,52 @@
   }
  ],
  "stores": {
-  "postgres": 117,
+  "postgres": 123,
   "postgres-analytical": 5,
-  "redis": 8,
+  "redis": 9,
   "qdrant": 1
  },
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
-  "operations": 135,
-  "schemas": 116,
+  "operations": 143,
+  "schemas": 122,
   "states": 42,
-  "events": 46,
-  "tables": 131,
-  "screens": 193,
-  "flows": 10,
-  "documents": 44,
+  "events": 47,
+  "tables": 138,
+  "screens": 195,
+  "flows": 11,
+  "documents": 46,
   "openConflicts": 1
  },
  "metrics": {
   "design": [
    {
     "name": "Operations in the contract",
-    "done": 133,
-    "total": 133,
+    "done": 141,
+    "total": 141,
     "percent": 100,
     "note": "The seed of the closure."
    },
    {
     "name": "Lifecycles modelled",
     "done": 19,
-    "total": 32,
-    "percent": 59,
+    "total": 34,
+    "percent": 56,
     "note": "Status enums in the domain contract with a state model."
    },
    {
     "name": "Operations reaching a screen",
-    "done": 120,
-    "total": 133,
-    "percent": 90,
+    "done": 128,
+    "total": 141,
+    "percent": 91,
     "note": "This domain's own operations that a screen calls. Jobs and internal operations legitimately reach none."
    },
    {
     "name": "Events with a critical consumer",
     "done": 30,
-    "total": 46,
-    "percent": 65,
+    "total": 47,
+    "percent": 64,
     "note": "An event whose loss breaks something must say which consumer."
    }
   ],
@@ -97,10 +97,9 @@
   "build": 0
  },
  "waves": {
-  "wave1": 11,
+  "wave1": 13,
   "wave2": 27,
-  "wave4": 1,
-  "wave3": 154
+  "wave3": 155
  },
  "reachedOutsideTheContract": [
   {
@@ -279,9 +278,9 @@
   "operations": []
  },
  "storage": {
-  "postgres": 117,
+  "postgres": 123,
   "postgres-analytical": 5,
-  "redis": 8,
+  "redis": 9,
   "qdrant": 1
  },
  "inboundKeys": [],
@@ -293,6 +292,8 @@
   ]
  },
  "unmodelledLifecycles": [
+  "AiHistoryImport.status",
+  "AiTrainingRun.status",
   "AiPromptTemplate.status",
   "AiGovernancePolicy.status",
   "AiActionStep.status",
@@ -311,6 +312,11 @@
   {
    "file": "docs\\active\\action-register-22-september.md",
    "title": "Action register \u2014 22 September 2026",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\ai-functions-review-30-september.md",
+   "title": "AI functions review: build every AI function now, then let it learn",
    "status": ""
   },
   {
@@ -451,6 +457,11 @@
   {
    "file": "docs\\active\\spec-coverage-19-september.md",
    "title": "Ch03 capability coverage - the client's list against our screens",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\system-design-review-30-september.md",
+   "title": "TICVAI system design review (re-audit before Block A tickets)",
    "status": ""
   },
   {

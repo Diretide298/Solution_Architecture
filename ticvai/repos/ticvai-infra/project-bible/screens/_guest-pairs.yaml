@@ -401,13 +401,15 @@ groups:
     with their age; the street map needs the connection. Searching departures, buying a trip or a pass
     and saving a favourite route need the connection.
 - key: itinerary-planning
-  kind: appOnly
+  kind: paired
+  web: [WEB-050]
   app: [GST-051, GST-052, GST-053, GST-054, GST-059]
-  decision: raise
   note: 'Five screens with no requirement (guest-surface-parity.md); GST-054 assumes parked AI. **Deferred
     to a later release** (decided 28 September, audit R187): all five are `wave: 4` with a `deferred`
     block and out of Block A; the itinerary suggestion is removed from them (audit R209). Confirmed on 29
-    September: the itinerary screens stay in wave 4 (rev 3 GAP-C3).'
+    September: the itinerary screens stay in wave 4 (rev 3 GAP-C3). **Superseded 29 September (MoM
+    MOB-6):** the Plan tab is Block A, a rules planner with the AI planner agent on top; all five are
+    wave 1 again and WEB-050 Plan Your Visit pairs them on the web.'
 
 # ── engagement and support ──────────────────────────────────────────────────────────────────
 - key: help-and-cases

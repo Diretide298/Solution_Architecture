@@ -1,0 +1,47 @@
+# apiClient.anomalyDetected v1 — published by public-api
+# Added 30 September (second wave of the 29 September pass): 17 September minutes M17-07, API security monitoring.
+
+name: apiClient.anomalyDetected
+version: 1
+publisher: public-api
+description: An API client's traffic breached an anomaly rule (volume against its own baseline or a ceiling,
+  4xx share, refusals from outside the allow-list, calls outside its usual operations), and the breach was
+  recorded as an ApiAnomaly with the action taken.
+aggregate: apiClient
+emittedWhen: the anomaly monitor records a public-api ApiAnomaly (control.api_anomaly) for a rule set with setApiAnomalyRule
+payload:
+- field: anomalyId
+  type: uuid
+- field: clientId
+  type: uuid
+- field: tenantId
+  type: uuid
+- field: ruleKey
+  type: string
+- field: measure
+  type: string
+- field: observed
+  type: number
+- field: baseline
+  type: number
+  required: false
+- field: actionTaken
+  type: string
+  notes: flag, throttle or suspend (ApiAnomaly.actionTaken)
+- field: detectedAt
+  type: timestamp
+consumers:
+- context: public-api
+  purpose: Deliver to webhook subscriptions taking apiClient.anomalyDetected, so the integration's owner hears of a
+    runaway client from TICVAI before a guest does (M17-07)
+  idempotencyKey: anomalyId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+- context: reporting
+  purpose: Raise the anomaly to the tenant's and TICVAI's API administrators (ADM-015, DEV-006)
+  idempotencyKey: anomalyId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 1 year after publication
+notes: '**Added 30 September (second wave of the 29 September pass, M17-07).** No state model emits this: an anomaly is a record written by
+  the monitor, not a status change, so the emit sits on the monitor that writes control.api_anomaly.'

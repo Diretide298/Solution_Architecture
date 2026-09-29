@@ -7,6 +7,8 @@ publisher: approvals
 description: An approval request was granted at its final level.
 aggregate: approvalRequest
 emittedWhen: ApprovalStatus pending or escalated to approved
+emittedBy:
+- decideApprovalRequest
 payload:
 - field: requestId
   type: string

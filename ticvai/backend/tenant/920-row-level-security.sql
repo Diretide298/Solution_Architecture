@@ -96,14 +96,14 @@ BEGIN
 END
 $$;
 
--- **77 tables carry `venue_id` and no `scope_path`, and a policy set built on `scope_path`
+-- **80 tables carry `venue_id` and no `scope_path`, and a policy set built on `scope_path`
 -- alone leaves every one of them open.** `check-migrations` has said so since it was written --
 -- checking only scope_path missed the tables that carry venue_id instead, and they would have
 -- passed with no policy at all -- and the hand-written baseline never closed it because it
 -- protected three tables in total.
 --
 -- A venue id is resolved to its path through the scope tree rather than assumed. **The subquery is
--- the price of not carrying a redundant `scope_path` column on those 77 tables**, and
+-- the price of not carrying a redundant `scope_path` column on those 80 tables**, and
 -- `platform.scope` is small, cached and indexed on `id` and, with GiST, on `path`.
 --
 -- **A null `venue_id` is a tenant-level row, and until 24 September nobody could see it** — not
@@ -172,7 +172,63 @@ BEGIN
 END
 $$;
 
--- **997 tables: 560 scoped by `scope_path`, 77 by `venue_id`, 151 through the parent that owns them, 208 with no policy.**
+
+-- True when the connection holds the tenant root itself (head office, or a worker's system scope).
+CREATE OR REPLACE FUNCTION platform.tenant_root_in_scope()
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT cardinality(platform.current_scope_paths()) > 0
+       AND EXISTS (SELECT 1 FROM platform.scope s
+                    WHERE s.level = 'tenant'
+                      AND s.path = ANY (platform.current_scope_paths()));
+$$;
+
+-- True when the row belongs to the session's own subject, or the connection holds the tenant root.
+CREATE OR REPLACE FUNCTION platform.subject_in_scope(row_subject_id uuid)
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT (row_subject_id IS NOT NULL
+            AND row_subject_id::text = NULLIF(current_setting('ticvai.subject_id', true), ''))
+        OR platform.tenant_root_in_scope();
+$$;
+
+CREATE OR REPLACE FUNCTION platform.apply_tenant_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING (platform.tenant_root_in_scope()) '
+                   'WITH CHECK (platform.tenant_root_in_scope())', policy_name, target);
+END
+$$;
+
+CREATE OR REPLACE FUNCTION platform.apply_subject_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING (platform.subject_in_scope(subject_id)) '
+                   'WITH CHECK (platform.subject_in_scope(subject_id))', policy_name, target);
+END
+$$;
+
+-- **1008 tables: 570 scoped by `scope_path`, 80 by `venue_id`, 152 through the parent that owns them, 27 by subject, 178 to the tenant root only, 0 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -285,6 +341,7 @@ SELECT platform.apply_scope_rls('ai.assistant_profile'::regclass);
 SELECT platform.apply_scope_rls('ai.blueprint'::regclass);
 SELECT platform.apply_scope_rls('ai.byok_enablement'::regclass);
 SELECT platform.apply_scope_rls('ai.capability'::regclass);
+SELECT platform.apply_scope_rls('ai.capability_maturity'::regclass);
 SELECT platform.apply_scope_rls('ai.config_session'::regclass);
 SELECT platform.apply_scope_rls('ai.control'::regclass);
 SELECT platform.apply_scope_rls('ai.control_test'::regclass);
@@ -304,6 +361,8 @@ SELECT platform.apply_scope_rls('ai.governance_alert'::regclass);
 SELECT platform.apply_scope_rls('ai.governance_policy'::regclass);
 SELECT platform.apply_scope_rls('ai.governance_policy_version'::regclass);
 SELECT platform.apply_scope_rls('ai.guided_choice_suggestion'::regclass);
+SELECT platform.apply_scope_rls('ai.history_import'::regclass);
+SELECT platform.apply_scope_rls('ai.history_observation'::regclass);
 SELECT platform.apply_scope_rls('ai.incident'::regclass);
 SELECT platform.apply_scope_rls('ai.index_failure'::regclass);
 SELECT platform.apply_scope_rls('ai.insight'::regclass);
@@ -334,6 +393,8 @@ SELECT platform.apply_scope_rls('ai.signal_source'::regclass);
 SELECT platform.apply_scope_rls('ai.suggestion'::regclass);
 SELECT platform.apply_scope_rls('ai.suggestion_outcome'::regclass);
 SELECT platform.apply_scope_rls('ai.tool'::regclass);
+SELECT platform.apply_scope_rls('ai.training_run'::regclass);
+SELECT platform.apply_scope_rls('ai.venue_settings'::regclass);
 SELECT platform.apply_scope_rls('approvals.approved_action_execution'::regclass);
 SELECT platform.apply_scope_rls('approvals.approver_availability'::regclass);
 SELECT platform.apply_scope_rls('approvals.automation'::regclass);
@@ -550,11 +611,9 @@ SELECT platform.apply_scope_rls('marketing.waiver_master'::regclass);
 SELECT platform.apply_scope_rls('marketing.waiver_requirement'::regclass);
 SELECT platform.apply_scope_rls('marketing.waiver_requirement_event'::regclass);
 SELECT platform.apply_scope_rls('marketing.waiver_signatory_rule'::regclass);
-SELECT platform.apply_scope_rls('marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)'::regclass);
 SELECT platform.apply_scope_rls('marketing.waiver_trigger_rule'::regclass);
 SELECT platform.apply_scope_rls('marketing.waiver_verification'::regclass);
 SELECT platform.apply_scope_rls('marketing.waiver_version_control'::regclass);
-SELECT platform.apply_scope_rls('marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)'::regclass);
 SELECT platform.apply_scope_rls('orders.after_sale_policy'::regclass);
 SELECT platform.apply_scope_rls('orders.after_sale_request'::regclass);
 SELECT platform.apply_scope_rls('orders.b2b_credit'::regclass);
@@ -605,6 +664,7 @@ SELECT platform.apply_scope_rls('payments.payment_terms'::regclass);
 SELECT platform.apply_scope_rls('payments.provider'::regclass);
 SELECT platform.apply_scope_rls('payments.provider_connection'::regclass);
 SELECT platform.apply_scope_rls('payments.provider_cost'::regclass);
+SELECT platform.apply_scope_rls('payments.provider_event'::regclass);
 SELECT platform.apply_scope_rls('payments.reconciliation_source'::regclass);
 SELECT platform.apply_scope_rls('payments.risk_rules'::regclass);
 SELECT platform.apply_scope_rls('payments.routing_rule'::regclass);
@@ -615,6 +675,7 @@ SELECT platform.apply_scope_rls('pii.consent_identifier'::regclass);
 SELECT platform.apply_scope_rls('platform.configuration_profile'::regclass);
 SELECT platform.apply_scope_rls('platform.connectivity_policy'::regclass);
 SELECT platform.apply_scope_rls('platform.dead_letter'::regclass);
+SELECT platform.apply_scope_rls('platform.idempotency_record'::regclass);
 SELECT platform.apply_scope_rls('platform.offline_policy'::regclass);
 SELECT platform.apply_scope_rls('platform.outbox'::regclass);
 SELECT platform.apply_scope_rls('platform.workstation'::regclass);
@@ -703,6 +764,7 @@ SELECT platform.apply_scope_rls('tenancy.device_rollout'::regclass);
 SELECT platform.apply_scope_rls('tenancy.device_tamper_event'::regclass);
 SELECT platform.apply_scope_rls('tenancy.device_telemetry'::regclass);
 SELECT platform.apply_scope_rls('venuemap.map'::regclass);
+SELECT platform.apply_scope_rls('venuemap.visit_plan'::regclass);
 SELECT platform.apply_scope_rls('wallet.accounting_mapping'::regclass);
 SELECT platform.apply_scope_rls('wallet.adjustment'::regclass);
 SELECT platform.apply_scope_rls('wallet.authentication_policy'::regclass);
@@ -729,12 +791,16 @@ SELECT platform.apply_scope_rls('wallet.transfer_rules'::regclass);
 SELECT platform.apply_scope_rls('wallet.voucher_type'::regclass);
 SELECT platform.apply_scope_rls('wallet.wallet_type'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.analytics_provider'::regclass);
+SELECT platform.apply_scope_rls('whitelabel.app_build'::regclass);
+SELECT platform.apply_scope_rls('whitelabel.booking_flow'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.config_version'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.content_page'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.faq_category'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.footer_config'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.policy'::regclass);
 SELECT platform.apply_scope_rls('whitelabel.promo_block'::regclass);
+SELECT platform.apply_scope_rls('whitelabel.site_setup_progress'::regclass);
+SELECT platform.apply_scope_rls('whitelabel.store_account'::regclass);
 SELECT platform.apply_scope_rls('workforce.field_ownership'::regclass);
 SELECT platform.apply_scope_rls('workforce.forecast_requirement'::regclass);
 SELECT platform.apply_scope_rls('workforce.integration_source'::regclass);
@@ -778,6 +844,8 @@ SELECT platform.apply_venue_rls('maintenance.asset'::regclass);
 SELECT platform.apply_venue_rls('maintenance.incident'::regclass);
 SELECT platform.apply_venue_rls('maintenance.inspection'::regclass);
 SELECT platform.apply_venue_rls('maintenance.inspection_template'::regclass);
+SELECT platform.apply_venue_rls('maintenance.priority_scoring_model'::regclass);
+SELECT platform.apply_venue_rls('maintenance.vendor_service_request'::regclass);
 SELECT platform.apply_venue_rls('maintenance.work_order'::regclass);
 SELECT platform.apply_venue_rls('marketing.campaign'::regclass);
 SELECT platform.apply_venue_rls('marketing."case"'::regclass);
@@ -789,6 +857,7 @@ SELECT platform.apply_venue_rls('marketing.review'::regclass);
 SELECT platform.apply_venue_rls('marketing.segment'::regclass);
 SELECT platform.apply_venue_rls('orders.cart'::regclass);
 SELECT platform.apply_venue_rls('orders.deposit_box'::regclass);
+SELECT platform.apply_venue_rls('orders.order_line'::regclass);
 SELECT platform.apply_venue_rls('orders.refund_policy'::regclass);
 SELECT platform.apply_venue_rls('orders.reservation'::regclass);
 SELECT platform.apply_venue_rls('platform.cross_region_entitlement'::regclass);
@@ -846,7 +915,6 @@ SELECT platform.apply_parent_rls('approvals.escalation'::regclass, 'request_id',
 SELECT platform.apply_parent_rls('approvals.rule'::regclass, 'matrix_id', 'approvals.matrix'::regclass, 'id');
 SELECT platform.apply_parent_rls('assets.media_usage'::regclass, 'asset_id', 'assets.media_asset'::regclass, 'id');
 SELECT platform.apply_parent_rls('catalogue.calculation_step'::regclass, 'calculation_profile_id', 'catalogue.calculation_profile'::regclass, 'id');
-SELECT platform.apply_parent_rls('catalogue.inventory_hold'::regclass, 'holder_workstation_id', 'platform.workstation'::regclass, 'id');
 SELECT platform.apply_parent_rls('catalogue.performance'::regclass, 'event_id', 'catalogue.event'::regclass, 'id');
 SELECT platform.apply_parent_rls('catalogue.price'::regclass, 'price_list_id', 'catalogue.price_list'::regclass, 'id');
 SELECT platform.apply_parent_rls('catalogue.pricing_publication_target'::regclass, 'pricing_publication_id', 'catalogue.pricing_publication'::regclass, 'id');
@@ -906,7 +974,8 @@ SELECT platform.apply_parent_rls('orders.group_quote_line'::regclass, 'group_quo
 SELECT platform.apply_parent_rls('orders.invitation'::regclass, 'product_id', 'catalogue.product'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.no_sale_event'::regclass, 'shift_id', 'orders.pos_shift'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.order_fee'::regclass, 'order_id', 'orders.sales_order'::regclass, 'id');
-SELECT platform.apply_parent_rls('orders.order_line'::regclass, 'sales_order_id', 'orders.sales_order'::regclass, 'id');
+SELECT platform.apply_parent_rls('orders.order_line_discount'::regclass, 'order_line_id', 'orders.order_line'::regclass, 'id');
+SELECT platform.apply_parent_rls('orders.order_line_eligibility'::regclass, 'order_line_id', 'orders.order_line'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.payment'::regclass, 'order_id', 'orders.sales_order'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.pos_shift_approval'::regclass, 'pos_shift_id', 'orders.pos_shift'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.pos_shift_incident'::regclass, 'pos_shift_id', 'orders.pos_shift'::regclass, 'id');
@@ -948,6 +1017,7 @@ SELECT platform.apply_parent_rls('transport.route_stop'::regclass, 'route_id', '
 SELECT platform.apply_parent_rls('venuemap.path'::regclass, 'map_id', 'venuemap.map'::regclass, 'id');
 SELECT platform.apply_parent_rls('venuemap.placed_resource'::regclass, 'resource_id', 'resources.resource'::regclass, 'id');
 SELECT platform.apply_parent_rls('venuemap.point'::regclass, 'map_id', 'venuemap.map'::regclass, 'id');
+SELECT platform.apply_parent_rls('venuemap.visit_plan_item'::regclass, 'plan_id', 'venuemap.visit_plan'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.faq_entry'::regclass, 'faq_category_id', 'whitelabel.faq_category'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.footer_config_column'::regclass, 'footer_config_id', 'whitelabel.footer_config'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.footer_config_social_link'::regclass, 'footer_config_id', 'whitelabel.footer_config'::regclass, 'id');
@@ -969,7 +1039,6 @@ SELECT platform.apply_parent_rls('ledger.fiscal_period_event'::regclass, 'fiscal
 SELECT platform.apply_parent_rls('ledger.journal_entry'::regclass, 'fiscal_period_id', 'ledger.fiscal_period'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.conversation_message_attachment'::regclass, 'conversation_message_id', 'marketing.conversation_message'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.chargeback'::regclass, 'payment_id', 'orders.payment'::regclass, 'id');
-SELECT platform.apply_parent_rls('orders.order_line_eligibility'::regclass, 'order_line_id', 'orders.order_line'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.payment_tip'::regclass, 'payment_id', 'orders.payment'::regclass, 'id');
 SELECT platform.apply_parent_rls('promotions.bundle_choice_option'::regclass, 'bundle_choice_group_id', 'promotions.bundle_choice_group'::regclass, 'id');
 SELECT platform.apply_parent_rls('reporting.export'::regclass, 'execution_id', 'reporting.execution'::regclass, 'id');
@@ -977,219 +1046,220 @@ SELECT platform.apply_parent_rls('reporting.schedule_recipient'::regclass, 'sche
 SELECT platform.apply_parent_rls('retail.reservation_line'::regclass, 'reservation_id', 'retail.reservation'::regclass, 'id');
 SELECT platform.apply_parent_rls('seating.seat_hold'::regclass, 'performance_id', 'catalogue.performance'::regclass, 'id');
 SELECT platform.apply_parent_rls('catalogue.channel_allocation'::regclass, 'envelope_id', 'catalogue.channel_capacity'::regclass, 'id');
+SELECT platform.apply_parent_rls('catalogue.inventory_hold'::regclass, 'channel_capacity_id', 'catalogue.channel_capacity'::regclass, 'id');
 SELECT platform.apply_parent_rls('fnb.recipe'::regclass, 'menu_item_id', 'fnb.menu_item'::regclass, 'id');
 SELECT platform.apply_parent_rls('fnb.sub_bill'::regclass, 'bill_split_id', 'fnb.bill_split'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.chargeback_evidence'::regclass, 'chargeback_id', 'orders.chargeback'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.chargeback_investigation_log'::regclass, 'chargeback_id', 'orders.chargeback'::regclass, 'id');
 SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'fnb.recipe'::regclass, 'id');
 
--- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a
--- NOT NULL owning reference) before row-level security can hold for it.
---   access.access_change  -- only nullable references (order_id -> orders.sales_order)
---   access.parking_entitlement  -- several protected owners (facility_id -> access.parking_facility, order_id -> orders.sales_order); which one owns the row is not decided
---   ai.config_source  -- several protected owners (session_id -> ai.config_session, asset_id -> assets.media_asset); which one owns the row is not decided
---   approvals.accreditation_badge  -- no scope column and no declared owner
---   approvals.step_up_policy  -- no scope column and no declared owner
---   assets.media_collection_member  -- no scope column and no declared owner
---   catalogue.alternative_code  -- only nullable references (variant_id -> catalogue.variant, product_id -> catalogue.product)
---   catalogue.membership_benefit  -- no scope column and no declared owner
---   catalogue.membership_programme  -- no scope column and no declared owner
---   catalogue.plan_benefit  -- no scope column and no declared owner
---   catalogue.product_media  -- no scope column and no declared owner
---   catalogue.product_version  -- only nullable references (product_id -> catalogue.product)
---   embedded as attributes (jsonb) on orders.cart_line and orders.order_line  -- no scope column and no declared owner
---   embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line  -- no scope column and no declared owner
---   fnb.allergen_verdict  -- no scope column and no declared owner
---   fnb.cold_chain_event  -- no scope column and no declared owner
---   fnb.combo  -- no scope column and no declared owner
---   fnb.combo_slot  -- no scope column and no declared owner
---   fnb.delivery_location_outlet  -- only nullable references (location_id -> fnb.delivery_location, outlet_id -> platform.outlet)
---   fnb.dining_table  -- only nullable references (outlet_id -> platform.outlet)
---   fnb.ingredient_substitute  -- no scope column and no declared owner
---   fnb.kitchen_exception  -- no scope column and no declared owner
---   fnb.kitchen_station  -- only nullable references (outlet_id -> platform.outlet)
---   fnb.menu_item_modifier  -- no scope column and no declared owner
---   fnb.production_plan  -- no scope column and no declared owner
---   fnb.production_plan_line  -- its owner fnb.production_plan has no policy either
---   fnb.reservation_table  -- its owner fnb.dining_table has no policy either
---   fnb.sold_out_item  -- no scope column and no declared owner
---   fnb.substitution_rule  -- no scope column and no declared owner
---   fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)  -- no scope column and no declared owner
---   fnb.temperature_log  -- no scope column and no declared owner
---   games.play  -- only nullable references (game_id -> games.game)
---   games.reader_deployment  -- no scope column and no declared owner
---   identity.authz_audit  -- only nullable references (actor_principal_id -> identity.principal, subject_principal_id -> identity.principal)
---   identity.benefit_usage  -- no scope column and no declared owner
---   identity.customer_membership  -- no scope column and no declared owner
---   identity.guest_identity_verification  -- no scope column and no declared owner
---   identity.membership_history  -- no scope column and no declared owner
---   identity.mfa_challenge  -- its owner identity.principal has no policy either
---   identity.mfa_method  -- only nullable references (principal_id -> identity.principal)
---   identity.mfa_recovery_code  -- only nullable references (principal_id -> identity.principal)
---   identity.module  -- no scope column and no declared owner
---   identity.otp_challenge  -- its owner pii.subject has no policy either
---   identity.permission  -- no scope column and no declared owner
---   identity.principal  -- only nullable references (primary_role_id -> identity.role, home_scope_id -> platform.scope)
---   identity.principal_credential  -- only nullable references (principal_id -> identity.principal)
---   identity.refresh_token  -- no scope column and no declared owner
---   identity.role  -- no scope column and no declared owner
---   identity.role_permission  -- its owner identity.role has no policy either
---   inventory.count  -- only nullable references (started_by_principal_id -> identity.principal, posted_by_principal_id -> identity.principal, journal_entry_id -> ledger.journal_entry)
---   inventory.count_line  -- its owner inventory.count has no policy either
---   inventory.quotation_line  -- several protected owners (quotation_id -> inventory.quotation, item_id -> inventory.item); which one owns the row is not decided
---   inventory.serialised_item  -- no scope column and no declared owner
---   inventory.stock_batch  -- several protected owners (item_id -> inventory.item, location_id -> inventory.location); which one owns the row is not decided
---   inventory.stock_reservation  -- no scope column and no declared owner
---   inventory.supplier_contract  -- no scope column and no declared owner
---   ledger.deposit  -- only nullable references (subject_id -> pii.subject, order_id -> orders.sales_order)
---   ledger.inter_entity_obligation  -- only nullable references (entitlement_id -> access.entitlement, order_id -> orders.sales_order)
---   ledger.recognition_schedule  -- only nullable references (deferred_account_id -> ledger.account, recognised_account_id -> ledger.account, breakage_account_id -> ledger.account)
---   ledger.tax_code  -- only nullable references (account_id -> ledger.account)
---   ledger.tax_exemption  -- its owner ledger.tax_code has no policy either
---   maintenance.asset_document  -- no scope column and no declared owner
---   maintenance.asset_status_change  -- no scope column and no declared owner
---   maintenance.incident_authority_notification  -- no scope column and no declared owner
---   maintenance.incident_investigation_note  -- no scope column and no declared owner
---   maintenance.incident_involved_party  -- no scope column and no declared owner
---   marketing.agent_availability  -- its owner identity.principal has no policy either
---   marketing.badge  -- no scope column and no declared owner
---   marketing.campaign_target  -- no scope column and no declared owner
---   marketing.case_message  -- only nullable references (author_principal_id -> identity.principal, case_id -> marketing.case)
---   marketing.communication_policy_decision  -- no scope column and no declared owner
---   marketing.consent_propagation  -- no scope column and no declared owner
---   marketing.consent_purpose  -- its owner platform.tenant has no policy either
---   marketing.consent_purpose_channel  -- its owner marketing.consent_purpose has no policy either
---   marketing.consent_question_version  -- no scope column and no declared owner
---   marketing.consent_record  -- its owner pii.subject has no policy either
---   marketing.consent_record_channel  -- its owner marketing.consent_record has no policy either
---   marketing.customer_badge  -- no scope column and no declared owner
---   marketing.form_submission  -- its owner pii.subject has no policy either
---   marketing.guest_device  -- its owner pii.subject has no policy either
---   marketing.guest_document  -- its owner pii.subject has no policy either
---   marketing.guest_extra_field  -- no scope column and no declared owner
---   marketing.guest_extra_option  -- no scope column and no declared owner
---   marketing.guest_extra_value  -- no scope column and no declared owner
---   marketing.guest_note  -- no scope column and no declared owner
---   marketing.guest_preference  -- no scope column and no declared owner
---   marketing.loyalty_campaign  -- no scope column and no declared owner
---   marketing.loyalty_points  -- no scope column and no declared owner
---   marketing.loyalty_rule  -- no scope column and no declared owner
---   marketing.message_dispatch  -- its owner pii.subject has no policy either
---   marketing.message_dispatch_attempt  -- no scope column and no declared owner
---   marketing.message_template  -- its owner platform.tenant has no policy either
---   marketing.message_template_version  -- no scope column and no declared owner
---   marketing.points_redemption_rule  -- only nullable references (product_id -> catalogue.product)
---   marketing.privacy_audit_event  -- no scope column and no declared owner
---   marketing.retention_run  -- no scope column and no declared owner
---   marketing.review_response  -- no scope column and no declared owner
---   marketing.reward  -- only nullable references (product_id -> catalogue.product)
---   marketing.reward_assignment  -- no scope column and no declared owner
---   marketing.subscription  -- no scope column and no declared owner
---   marketing.touch_point  -- its owner pii.subject has no policy either
---   marketing.waiver_signature  -- no scope column and no declared owner
---   marketing.wishlist_item  -- its owner pii.subject has no policy either
---   orders.deposit_policy (dining_* columns)  -- no scope column and no declared owner
---   orders.group_customer_organization  -- no scope column and no declared owner
---   orders.group_customer_organization_contact  -- its owner orders.group_customer_organization has no policy either
---   orders.group_enquiry  -- only nullable references (organisation_id -> orders.group_customer_organization)
---   orders.group_participant  -- its owner orders.group_participant_list has no policy either
---   orders.group_participant_list  -- no scope column and no declared owner
---   orders.group_payment_milestone  -- its owner orders.group_payment_schedule has no policy either
---   orders.group_payment_schedule  -- no scope column and no declared owner
---   orders.group_ticket_allocation  -- no scope column and no declared owner
---   orders.group_ticket_allocation_line  -- its owner orders.group_ticket_allocation has no policy either
---   orders.group_ticket_fulfillment  -- no scope column and no declared owner
---   orders.invitation_allowance  -- its owner identity.principal has no policy either
---   orders.member_exception  -- no scope column and no declared owner
---   orders.membership_activation_action  -- no scope column and no declared owner
---   orders.membership_migration  -- no scope column and no declared owner
---   orders.membership_renewal  -- only nullable references (order_id -> orders.sales_order)
---   orders.refund_calculation_policy  -- no scope column and no declared owner
---   orders.ticket_template  -- no scope column and no declared owner
---   orders.ticket_template_channel  -- its owner orders.ticket_template has no policy either
---   payments.deposit_activity  -- only nullable references (payment_id -> orders.payment)
---   payments.fee_rule  -- no scope column and no declared owner
---   payments.token  -- its owner pii.subject has no policy either
---   pii.subject  -- no scope column and no declared owner
---   pii.subject_contact  -- its owner pii.subject has no policy either
---   pii.subject_document  -- its owner pii.subject has no policy either
---   platform.audit_read  -- its owners identity.principal, pii.subject have no policy either
---   platform.audit_record  -- only nullable references (principal_id -> identity.principal, org_unit_id -> platform.scope)
---   platform.cell_endpoint  -- no scope column and no declared owner
---   platform.denomination  -- no scope column and no declared owner
---   platform.device  -- only nullable references (workstation_id -> platform.workstation)
---   platform.device_heartbeat  -- only nullable references (device_id -> platform.device)
---   platform.guest_link  -- no scope column and no declared owner
---   platform.profile_deployment  -- no scope column and no declared owner
---   platform.region_settings  -- only nullable references (org_unit_id -> platform.scope)
---   platform.sale_board_tile  -- only nullable references (page_id -> platform.sale_board_page)
---   platform.tenant  -- only nullable references (home_region_id -> platform.scope)
---   platform.wallet_authorisation  -- its owner platform.guest_link has no policy either
---   pricing.dynamic_price_action  -- no scope column and no declared owner
---   pricing.dynamic_price_condition  -- no scope column and no declared owner
---   promotions.coupon_code_batch  -- no scope column and no declared owner
---   promotions.partner_bundle_product  -- no scope column and no declared owner
---   promotions.promotion_variant  -- no scope column and no declared owner
---   promotions.upsell_rule  -- only nullable references (suggested_bundle_id -> promotions.bundle)
---   rental.agreement_item  -- no scope column and no declared owner
---   rental.inspection_item  -- no scope column and no declared owner
---   rental.participant  -- no scope column and no declared owner
---   reporting.dashboard_tile  -- several protected owners (dashboard_id -> reporting.dashboard, report_id -> reporting.report_definition); which one owns the row is not decided
---   resources.performance_participant  -- no scope column and no declared owner
---   retail.exchange  -- its owners retail.return, retail.sale have no policy either
---   retail."return"  -- its owner retail.sale has no policy either
---   retail.return_line  -- its owner retail.return has no policy either
---   retail.sale  -- several protected owners (order_id -> orders.sales_order, outlet_id -> platform.outlet); which one owns the row is not decided
---   retail.sale_line  -- its owner retail.sale has no policy either
---   seating.seat  -- only nullable references (seat_map_id -> seating.seat_map)
---   seating.seat_block_item  -- no scope column and no declared owner
---   seating.seat_hold_item  -- no scope column and no declared owner
---   seating.seat_price_band  -- no scope column and no declared owner
---   subscription.capacity_pack  -- no scope column and no declared owner
---   subscription.contract  -- its owners platform.tenant, subscription.plan have no policy either
---   subscription.enforcement_policy  -- no scope column and no declared owner
---   subscription.go_live_readiness  -- no scope column and no declared owner
---   subscription.licensing_model  -- no scope column and no declared owner
---   subscription.membership_household_policy_role_limit  -- only nullable references (membership_household_policy_id -> subscription.membership_household_policy)
---   subscription.module_listing  -- no scope column and no declared owner
---   subscription.partner_quote  -- no scope column and no declared owner
---   subscription.plan  -- no scope column and no declared owner
---   subscription.plan_limit  -- its owner subscription.plan has no policy either
---   subscription.plan_module  -- its owner subscription.plan has no policy either
---   subscription.tier_allowance  -- no scope column and no declared owner
---   subscription.tier_module  -- no scope column and no declared owner
---   subscription.trial_config  -- no scope column and no declared owner
---   subscription.vsi_assessment  -- no scope column and no declared owner
---   subscription.vsi_model  -- no scope column and no declared owner
---   sync.cell_connection  -- no scope column and no declared owner
---   sync.cross_cell_request  -- no scope column and no declared owner
---   transport.departure  -- no scope column and no declared owner
---   transport.fare_matrix_cell  -- its owner transport.fare_table has no policy either
---   transport.fare_passenger_type  -- its owner transport.fare_table has no policy either
---   transport.fare_table  -- no scope column and no declared owner
---   transport.timetable  -- no scope column and no declared owner
---   transport.timetable_run  -- its owner transport.timetable has no policy either
---   venuemap.import_job  -- only nullable references (map_id -> venuemap.map)
---   venuemap.map_version  -- no scope column and no declared owner
---   wallet.balance  -- no scope column and no declared owner
---   wallet.gift_card  -- its owner pii.subject has no policy either
---   wallet.hold  -- only nullable references (order_id -> orders.sales_order)
---   wallet.shared_wallet_member  -- no scope column and no declared owner
---   wallet.wallet  -- its owner pii.subject has no policy either
---   whitelabel.banner  -- its owner whitelabel.tenant_config has no policy either
---   whitelabel.custom_domain  -- no scope column and no declared owner
---   whitelabel.feature_toggle  -- its owner whitelabel.tenant_config has no policy either
---   whitelabel.homepage_section  -- only nullable references (content_page_id -> whitelabel.content_page)
---   whitelabel.module_enablement  -- its owner whitelabel.tenant_config has no policy either
---   whitelabel.navigation_item  -- no scope column and no declared owner
---   whitelabel.tenant_config  -- its owner platform.tenant has no policy either
---   workforce.attendance_amendment  -- no scope column and no declared owner
---   workforce.employee  -- no scope column and no declared owner
---   workforce.employment  -- no scope column and no declared owner
---   workforce.job_title  -- no scope column and no declared owner
---   workforce.leave_balance  -- no scope column and no declared owner
---   workforce.leave_type  -- no scope column and no declared owner
---   workforce.shift  -- no scope column and no declared owner
---   workforce.staff_conversation_participant  -- no scope column and no declared owner
---   workforce.staff_message  -- no scope column and no declared owner
---   workforce.training_record  -- no scope column and no declared owner
+-- By subject (SD-015): the session's own subject, or the tenant root.
+SELECT platform.apply_subject_rls('access.parking_entitlement'::regclass);
+SELECT platform.apply_subject_rls('identity.guest_identity_verification'::regclass);
+SELECT platform.apply_subject_rls('identity.otp_challenge'::regclass);
+SELECT platform.apply_subject_rls('ledger.deposit'::regclass);
+SELECT platform.apply_subject_rls('maintenance.incident_involved_party'::regclass);
+SELECT platform.apply_subject_rls('marketing.communication_policy_decision'::regclass);
+SELECT platform.apply_subject_rls('marketing.consent_record'::regclass);
+SELECT platform.apply_subject_rls('marketing.form_submission'::regclass);
+SELECT platform.apply_subject_rls('marketing.guest_device'::regclass);
+SELECT platform.apply_subject_rls('marketing.guest_document'::regclass);
+SELECT platform.apply_subject_rls('marketing.guest_note'::regclass);
+SELECT platform.apply_subject_rls('marketing.guest_preference'::regclass);
+SELECT platform.apply_subject_rls('marketing.message_dispatch'::regclass);
+SELECT platform.apply_subject_rls('marketing.privacy_audit_event'::regclass);
+SELECT platform.apply_subject_rls('marketing.subscription'::regclass);
+SELECT platform.apply_subject_rls('marketing.touch_point'::regclass);
+SELECT platform.apply_subject_rls('marketing.wishlist_item'::regclass);
+SELECT platform.apply_subject_rls('orders.membership_activation_action'::regclass);
+SELECT platform.apply_subject_rls('payments.token'::regclass);
+SELECT platform.apply_subject_rls('pii.subject_contact'::regclass);
+SELECT platform.apply_subject_rls('pii.subject_document'::regclass);
+SELECT platform.apply_subject_rls('platform.audit_read'::regclass);
+SELECT platform.apply_subject_rls('resources.performance_participant'::regclass);
+SELECT platform.apply_subject_rls('retail.sale'::regclass);
+SELECT platform.apply_subject_rls('wallet.gift_card'::regclass);
+SELECT platform.apply_subject_rls('wallet.shared_wallet_member'::regclass);
+SELECT platform.apply_subject_rls('wallet.wallet'::regclass);
+
+-- Tenant root only (SD-015): no scope column and no protected owner, so visible only
+-- to a connection holding the tenant root. `pii.*` and `payments.token` are also
+-- reached only through their owning service's role; this policy is the floor.
+SELECT platform.apply_tenant_rls('access.access_change'::regclass);  -- was: only nullable references (order_id -> orders.sales_order)
+SELECT platform.apply_tenant_rls('ai.config_source'::regclass);  -- was: several protected owners (session_id -> ai.config_session, asset_id -> assets.media_asset); which one owns the row is not decided
+SELECT platform.apply_tenant_rls('approvals.accreditation_badge'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('approvals.step_up_policy'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('assets.media_collection_member'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('catalogue.alternative_code'::regclass);  -- was: only nullable references (variant_id -> catalogue.variant, product_id -> catalogue.product)
+SELECT platform.apply_tenant_rls('catalogue.membership_benefit'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('catalogue.membership_programme'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('catalogue.plan_benefit'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('catalogue.product_media'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('catalogue.product_version'::regclass);  -- was: only nullable references (product_id -> catalogue.product)
+SELECT platform.apply_tenant_rls('fnb.allergen_verdict'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.cold_chain_event'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.combo'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.combo_slot'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.delivery_location_outlet'::regclass);  -- was: only nullable references (location_id -> fnb.delivery_location, outlet_id -> platform.outlet)
+SELECT platform.apply_tenant_rls('fnb.dining_table'::regclass);  -- was: only nullable references (outlet_id -> platform.outlet)
+SELECT platform.apply_tenant_rls('fnb.ingredient_substitute'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.kitchen_exception'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.kitchen_station'::regclass);  -- was: only nullable references (outlet_id -> platform.outlet)
+SELECT platform.apply_tenant_rls('fnb.menu_item_modifier'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.production_plan'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.production_plan_line'::regclass);  -- was: its owner fnb.production_plan has no policy either
+SELECT platform.apply_tenant_rls('fnb.reservation_table'::regclass);  -- was: its owner fnb.dining_table has no policy either
+SELECT platform.apply_tenant_rls('fnb.sold_out_item'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.substitution_rule'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('fnb.temperature_log'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('games.play'::regclass);  -- was: only nullable references (game_id -> games.game)
+SELECT platform.apply_tenant_rls('games.reader_deployment'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('identity.authz_audit'::regclass);  -- was: only nullable references (actor_principal_id -> identity.principal, subject_principal_id -> identity.principal)
+SELECT platform.apply_tenant_rls('identity.benefit_usage'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('identity.customer_membership'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('identity.membership_history'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('identity.mfa_challenge'::regclass);  -- was: its owner identity.principal has no policy either
+SELECT platform.apply_tenant_rls('identity.mfa_method'::regclass);  -- was: only nullable references (principal_id -> identity.principal)
+SELECT platform.apply_tenant_rls('identity.mfa_recovery_code'::regclass);  -- was: only nullable references (principal_id -> identity.principal)
+SELECT platform.apply_tenant_rls('identity.module'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('identity.permission'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('identity.principal'::regclass);  -- was: only nullable references (primary_role_id -> identity.role, home_scope_id -> platform.scope)
+SELECT platform.apply_tenant_rls('identity.principal_credential'::regclass);  -- was: only nullable references (principal_id -> identity.principal)
+SELECT platform.apply_tenant_rls('identity.refresh_token'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('identity.role'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('identity.role_permission'::regclass);  -- was: its owner identity.role has no policy either
+SELECT platform.apply_tenant_rls('inventory.count'::regclass);  -- was: only nullable references (started_by_principal_id -> identity.principal, posted_by_principal_id -> identity.principal, journal_entry_id -> ledger.journal_entry)
+SELECT platform.apply_tenant_rls('inventory.count_line'::regclass);  -- was: its owner inventory.count has no policy either
+SELECT platform.apply_tenant_rls('inventory.quotation_line'::regclass);  -- was: several protected owners (quotation_id -> inventory.quotation, item_id -> inventory.item); which one owns the row is not decided
+SELECT platform.apply_tenant_rls('inventory.serialised_item'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('inventory.stock_batch'::regclass);  -- was: several protected owners (item_id -> inventory.item, location_id -> inventory.location); which one owns the row is not decided
+SELECT platform.apply_tenant_rls('inventory.stock_reservation'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('inventory.supplier_contract'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('ledger.inter_entity_obligation'::regclass);  -- was: only nullable references (entitlement_id -> access.entitlement, order_id -> orders.sales_order)
+SELECT platform.apply_tenant_rls('ledger.recognition_schedule'::regclass);  -- was: only nullable references (deferred_account_id -> ledger.account, recognised_account_id -> ledger.account, breakage_account_id -> ledger.account)
+SELECT platform.apply_tenant_rls('ledger.tax_code'::regclass);  -- was: only nullable references (account_id -> ledger.account)
+SELECT platform.apply_tenant_rls('ledger.tax_exemption'::regclass);  -- was: its owner ledger.tax_code has no policy either
+SELECT platform.apply_tenant_rls('maintenance.asset_document'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('maintenance.asset_status_change'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('maintenance.incident_authority_notification'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('maintenance.incident_investigation_note'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.agent_availability'::regclass);  -- was: its owner identity.principal has no policy either
+SELECT platform.apply_tenant_rls('marketing.badge'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.campaign_target'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.case_message'::regclass);  -- was: only nullable references (author_principal_id -> identity.principal, case_id -> marketing.case)
+SELECT platform.apply_tenant_rls('marketing.consent_propagation'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.consent_purpose'::regclass);  -- was: its owner platform.tenant has no policy either
+SELECT platform.apply_tenant_rls('marketing.consent_purpose_channel'::regclass);  -- was: its owner marketing.consent_purpose has no policy either
+SELECT platform.apply_tenant_rls('marketing.consent_question_version'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.consent_record_channel'::regclass);  -- was: its owner marketing.consent_record has no policy either
+SELECT platform.apply_tenant_rls('marketing.customer_badge'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.guest_extra_field'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.guest_extra_option'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.guest_extra_value'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.loyalty_campaign'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.loyalty_points'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.loyalty_rule'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.message_dispatch_attempt'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.message_template'::regclass);  -- was: its owner platform.tenant has no policy either
+SELECT platform.apply_tenant_rls('marketing.message_template_version'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.points_redemption_rule'::regclass);  -- was: only nullable references (product_id -> catalogue.product)
+SELECT platform.apply_tenant_rls('marketing.retention_run'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.review_response'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.reward'::regclass);  -- was: only nullable references (product_id -> catalogue.product)
+SELECT platform.apply_tenant_rls('marketing.reward_assignment'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('marketing.waiver_signature'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.group_customer_organization'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.group_customer_organization_contact'::regclass);  -- was: its owner orders.group_customer_organization has no policy either
+SELECT platform.apply_tenant_rls('orders.group_enquiry'::regclass);  -- was: only nullable references (organisation_id -> orders.group_customer_organization)
+SELECT platform.apply_tenant_rls('orders.group_participant'::regclass);  -- was: its owner orders.group_participant_list has no policy either
+SELECT platform.apply_tenant_rls('orders.group_participant_list'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.group_payment_milestone'::regclass);  -- was: its owner orders.group_payment_schedule has no policy either
+SELECT platform.apply_tenant_rls('orders.group_payment_schedule'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.group_ticket_allocation'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.group_ticket_allocation_line'::regclass);  -- was: its owner orders.group_ticket_allocation has no policy either
+SELECT platform.apply_tenant_rls('orders.group_ticket_fulfillment'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.invitation_allowance'::regclass);  -- was: its owner identity.principal has no policy either
+SELECT platform.apply_tenant_rls('orders.member_exception'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.membership_migration'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.membership_renewal'::regclass);  -- was: only nullable references (order_id -> orders.sales_order)
+SELECT platform.apply_tenant_rls('orders.refund_calculation_policy'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.ticket_template'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('orders.ticket_template_channel'::regclass);  -- was: its owner orders.ticket_template has no policy either
+SELECT platform.apply_tenant_rls('payments.deposit_activity'::regclass);  -- was: only nullable references (payment_id -> orders.payment)
+SELECT platform.apply_tenant_rls('payments.fee_rule'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('pii.subject'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('platform.audit_record'::regclass);  -- was: only nullable references (principal_id -> identity.principal, org_unit_id -> platform.scope)
+SELECT platform.apply_tenant_rls('platform.cell_endpoint'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('platform.denomination'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('platform.device'::regclass);  -- was: only nullable references (workstation_id -> platform.workstation)
+SELECT platform.apply_tenant_rls('platform.device_heartbeat'::regclass);  -- was: only nullable references (device_id -> platform.device)
+SELECT platform.apply_tenant_rls('platform.guest_link'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('platform.profile_deployment'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('platform.region_settings'::regclass);  -- was: only nullable references (org_unit_id -> platform.scope)
+SELECT platform.apply_tenant_rls('platform.sale_board_tile'::regclass);  -- was: only nullable references (page_id -> platform.sale_board_page)
+SELECT platform.apply_tenant_rls('platform.tenant'::regclass);  -- was: only nullable references (home_region_id -> platform.scope)
+SELECT platform.apply_tenant_rls('platform.wallet_authorisation'::regclass);  -- was: its owner platform.guest_link has no policy either
+SELECT platform.apply_tenant_rls('pricing.dynamic_price_action'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('pricing.dynamic_price_condition'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('promotions.coupon_code_batch'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('promotions.partner_bundle_product'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('promotions.promotion_variant'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('promotions.upsell_rule'::regclass);  -- was: only nullable references (suggested_bundle_id -> promotions.bundle)
+SELECT platform.apply_tenant_rls('rental.agreement_item'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('rental.inspection_item'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('rental.participant'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('reporting.dashboard_tile'::regclass);  -- was: several protected owners (dashboard_id -> reporting.dashboard, report_id -> reporting.report_definition); which one owns the row is not decided
+SELECT platform.apply_tenant_rls('retail.exchange'::regclass);  -- was: its owners retail.return, retail.sale have no policy either
+SELECT platform.apply_tenant_rls('retail."return"'::regclass);  -- was: its owner retail.sale has no policy either
+SELECT platform.apply_tenant_rls('retail.return_line'::regclass);  -- was: its owner retail.return has no policy either
+SELECT platform.apply_tenant_rls('retail.sale_line'::regclass);  -- was: its owner retail.sale has no policy either
+SELECT platform.apply_tenant_rls('seating.seat'::regclass);  -- was: only nullable references (seat_map_id -> seating.seat_map)
+SELECT platform.apply_tenant_rls('seating.seat_block_item'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('seating.seat_hold_item'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('seating.seat_price_band'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.capacity_pack'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.contract'::regclass);  -- was: its owners platform.tenant, subscription.plan have no policy either
+SELECT platform.apply_tenant_rls('subscription.enforcement_policy'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.go_live_readiness'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.licensing_model'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.membership_household_policy_role_limit'::regclass);  -- was: only nullable references (membership_household_policy_id -> subscription.membership_household_policy)
+SELECT platform.apply_tenant_rls('subscription.module_listing'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.partner_quote'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.plan'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.plan_limit'::regclass);  -- was: its owner subscription.plan has no policy either
+SELECT platform.apply_tenant_rls('subscription.plan_module'::regclass);  -- was: its owner subscription.plan has no policy either
+SELECT platform.apply_tenant_rls('subscription.tier_allowance'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.tier_module'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.trial_config'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.vsi_assessment'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('subscription.vsi_model'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('sync.cell_connection'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('sync.cross_cell_request'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('transport.departure'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('transport.fare_matrix_cell'::regclass);  -- was: its owner transport.fare_table has no policy either
+SELECT platform.apply_tenant_rls('transport.fare_passenger_type'::regclass);  -- was: its owner transport.fare_table has no policy either
+SELECT platform.apply_tenant_rls('transport.fare_table'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('transport.timetable'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('transport.timetable_run'::regclass);  -- was: its owner transport.timetable has no policy either
+SELECT platform.apply_tenant_rls('venuemap.import_job'::regclass);  -- was: only nullable references (map_id -> venuemap.map)
+SELECT platform.apply_tenant_rls('venuemap.map_version'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('wallet.balance'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('wallet.hold'::regclass);  -- was: only nullable references (order_id -> orders.sales_order)
+SELECT platform.apply_tenant_rls('whitelabel.banner'::regclass);  -- was: its owner whitelabel.tenant_config has no policy either
+SELECT platform.apply_tenant_rls('whitelabel.booking_flow_step'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('whitelabel.custom_domain'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('whitelabel.feature_toggle'::regclass);  -- was: its owner whitelabel.tenant_config has no policy either
+SELECT platform.apply_tenant_rls('whitelabel.homepage_section'::regclass);  -- was: only nullable references (content_page_id -> whitelabel.content_page)
+SELECT platform.apply_tenant_rls('whitelabel.module_enablement'::regclass);  -- was: its owner whitelabel.tenant_config has no policy either
+SELECT platform.apply_tenant_rls('whitelabel.navigation_item'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('whitelabel.tenant_config'::regclass);  -- was: its owner platform.tenant has no policy either
+SELECT platform.apply_tenant_rls('workforce.attendance_amendment'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('workforce.employee'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('workforce.employment'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('workforce.job_title'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('workforce.leave_balance'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('workforce.leave_type'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('workforce.shift'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('workforce.staff_conversation_participant'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('workforce.staff_message'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('workforce.training_record'::regclass);  -- was: no scope column and no declared owner

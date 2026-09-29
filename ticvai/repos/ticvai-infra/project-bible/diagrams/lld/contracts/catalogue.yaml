@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 236 operations
+title: catalogue — 237 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -16,11 +16,14 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.channel_allocation
   - catalogue.channel_capacity
   - catalogue.inventory_hold
   - platform.workstation
   writes:
   - cache:idempotency
+  - catalogue.channel_allocation
+  - catalogue.channel_capacity
   - catalogue.inventory_hold
 - operation: approvePricingWorkflowAuthority
   verb: PUT
@@ -220,6 +223,24 @@ operations:
   - catalogue.import_job
   - catalogue.product
   - catalogue.variant
+- operation: convertInventoryHold
+  verb: POST
+  path: /inventory-holds/{inventoryHoldId}/convert
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - catalogue.channel_allocation
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  writes:
+  - cache:idempotency
+  - catalogue.channel_allocation
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
 - operation: copyPriceList
   verb: POST
   path: /price-lists/{priceListId}/copy
@@ -392,6 +413,7 @@ operations:
   - cache:idempotency
   - catalogue.product
   - catalogue.product_media
+  - whitelabel.booking_flow
   writes:
   - cache:idempotency
   - catalogue.product
@@ -469,9 +491,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.channel_capacity
   - catalogue.inventory_hold
   writes:
   - cache:idempotency
+  - catalogue.channel_capacity
   - catalogue.inventory_hold
 - operation: freezeEntitlement
   verb: POST
@@ -1465,6 +1489,8 @@ operations:
   offline: true
   reads:
   - catalogue.performance
+  - catalogue.product
+  - catalogue.product_category
   writes: []
 - operation: listPriceCalculationSequence
   verb: GET
@@ -1842,7 +1868,10 @@ operations:
   offline: true
   reads:
   - catalogue.product
+  - catalogue.product_category
+  - catalogue.product_eligibility_rule
   - catalogue.product_media
+  - whitelabel.guided_choice_answer
   writes: []
 - operation: listQuantityGroupVolume
   verb: GET
@@ -2249,8 +2278,11 @@ operations:
   - staff
   offline: false
   reads:
+  - catalogue.channel_capacity
   - catalogue.inventory_hold
-  writes: []
+  writes:
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
 - operation: renewInventoryHold
   verb: POST
   path: /inventory-holds/{inventoryHoldId}/renew
@@ -2261,9 +2293,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.channel_capacity
   - catalogue.inventory_hold
   writes:
   - cache:idempotency
+  - catalogue.channel_capacity
   - catalogue.inventory_hold
 - operation: reportBundleApplied
   verb: POST
@@ -2370,8 +2404,10 @@ operations:
   reads:
   - catalogue.event
   - catalogue.product
+  - catalogue.product_eligibility_rule
   - catalogue.product_media
   - catalogue.variant
+  - whitelabel.guided_choice_answer
   writes: []
 - operation: setAlternativeCodes
   verb: PUT
@@ -3082,10 +3118,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.product
   - catalogue.product_category
+  - whitelabel.booking_flow
   writes:
   - cache:idempotency
-  - cache:resolution
   - catalogue.product_category
 - operation: setProductContextOwnership
   verb: PUT
@@ -3487,6 +3524,7 @@ operations:
   - cache:idempotency
   - catalogue.product
   - catalogue.product_media
+  - whitelabel.booking_flow
   writes:
   - cache:idempotency
   - catalogue.product

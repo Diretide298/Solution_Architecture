@@ -6,14 +6,14 @@
 
 | | |
 |---|---|
-| **Operations** | 135 |
-| **Schemas** | 116 |
+| **Operations** | 143 |
+| **Schemas** | 122 |
 | **States** | 42 |
-| **Events** | 46 |
-| **Tables** | 131 |
-| **Screens** | 193 |
-| **Flows** | 10 |
-| **Documents** | 44 |
+| **Events** | 47 |
+| **Tables** | 138 |
+| **Screens** | 195 |
+| **Flows** | 11 |
+| **Documents** | 46 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -58,11 +58,11 @@
 | **Every model call leaves an audit record** — 17 operations write an `ai.interaction` (8.3.55). | yes | tools/check-package.py — a model-calling operation with no interaction fails |
 | **Only governed operations outside the domain may write to it** — 2 operations in other contracts write an `ai.*` table: ['askReportingQuestion', 'saveNaturalLanguageQuery']. Each is a governance record, not a bypass. | yes | tools/check-package.py allowlist, stated in ADR-0020 |
 
-**Storage tiers** — `postgres` 117 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 8
+**Storage tiers** — `postgres` 123 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 9
 
 ## Operations
 
-**133 in the contract.**
+**141 in the contract.**
 
 | Operation | Verb | Guest | Scope |
 |---|---|---|---|
@@ -107,6 +107,7 @@
 | `getAiDecisionTrace` | GET |  | venue |
 | `getAiPolicy` | GET |  | venue |
 | `getAiUsage` | GET |  | tenant |
+| `getAiVenueSettings` | GET |  | venue |
 | `getApprovalRequestScore` | GET |  | venue |
 | `getConfigurationBlueprint` | GET |  | venue |
 | `getCustomerRecommendationProfile` | GET |  | venue |
@@ -116,8 +117,12 @@
 | `getForecastAccuracy` | GET |  | venue |
 | `getGuidedChoiceSuggestion` | GET |  | venue |
 | `getRiskCase` | GET |  | venue |
+| `getVenueHistoryImport` | GET |  | venue |
+| `importVenueHistory` | POST |  | venue |
 | `ingestKnowledgeDocument` | POST |  | tenant |
 | `listAiCapabilities` | GET |  | venue |
+| `listAiCapabilityHealth` | GET |  | tenant |
+| `listAiCapabilityMaturity` | GET |  | venue |
 | `listAiControls` | GET |  | tenant |
 | `listAiConversations` | GET |  | venue |
 | `listAiEvaluations` | GET |  | tenant |
@@ -130,6 +135,7 @@
 | `listAiProviders` | GET |  | tenant |
 | `listAiRiskRegister` | GET |  | tenant |
 | `listAiTools` | GET |  | tenant |
+| `listAiTrainingRuns` | GET |  | tenant |
 | `listAnomalyDetectors` | GET |  | venue |
 | `listAssistantProfiles` | GET |  | tenant |
 | `listConfigurationSessions` | GET |  | venue |
@@ -147,6 +153,7 @@
 | `listPromptTemplates` | GET |  | tenant |
 | `listProposedActions` | GET |  | venue |
 | `listRiskAlerts` | GET |  | venue |
+| `listVenueHistoryImports` | GET |  | venue |
 | `openAiIncident` | POST |  | tenant |
 | `overrideAiDecision` | POST |  | venue |
 | `pauseActionPlan` | POST |  | venue |
@@ -190,6 +197,7 @@
 | `setAiProvider` | PUT |  | tenant |
 | `setAiRiskRegisterEntry` | PUT |  | tenant |
 | `setAiTool` | PUT |  | platform |
+| `setAiVenueSettings` | PUT |  | venue |
 | `setForecastDefinition` | PUT |  | venue |
 | `setIndexSource` | PUT |  | tenant |
 | `setSuggestionProvider` | PUT |  | tenant |
@@ -277,7 +285,7 @@
 | `conversation.handedOver` | consumes | marketing | yes |
 | `device.statusChanged` | consumes | tenancy | no |
 | `entitlement.expiringSoon` | consumes | access | no |
-| `entitlement.issued` | consumes | catalogue | yes |
+| `entitlement.issued` | consumes | access | yes |
 | `entitlement.transferred` | consumes | catalogue | no |
 | `fnb.menuPublished` | consumes | fnb | yes |
 | `identity.credentialResetRequested` | consumes | identity | no |
@@ -292,6 +300,7 @@
 | `order.paid` | consumes | orders | yes |
 | `order.refunded` | consumes | orders | yes |
 | `payment.attemptFailed` | consumes | payments | no |
+| `payment.captured` | consumes | orders | no |
 | `performance.cancelled` | consumes | catalogue | yes |
 | `promotions.recommendationStrategyPublished` | consumes | promotions | no |
 | `reporting.definitionPublished` | consumes | reporting | yes |
@@ -305,9 +314,9 @@
 
 ## Storage
 
-**`postgres`** — 117
+**`postgres`** — 123
 
-`ai.action_plan` · `ai.action_step` · `ai.anomaly_detector` · `ai.answer_feedback` · `ai.approval_request_score` · `ai.assistant_profile` · `ai.blueprint` · `ai.blueprint_decision` · `ai.byok_enablement` · `ai.capability` · `ai.case_action` · `ai.case_evidence` · `ai.chunk_embedding` · `ai.chunk_ref` · `ai.config_session` · `ai.config_source` · `ai.control` · `ai.control_test` · `ai.decision_record` · `ai.entity_risk` · `ai.eval_run` · `ai.eval_suite` · `ai.evidence_package` · `ai.forecast_accuracy` · `ai.forecast_definition` · `ai.forecast_export` · `ai.forecast_point` · `ai.forecast_scenario` · `ai.forecast_version` · `ai.governance_alert` · `ai.governance_policy` · `ai.governance_policy_version` · `ai.guided_choice_suggestion` · `ai.incident` · `ai.index_entry` · `ai.index_failure` · `ai.index_job` · `ai.index_source` · `ai.insight` · `ai.intervention` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.knowledge_gap` · `ai.layout_draft` · `ai.model` · `ai.operational_requirement` · `ai.policy` · `ai.policy_exception` · `ai.prompt_template` · `ai.proposed_action` · `ai.provider` · `ai.rec_decision` · `ai.rec_decline` · `ai.rec_event` · `ai.release` · `ai.risk_alert` · `ai.risk_assessment` · `ai.risk_case` · `ai.risk_edge` · `ai.risk_register` · `ai.risk_strategy` · `ai.signal_observation` · `ai.signal_source` · `ai.tool` · `approvals.request` · `approvals.sla_policy` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `fnb.production_plan` · `inventory.movement` · `inventory.stock_batch` · `maintenance.inspection_template` · `marketing.attribution_touch` · `marketing.audience_list` · `marketing.campaign` · `marketing.case` · `marketing.consent_record` · `marketing.guest_profile` · `marketing.loyalty_position` · `marketing.loyalty_programme` · `marketing.message_template` · `marketing.message_template_version` · `marketing.segment` · `marketing.segment_criterion` · `orders.order_line` · `platform.region_settings` · `platform.scope` · `promotions.promotion` · `queue.queue` · `queue.reading` · `reporting.report_definition` · `retail.merchandise` · `seating.accessible` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `seating.zone` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `whitelabel.banner` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.homepage_section` · `whitelabel.policy` · `whitelabel.promo_block`
+`ai.action_plan` · `ai.action_step` · `ai.anomaly_detector` · `ai.answer_feedback` · `ai.approval_request_score` · `ai.assistant_profile` · `ai.blueprint` · `ai.blueprint_decision` · `ai.byok_enablement` · `ai.capability` · `ai.capability_maturity` · `ai.case_action` · `ai.case_evidence` · `ai.chunk_embedding` · `ai.chunk_ref` · `ai.config_session` · `ai.config_source` · `ai.control` · `ai.control_test` · `ai.decision_record` · `ai.entity_risk` · `ai.eval_run` · `ai.eval_suite` · `ai.evidence_package` · `ai.forecast_accuracy` · `ai.forecast_definition` · `ai.forecast_export` · `ai.forecast_point` · `ai.forecast_scenario` · `ai.forecast_version` · `ai.governance_alert` · `ai.governance_policy` · `ai.governance_policy_version` · `ai.guided_choice_suggestion` · `ai.history_import` · `ai.history_observation` · `ai.incident` · `ai.index_entry` · `ai.index_failure` · `ai.index_job` · `ai.index_source` · `ai.insight` · `ai.intervention` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.knowledge_gap` · `ai.layout_draft` · `ai.model` · `ai.operational_requirement` · `ai.policy` · `ai.policy_exception` · `ai.prompt_template` · `ai.proposed_action` · `ai.provider` · `ai.rec_decision` · `ai.rec_decline` · `ai.rec_event` · `ai.release` · `ai.risk_alert` · `ai.risk_assessment` · `ai.risk_case` · `ai.risk_edge` · `ai.risk_register` · `ai.risk_strategy` · `ai.signal_source` · `ai.tool` · `ai.training_run` · `ai.venue_settings` · `approvals.request` · `approvals.sla_policy` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `fnb.production_plan` · `inventory.movement` · `inventory.stock_batch` · `maintenance.inspection_template` · `marketing.attribution_touch` · `marketing.audience_list` · `marketing.campaign` · `marketing.case` · `marketing.consent_record` · `marketing.guest_profile` · `marketing.loyalty_position` · `marketing.loyalty_programme` · `marketing.message_template` · `marketing.message_template_version` · `marketing.segment` · `marketing.segment_criterion` · `orders.order_line` · `platform.region_settings` · `platform.scope` · `promotions.promotion` · `queue.queue` · `queue.reading` · `reporting.report_definition` · `retail.merchandise` · `seating.accessible` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `seating.zone` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `venuemap.visit_plan` · `venuemap.visit_plan_item` · `whitelabel.banner` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.homepage_section` · `whitelabel.policy` · `whitelabel.promo_block`
 
 **`postgres-analytical`** — 5
 
@@ -317,9 +326,9 @@
 
 `qdrant:knowledge`
 
-**`redis`** — 8
+**`redis`** — 9
 
-`cache:answer` · `cache:embedding` · `cache:governance-policy` · `cache:idempotency` · `cache:rec-candidates` · `cache:rec-features` · `cache:resolution` · `cache:risk-features`
+`cache:ai-breaker` · `cache:answer` · `cache:embedding` · `cache:governance-policy` · `cache:idempotency` · `cache:rec-candidates` · `cache:rec-features` · `cache:resolution` · `cache:risk-features`
 
 ## Screens
 
@@ -332,13 +341,13 @@
 
 **P02 Guest App**
 
-- `GST-001` Home – Default — wave 1, 2 operations
+- `GST-001` Home — wave 1, 2 operations
 - `GST-031` AI Concierge – Home — wave 2, 3 operations
 - `GST-032` AI Concierge – Chat — wave 2, 2 operations
 - `GST-033` AI Concierge – Contextual Help — wave 2, 1 operation
 - `GST-036` Loyalty & Rewards — wave 2, 2 operations
 - `GST-048` Upsell / Cross-Sell — wave 2, 2 operations
-- `GST-054` AI Optimized Itinerary — wave 4, 1 operation
+- `GST-054` AI Planner — wave 1, 3 operations
 - `GST-068` Help & My Cases — wave 2, 1 operation
 
 **P04 Venue POS**
@@ -433,7 +442,7 @@
 - `ADM-486` Channel, Media & Fulfillment Configuration — wave 3, 3 operations
 - `ADM-487` Cross-Module Conflict & Dependency Validation — wave 3, 2 operations
 - `ADM-488` Configuration Preview & Impact Analysis — wave 3, 2 operations
-- `ADM-489` AI Configuration Readiness Center — wave 3, 2 operations
+- `ADM-489` AI Configuration Readiness Center — wave 3, 4 operations
 - `ADM-490` Configuration Validation Results — wave 3, 2 operations
 - `ADM-491` AI Recommendations & Best-Practice Review — wave 3, 2 operations
 - `ADM-492` Configuration Approval Workflow — wave 3, 3 operations
@@ -463,7 +472,7 @@
 - `ADM-516` Resource, Equipment & Facility Requirement Forecast — wave 3, 2 operations
 - `ADM-517` Operational Scenario & Readiness Simulator — wave 3, 3 operations
 - `ADM-518` Operational Forecast Review, Recommendations & Handover — wave 3, 2 operations
-- `ADM-519` AI Governance Command Center — wave 3, 4 operations
+- `ADM-519` AI Governance Command Center — wave 3, 5 operations
 - `ADM-520` AI Capability Registry & Ownership — wave 3, 2 operations
 - `ADM-521` AI Risk Classification & Assessment — wave 3, 2 operations
 - `ADM-522` AI Autonomy Level Configuration — wave 3, 3 operations
@@ -479,7 +488,7 @@
 - `ADM-532` Conditional Approval & Approval Conditions — wave 3, 2 operations
 - `ADM-533` Human Review, Challenge & AI Clarification Workspace — wave 3, 3 operations
 - `ADM-534` Escalation, Delegation & Approval SLA Management — wave 3, 2 operations
-- `ADM-535` Live AI Execution Oversight & Human Intervention — wave 3, 4 operations
+- `ADM-535` Live AI Execution Oversight & Human Intervention — wave 3, 5 operations
 - `ADM-536` Human Override & Manual Control Center — wave 3, 4 operations
 - `ADM-537` Approval & Intervention History / Decision Timeline — wave 3, 2 operations
 - `ADM-538` Human Oversight Workflow Simulator & Readiness Center — wave 3, 2 operations
@@ -493,12 +502,12 @@
 - `ADM-546` Execution & Business Outcome Trace — wave 3, 2 operations
 - `ADM-547` AI Audit Record & Evidence Package — wave 3, 2 operations
 - `ADM-548` AI Trace Investigation & Replay Simulator — wave 3, 2 operations
-- `ADM-549` AI Governance Monitoring Command Center — wave 3, 2 operations
+- `ADM-549` AI Governance Monitoring Command Center — wave 3, 4 operations
 - `ADM-550` AI Risk Register & Risk Exposure Management — wave 3, 2 operations
 - `ADM-551` AI Governance Control Library & Control Effectiveness — wave 3, 2 operations
 - `ADM-552` AI Policy Compliance & Violation Monitoring — wave 3, 2 operations
 - `ADM-553` AI Data, Privacy & Usage Compliance Monitoring — wave 3, 2 operations
-- `ADM-554` AI Quality, Behavior & Governance Drift Monitoring — wave 3, 5 operations
+- `ADM-554` AI Quality, Behavior & Governance Drift Monitoring — wave 3, 6 operations
 - `ADM-555` AI Governance Alert & Detection Center — wave 3, 3 operations
 - `ADM-556` AI Incident & Remediation Management — wave 3, 6 operations
 - `ADM-557` AI Compliance, Assurance & Governance Reporting — wave 3, 3 operations
@@ -531,6 +540,7 @@
 - `CMS-010` Media Library — wave 2, 1 operation
 - `CMS-062` Central Digital Asset Library — wave 3, 1 operation
 - `CMS-101` Help Me Choose — wave 2, 2 operations
+- `CMS-104` App Build & Store Publishing — wave 1, 2 operations
 
 **P15 Kitchen Display**
 
@@ -551,6 +561,7 @@
 - `ANL-058` AI Recommendation & Next-Best-Action Center — wave 3, 1 operation
 - `ANL-059` AI Insight History, Evidence & Explainability — wave 3, 2 operations
 - `ANL-060` AI Analytics Governance & Model Control — wave 3, 8 operations
+- `ANL-071` AI Maturity & Learning — wave 3, 6 operations
 
 ## Flows
 
@@ -560,6 +571,7 @@
 - **F20** A manager asks a question and gets an answer — wave 1
 - **F24** A guest asks the assistant and ends up with a person — wave 2
 - **F26** A venue maps its site — wave 2
+- **F49** A guest plans a day and follows it — wave 1
 - **F77** A promotion is built, bundled, published and measured — wave 3
 - **F82** A month is analysed from incrementality to a scheduled report — wave 3
 - **F86** A POS layout is designed, previewed and deployed — wave 2
@@ -570,6 +582,7 @@
 | Document | Status | Mentions |
 |---|---|---|
 | [Action register — 22 September 2026](..\docs\active\action-register-22-september.md) |  | 6 |
+| [AI functions review: build every AI function now, then let it learn](..\docs\active\ai-functions-review-30-september.md) |  | 18 |
 | [AI scope — for confirmation](..\docs\active\ai-scope-for-confirmation.md) |  | 1 |
 | [AI suggestion rules: one rule and a minimum history per kind](..\docs\active\ai-suggestion-rules-proposal.md) |  | 3 |
 | [BL-073 — cookie consent: what to buy, what to build, what is ours either way](..\docs\active\bl-073-cookie-consent-20-september.md) |  | 1 |
@@ -598,11 +611,12 @@
 | [Regenerating the screen layer — plan](..\docs\active\screen-regeneration-plan.md) |  | 1 |
 | [Six-month build plan, re-planned 29 September 2026](..\docs\active\six-month-plan-29-september.md) |  | 1 |
 | [Ch03 capability coverage - the client's list against our screens](..\docs\active\spec-coverage-19-september.md) |  | 1 |
+| [TICVAI system design review (re-audit before Block A tickets)](..\docs\active\system-design-review-30-september.md) |  | 4 |
 | [The 26 undrafted packs — what is in them and what they would cost](..\docs\active\undrafted-packs-scope-20-september.md) |  | 1 |
 | [Viewer — what changed in the package on 20 August](..\docs\active\viewer-update-brief-20aug.md) |  | 1 |
 | [Workshop pack — what was done, and how to re-verify it](..\docs\active\workshop-pack-log.md) |  | 3 |
 | [ADR-0007: Hybrid repository topology](..\docs\adr\0007-hybrid-repository-topology.md) | Accepted | 1 |
-| [ADR-0020 — Where AI runs, and what it is isolated from](..\docs\adr\0020-ai-isolation-boundary.md) | Proposed · 17 August 2026 | 13 |
+| [ADR-0020 — Where AI runs, and what it is isolated from](..\docs\adr\0020-ai-isolation-boundary.md) | Proposed · 17 August 2026 | 20 |
 | [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](..\docs\adr\0021-qdrant-partitioning.md) | Proposed · 17 August 2026 | 4 |
 | [ADR-0023 — Personal data lives apart from the append-only ledger](..\docs\adr\0023-pii-separation.md) | Accepted · 17 August 2026, recording a decision already impl | 2 |
 | [ADR-0028: Sixteen services, and the data boundary decides where they split](..\docs\adr\0028-service-decomposition.md) | Accepted. The data topology reopened by CF-161 on 24 August  | 1 |
@@ -611,7 +625,7 @@
 | [ADR-0046: On-premise has two configurations, and the difference is a control channel](..\docs\adr\0046-on-premise-has-two-configurations.md) | Accepted | 1 |
 | [ADR-0047: How long data is kept, and where it goes next](..\docs\adr\0047-how-long-data-is-kept-and-where-it-goes-next.md) | Accepted — the RPO floor decided 21 September; one number pe | 2 |
 | [AI provider credentials — where the key lives and who can reach it](..\docs\architecture\ai-credentials.md) |  | 3 |
-| [TICVAI AI subsystem: system design](..\docs\architecture\ai-system-design.md) |  | 150 |
+| [TICVAI AI subsystem: system design](..\docs\architecture\ai-system-design.md) |  | 162 |
 | [Architecture](..\docs\architecture\README.md) |  | 1 |
 
 ## Conflicts

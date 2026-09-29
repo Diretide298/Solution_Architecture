@@ -7,15 +7,15 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 676,
-  "operations": 706,
+  "operations": 718,
   "contracts": 20,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 161
+  "operationsWithNoScreen": 162
  },
  "waves": {
   "wave1": 12,
@@ -139,7 +139,7 @@
   },
   {
    "contract": "ai",
-   "operations": 93
+   "operations": 99
   },
   {
    "contract": "orders",
@@ -155,7 +155,7 @@
   },
   {
    "contract": "approvals",
-   "operations": 38
+   "operations": 40
   },
   {
    "contract": "platform-ops",
@@ -170,11 +170,11 @@
    "operations": 20
   },
   {
-   "contract": "finance",
+   "contract": "tenancy",
    "operations": 15
   },
   {
-   "contract": "tenancy",
+   "contract": "finance",
    "operations": 15
   },
   {
@@ -183,7 +183,7 @@
   },
   {
    "contract": "public-api",
-   "operations": 7
+   "operations": 11
   },
   {
    "contract": "cross-region",
@@ -202,11 +202,11 @@
    "operations": 2
   },
   {
-   "contract": "inventory",
+   "contract": "maintenance",
    "operations": 1
   },
   {
-   "contract": "maintenance",
+   "contract": "inventory",
    "operations": 1
   }
  ],
@@ -343,7 +343,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/general/api-rate-limit-and-quota-management",
-   "operations": 9,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -4411,7 +4411,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-configuration-readiness-center-adm-489",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -4681,7 +4681,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-governance-command-center-adm-519",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -4780,7 +4780,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-approval-requirement-routing-configuration-adm-530",
-   "operations": 3,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -4798,7 +4798,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/conditional-approval-approval-conditions-adm-532",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -4816,7 +4816,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/escalation-delegation-approval-sla-management-adm-534",
-   "operations": 2,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -4825,7 +4825,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/live-ai-execution-oversight-human-intervention-adm-535",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -4951,7 +4951,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-governance-monitoring-command-center-adm-549",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -4996,7 +4996,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-quality-behavior-governance-drift-monitoring-adm-554",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -6587,12 +6587,6 @@
     "summary": "Tick what they may do"
    },
    {
-    "operation": "listStockReservations",
-    "contract": "inventory",
-    "verb": "GET",
-    "summary": "Soft holds on stock"
-   },
-   {
     "operation": "actOnWaiverRequirements",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -7217,6 +7211,12 @@
     "summary": "Block a gift card"
    },
    {
+    "operation": "captureWalletHold",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Debit a held amount"
+   },
+   {
     "operation": "closeWallet",
     "contract": "wallet",
     "verb": "POST",
@@ -7227,6 +7227,12 @@
     "contract": "wallet",
     "verb": "GET",
     "summary": "A wallet's balance"
+   },
+   {
+    "operation": "holdWalletFunds",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Hold wallet funds for a spend in progress"
    },
    {
     "operation": "listWalletHolds",
@@ -7241,10 +7247,10 @@
     "summary": "Unfreeze a wallet"
    },
    {
-    "operation": "getNavigation",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read navigation"
+    "operation": "releaseWalletHold",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Give held wallet funds back"
    },
    {
     "operation": "publishContentBlock",

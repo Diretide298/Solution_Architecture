@@ -208,9 +208,9 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
-  /releases/{reinventoryHoldId}:
+  /releases/{releaseId}:
     parameters:
-    - name: reinventoryHoldId
+    - name: releaseId
       in: path
       required: true
       schema:
@@ -240,9 +240,9 @@ paths:
                 $ref: '#/components/schemas/ReleaseDetail'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
-  /releases/{reinventoryHoldId}/reject:
+  /releases/{releaseId}/reject:
     parameters:
-    - name: reinventoryHoldId
+    - name: releaseId
       in: path
       required: true
       schema:
@@ -290,9 +290,9 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
-  /releases/{reinventoryHoldId}/withdraw:
+  /releases/{releaseId}/withdraw:
     parameters:
-    - name: reinventoryHoldId
+    - name: releaseId
       in: path
       required: true
       schema:
@@ -340,9 +340,9 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
-  /releases/{reinventoryHoldId}/promote:
+  /releases/{releaseId}/promote:
     parameters:
-    - name: reinventoryHoldId
+    - name: releaseId
       in: path
       required: true
       schema:
@@ -418,9 +418,9 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/PromotionBlockedProblem'
-  /releases/{reinventoryHoldId}/readiness:
+  /releases/{releaseId}/readiness:
     parameters:
-    - name: reinventoryHoldId
+    - name: releaseId
       in: path
       required: true
       schema:
@@ -1754,11 +1754,11 @@ components:
       type: object
       x-ticvai-persistence: none — computed
       required:
-      - reinventoryHoldId
+      - releaseId
       - canPromote
       - gates
       properties:
-        reinventoryHoldId:
+        releaseId:
           type: string
           format: uuid
         canPromote:
@@ -1806,7 +1806,7 @@ components:
       x-ticvai-persistence: control.rollout
       required:
       - id
-      - reinventoryHoldId
+      - releaseId
       - environment
       - status
       - startedAt
@@ -1814,7 +1814,7 @@ components:
         id:
           type: string
           format: uuid
-        reinventoryHoldId:
+        releaseId:
           type: string
           format: uuid
         environment:
@@ -2477,23 +2477,43 @@ components:
         edges pointing at a table the schema did not have.**'
       required:
       - id
+      - eventId
       - eventName
+      - tenantId
+      - aggregateType
+      - aggregateId
+      - sequence
       - payload
       - createdAt
       properties:
         id:
           type: string
           format: uuid
+        eventId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: '**The envelope''s event id, a ULID** (system-design review SD-030, 29 September; applied
+            30 September). Allocated in the writing transaction; the consumer inbox key, so a redelivery is
+            recognised as the same event. `events/_schema.yaml` defines the envelope.'
         eventName:
           type: string
-          description: One of the 29 declared events.
+          description: The `name` of an event in `events/` (`aggregate.pastTenseFact`).
+        eventVersion:
+          type: integer
+          minimum: 1
+          description: The event's `version`, carried in the envelope so a consumer on an older version can tell.
+        tenantId:
+          type: string
+          format: uuid
+          description: The tenant the change belongs to (envelope field, SD-030).
         aggregateType:
           type: string
           description: The table the change happened in.
         aggregateId:
           type: string
-          format: uuid
-          description: Which row changed.
+          maxLength: 64
+          description: '**Which row changed, as text** (SD-012, SD-030): order ids are ULIDs and most other keys
+            UUIDs, so the column holds either; it was `format: uuid`, which no order event could satisfy.'
         payload:
           type: object
           description: '**The event as it happened, not a reference to a row that may have moved on.**
@@ -2503,8 +2523,15 @@ components:
           description: The partition key (ADR-0005).
         sequence:
           type: integer
-          description: '**Monotonic per scope.** A consumer that missed one knows it missed one — ordering
-            is the difference between at-least-once and unusable.'
+          description: '**Monotonic per aggregate** (SD-030: was *per scope*), allocated in the writing
+            transaction. A consumer that missed one knows it missed one — ordering is the difference between
+            at-least-once and unusable — and ordering is only ever promised within one aggregate.'
+        traceId:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: The W3C trace id of the request that made the change (envelope field, SD-030), so a
+            consumer's work joins the producer's trace.
         publishedAt:
           type: string
           format: date-time

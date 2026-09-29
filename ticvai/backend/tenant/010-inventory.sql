@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS inventory.item (
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS inventory.kit_component (
     kit_item_id                       uuid,
     component_item_id                 uuid NOT NULL,
@@ -309,9 +309,9 @@ CREATE TABLE IF NOT EXISTS inventory.stock_reservation (
     item_id                           uuid NOT NULL,
     location_id                       uuid NOT NULL,
     quantity                          numeric(18,4) NOT NULL,
-    source_type                       text NOT NULL CONSTRAINT stock_reservation_source_type_chk CHECK (char_length(source_type) <= 50),
-    source_id                         uuid NOT NULL,
-    status                            text NOT NULL CONSTRAINT stock_reservation_status_chk CHECK (char_length(status) <= 30),
+    source_type                       text NOT NULL CONSTRAINT stock_reservation_source_type_chk CHECK (source_type IN ('workOrder', 'rentalAgreement', 'order', 'transfer', 'other')),
+    source_id                         text NOT NULL CONSTRAINT stock_reservation_source_id_chk CHECK (char_length(source_id) <= 64),
+    status                            text NOT NULL CONSTRAINT stock_reservation_status_chk CHECK (status IN ('active', 'consumed', 'released', 'expired')),
     expires_at                        timestamptz,
     created_at                        timestamptz NOT NULL,
     released_at                       timestamptz

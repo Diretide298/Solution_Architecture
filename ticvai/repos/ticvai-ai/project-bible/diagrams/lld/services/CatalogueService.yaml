@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 444 operations, 134 tables
+title: CatalogueService — 445 operations, 134 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -15,7 +15,7 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 444
+  operations: 445
   inAFlow: 256
   percent: 58%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -43,7 +43,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 236
+  count: 237
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -51,8 +51,8 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 4
-    writes: 2
+    reads: 5
+    writes: 4
   - operation: approvePricingWorkflowAuthority
     verb: PUT
     path: /pricing-workflow-authority
@@ -149,6 +149,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 4
+  - operation: convertInventoryHold
+    verb: POST
+    path: /inventory-holds/{inventoryHoldId}/convert
+    scope: venue
+    permission: null
+    offline: false
+    reads: 4
+    writes: 4
   - operation: copyPriceList
     verb: POST
     path: /price-lists/{priceListId}/copy
@@ -235,7 +243,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: decideCatalogueAiFinding
     verb: POST
@@ -275,8 +283,8 @@ operationsByContract:
     scope: venue
     permission: CAPACITY_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: freezeEntitlement
     verb: POST
     path: /entitlements/{entitlementId}/freeze
@@ -875,7 +883,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 1
+    reads: 3
     writes: 0
   - operation: listPriceCalculationSequence
     verb: GET
@@ -1091,7 +1099,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 2
+    reads: 5
     writes: 0
   - operation: listQuantityGroupVolume
     verb: GET
@@ -1307,16 +1315,16 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 1
-    writes: 0
+    reads: 2
+    writes: 2
   - operation: renewInventoryHold
     verb: POST
     path: /inventory-holds/{inventoryHoldId}/renew
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: reportBundleApplied
     verb: POST
     path: /catalogue/bundles/{version}/applied
@@ -1371,7 +1379,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: true
-    reads: 4
+    reads: 6
     writes: 0
   - operation: setAlternativeCodes
     verb: PUT
@@ -1731,8 +1739,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 3
+    reads: 4
+    writes: 2
   - operation: setProductContextOwnership
     verb: PUT
     path: /product-context-ownership
@@ -1923,7 +1931,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: updateProductVariant
     verb: PATCH
@@ -1982,7 +1990,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 6
+    reads: 7
     writes: 7
   - operation: createCommercialCampaign
     verb: POST
@@ -3635,6 +3643,7 @@ tables:
   - cloneSeatMap
   - commitCatalogueImport
   - commitImportJob
+  - convertInventoryHold
   - copyPriceList
   - copySeatMapSection
   - createBulkProductCatalogue
@@ -3798,6 +3807,7 @@ tables:
   - cloneSeatMap
   - commitCatalogueImport
   - commitImportJob
+  - convertInventoryHold
   - copyPriceList
   - createBulkProductCatalogue
   - createBundle
@@ -3951,7 +3961,6 @@ tables:
   writtenBy:
   - listPrices
   - setPrices
-  - setProductCategories
   readBy:
   - listPrices
   gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
@@ -4034,7 +4043,11 @@ tables:
   parent: null
   writtenBy:
   - catalogue
-  foreignWriters: null
+  - orders
+  - payments
+  foreignWriters:
+  - orders
+  - payments
 - table: catalogue.channel_connection
   columns: 23
   store: postgres
@@ -4189,14 +4202,18 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.inventory_hold
-  columns: 14
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
   - catalogue
   - orders
+  - payments
+  - venue-map
   foreignWriters:
   - orders
+  - payments
+  - venue-map
 - table: catalogue.lifecycle_action
   columns: 24
   store: postgres
@@ -4384,7 +4401,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product
-  columns: 39
+  columns: 41
   store: postgres
   parent: null
   writtenBy:
@@ -4393,7 +4410,7 @@ tables:
   foreignWriters:
   - inventory
 - table: catalogue.product_category
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -4407,7 +4424,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product_eligibility_rule
-  columns: 14
+  columns: 15
   store: postgres
   parent: catalogue.product
   writtenBy:
@@ -4583,7 +4600,7 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.bundle_component
-  columns: 10
+  columns: 13
   store: postgres
   parent: promotions.bundle
   writtenBy:
@@ -4909,6 +4926,10 @@ readsFrom:
   operations: 10
 - service: AccessService
   operations: 9
+- service: WhiteLabelService
+  operations: 5
+- service: FnbService
+  operations: 1
 - service: LedgerService
   operations: 1
 - service: TenancyService
@@ -5034,31 +5055,30 @@ screens:
 - P01:WEB-040 Virtual Queue
 - P01:WEB-043 Loyalty & Rewards
 - P01:WEB-048 Book a Space by the Hour
-- P02:GST-001 Home – Default
-- P02:GST-002 Explore Categories
-- P02:GST-003 Event & Attraction Listing
-- P02:GST-004 Attraction Details
+- P01:WEB-050 Plan Your Visit
+- P02:GST-001 Home
+- P02:GST-002 Explore
+- P02:GST-003 Buy Tickets
+- P02:GST-004 Item Detail
 - P02:GST-005 What's On
-- P02:GST-006 Event / Exhibition Details
+- P02:GST-006 Item Detail – Event / Exhibition
 - P02:GST-007 Select Date & Time
 - P02:GST-008 Tickets & Add-ons
 - P02:GST-015 Memberships
 - P02:GST-021 Interactive Map
 - P02:GST-036 Loyalty & Rewards
 - P02:GST-037 Offers & Promotions
-- P02:GST-038 Digital Companion Mode
+- P02:GST-038 At the Venue
 - P02:GST-041 Checkout Entry
 - P02:GST-044 Multi-Currency & Pricing
 - P02:GST-049 Interactive Seat Selection
 - P02:GST-050 Resource Booking – Cabana
-- P02:GST-051 Plan Your Adventure – Start
+- P02:GST-051 Plan
 - P02:GST-052 Suggested Itineraries
-- P02:GST-053 Build Your Own Itinerary
-- P02:GST-054 AI Optimized Itinerary
+- P02:GST-053 Your Plan
 - P02:GST-056 Bundle Package
 - P02:GST-058 Resource Availability (Cabana)
-- P02:GST-059 Plan My Day – In Progress
-- P02:GST-063 Search
+- P02:GST-063 Explore – Search Results
 - P02:GST-070 Reserve a Table
 - P02:GST-072 Share & Group Booking
 - P02:GST-075 Book a Space by the Hour
@@ -5092,6 +5112,7 @@ screens:
 - P08:BO-019 Closures & Blackouts
 - P08:BO-037 Offline Package Status
 - P08:BO-063 Opening Hours & Calendar
+- P08:BO-094 Map Editor & Publish
 - P08:BO-1000 Mobile & Accessible Selection
 - P08:BO-1001 View Preview, Compare & Heat Map
 - P08:BO-1002 AI Conversational Seat Assistant
@@ -5538,6 +5559,7 @@ screens:
 - P10:PTR-009 Group / Bulk Booking
 - P10:PTR-010 Cart & Quote
 - P13:CMS-101 Help Me Choose
+- P13:CMS-103 Booking Flows
 - P16:ANL-004 Product Performance
 - P16:ANL-018 Alerts & Exception Center
 - P17:SGN-005 Sales Channel Assessment
@@ -5576,7 +5598,6 @@ flows:
 - F32 A till opens, trades and settles
 - F33 A till goes offline and comes back
 - F34 A retail sale, from scan to return
-- F49 A guest plans a day and follows it
 - F53 A guest earns, sees and spends loyalty
 - F55 A guest buys on the web and transfers to a friend
 - F58 A ticket is sold at a till, added to, and refunded

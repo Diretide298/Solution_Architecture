@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `access` |
 | Schemas owned | `access` |
-| Operations in the slice | 34 of 245 |
+| Operations in the slice | 38 of 246 |
 | Scale | Read-heavy, extreme latency sensitivity, edge-cached. `frozenDays` is held rather than replayed precisely because the gate cannot afford the arithmetic. |
 | If it is down | Down means the gates stop. Runs at the edge with a local decision cache. |
 
@@ -22,7 +22,6 @@
 | [CatalogueService](CatalogueService.md) | `catalogue.entitlement_template`, `catalogue.product` |
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `pii.subject`, `pii.subject_biometric` |
 | [MarketingService](MarketingService.md) | `marketing.consent_record` |
-| [VenueOpsService](VenueOpsService.md) | `venuemap.map`, `venuemap.path`, `venuemap.point` |
 
 ## Operations in the first release
 
@@ -41,9 +40,12 @@
 | access | [`listMyEntitlements`](#listmyentitlements) | GET | `/guests/me/entitlements` | core | 1 | GST-001, GST-012, GST-055, POS-002, WEB-001, WEB-018 |
 | access | [`listParkingFacilities`](#listparkingfacilities) | GET | `/parking-facilities` | core | 2 | BO-006, GST-027, GST-028, WEB-041 |
 | access | [`revokeFacePass`](#revokefacepass) | DELETE | `/face-pass/enrolments/{enrolmentId}` | core | 2 | GST-069, WEB-024 |
+| access | [`rollbackAccessPolicy`](#rollbackaccesspolicy) | POST | `/dynamic-access-policy/{policyId}/rollback` | setup | 1 | BO-243 |
+| access | [`setAccessAttributeCatalog`](#setaccessattributecatalog) | PUT | `/access-attribute-catalog` | setup | 1 | BO-235 |
 | access | [`setAccessPointGroup`](#setaccesspointgroup) | PUT | `/access-point-groups` | setup | 1 | BO-151 |
 | access | [`setBiometricVerificationProfile`](#setbiometricverificationprofile) | PUT | `/biometric-verification-profile` | setup | 1 | BO-184, BO-185, BO-191 |
 | access | [`setBleBeaconGeofence`](#setblebeacongeofence) | PUT | `/ble-beacon-geofence` | setup | 1 | BO-168 |
+| access | [`setContextTimeEvent`](#setcontexttimeevent) | PUT | `/context-time-event` | setup | 1 | BO-222, BO-237 |
 | access | [`setCredentialActivationDisplay`](#setcredentialactivationdisplay) | PUT | `/credential-activation-display` | setup | 1 | BO-166 |
 | access | [`setDeviceBindingPolicy`](#setdevicebindingpolicy) | PUT | `/device-binding-policy` | setup | 1 | BO-164, BO-167 |
 | access | [`setFaceMatchingVerification`](#setfacematchingverification) | PUT | `/face-matching-verification` | setup | 1 | BO-189 |
@@ -53,6 +55,7 @@
 | access | [`setParkingFacility`](#setparkingfacility) | PUT | `/parking-facilities` | setup | 2 | BO-006 |
 | access | [`setVirtualTicketIdentity`](#setvirtualticketidentity) | PUT | `/virtual-ticket-identity` | setup | 1 | BO-335 |
 | access | [`setVisualAccessRule`](#setvisualaccessrule) | PUT | `/visual-access-rule` | setup | 1 | BO-155 |
+| access | [`setVisualDynamicPolicy`](#setvisualdynamicpolicy) | PUT | `/visual-dynamic-policy` | setup | 1 | BO-234, BO-236, BO-238 |
 | access | [`updateParkingEntitlement`](#updateparkingentitlement) | PATCH | `/parking-entitlements/{entitlementId}` | core | 2 | GST-027, WEB-041 |
 | accessPoint | [`addBlacklistEntry`](#addblacklistentry) | POST | `/blacklist` | setup | 1 | BO-033 |
 | accessPoint | [`createAccessPoint`](#createaccesspoint) | POST | `/access-points` | setup | 1 | BO-064, BO-144 |
@@ -603,6 +606,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 | includeExpired | query |  | boolean |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
@@ -674,6 +678,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 | state | query |  | enum (usableNow, upcoming, expired, all) |  |
 | includeShared | query |  | boolean | Entitlements shared with this guest by somebody else (shareEntitlement). |
 | pageSize | query |  | integer |  |
@@ -810,6 +815,118 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Destroyed |
+
+### rollbackAccessPolicy
+
+**`POST /dynamic-access-policy/{policyId}/rollback`**: Put a previous policy version back
+
+**Restoring creates a new version rather than rewinding to an old one** (decided 29 September, VM close-out), following `restoreProductVersion` and `restoreConfigVersion`: the version that was wrong stays in the history, because an access decision made under it must still be explainable.
+
+The restored version takes the same approval route as any policy change (`evaluateApprovalRequirement`): where approval is required it is `pendingApproval` and the current version stays active until it is granted; where none is required it is `active` at once.
+
+|  |  |
+|---|---|
+| Permission | `ACCESS_POINT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `access.dynamic_policy` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `access.dynamic_policy`, `access.dynamic_policy_version`, `cache:idempotency` |
+| Writes | `access.configuration_change`, `access.dynamic_policy`, `access.dynamic_policy_version`, `cache:idempotency` |
+| Called by | BO-243 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| policyId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| targetVersion | integer | yes | The version whose content is restored (min 1) |
+| reason | string | yes | (min length 3; max length 300) |
+
+**Response**: `DynamicAccessPolicyCommandCenterView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| version | integer |  | Current version. (min 1) |
+| policyId | string | yes |  |
+| policyName | string |  | e.g. |
+| scope | string |  | Where the policy applies, e.g. |
+| policyType | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) |  |  |
+| priority | integer |  |  |
+| status | enum (draft, pendingApproval, active, inactive, expired) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Restored as a new version |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | targetVersion is the current version, or does not exist for this policy |
+
+### setAccessAttributeCatalog
+
+**`PUT /access-attribute-catalog`**: Add or amend an access attribute
+
+**The write behind the Access Attribute Catalog** (decided 29 September, VM close-out): the attributes dynamic access policies test (guest category, tier, age band, ...).
+
+**Upsert keyed by `attributeKey`**, unique within the tenant. An attribute a published policy tests cannot change `dataType` or be disabled (`409`); a new attribute is added instead.
+
+|  |  |
+|---|---|
+| Permission | `ACCESS_POINT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `access.access_attribute` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `access.access_attribute`, `access.dynamic_policy`, `cache:idempotency` |
+| Writes | `access.access_attribute`, `access.configuration_change`, `cache:idempotency` |
+| Called by | BO-235 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `AccessAttributeCatalogInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| attributeKey | string | yes | Stable key a policy condition names, e.g. (max length 100; pattern ^[a-z][a-zA-Z0-9]*(\.[a-z][a-zA-Z0-9]*)*$) |
+| category | enum (guest, credential, employee, location, time, operational, device, risk) | yes |  |
+| label | string | yes | (max length 200) |
+| dataType | enum (string, integer, number, boolean, date, dateTime, enum) | yes |  |
+| allowedValues | array of string |  | Required when dataType is enum |
+| enabled | boolean |  | (default True) |
+
+**Response**: `AccessAttributeCatalogView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| category | enum (guest, credential, employee, location, time, operational, device, risk) | yes |  |
+| attributeKey | string | yes | Dotted governed key, e.g. |
+| label | string |  |  |
+| dataType | enum (string, integer, number, boolean, date, dateTime, enum) |  |  |
+| allowedValues | array of string |  | For enum attributes, e.g. |
+| enabled | boolean |  | Whether the venue may use this attribute in policies (e.g. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 409 |  | Changing the data type of, or disabling, an attribute a published policy tests |
+| 422 |  | dataType enum with no allowedValues |
 
 ### setAccessPointGroup
 
@@ -1017,6 +1134,69 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | BLE Beacon & Geofence Configuration |
+
+### setContextTimeEvent
+
+**`PUT /context-time-event`**: Context, Time, Event & Capacity Policy Builder
+
+**Drafted from the workshop pack and checked against it on 29 September.** Access Control Module, page 137. The screen says: Configure policies driven by changing venue conditions rather than only guest attributes.
+
+**Every property carries the sentence it came from.** 13 were read from the screen's own bulleted directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences, checked against the pack on 29 September.
+
+**Agreed (decided 29 September, readiness close-out).** The supported condition kinds were separate fields; they are now one contextType enum with a condition expression and result. Sample occupancy bands became two configurable thresholds, and the write gained the policy identity.
+
+|  |  |
+|---|---|
+| Permission | `ACCESS_POINT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `access.dynamic_policy` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `access.dynamic_policy`, `cache:idempotency` |
+| Writes | `access.configuration_change`, `access.dynamic_policy`, `access.dynamic_policy_version`, `cache:idempotency` |
+| Called by | BO-222, BO-237 |
+| State model | AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `draft` -> `pendingApproval`, `draft` -> `inactive`, `active` -> `inactive`, `inactive` -> `pendingApproval` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ContextTimeEventCapacityPolicyBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes |  |
+| conditionExpression | string | yes | e.g. |
+| name | string | yes |  |
+| policyId | string | yes |  |
+| contextType | enum (date, day, time, season, event, performance, specialEvent, holiday, …) | yes | Kind of venue condition the policy reacts to |
+| monitorThresholdPercent | integer |  | Occupancy percent at which the band becomes Monitor |
+| restrictThresholdPercent | integer |  | Occupancy percent at which the band becomes Restrict |
+| status | enum (active, inactive) |  | inactive switches the policy off at once; active on a new or inactive policy submits it for approval (pendingApproval) (decided 29 September, writers pass) (default active) |
+| validFrom | string (date-time) |  | Start of validity; null for at once (decided 29 September, writers pass) (nullable) |
+| validTo | string (date-time) |  | End of validity: after it a timer moves the policy to expired (decided 29 September, writers pass) (nullable) |
+
+**Response**: `ContextTimeEventCapacityPolicyBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes |  |
+| conditionExpression | string | yes | e.g. |
+| name | string | yes |  |
+| policyId | string | yes |  |
+| contextType | enum (date, day, time, season, event, performance, specialEvent, holiday, …) | yes | Kind of venue condition the policy reacts to |
+| monitorThresholdPercent | integer |  | Occupancy percent at which the band becomes Monitor |
+| restrictThresholdPercent | integer |  | Occupancy percent at which the band becomes Restrict |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Context, Time, Event & Capacity Policy Builder |
 
 ### setCredentialActivationDisplay
 
@@ -1640,6 +1820,68 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Visual Access Rule Builder |
+
+### setVisualDynamicPolicy
+
+**`PUT /visual-dynamic-policy`**: Visual Dynamic Policy Builder
+
+**Drafted from the workshop pack and checked against it on 29 September.** Access Control Module, page 136. The screen says: Provide a no-code interface for constructing contextual access policies.
+
+**Every property carries the sentence it came from.** 7 were read from the screen's own bulleted directory and 14 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences, checked against the pack on 29 September.
+
+**Agreed (decided 29 September, readiness close-out).** The seven result labels were separate fields; they are now one result enum. The write gained the policy identity and the condition expression it was missing.
+
+**The screen's actions are behaviour, not fields:** Simulate (`simulatePolicyConflictImpact`).
+
+|  |  |
+|---|---|
+| Permission | `ACCESS_POINT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `access.dynamic_policy` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `access.access_attribute`, `access.dynamic_policy`, `cache:idempotency` |
+| Writes | `access.configuration_change`, `access.dynamic_policy`, `access.dynamic_policy_version`, `cache:idempotency` |
+| Called by | BO-234, BO-236, BO-238 |
+| State model | AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `draft` -> `pendingApproval`, `draft` -> `inactive`, `active` -> `inactive`, `inactive` -> `pendingApproval` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `VisualDynamicPolicyBuilderInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| conditionExpression | string | yes | Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. |
+| name | string | yes | e.g. |
+| policyId | string | yes |  |
+| result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes | Decision the policy returns when its condition holds |
+| priority | integer |  |  |
+| status | enum (active, inactive) |  | inactive switches the policy off at once; active on a new or inactive policy submits it for approval (pendingApproval) (decided 29 September, writers pass) (default active) |
+| validFrom | string (date-time) |  | Start of validity; null for at once (decided 29 September, writers pass) (nullable) |
+| validTo | string (date-time) |  | End of validity: after it a timer moves the policy to expired (decided 29 September, writers pass) (nullable) |
+
+**Response**: `VisualDynamicPolicyBuilderView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| conditionExpression | string | yes | Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. |
+| name | string | yes | e.g. |
+| policyId | string | yes |  |
+| result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes | Decision the policy returns when its condition holds |
+| priority | integer |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Visual Dynamic Policy Builder |
 
 ### updateParkingEntitlement
 
@@ -2316,14 +2558,16 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `access.access_point`, `access.accreditation_credential`, `access.admission_rules`, `access.blacklist`, `cache:resolution`, `catalogue.entitlement_template`, `identity.principal`, `venuemap.map`, `venuemap.path`, `venuemap.point` |
-| Writes | `cache:resolution` |
+| Reads | `access.access_point`, `access.accreditation_credential`, `access.admission_rules`, `access.blacklist`, `access.dynamic_policy`, `access.entitlement` |
+| Writes | - |
 | Called by | BO-034, BO-035, BO-037, BO-060, BO-207, EMP-010, EMP-015, EMP-017, POS-013, SCN-003, SCN-007, SCN-008, SCN-009, SCN-013, SCN-014, SCN-015 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| sinceVersion | query |  | integer | The entitlementsVersion of the package the device holds; omitted, the whole package (SD-052). |
+| X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 | validFrom | query | yes | string (date-time) |  |
 | validTo | query | yes | string (date-time) |  |
 | If-None-Match | header |  | string |  |
@@ -2337,7 +2581,29 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | validFrom | string (date-time) | yes |  |
 | validTo | string (date-time) | yes |  |
 | accessPointId | string (uuid) | yes |  |
-| entitlements | array of object | yes |  |
+| entitlementsVersion | integer |  | The highest access.entitlement change included (SD-052, 29 September). |
+| dynamicPolicies | array of AccessDynamicPolicy |  | The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one. |
+| dynamicPolicies[].id | string (uuid) | yes | The policyId |
+| dynamicPolicies[].venueId | string (uuid) |  | (nullable) |
+| dynamicPolicies[].scopePath | string | yes | ltree of the owning scope node; where it applies further is access.policy_scope_assignment |
+| dynamicPolicies[].name | string | yes | (max length 200) |
+| dynamicPolicies[].policyType | enum (guestAttribute, accreditation, occupancy, employee, risk, membership, timeEvent) | yes |  |
+| dynamicPolicies[].contextType | enum (date, day, time, season, event, performance, specialEvent, holiday, …) |  | Context/time/event policies (setContextTimeEvent) (nullable) |
+| dynamicPolicies[].identityType | enum (guest, member, annualPassHolder, employee, contractor, vendor, performer, media, …) |  | Identity-based policies (listIdentityMembershipAccreditation) (nullable) |
+| dynamicPolicies[].conditionExpression | string | yes | Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN |
+| dynamicPolicies[].result | enum (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor) | yes |  |
+| dynamicPolicies[].priority | integer |  | (nullable) |
+| dynamicPolicies[].allowedZoneIds | array of string (uuid) |  |  |
+| dynamicPolicies[].deniedZoneIds | array of string (uuid) |  |  |
+| dynamicPolicies[].monitorThresholdPercent | integer |  | Occupancy policies. (min 0; max 100; nullable) |
+| dynamicPolicies[].restrictThresholdPercent | integer |  | Occupancy policies. (min 0; max 100; nullable) |
+| dynamicPolicies[].validFrom | string (date-time) |  | (nullable) |
+| dynamicPolicies[].validTo | string (date-time) |  | The grant expires automatically at validTo (nullable) |
+| dynamicPolicies[].status | enum (draft, pendingApproval, active, inactive, expired) | yes | (default draft) |
+| dynamicPolicies[].currentVersion | integer | yes | The version in force (access.dynamic_policy_version) (min 1) |
+| dynamicPolicies[].createdAt | string (date-time) |  | (read-only) |
+| dynamicPolicies[].updatedAt | string (date-time) |  | (read-only) |
+| entitlements | array of object | yes | Read from access.entitlement (SD-052). |
 | entitlements[].ticketId | string | yes | The Entitlement.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | entitlements[].mediaCodes | array of string | yes | A ticket may carry several media over its life. |
 | entitlements[].validFrom | string (date-time) | yes |  |
@@ -2390,6 +2656,21 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
+
+### `access.access_attribute`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| scope_path | text | yes | ltree of the owning scope node (tenant) |
+| attribute_key | text | yes | Stable key a policy condition names, e.g. |
+| category | text | yes |  |
+| label | text | yes |  |
+| data_type | text | yes |  |
+| allowed_values | text[] | no | Required when dataType is enum |
+| is_enabled | boolean | yes |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
 
 ### `access.access_device`
 
@@ -2674,6 +2955,46 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | yes | ltree of the owning scope node |
 | updated_at | timestamptz | no |  |
 
+### `access.dynamic_policy`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | The policyId |
+| venue_id | uuid | no |  |
+| scope_path | text | yes | ltree of the owning scope node; where it applies further is access.policy_scope_assignment |
+| name | text | yes |  |
+| policy_type | text | yes |  |
+| context_type | text | no | Context/time/event policies (setContextTimeEvent) |
+| identity_type | text | no | Identity-based policies (listIdentityMembershipAccreditation) |
+| condition_expression | text | yes | Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN |
+| result | text | yes |  |
+| priority | integer | no |  |
+| allowed_zone_ids | text[] | no |  |
+| denied_zone_ids | text[] | no |  |
+| monitor_threshold_percent | integer | no | Occupancy policies. |
+| restrict_threshold_percent | integer | no | Occupancy policies. |
+| valid_from | timestamptz | no |  |
+| valid_to | timestamptz | no | The grant expires automatically at validTo |
+| status | text | yes |  |
+| current_version | integer | yes | The version in force (access.dynamic_policy_version) |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `access.dynamic_policy_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| dynamic_policy_id | uuid | yes |  |
+| scope_path | text | yes | ltree of the owning scope node |
+| version | integer | yes | Unique per policy |
+| status | text | yes |  |
+| definition | jsonb | yes | The policy content of this version - name, policyType, contextType, identityType, conditionExpression, result, priority, zones, thresholds and validity - as on access.dynamic_policy |
+| restored_from_version | integer | no | Set by rollbackAccessPolicy (its targetVersion) |
+| reason | text | no |  |
+| created_by_principal_id | uuid | no |  |
+| created_at | timestamptz | yes |  |
+
 ### `access.entitlement`
 
 | Column | Type | Required | Notes |
@@ -2832,12 +3153,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-211 operations, added to this service in later releases without changing any of the above.
+208 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `lockIdentity`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `registerAccessDevice`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackAccessPolicy`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevice`, `updateSecurityAlert`, `verifyIdentity` |
+| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `lockIdentity`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `registerAccessDevice`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackConfigurationVersion`, `setAccessAreaZone`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevice`, `updateSecurityAlert`, `verifyIdentity` |
 | accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry` |
 | drafted | `listBiometricConsentGuardian`, `listBiometricLifecycleRetention` |
 | sync | `listScans`, `syncScans` |
-| validation | `lookupTicket`, `overrideAccess`, `validateAccess`, `validateGroupAccess` |
+| validation | `issueOrderEntitlements`, `lookupTicket`, `overrideAccess`, `validateAccess`, `validateGroupAccess` |

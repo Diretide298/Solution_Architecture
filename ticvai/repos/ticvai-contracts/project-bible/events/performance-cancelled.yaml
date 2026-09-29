@@ -7,6 +7,8 @@ publisher: catalogue
 description: A performance was cancelled and everyone holding a ticket must be made whole.
 aggregate: performance
 emittedWhen: Performance.status onSale or suspended or scheduled to cancelled
+emittedBy:
+- cancelPerformance
 payload:
 - field: performanceId
   type: uuid

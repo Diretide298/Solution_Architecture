@@ -138,7 +138,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: resolveGuestLink
     verb: GET
     path: /guest-links/resolve
@@ -224,10 +224,12 @@ tables:
   writtenBy:
   - access
   - games
+  - orders
   - subscription
   foreignWriters:
   - access
   - games
+  - orders
   - subscription
 readsFrom:
 - service: TenancyService
@@ -236,7 +238,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 10
+  operations: 11
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -264,6 +266,9 @@ writesOutside:
   - operation: reconcileRedemptions
     tables:
     - platform.cross_region_entitlement
+  - operation: relinquishWalletAuthorisation
+    tables:
+    - platform.wallet_authorisation
   - operation: revokeCrossRegionEntitlement
     tables:
     - platform.cross_region_entitlement

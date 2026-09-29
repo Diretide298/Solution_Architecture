@@ -64,9 +64,43 @@ platform:
       the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather
       than different.'
     decided: 10 September 2026
+  navigationSets:
+    appTabs:
+      members:
+      - GST-001
+      - GST-002
+      - GST-051
+      - GST-012
+      - GST-038
+      destinations:
+      - GST-001
+      - GST-002
+      - GST-003
+      - GST-051
+      - GST-012
+      - GST-038
+      provenance: 'decided 29 September 2026 (P29), MOB-1, MOB-2: default tabs Home, Explore, Plan and
+        Tickets with the persistent Buy tickets button (GST-003); Map (GST-038 At the Venue) is an optional
+        tab per venue. The tab set is venue configuration (NavigationConfig bottomNavigation, LinkTarget
+        kind appSection).'
+  appShell:
+    tabs: 'Home (GST-001), Explore (GST-002), Plan (GST-051), Tickets (GST-012) by default, plus the Buy
+      tickets button. The set, order, labels and icons are venue configuration (`NavigationConfig.bottomNavigation`
+      items of `LinkTarget` kind `appSection`: home, explore, plan, tickets, map, account, buyTickets),
+      edited on CMS-009. Map is optional (GST-038). The Plan tab is hidden when the venue turns module
+      `visitPlanner` off. Account is the header icon (GST-039), not a tab.'
+    buyButton: A persistent **Buy tickets** button on every screen, opening GST-003 Buy Tickets. Style
+      from `NavigationConfig.buyButton.style` (raised centre button by default, floating, flat or hidden)
+      and its label from `buyButton.label`. Hidden on the booking and checkout steps (GST-007, GST-008,
+      GST-049, GST-050, GST-056, GST-058, GST-074 to GST-079, GST-041, GST-042, GST-009, GST-010), where
+      it would abandon the booking. An app-shell component, not a screen.
+    introVideo: 'A first-launch state of GST-001 (MOB-5): `BrandIdentity.introVideoAssetRef` played full
+      screen per `BrandIdentity.introVideoMode` (off by default, firstLaunch or everyLaunch), streamed,
+      with **Skip introduction** always shown.'
+    provenance: decided 29 September 2026 (P29), MOB-1, MOB-2, MOB-5; mobile v4 prototype
 screens:
 - id: GST-001
-  name: Home – Default
+  name: Home
   module: Discovery & Browse
   requiresModule: marketing
   wave: 1
@@ -151,6 +185,8 @@ screens:
     - to: GST-003
       trigger: Event & Attraction Listing
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
+      carries:
+      - eventId
     - to: GST-004
       trigger: Attraction Details
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
@@ -168,8 +204,10 @@ screens:
         productId, so an edge into it carries them
     - to: GST-007
       trigger: Select Date & Time
-      provenance: derived — GST-007 declares entryState.params eventId and GST-001 holds none of them,
-        so the edge carries nothing and GST-007 opens cold
+      carries:
+      - eventId
+      provenance: derived — GST-007 declares entryState.params eventId and GST-001 holds eventId, so an
+        edge into it carries them
     - to: GST-008
       trigger: Tickets & Add-ons
       carries:
@@ -338,16 +376,12 @@ screens:
         holds none of them, so the edge carries nothing and GST-049 opens cold
     - to: GST-052
       trigger: Suggested Itineraries
-      provenance: derived — GST-052 declares entryState.params suggestionId and GST-001 holds none of
-        them, so the edge carries nothing and GST-052 opens cold
-      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
-        in the first release (decided 28 September, audit R187)'
+      provenance: derived — GST-052 declares entryState.params  and GST-001 holds none of them, so the
+        edge carries nothing and GST-052 opens cold
     - to: GST-054
       trigger: AI Optimized Itinerary
-      provenance: derived — GST-054 declares entryState.params conversationId, suggestionId and GST-001
-        holds none of them, so the edge carries nothing and GST-054 opens cold
-      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
-        in the first release (decided 28 September, audit R187)'
+      provenance: derived — GST-054 declares entryState.params conversationId, planId and GST-001 holds
+        none of them, so the edge carries nothing and GST-054 opens cold
     - to: GST-055
       trigger: Dynamic QR Ticket
       carries:
@@ -361,10 +395,8 @@ screens:
         so the edge carries nothing and GST-056 opens cold
     - to: GST-059
       trigger: Plan My Day – In Progress
-      provenance: derived — GST-059 declares entryState.params suggestionId and GST-001 holds none of
+      provenance: derived — GST-059 declares entryState.params itemId, planId and GST-001 holds none of
         them, so the edge carries nothing and GST-059 opens cold
-      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
-        in the first release (decided 28 September, audit R187)'
     - to: GST-061
       trigger: Menu Item Detail
       provenance: derived — GST-061 declares entryState.params outletId and GST-001 holds none of them,
@@ -413,13 +445,9 @@ screens:
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
     - to: GST-051
       trigger: Plan Your Adventure – Start
-      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
-        in the first release (decided 28 September, audit R187)'
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
     - to: GST-053
       trigger: Build Your Own Itinerary
-      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
-        in the first release (decided 28 September, audit R187)'
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
     - to: GST-057
       trigger: Accessibility Information
@@ -439,8 +467,18 @@ screens:
     - to: GST-076
       trigger: Book a trip (a transport venue)
       provenance: 'decided 29 September, rev 3 REV3-21: the transport venue''s home call to action'
+    - to: GST-004
+      trigger: Opens a highlight (Item Detail)
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), MOB-3, MOB-4
+    - to: GST-051
+      trigger: Plan tab
+      provenance: decided 29 September 2026 (P29), MOB-1, MOB-6
     entryFrom:
     - GST-076
+    uses:
+    - appTabs
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Landing. **Declared
     only a health check.** Pranay asked for guest details and tickets; Chitrangi asked for search. All
@@ -455,12 +493,21 @@ screens:
     The venue picked here (audit R267) is the venue whose booking-flow settings apply; the booking screens''
     *Booking at* bar changes it (REV3-18). Every booking-flow setting named here is read from `getTenantConfig`
     `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
-    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).'
+    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).
+
+
+    **Mobile v4 (decided 29 September, MOB-1, MOB-3, MOB-5).** Retitled **Home** and made the Home tab
+    root: hero (carousel, video, poster or split), the venue overview (description, opening hours, info),
+    type tiles and one or two highlights per type; tapping a highlight opens Item Detail (GST-004). GST-005
+    What''s On and GST-029 Venue Info & Services stay and are linked from here. The optional intro video
+    is a first-launch state of this screen, not a screen. The Plan tab (GST-051) is in Block A (29 September
+    re-plan, superseding audit R187 and rev 3 GAP-C3), so its links no longer carry a later-release precondition.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getTenantAppStatus` reads one of them
     — list, select, act'
-  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
+  purpose: 'The Home tab: what this venue is, when it is open and what there is to do, with one or two
+    highlights per type, from which everything else is entered.'
   layout:
     template: split
     regions:
@@ -540,6 +587,32 @@ screens:
         - Money.scale
         operation: searchCatalogue
         provenance: contract catalogue.yaml GET /search
+      - kind: banner
+        label: Hero
+        bindsTo: TenantConfig.homepage
+        operation: getTenantConfig
+        notes: 'The venue hero in the style the venue set on the Home section (`heroStyle`: carousel,
+          video, poster or split). Video heroes stream; a missing asset falls back to the poster image.'
+        provenance: decided 29 September 2026 (P29), MOB-3
+      - kind: detailPanel
+        label: Venue overview
+        bindsTo: TenantAppStatus.venues
+        operation: getTenantAppStatus
+        notes: '**Home is a venue overview** (MOB-3): the venue description, today''s opening hours (from
+          `getTenantAppStatus.venues`), getting here and before-you-go info.'
+        provenance: decided 29 September 2026 (P29), MOB-3
+      - kind: cardList
+        label: Type tiles
+        operation: listProductCategories
+        notes: Rides, dining, events and shops (the venue's own categories). A tile opens Explore (GST-002)
+          on that type.
+        provenance: decided 29 September 2026 (P29), MOB-3
+      - kind: cardList
+        label: Highlights per type
+        operation: listProducts
+        notes: One or two items per type (`itemsPerSection`, 1-2, set on CMS-007); a highlight opens Item
+          Detail (GST-004). Each card shows its own primary image or clip (`Product.media`).
+        provenance: decided 29 September 2026 (P29), MOB-3
     - name: contextPanel
       slot: selection
       components:
@@ -640,6 +713,8 @@ screens:
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
+    introVideo: 'First-launch state (MOB-5): the intro video overlay plays over Home while Home loads
+      behind it; Skip introduction reveals Home.'
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
@@ -692,6 +767,16 @@ screens:
     purpose: App-shell beacon of hashed browsing behaviour for fraud prevention
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: listProducts
+    contract: catalogue
+    purpose: One or two highlights per type (rides, dining, events, shops) for the Home sections (MOB-3)
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-3
+  - operationId: listProductCategories
+    contract: catalogue
+    purpose: The type tiles on Home (rides, dining, events, shops)
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-3
   entryState:
     params:
     - name: subjectId
@@ -711,19 +796,34 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-001
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: Discover tab (Home)
-      differences: Home carries an "At venue mode is live" banner and the EN/العربية language button;
-        no search box on home (search is reached from the listing). YAML reads listMyEntitlements but
-        the prototype home shows no ticket strip.
+      view: Home tab (launch → venue → Home); intro video on first launch
+      differences: The v4 home shows no ticket strip; `listMyEntitlements` feeds the visit-day venue suggestion
+        only.
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+  overlays:
+  - id: introVideo
+    component: modal
+    trigger: App start, when `BrandIdentity.introVideoMode` is `firstLaunch` (first open on this device)
+      or `everyLaunch`; never when it is `off` (the default)
+    body: The venue's intro video, full screen and muted, streamed from `BrandIdentity.introVideoAssetRef`
+      so a new video needs no app rebuild. **Skip introduction** is always shown; the video ending has
+      the same effect.
+    bindsTo: TenantConfig.brand
+    dismiss:
+      label: Skip introduction
+      to: GST-001
+      carries: []
+      discards:
+      - the rest of the video
+    provenance: decided 29 September 2026 (P29), MOB-5; mobile v4 prototype, launch screen
 - id: GST-002
-  name: Explore Categories
+  name: Explore
   module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
@@ -741,6 +841,7 @@ screens:
     - GST-001
     - GST-003
     - GST-004
+    - GST-063
     transitions:
     - to: GST-001
       trigger: Home – Default
@@ -754,22 +855,34 @@ screens:
       trigger: Attraction Details
       carries:
       - productId
-      provenance: derived — GST-004 declares entryState.params eventId, productId and GST-002 holds productId,
-        so an edge into it carries them
+      provenance: derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-002
+        holds productId, so an edge into it carries them
+    - to: GST-063
+      trigger: Searches (results in place)
+      provenance: decided 29 September 2026 (P29), MOB-1
+    uses:
+    - appTabs
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
 
     **Rev 3 (decided 29 September).** Category → subcategory tiles or a flat list per `ticketCategories`
-    (REV3-16); grid or row per `categoryDisplay` (23SEP-18). Info-only products are listed with their
-    label and open details (REV3-14). Every booking-flow setting named here is read from `getTenantConfig`
-    `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
-    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).'
+    (REV3-16); grid or row per `cardLayout` (the retired `categoryDisplay` is removed, W7). Info-only
+    products are listed with their label and open details (REV3-14). Every booking-flow setting named
+    here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit
+    R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field by field (decided
+    29 September, rev 3 CFG-11).
+
+
+    **Mobile v4 (decided 29 September, MOB-1).** Retitled **Explore** and made the Explore tab root: search,
+    category tiles and inline video previews. **GST-063 Search is its search-results state: one implementation,
+    both ids kept** (as GAP-D3). Rows versus grid is `cardLayout`; `categoryDisplay` is retired (W7).'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Find explore categories for this venue.
+  purpose: 'The Explore tab: search the venue, browse its categories and preview items before opening
+    one.'
   layout:
     template: split
     regions:
@@ -781,7 +894,7 @@ screens:
         bindsTo: ProductCategory
         notes: '`BookingFlowConfig.ticketCategories` `categoryThenSubcategory` (default): the category
           tiles, then that category''s products (`listProducts?categoryId=`); `flatList` skips them. Grid
-          or one scrolling row per `categoryDisplay`.'
+          or one scrolling row per `cardLayout` (W7).'
         operation: listProductCategories
         provenance: decided 29 September, rev 3 REV3-16, 23SEP-18
       - kind: textField
@@ -817,6 +930,18 @@ screens:
         - Product.onSaleTo
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
+      - kind: searchField
+        label: Search the venue
+        operation: searchCatalogue
+        notes: Sends `?q=` to `searchCatalogue`; results replace the tiles in place (GST-063, the same
+          implementation).
+        provenance: decided 29 September 2026 (P29), MOB-1
+      - kind: cardList
+        label: Inline video previews
+        operation: listProducts
+        notes: Cards play the product's own short clip muted in place (`Product.media` kind video, M17-10)
+          and show the primary image otherwise; a card opens Item Detail (GST-004).
+        provenance: decided 29 September 2026 (P29), MOB-1
     - name: contextPanel
       slot: selection
       components:
@@ -864,6 +989,11 @@ screens:
     contract: catalogue
     purpose: The category tiles (a tree, with images and descriptions)
     trigger: onLoad
+  - operationId: searchCatalogue
+    contract: catalogue
+    purpose: Search from the top of Explore; results are GST-063, a state of this screen
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-1
   entryState:
     preloaded:
     - Product.id
@@ -876,18 +1006,16 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-002
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: Account → All screens → Wave 1 → Explore categories
-      differences: Tiles also jump to F&B, Retail, Parking and Memberships, not only to listing/details
-        as the YAML navigation says.
+      view: Explore tab
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: GST-003
-  name: Event & Attraction Listing
+  name: Buy Tickets
   module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
@@ -905,6 +1033,11 @@ screens:
     - GST-001
     - GST-002
     - GST-004
+    - GST-007
+    - GST-008
+    - GST-074
+    - GST-075
+    - GST-056
     fromFlows: true
     transitions:
     - to: GST-001
@@ -916,8 +1049,31 @@ screens:
       carries:
       - eventId
       - productId
-      provenance: derived — GST-004 declares entryState.params eventId, productId and GST-003 holds eventId,
-        productId, so an edge into it carries them
+      provenance: derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-003
+        holds eventId, productId, so an edge into it carries them
+    - to: GST-007
+      trigger: 'Book (a dated product: date, then time, then tickets)'
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), MOB-2
+    - to: GST-008
+      trigger: Book (an undated product, or a product-first flow such as a workshop)
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), MOB-2, W8
+    - to: GST-074
+      trigger: Book (a spot on the venue map, where the flow picks on the map)
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), MOB-2, W6
+    - to: GST-075
+      trigger: Book (a space by the hour)
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), MOB-2, W9
+    - to: GST-056
+      trigger: Book a bundle (e.g. meal combo with admission)
+      provenance: decided 29 September 2026 (P29), MOB-2, MOB-4
     - to: BO-005
       trigger: A supervisor sees the queue building
       provenance: flow F21 step 2→3
@@ -942,12 +1098,20 @@ screens:
     (REV3-16). Each product shows its own primary image (`Product.media`, 23SEP-4). Card layout, size
     and density are the enums of DG-6. Every booking-flow setting named here is read from `getTenantConfig`
     `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
-    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).'
+    venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).
+
+
+    **Mobile v4 (decided 29 September, MOB-2).** Retitled **Buy Tickets**: every bookable product and
+    flow (cabanas, surf, transport and the rest stay available, MOB-1). The persistent Buy tickets button
+    of the app shell opens it from any screen except the booking and checkout steps. The booking steps
+    behind it are unchanged and follow the published booking flow (W12). **W4:** Help me choose filters
+    this list (`listProducts` `guidedAnswerIds`) with a *Show everything* link. **W3:** info-only products
+    show Call sales / Email sales instead of Book.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
     act'
-  purpose: Find the right one quickly, and act on it without opening it.
+  purpose: Every bookable product and booking flow of the venue, one tap from any screen.
   layout:
     template: split
     regions:
@@ -1011,6 +1175,27 @@ screens:
         - Money.scale
         operation: searchCatalogue
         provenance: contract catalogue.yaml GET /search
+      - kind: banner
+        label: Help me choose
+        operation: getPublishedGuidedChoice
+        notes: '**Help me choose filters the list** (W4): the answers are sent as `guidedAnswerIds` to
+          `listProducts` and only the suitable products stay; `GuidedChoice.behaviour` `recommend` opens
+          one product instead. It is never a consent step.'
+        provenance: decided 29 September 2026 (P29), W4
+      - kind: secondaryButton
+        label: Show everything
+        operation: listProducts
+        notes: Clears the Help me choose filter and lists every product again (`GuidedChoice.showEverything`,
+          on by default).
+        provenance: decided 29 September 2026 (P29), W4
+      - kind: cardList
+        label: Contact sales
+        bindsTo: Product.salesContact
+        operation: listProducts
+        notes: '**View-only products** (W3): a product with `guestListing` `infoOnly` shows its details
+          and, instead of Book, **Call sales** and **Email sales** from `Product.salesContact` (the venue
+          contact when it has none). Hidden when `showInfoOnly` is off.'
+        provenance: decided 29 September 2026 (P29), W3
     - name: contextPanel
       slot: selection
       components:
@@ -1083,10 +1268,17 @@ screens:
     contract: catalogue
     purpose: Find something by name
     trigger: onAction
+  - operationId: getPublishedGuidedChoice
+    contract: white-label
+    purpose: 'Help me choose: the venue''s questions whose answers filter this list (W4)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W4
   entryState:
     params:
     - name: eventId
       from: deepLink
+    - name: venueId
+      from: session
     coldEntry: '**Named, expired or withdrawn — never a 404** (ADR-0030). A guest holding a link that
       no longer resolves did nothing wrong; the screen says what happened and offers the list it came
       from.'
@@ -1101,18 +1293,16 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-003
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: Account → All screens → Wave 1 → Event & attraction listing
-      differences: Rev 3 adds "Ticket categories" (category → subcategory) and "Experiences, product first"
-        listings which the YAML does not describe.
+      view: Buy tickets (the centre button, any screen)
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: GST-004
-  name: Attraction Details
+  name: Item Detail
   module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
@@ -1125,6 +1315,8 @@ screens:
   navigation:
     entryFrom:
     - GST-001
+    - GST-002
+    - GST-003
     inferred: true
     exitTo:
     - GST-001
@@ -1135,6 +1327,8 @@ screens:
     - GST-049
     - GST-074
     - GST-075
+    - GST-056
+    - GST-038
     transitions:
     - to: GST-001
       trigger: Home – Default
@@ -1171,6 +1365,14 @@ screens:
       carries:
       - productId
       provenance: decided 29 September, rev 3 REV3-13
+    - to: GST-056
+      trigger: Buy meal combo (a bundle that includes admission)
+      carries:
+      - bundleId
+      provenance: decided 29 September 2026 (P29), MOB-4
+    - to: GST-038
+      trigger: Show on the map (At the Venue, Map view)
+      provenance: decided 29 September 2026 (P29), MOB-4
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity,
     31 August**: added listPerformances. **A guest does not know which surface they are on** — the same
@@ -1182,12 +1384,20 @@ screens:
     for a dated product (REV3-2), straight to the seat map for a single-performance fixture (23SEP-16,
     REV3-4), to the map booking for a spot on a venue map (GST-074, REV3-15), or to the space booking
     (GST-075, REV3-13). Help me choose sits on the booking step (GST-008), not here (REV3-11). The event
-    banner lists dates only when `eventBannerDates` is on (23SEP-19).'
+    banner lists dates only when `eventBannerDates` is on (23SEP-19).
+
+
+    **Mobile v4 (decided 29 September, MOB-4).** GST-004 and GST-006 become one **Item Detail** screen
+    for rides, shows, restaurants and shops: **one implementation, both ids kept** (as GAP-D3). Gallery,
+    the 2D/3D map pin (`getVenueMap`) and a product card from `VenuePoint.featuredOffer` (product or bundle).
+    *Buy meal combo* adds the required admission because the bundle carries it. **W3:** an info-only product
+    shows Call sales / Email sales instead of Book.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listPerformances` reads the population and `getProduct` reads one of them — list, select,
     act'
-  purpose: See attraction details for this venue.
+  purpose: 'One detail screen for a ride, show, restaurant or shop: what it is, where it is on the map,
+    and the product to buy for it.'
   layout:
     template: split
     regions:
@@ -1241,6 +1451,38 @@ screens:
         notes: Read more opens on the primary video or photo.
         operation: getProduct
         provenance: decided 29 September, rev 3 23SEP-4
+      - kind: detailPanel
+        label: Gallery
+        bindsTo: VenuePoint
+        columns:
+        - VenuePoint.description
+        - VenuePoint.media
+        operation: getVenueMap
+        notes: Photos and clips from `VenuePoint.media` (else `Product.media`), with the point's description.
+        provenance: decided 29 September 2026 (P29), MOB-4
+      - kind: seatMap
+        label: Where it is
+        operation: getVenueMap
+        notes: The item's pin on the venue map, 2D or 3D per the venue; tapping it opens At the Venue
+          on the Map view (GST-038 / GST-021) with directions.
+        provenance: decided 29 September 2026 (P29), MOB-4
+      - kind: cardList
+        label: The product for it
+        bindsTo: VenuePoint.featuredOffer
+        operation: getBundle
+        notes: '**The right product** (MOB-4): `VenuePoint.featuredOffer` names a product (`getProduct`)
+          or a bundle (`getBundle`), on any kind of point. A restaurant proposes **Buy meal combo**: a
+          bundle with an admission component and a meal component, so the park ticket is included and
+          checkout is about three steps (GST-056 → GST-041).'
+        provenance: decided 29 September 2026 (P29), MOB-4
+      - kind: secondaryButton
+        label: Call sales / Email sales
+        bindsTo: Product.salesContact
+        operation: getProduct
+        notes: '**View-only product** (W3): with `guestListing` `infoOnly` there is no Book; the sales
+          contact from `Product.salesContact` (phone, email, note; the venue contact when absent) is shown
+          instead.'
+        provenance: decided 29 September 2026 (P29), W3
     - name: contextPanel
       slot: selection
       components:
@@ -1352,12 +1594,28 @@ screens:
     contract: catalogue
     purpose: List performances of an event
     trigger: onLoad
+  - operationId: getVenueMap
+    contract: venue-map
+    purpose: The item's point on the 2D/3D venue map, with its description, media and featured offer (MOB-4)
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-4
+  - operationId: getBundle
+    contract: promotions
+    purpose: The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4)
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-4
   entryState:
     params:
     - name: productId
       from: deepLink
     - name: eventId
       from: deepLink
+    - name: mapId
+      from: session
+      optional: true
+    - name: bundleId
+      from: navigation
+      optional: true
     coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a successor
       exists, and the catalogue where none does.'
     preloaded:
@@ -1371,12 +1629,11 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-004
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: Account → All screens → Wave 1 → Attraction details
-      differences: Shows nearby show times and a Join virtual queue action (GST-023) not in the YAML navigation.
+      view: Explore or Home → any item (Item detail)
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1546,7 +1803,7 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: GST-006
-  name: Event / Exhibition Details
+  name: Item Detail – Event / Exhibition
   module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
@@ -1564,6 +1821,7 @@ screens:
     - GST-001
     - GST-002
     - GST-003
+    - GST-007
     transitions:
     - to: GST-001
       trigger: Home – Default
@@ -1575,8 +1833,18 @@ screens:
       - eventId
       provenance: derived — GST-003 declares entryState.params eventId and GST-006 holds eventId, so an
         edge into it carries them
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    - to: GST-007
+      trigger: Book (date, then time, then tickets)
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), MOB-4, W12
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+
+
+    **Mobile v4 (decided 29 September, MOB-4).** The event and exhibition reading of **Item Detail**:
+    **one implementation with GST-004, both ids kept** (as GAP-D3). Book follows the event''s published
+    booking flow (W12).'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getPerformance` reads one record and nothing reads a population — the screen is about
@@ -1659,11 +1927,11 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-006
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: Account → All screens → Wave 1 → Event / exhibition details
+      view: Explore → an event (Item detail)
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1710,6 +1978,11 @@ screens:
       carries:
       - performanceId
       provenance: decided 29 September, rev 3 REV3-4 (`seatEventDateMode` `inlineStep`) and REV3-7
+    - to: GST-008
+      trigger: Picks a date and time after choosing the workshop (product-first flow)
+      carries:
+      - performanceId
+      provenance: decided 29 September 2026 (P29), W8
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
@@ -1725,7 +1998,21 @@ screens:
     (DG-3). Guest copy may say *Session* (CFG-10); code keeps `Performance`. Every booking-flow setting
     named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit
     R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field by field (decided
-    29 September, rev 3 CFG-11).'
+    29 September, rev 3 CFG-11).
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.
+
+
+    **29 September (MOB-29SEP).** **M17-08:** seven-day date strip plus a calendar icon. **W8:** a product-first
+    flow (workshop, experience) comes here after the product is chosen on GST-008; the date-first default
+    no longer overrides it, because the order is the flow''s. **W5:** surf and session levels appear only
+    after a time slot is chosen. **W11:** guided tours stay date → language → time slot, confirmed unchanged.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listPerformances` reads the population and `getAvailability` reads one of them — list,
@@ -1811,6 +2098,21 @@ screens:
           for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.'
         provenance: contract catalogue.yaml GET /availability
         bindsTo: PerformanceAvailability
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (date and time) highlighted.
+          A step the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+      - kind: datePicker
+        label: Next 7 days
+        operation: listPerformances
+        notes: '**A date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31)
+          with a calendar icon that opens the full month for later dates (M17-08).'
+        provenance: decided 29 September 2026 (P29), M17-08
     - name: actionBar
       slot: rowActions
       components:
@@ -1866,11 +2168,18 @@ screens:
     trigger: onAction
     invalidates:
     - getCart
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: eventId
       from: deepLink
     - name: cartId
+      from: session
+    - name: venueId
       from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
@@ -1883,16 +2192,12 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-007
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: partial
-      view: 'Account → All screens → Wave 1 → Select date & time; Rev 3 feedback → Performance times;
-        live flow: Discover → venue → Booking (embedded web engine)'
-      differences: Rev 3 adds date → time → ticket reveal, a morning/afternoon/evening filter with counts,
-        paging of long time lists, a waitlist on sold-out times, and per-flow variants (guided tour by
-        language, surf session filters, swim consent pop-up, location switcher, quick tour). None of these
-        (paging, part-of-day filter, waitlist, language filter) are in the YAML.
+      view: Buy tickets → a dated product → Booking (date and time step)
+      differences: Booking in the app runs the website booking engine; per-flow step order.
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1981,6 +2286,8 @@ screens:
       trigger: Change date or time
       back: true
       provenance: decided 29 September, rev 3 REV3-2
+      carries:
+      - eventId
     - to: GST-072
       trigger: Booking for a group or a party
       provenance: decided 29 September, rev 3 GAP-D3; DG-4
@@ -1990,6 +2297,11 @@ screens:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 opens cold
+    - to: GST-007
+      trigger: Workshop chosen, then date and time (product-first flow)
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), W8
   notes: '**Rev 3 (decided 29 September).** **Ticket selection moved onto this screen** (GAP-D3): the
     name promised choosing tickets and add-ons and the definition was a ticket transfer, which stays on
     GST-014 / GST-045 (one implementation with two ids). Tickets come after the date and time (REV3-2);
@@ -1998,7 +2310,21 @@ screens:
     at (REV3-18). On mobile the basket stays a bottom bar with the running total (REV3-10). Every booking-flow
     setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest
     picked (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field
-    by field (decided 29 September, rev 3 CFG-11).'
+    by field (decided 29 September, rev 3 CFG-11).
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.
+
+
+    **29 September.** **W4:** Help me choose filters the products (`guidedAnswerIds`) with *Show everything*;
+    `behaviour` `recommend` stays an option. **W8:** in a product-first flow (workshop, experience) this
+    step comes first and the date and time follow (GST-007). **W5:** surf levels (beginner, intermediate
+    …) appear only after the time slot.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProductVariants` reads the ticket types of the product and a stepper sets each
@@ -2046,9 +2372,25 @@ screens:
         bindsTo: GuidedChoice
         notes: 'The venue''s published Help me choose (404 = none): a button, a pop-up once on first arrival,
           and/or a dark banner under the products (*Choose from the experiences above or let us help you
-          decide*).'
+          decide*). **29 September (W4): the answers filter the list** — sent as `guidedAnswerIds` to
+          `listProducts`, so only suitable products stay; *Show everything* clears it. Never a consent
+          step: a swimmer answer pre-fills the REV3-26 swim consent, which the guest still confirms.'
         operation: getPublishedGuidedChoice
         provenance: decided 29 September, rev 3 REV3-11; prototype r3hmc
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A
+          step the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+      - kind: secondaryButton
+        label: Show everything
+        operation: listProducts
+        notes: Clears the Help me choose filter (W4).
+        provenance: decided 29 September 2026 (P29), W4
     - name: actionBar
       slot: rowActions
       components:
@@ -2091,6 +2433,11 @@ screens:
     contract: orders
     purpose: Add the tickets and add-ons
     trigger: onAction
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: productId
@@ -2109,16 +2456,12 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-008
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: partial
-      view: Account → All screens → Wave 1 → Tickets & add-ons; ticket selection itself is Rev 3 feedback
-        → Tickets after a time
-      differences: The YAML (transferOrderTickets only) and the Wave 1 prototype screen both treat this
-        as tickets-with-transfer after purchase, but the name and the Rev 3 flow mean choosing ticket
-        types and add-ons during booking. Rev 3 also moves all add-ons to one Add-ons step. The YAML needs
-        a definition for selection and add-ons (listProducts/addCartLine).
+      view: Buy tickets → a product → Booking (tickets step)
+      differences: Booking in the app runs the website booking engine.
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -2188,7 +2531,19 @@ screens:
     you?'' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing
     profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch`
     and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff
-    review.'
+    review.
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.
+
+
+    **29 September.** **W1:** a guest who proved the contact with the code arrives here with it; only
+    the T&Cs tick (and the unticked marketing opt-in, M18-15) remains.'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getCart` reads one record and nothing reads a population — the screen is about that
@@ -2231,6 +2586,28 @@ screens:
         - PaymentLinkView.releaseHoldOnExpiry
         operation: getPaymentLink
         provenance: contract orders.yaml GET /payment-links/{token}
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (review and payment) highlighted.
+          A step the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+      - kind: consentBlock
+        label: Terms and conditions
+        operation: checkoutCart
+        notes: '**After the code the guest goes straight to the T&Cs tick and completes** (W1): no second
+          name, email or phone form. The profile is created by `checkoutCart` and completed later.'
+        provenance: decided 29 September 2026 (P29), W1
+      - kind: toggle
+        label: Send me offers and news
+        operation: checkoutCart
+        notes: '**Marketing opt-in beside the T&Cs, never pre-ticked** (M18-15), sent as `marketingConsents[]`
+          on `checkoutCart`, bound to the order and the verified contact and attached to the profile on
+          match.'
+        provenance: decided 29 September 2026 (P29), M18-15
     - name: actionBar
       slot: rowActions
       components:
@@ -2308,6 +2685,11 @@ screens:
     contract: orders
     purpose: Pay a booking somebody else made
     trigger: onAction
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: cartId
@@ -2318,6 +2700,8 @@ screens:
       from: deepLink
     - name: token
       from: deepLink
+    - name: venueId
+      from: session
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
@@ -2445,6 +2829,9 @@ screens:
       - subjectId
       - attendees
     provenance: client-verified
+  x-ticvai-make-or-break: 'M18-15: may a guest-checkout customer be sent marketing on an opt-in taken
+    at checkout (law and the client''s marketing policy)? Until the client confirms, the opt-in is shown
+    unticked and nothing is sent without it.'
 - id: GST-010
   name: Booking Confirmation
   module: Cart & Checkout
@@ -2786,13 +3173,19 @@ screens:
       carries:
       - entitlementId
       - orderId
+    uses:
+    - appTabs
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. My Tickets. **Declared
     only `transferOrderTickets` until 20 August** — a guest could give a ticket away and could not read
     one. Raised by Pranay. **Rewired on the 20 August review.** **Cross-surface parity, 31 August**: added
     getEntitlementCredential, getEntitlementHistory, listEntitlements. **The same screen on web and app
     was calling different operations** — one side could do something the other could not, and nothing
-    recorded the difference as deliberate.'
+    recorded the difference as deliberate.
+
+
+    **Mobile v4 (decided 29 September, MOB-1, MOB-7).** The **Tickets** tab root. GST-013 Ticket Details
+    and GST-055 Dynamic QR Ticket (refresh every 30 s) are unchanged.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list,
@@ -2965,13 +3358,11 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-012
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: Tickets tab (#tickets)
-      differences: Add to wallet (issueWalletPass) is on this screen in the prototype; the YAML puts the
-        wallet pass on GST-018.
+      view: Tickets tab
   apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -4652,6 +5043,7 @@ screens:
   navigation:
     entryFrom:
     - GST-001
+    - GST-038
     inferred: true
     exitTo:
     - GST-001
@@ -4681,7 +5073,11 @@ screens:
     this morning gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html`
     frame `seat-4b`. **The frame names this screen on its own face**, which is the first pack to do that:
     the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts
-    produced nonsense. **A board that says what it draws removes the guess entirely.**'
+    produced nonsense. **A board that says what it draws removes the guess entirely.**
+
+
+    **Mobile v4 (decided 29 September, MOB-1).** The **Map** view of GST-038 At the Venue: **one implementation
+    with GST-038, the ids kept** (as GAP-D3).'
   density: comfortable
   boardFrames:
   - Seat Board 4.dc.html#seat-4b
@@ -4841,12 +5237,11 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-021
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: Account → All screens → Wave 2 → Interactive map; also At-venue tab → Map
-      differences: Prototype promises an offline map; not in the YAML states.
+      view: At the venue → Map
     derivedFrom: wireframes/reference/Seat Board 4.dc.html
     note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -4869,6 +5264,7 @@ screens:
     entryFrom:
     - GST-001
     - GST-021
+    - GST-038
     inferred: true
     exitTo:
     - GST-001
@@ -4892,13 +5288,15 @@ screens:
         edge carries nothing and GST-001 opens cold
     - to: GST-059
       trigger: Plan My Day – In Progress
-      precondition: 'a later release: the itinerary planner is deferred and this tile or link is not shown
-        in the first release (decided 28 September, audit R187)'
-      provenance: derived — GST-059 declares entryState.params suggestionId and GST-022 holds none of
+      provenance: derived — GST-059 declares entryState.params itemId, planId and GST-022 holds none of
         them, so the edge carries nothing and GST-059 opens cold
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
     with the queue platform F21 runs on.
+
+
+    **Mobile v4 (decided 29 September, MOB-1).** The **Waits** view of GST-038 At the Venue: **one implementation
+    with GST-038, the ids kept** (as GAP-D3).'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getWaitTimes` reads one record and nothing reads a population — the screen is about
@@ -4948,12 +5346,11 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-022
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: Account → All screens → Wave 2 → Attraction wait times
-      differences: Links to Plan my day (GST-059, deferred).
+      view: At the venue → Waits
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -6719,8 +7116,8 @@ screens:
     trigger: onAction
   - operationId: requestSuggestion
     contract: ai
-    purpose: A suggestion of kind prepPlan, upsell or waitTime only — the kinds a guest may ask for; no
-      itinerary or scenario (decided 28 September, audit R209)
+    purpose: A suggestion of kind prepPlan, upsell or waitTime from the concierge; an itinerary (guest-allowed
+      since 29 September) is asked on the Plan tab (GST-054), not here
     trigger: onAction
   entryState:
     params:
@@ -6791,9 +7188,9 @@ screens:
     component: modal
     trigger: Request suggestion
     body: '**Collects what `requestSuggestion` sends before it is called.** Required: `kind`, offered
-      as `prepPlan`, `upsell` or `waitTime` only — no itinerary or `scenario`, which the planner''s deferral
-      took out of the first release (decided 28 September, audit R209, R187). Optional: `subjectRef`,
-      `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.'
+      as `prepPlan`, `upsell` or `waitTime` only — no `scenario`; an itinerary is asked on the Plan tab
+      (GST-054, since 29 September). Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing;
+      the screen behind is unchanged.'
     confirm:
       label: Request suggestion
       operation: requestSuggestion
@@ -7831,7 +8228,7 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: GST-038
-  name: Digital Companion Mode
+  name: At the Venue
   module: In-venue Services
   requiresModule: queue
   wave: 3
@@ -7848,19 +8245,49 @@ screens:
     exitTo:
     - GST-001
     - GST-002
+    - GST-021
+    - GST-022
+    - GST-024
+    - GST-026
+    - GST-029
+    - GST-023
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-038 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-  notes: '**Not minuted and not in the matrix.** The only unsourced screen of the eight audited on 17
-    August — it reads as a framing for the in-venue capabilities rather than a capability of its own,
-    and CF-92 asks whether it is a real screen or a name for a mode.'
+    - to: GST-021
+      trigger: Map view
+      provenance: decided 29 September 2026 (P29), MOB-1
+    - to: GST-022
+      trigger: Waits view
+      provenance: decided 29 September 2026 (P29), MOB-1
+    - to: GST-024
+      trigger: Food
+      provenance: decided 29 September 2026 (P29), MOB-1
+    - to: GST-026
+      trigger: Shop
+      provenance: decided 29 September 2026 (P29), MOB-1
+    - to: GST-029
+      trigger: Services
+      provenance: decided 29 September 2026 (P29), MOB-1
+    - to: GST-023
+      trigger: Join a virtual queue
+      provenance: decided 29 September 2026 (P29), MOB-1
+    uses:
+    - appTabs
+  notes: '**Mobile v4 (decided 29 September, MOB-1).** Retitled **At the Venue**, the in-venue mode and
+    the optional Map tab: views Map, Waits, Food, Shows, Shop and Services, plus a *Happening now* panel
+    (live orders and queues). **GST-021 Interactive Map and GST-022 Attraction Wait Times are its Map
+    and Waits views: one implementation, three ids** (as GAP-D3). Food opens GST-024, Shop GST-026, Services
+    GST-029, a queue GST-023. This answers CF-92: it is a real screen. (Was: *Not minuted and not in the
+    matrix* — the only unsourced screen of the eight audited on 17 August.)'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getTenantAppStatus` reads one of them — list,
     select, act'
-  purpose: 'The in-venue home: your tickets, the map, and what is near you.'
+  purpose: 'Everything live at the venue in one place: map, waits, food, shows, shop and services, with
+    what is happening now.'
   layout:
     template: split
     regions:
@@ -7900,6 +8327,15 @@ screens:
         - Product.onSaleTo
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
+      - kind: selectField
+        label: Map · Waits · Food · Shows · Shop · Services
+        notes: The view switcher. Map and Waits are GST-021 and GST-022 rendered in place.
+        provenance: decided 29 September 2026 (P29), MOB-1
+      - kind: banner
+        label: Happening now
+        operation: getWaitTimes
+        notes: Live orders, queue calls and the next show, from the guest's own orders and queues.
+        provenance: decided 29 September 2026 (P29), MOB-1
     - name: contextPanel
       slot: selection
       components:
@@ -7998,12 +8434,11 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-038
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: At-venue tab ("Your park, live"); Account → All screens → Wave 3 → Digital companion mode
-      differences: 'Prototype has two versions of this screen: the tab and the directory screen.'
+      view: At the venue (Home → At the venue, or the Map tab where the venue shows it)
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8050,8 +8485,11 @@ screens:
       trigger: Security & Sign-in
       provenance: derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds
         none of them, so the edge carries nothing and GST-073 opens cold
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+
+
+    **29 September (W1).** A profile created by guest checkout shows *Complete your details*.'
   density: comfortable
   pattern: configEditor
   patternReason: the screen declares only writes (`recordConsent`) and no read of a population — it is
@@ -8087,6 +8525,12 @@ screens:
         label: recordedAt
         bindsTo: RecordConsentRequest.recordedAt
         provenance: contract marketing-crm.yaml POST /guests/{subjectId}/consents
+      - kind: banner
+        label: Complete your details
+        operation: updateMyProfile
+        notes: 'For a profile created by guest checkout (W1): asks for what the pop-up did not, whenever
+          the guest likes; never blocks anything.'
+        provenance: decided 29 September 2026 (P29), W1
     - name: actionBar
       slot: publish
       components:
@@ -8368,11 +8812,14 @@ screens:
     - GST-077
     - GST-078
     - GST-070
+    - GST-053
+    - GST-056
     inferred: true
     exitTo:
     - GST-001
     - GST-002
     - GST-042
+    - GST-059
     transitions:
     - to: GST-042
       trigger: Signs in, or proves the contact the tickets go to
@@ -8387,6 +8834,9 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-041 holds none of them, so the
         edge carries nothing and GST-001 opens cold
+    - to: GST-059
+      trigger: They follow it through the day
+      provenance: flow F49 step 5→6
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Promo code added 28
     September** (decided 28 September, audit R073 (e)) — the web cart WEB-010 has the field, and the two
@@ -8399,7 +8849,20 @@ screens:
     guest checkout and matching are unchanged (DG-1). Visit date per line (23SEP-9). **On mobile the basket
     stays a bottom bar with the running total**; the floating icon and the cart side apply to the website
     (REV3-10). A spot held on the venue map counts down from its `ResourceHold.expiresAt` (REV3-15). `checkoutCart`
-    `422 consentRequired` or `consentAnswerBlocks` sends the guest back to the consent questions (REV3-26).'
+    `422 consentRequired` or `consentAnswerBlocks` sends the guest back to the consent questions (REV3-26).
+
+
+    **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
+    returns the flow the product (or its category, else the venue default for its kind) uses, with its
+    enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
+    flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `bookingFlow`.
+
+
+    **29 September.** **W1:** after the guest code, or when signed in, the basket goes straight to payment
+    (GST-009) with no details form. *Book this plan* (GST-053) and *Buy meal combo* (GST-004 → GST-056)
+    land here.'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getCart` reads one record and nothing reads a population — the screen is about that
@@ -8452,6 +8915,15 @@ screens:
         notes: '`Performance.startsAt` on each line (the match date for a fixture).'
         operation: getPerformance
         provenance: decided 29 September, rev 3 23SEP-9
+      - kind: progressIndicator
+        label: Booking steps
+        bindsTo: BookingFlow
+        columns:
+        - BookingFlow.steps
+        operation: getPublishedBookingFlow
+        notes: The steps of the published flow in their `sortOrder`, this one (basket) highlighted. A
+          step the flow has turned off is not shown and is skipped by Continue and Back.
+        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
     - name: promoCode
       slot: fields
       components:
@@ -8559,6 +9031,11 @@ screens:
     contract: resources
     purpose: The countdown of a spot held on the venue map
     trigger: onInterval
+  - operationId: getPublishedBookingFlow
+    contract: white-label
+    purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), W12
   entryState:
     params:
     - name: cartId
@@ -8572,6 +9049,8 @@ screens:
       optional: true
     - name: holdId
       from: navigation
+    - name: venueId
+      from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case. **A cold arrival without
       a verified sign-in is offered the fork here** — sign in, or prove the contact where the site's `guestCheckout`
       is on — and keeps the cart either way (ADR-0045).
@@ -8580,15 +9059,12 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-041
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: partial
-      view: Account → All screens → Wave 1 → Checkout entry (#ident); Rev 3 feedback → Sign in after add-ons
-      differences: In the prototype, Checkout entry is the choice between signing in and guest checkout,
-        with contact proof and profile matching. The YAML defines a cart screen instead (promo code, extend/abandon/claim
-        cart, edit lines), which the prototype does not show here. Rev 3 moves sign-in to after Add-ons
-        (configurable).
+      view: Cart (bottom bar → basket)
+      differences: Basket as a bottom bar on mobile.
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8697,7 +9173,12 @@ screens:
     **The venue in context is sent** (decided 29 September, rev 3 GAP-B1, per venue): `verifyGuestOtp`,
     `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin` and `createMfaChallenge` take an optional
     `venueId`, the venue the app or booking is in, so the second factor is asked only where that venue
-    has guest two-step verification on.'
+    has guest two-step verification on.
+
+
+    **29 September (W1).** The guest pop-up asks only `guestContactFields` (Email only / + name / + mobile),
+    then the six-digit code (DG-1). After the code the guest is not asked for name, email or phone again:
+    back to the basket and on to the T&Cs (GST-009).'
   density: comfortable
   pattern: form
   patternReason: '**A sign-in form, not a list.** Four ways in (a one-time code, a password, Apple or
@@ -8719,7 +9200,8 @@ screens:
       - kind: textField
         label: Email or mobile number
         operation: requestGuestOtp
-        notes: One field for both routes below; the same identifier goes to `requestGuestOtp` and to `guestPasswordLogin`.
+        notes: '**Guest checkout asks only the configured fields** (W1): `BookingFlowSettings.guestContactFields`
+          (email, mobile, name; at least the `GuestMatchPolicy.matchBy` key). Nothing else is asked.'
         provenance: contract identity.yaml POST /auth/guest/otp
       - kind: primaryButton
         label: Send me a code
@@ -9772,7 +10254,11 @@ screens:
     fixture strip and a direct path from GST-004 (23SEP-16). A cabana map is GST-074, not this screen
     (REV3-15). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved
     for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
-    entry laid over field by field (decided 29 September, rev 3 CFG-11).'
+    entry laid over field by field (decided 29 September, rev 3 CFG-11).
+
+
+    **29 September (W2).** Sections first, zoom into a section for seats, pinch out or *Whole map* back
+    to the full map; held seats are kept.'
   density: comfortable
   boardFrames:
   - Seat Board 4.dc.html#seat-4a
@@ -9801,7 +10287,10 @@ screens:
         label: Choose seats
         notes: '**A seat selection screen with no seat map.** `noGeometry` is the state that matters:
           a map imported from a manifest alone can be sold from a list and not rendered, and the screen
-          has to say which it is rather than showing an empty frame.'
+          has to say which it is rather than showing an empty frame. **Sections first** (W2): the whole
+          map in section colours with prices; tapping a section zooms into it in place and shows its seats;
+          **pinch out** (or *← Whole map*) returns to the whole map to compare sections, keeping the seats
+          already held.'
         provenance: minute 2026-08-03 §Ticket Flow Variations by Product Type
       - kind: selectField
         label: Time bar
@@ -9880,17 +10369,12 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-049
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: partial
-      view: 'Account → All screens → Wave 2 → Interactive seat selection (#seats → embedded web engine:
-        Union Arena / Grand Playhouse seat maps); Rev 3 feedback → Seat map · date & time pop-up, Time
-        bar above the seat map'
-      differences: Rev 3 adds Flow 1 (fixed date, straight to the map) and Flow 2 (date and time, then
-        the map, as an inline step or a pop-up). It also adds a time bar whose show switch releases held
-        seats, a movable seat-view box, a theatre auditorium plan and up to ten seats. The YAML has no
-        date/time step on the map and no rule for switching show and releasing seats.
+      view: Buy tickets → a stadium or theatre event → seat map (← Whole map)
+      differences: The app runs the website seat engine (2D and 3D).
     derivedFrom: wireframes/reference/Seat Board 4.dc.html
     note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -9988,7 +10472,13 @@ screens:
     **Rev 3 (decided 29 September).** **A cabana placed on an ingested venue map is picked on the map
     and bought** (REV3-15 and GAP-C2, superseding audit R073 (c) for those resources): that is GST-074.
     This screen stays for a resource sold as capacity where the venue has no map, so the unit is assigned
-    rather than chosen.'
+    rather than chosen.
+
+
+    **29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana:
+    pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and
+    the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit.
+    Same venue-map back end as F&B and locations.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getAvailability` reads one of them — list,
@@ -10121,16 +10611,10 @@ screens:
       - attributes
     provenance: client-verified
 - id: GST-051
-  name: Plan Your Adventure – Start
+  name: Plan
   module: Engagement & Support
-  requiresModule: queue
-  wave: 4
-  deferred:
-    release: later
-    decided: '2026-09-28'
-    decision: R187
-    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
-      nothing exists to build them against (decided 28 September, audit R187).
+  requiresModule: ticketing
+  wave: 1
   capability: AI-35
   implementation:
     app: guest-app
@@ -10138,126 +10622,125 @@ screens:
     component: apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx
     status: notStarted
   navigation:
+    isEntryPoint: true
+    inferred: false
+    uses:
+    - appTabs
     entryFrom:
     - GST-001
-    inferred: true
+    - GST-053
     exitTo:
-    - GST-001
-    - GST-002
+    - GST-053
     - GST-052
+    - GST-001
     transitions:
+    - to: GST-053
+      trigger: Make my plan
+      control: primaryButton#makeMyPlan
+      operation: generateVisitPlan
+      carries:
+      - planId
+      onFailure:
+      - when: nothing suits the party
+        to: GST-051
+        note: Says which answer ruled everything out.
+      provenance: decided 29 September 2026 (P29), MOB-6; v4 prototype plan → planResult
     - to: GST-052
-      trigger: Suggested itineraries are offered
-      provenance: flow F49 step 1→2
-      operation: listProducts
+      trigger: Take a ready-made plan
+      provenance: decided 29 September 2026 (P29), MOB-6
     - to: GST-001
-      trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-051 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      trigger: Home tab
+      provenance: decided 29 September 2026 (P29), MOB-1
   notes: 'Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal
     visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner
     is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release
     that builds it.
 
 
-    **Rev 3 (decided 29 September).** Stays in wave 4 (GAP-C3): the itinerary screens are not built in
-    the first release, confirming audit R187.'
+    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    below.
+
+
+    **Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based
+    planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and
+    rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.
+
+
+    **Mobile v4 role (MOB-6): the Plan tab root, "Plan".** Inputs: party size, heights (or ages), dates,
+    pace (packed, balanced or relaxed), interests and cuisine. The rules planner (`generateVisitPlan`)
+    runs with no AI. The tab is hidden when the venue turns module `visitPlanner` off.'
   density: comfortable
-  pattern: listDetail
-  patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
-    act'
-  purpose: Start a plan for the visit — which attractions, in what order — before arriving.
+  pattern: multiStepForm
+  patternReason: The v4 prototype asks six questions one at a time (who, heights, days, pace, likes, food)
+    and ends on *Make my plan*
+  purpose: 'The Plan tab: tell the venue who is coming, when, at what pace and what you like, and get
+    a day-by-day plan.'
   layout:
-    template: split
+    template: wizard
     regions:
-    - name: contentBody
-      slot: collection
+    - name: progress
+      slot: progress
       components:
-      - kind: textField
-        label: Venue id
-        operation: listProducts
-        notes: Sends `?venueId=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: textField
-        label: Kind
-        operation: listProducts
-        notes: Sends `?kind=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: toggle
-        label: Is sellable
-        operation: listProducts
-        notes: Sends `?isSellable=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: dataTable
-        label: Every product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        operation: listProducts
-        provenance: contract catalogue.yaml GET /products
-    - name: contextPanel
-      slot: selection
+      - kind: progressIndicator
+        label: Plan your visit · n of 6
+        notes: Six questions; Heights is skipped when no children are coming.
+        provenance: decided 29 September 2026 (P29), MOB-6
+    - name: fields
+      slot: fields
       components:
-      - kind: detailPanel
-        label: The selected product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        - Product.categoryId
-        - Product.lifecycleState
-        - Product.isSellable
-        - Product.isStockTracked
+      - kind: numberField
+        label: Adults
+        notes: Age 12 and over, at least 1, at most 8.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: numberField
+        label: Children
+        notes: Age 3 to 11, 0-8.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: selectField
+        label: How tall are the children?
         operation: listProducts
-        provenance: contract catalogue.yaml GET /products
-      - kind: detailPanel
-        label: The wait time
-        bindsTo: WaitTime
-        columns:
-        - WaitTime.queueId
-        - WaitTime.queueName
-        - WaitTime.attractionProductId
-        - WaitTime.attractionCategoryId
-        - WaitTime.status
-        - WaitTime.waitMinutes
-        - WaitTime.source
-        - WaitTime.isStale
-        - WaitTime.heightRequirementCm
-        - WaitTime.zone
-        - WaitTime.asOf
-        operation: getWaitTimes
-        provenance: contract queue.yaml GET /queues/wait-times
+        notes: 'Per child: under 1.0 m, 1.0-1.2 m, 1.2-1.4 m, 1.4 m and over (or an age where the venue
+          sets age rules). Rides over a child''s limit are left out, from `ProductEligibilityRule`.'
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: multiSelect
+        label: Which days are you visiting?
+        notes: Up to three days; each day gets its own park at a multi-park venue.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: selectField
+        label: How busy should each day be?
+        notes: Packed, Balanced or Relaxed.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: multiSelect
+        label: What are you most interested in?
+        operation: listProducts
+        notes: 'Interest tags from the venue''s points (`VenuePoint.interestTags`): thrill rides, family
+          rides, shows, water, shopping.'
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: selectField
+        label: What would you like for lunch?
+        notes: Cuisines from the outlets (`VenuePoint.cuisineTags`); lunch is planned at a restaurant
+          that serves it.
+        provenance: decided 29 September 2026 (P29), MOB-6
+    - name: submit
+      slot: submit
+      components:
+      - kind: primaryButton
+        label: Make my plan
+        operation: generateVisitPlan
+        notes: 'Calls `generateVisitPlan`: the rules planner, no AI. Opens Your Plan (GST-053).'
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Take a ready-made plan
+        notes: Opens Suggested Itineraries (GST-052).
+        provenance: decided 29 September 2026 (P29), MOB-6
   states:
-    loading: The plan your adventure list.
-    error: Could not load. Names which read failed and leaves the plan your adventure untouched.
-    emptyFirstRun: No plan your adventure yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
-    emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the plan your adventure
-      are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    loading: The plan builds in place; the inputs stay on screen.
+    error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
+    emptyFirstRun: 'No plan yet: the first question is shown. Nothing is saved until *Make my plan*.'
+    emptyNoResults: 'Nothing suits the whole party on that day (for example every ride is over a child''s
+      height): says so and offers to change the answers.'
+    emptyNoAccess: A guest holds no permission. A plan that is not theirs says so without saying whose
+      it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
@@ -10270,39 +10753,34 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
+  - operationId: generateVisitPlan
+    contract: venue-map
+    purpose: Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
   entryState:
-    preloaded:
-    - WaitTime.queueId
-    - WaitTime.queueName
-    - WaitTime.attractionProductId
-    - WaitTime.status
-    - WaitTime.waitMinutes
+    params:
+    - name: venueId
+      from: session
+    coldEntry: The Plan tab; a cold arrival is the ordinary case and starts at the first question.
   wireframe:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-051
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: 'DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → Plan your adventure
-        – start'
-      differences: Deferred in the YAML but present in the prototype.
+      view: Plan tab (Plan your visit · 1 of 6 … 6 of 6)
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: GST-052
   name: Suggested Itineraries
   module: Engagement & Support
-  requiresModule: ai
-  wave: 4
-  deferred:
-    release: later
-    decided: '2026-09-28'
-    decision: R187
-    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
-      nothing exists to build them against (decided 28 September, audit R187).
+  requiresModule: ticketing
+  wave: 1
   capability: AI-35
   implementation:
     app: guest-app
@@ -10310,23 +10788,27 @@ screens:
     component: apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx
     status: notStarted
   navigation:
+    inferred: false
     entryFrom:
     - GST-001
     - GST-051
-    inferred: true
     exitTo:
-    - GST-001
-    - GST-002
     - GST-053
+    - GST-051
+    - GST-001
     transitions:
     - to: GST-053
-      trigger: They build their own instead
-      provenance: flow F49 step 2→3
-      operation: listProducts
+      trigger: Use this plan
+      operation: generateVisitPlan
+      carries:
+      - planId
+      provenance: decided 29 September 2026 (P29), MOB-6
+    - to: GST-051
+      trigger: Make my own
+      provenance: decided 29 September 2026 (P29), MOB-6
     - to: GST-001
-      trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-052 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      trigger: Home tab
+      provenance: decided 29 September 2026 (P29), MOB-1
   notes: 'Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary
     planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome
     is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest
@@ -10340,102 +10822,56 @@ screens:
     and waitTime, so this screen no longer asks for a day plan.
 
 
-    **Rev 3 (decided 29 September).** Stays in wave 4 (GAP-C3): the itinerary screens are not built in
-    the first release, confirming audit R187.'
+    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    below.
+
+
+    **Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based
+    planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and
+    rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.
+
+
+    **Mobile v4 role (MOB-6): ready-made day plans per venue** the guest can take; each is rules-built
+    by `generateVisitPlan` from preset inputs, then edited on GST-053.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Curated plans a guest can take rather than build.
+  purpose: Ready-made day plans for this venue that a guest can take instead of answering questions.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Venue id
+      - kind: cardList
+        label: Ready-made plans
         operation: listProducts
-        notes: Sends `?venueId=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: textField
-        label: Kind
-        operation: listProducts
-        notes: Sends `?kind=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: toggle
-        label: Is sellable
-        operation: listProducts
-        notes: Sends `?isSellable=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: dataTable
-        label: Every product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        operation: listProducts
-        provenance: contract catalogue.yaml GET /products
+        notes: 'The venue''s preset plans (e.g. *Thrill day*, *Family day*, *Relaxed day*), each a set
+          of planner inputs; **Use this plan** runs `generateVisitPlan` with those inputs and the guest''s
+          party size and date. Rules-built, not AI: seeded, not learned, on day one.'
+        provenance: decided 29 September 2026 (P29), MOB-6
       - kind: dataTable
         label: Every bundle
-        bindsTo: BundleSummary
-        columns:
-        - BundleSummary.venueId
-        - BundleSummary.publishedAt
-        - BundleSummary.publishedBy
-        - BundleSummary.contentHash
-        - BundleSummary.signatureKeyId
-        - BundleSummary.staleAfter
-        - BundleSummary.sizeBytes
-        - BundleSummary.note
-        - BundleSummary.appliedByWorkstations
         operation: listCatalogueBundles
+        notes: Bundles a preset plan can include (e.g. Fast Track).
         provenance: contract catalogue.yaml GET /catalogue/bundles
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        - Product.lifecycleState
-        - Product.isSellable
-        - Product.hasVariants
-        - Product.variantCount
-        operation: listProducts
-        provenance: contract catalogue.yaml GET /products
+      - kind: primaryButton
+        label: Use this plan
+        operation: generateVisitPlan
+        notes: Opens Your Plan (GST-053).
+        provenance: decided 29 September 2026 (P29), MOB-6
   states:
-    loading: The suggested itineraries list.
-    error: Could not load. Names which read failed and leaves the suggested itineraries untouched.
-    emptyFirstRun: No suggested itineraries yet. The itinerary suggestion was removed (audit R209); distinct
-      from a filter that matched nothing.
-    emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the suggested itineraries
-      are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    loading: The plan builds in place; the inputs stay on screen.
+    error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
+    emptyFirstRun: 'The venue has no ready-made plans: says so and offers *Make my own* (GST-051).'
+    emptyNoResults: 'Nothing suits the whole party on that day (for example every ride is over a child''s
+      height): says so and offers to change the answers.'
+    emptyNoAccess: A guest holds no permission. A plan that is not theirs says so without saying whose
+      it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
@@ -10448,18 +10884,16 @@ screens:
     contract: catalogue
     purpose: List published bundles
     trigger: onLoad
+  - operationId: generateVisitPlan
+    contract: venue-map
+    purpose: Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
   entryState:
     params:
-    - name: suggestionId
-      from: deepLink
-      optional: true
-    coldEntry: A suggestion opened from a saved plan.
-    preloaded:
-    - Product.id
-    - Product.code
-    - Product.name
-    - Product.description
-    - Product.kind
+    - name: venueId
+      from: session
+    coldEntry: Lists the venue's ready-made plans; nothing is needed upstream.
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -10469,22 +10903,17 @@ screens:
       rev: rev 3
       verified: 2026-09-28
       match: exact
-      view: 'DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → Suggested itineraries'
-      differences: Deferred in the YAML but present in the prototype.
+      view: Account → All screens → Wave 3 → Suggested itineraries
+      differences: 'Mobile v4 draws no ready-made plans list: its Plan tab goes straight to the questions.
+        Built from this definition in the v4 style.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: GST-053
-  name: Build Your Own Itinerary
+  name: Your Plan
   module: Engagement & Support
   requiresModule: ticketing
-  wave: 4
-  deferred:
-    release: later
-    decided: '2026-09-28'
-    decision: R187
-    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
-      nothing exists to build them against (decided 28 September, audit R187).
+  wave: 1
   capability: C02
   implementation:
     app: guest-app
@@ -10492,166 +10921,168 @@ screens:
     component: apps/guest-app/src/routes/general/BuildYourOwnItineraryDetail.tsx
     status: notStarted
   navigation:
+    inferred: false
     entryFrom:
-    - GST-001
+    - GST-051
     - GST-052
-    inferred: true
-    exitTo:
-    - GST-001
-    - GST-002
     - GST-054
+    exitTo:
+    - GST-041
+    - GST-054
+    - GST-051
+    - GST-048
+    - GST-059
+    - GST-001
     transitions:
+    - to: GST-041
+      trigger: Book this plan
+      control: primaryButton#bookThisPlan
+      operation: bookVisitPlan
+      carries:
+      - cartId
+      onFailure:
+      - when: an item sold out since the plan was made
+        to: GST-053
+        note: Names it and offers a swap; the rest of the plan is kept.
+      provenance: decided 29 September 2026 (P29), MOB-6; v4 prototype Book this plan
     - to: GST-054
-      trigger: An optimised order is proposed
-      provenance: flow F49 step 3→4
-      operation: listProducts
+      trigger: Refine with the AI planner
+      carries:
+      - planId
+      provenance: decided 29 September 2026 (P29), MOB-6
+    - to: GST-051
+      trigger: Change answers
+      provenance: decided 29 September 2026 (P29), MOB-6
+    - to: GST-048
+      trigger: More add-ons
+      carries:
+      - cartId
+      provenance: decided 29 September 2026 (P29), MOB-6
+    - to: GST-059
+      trigger: 'On the day: follow the plan'
+      carries:
+      - planId
+      provenance: decided 29 September 2026 (P29), MOB-6
     - to: GST-001
-      trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-053 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      trigger: Home tab
+      provenance: decided 29 September 2026 (P29), MOB-1
   notes: 'Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary
     (Chinmay raised, Qossai confirmed). **Out of the first release** (decided 28 September, audit R187):
     the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not
     deleted, for the release that builds it.
 
 
-    **Rev 3 (decided 29 September).** Stays in wave 4 (GAP-C3): the itinerary screens are not built in
-    the first release, confirming audit R187.'
+    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    below.
+
+
+    **Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based
+    planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and
+    rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.
+
+
+    **Mobile v4 role (MOB-6): "Your Plan".** Per-day itinerary with swap, remove, add and undo (`updateVisitPlan`
+    is versioned), add-ons such as Fast Track, and **Book this plan** → GST-041.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getCart` reads one of them — list, select,
     act'
-  purpose: Choose the attractions and the order yourself.
+  purpose: 'The plan, day by day: swap, remove or add items, undo, add Fast Track, then book the whole
+    plan.'
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Venue id
-        operation: listProducts
-        notes: Sends `?venueId=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: textField
-        label: Kind
-        operation: listProducts
-        notes: Sends `?kind=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: toggle
-        label: Is sellable
-        operation: listProducts
-        notes: Sends `?isSellable=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: dataTable
-        label: Every product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        operation: listProducts
-        provenance: contract catalogue.yaml GET /products
+      - kind: selectField
+        label: Day tabs
+        bindsTo: VisitPlan
+        operation: getVisitPlan
+        notes: Day 1 · Fri 2 Oct · Summit Peaks … one tab per chosen day.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: timeline
+        label: The day
+        bindsTo: VisitPlanItem
+        operation: getVisitPlan
+        notes: Arrive, then each timed item (ride, show, lunch at a restaurant serving the chosen cuisine)
+          with its place and zone; Fast Track marked on the rides it covers.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Swap
+        operation: listVisitPlanAlternatives
+        notes: Opens the swap sheet of candidates that suit everyone (`listVisitPlanAlternatives`); choosing
+          one saves a new version.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: destructiveButton
+        label: Remove
+        operation: updateVisitPlan
+        notes: Removes the item (not arrival or lunch); a new version, so Undo brings it back.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: + Add something
+        operation: listVisitPlanAlternatives
+        notes: The same sheet, adding to the day.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Undo changes
+        operation: updateVisitPlan
+        notes: Returns the day to the previous version of the plan.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: banner
+        label: Left out for your group
+        operation: getVisitPlan
+        notes: Items left out because of a child's height, with the limit (e.g. *Freefall Tower (needs
+          1.40 m)*).
+        provenance: decided 29 September 2026 (P29), MOB-6
     - name: contextPanel
       slot: selection
       components:
+      - kind: toggle
+        label: Add Fast Track
+        operation: updateVisitPlan
+        notes: An add-on from the plan's `addOnSuggestions` (the product GST-048 sells), priced per guest,
+          with the queuing time it saves.
+        provenance: decided 29 September 2026 (P29), MOB-6
       - kind: detailPanel
-        label: The selected product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        - Product.categoryId
-        - Product.lifecycleState
-        - Product.isSellable
-        - Product.isStockTracked
-        operation: listProducts
-        provenance: contract catalogue.yaml GET /products
+        label: Estimated total
+        operation: getVisitPlan
+        notes: Estimated price for the group and days; the guest confirms dates and tickets in the basket.
+        provenance: decided 29 September 2026 (P29), MOB-6
       - kind: detailPanel
         label: The wait time
-        bindsTo: WaitTime
-        columns:
-        - WaitTime.queueId
-        - WaitTime.queueName
-        - WaitTime.attractionProductId
-        - WaitTime.attractionCategoryId
-        - WaitTime.status
-        - WaitTime.waitMinutes
-        - WaitTime.source
-        - WaitTime.isStale
-        - WaitTime.heightRequirementCm
-        - WaitTime.zone
-        - WaitTime.asOf
         operation: getWaitTimes
+        notes: Live waits beside the rides on today's plan.
         provenance: contract queue.yaml GET /queues/wait-times
-      - kind: detailPanel
-        label: The cart
-        bindsTo: Cart
-        columns:
-        - Cart.id
-        - Cart.token
-        - Cart.venueId
-        - Cart.channel
-        - Cart.subjectId
-        - Cart.status
-        - Cart.lines
-        - Cart.conflicts
-        - Cart.subtotal
-        - Cart.discountTotal
-        - Cart.taxTotal
-        - Cart.total
-        - Cart.appliedPromotionIds
-        - Cart.expiresAt
-        - Cart.extensionsUsed
-        - Cart.maxExtensions
-        operation: getCart
-        provenance: contract orders.yaml GET /carts/{cartId}
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Add cart line
-        operation: addCartLine
-        provenance: contract orders.yaml POST /carts/{cartId}/lines
+        label: Book this plan
+        operation: bookVisitPlan
+        notes: '`bookVisitPlan` turns the plan and add-ons into cart lines and returns the cart; lands
+          on the basket (GST-041).'
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Refine with the AI planner
+        notes: Opens GST-054 when the venue has AI on.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Change answers
+        notes: Back to the questions (GST-051).
+        provenance: decided 29 September 2026 (P29), MOB-6
   states:
-    loading: The build your own list.
-    error: Could not load. Names which read failed and leaves the build your own untouched.
-    emptyFirstRun: No build your own yet. Offers Add cart line (`addCartLine`); distinct from a filter
-      that matched nothing.
-    emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the build your own are
-      still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    loading: The plan builds in place; the inputs stay on screen.
+    error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
+    emptyFirstRun: 'No plan yet: offers the questions (GST-051) or a ready-made plan (GST-052).'
+    emptyNoResults: 'Nothing suits the whole party on that day (for example every ride is over a child''s
+      height): says so and offers to change the answers.'
+    emptyNoAccess: A guest holds no permission. A plan that is not theirs says so without saying whose
+      it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: addCartLine
-    contract: orders
-    purpose: Add something
-    trigger: onAction
-    invalidates:
-    - listProducts
   - operationId: getCart
     contract: orders
     purpose: The cart, priced and checked, right now
@@ -10664,64 +11095,59 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  - operationId: getVisitPlan
+    contract: venue-map
+    purpose: 'The plan: days, timed items and add-on suggestions, at its current version'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: updateVisitPlan
+    contract: venue-map
+    purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: listVisitPlanAlternatives
+    contract: venue-map
+    purpose: Swap candidates for one item that suit everyone in the party
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: bookVisitPlan
+    contract: venue-map
+    purpose: 'Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart'
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
   entryState:
     params:
+    - name: planId
+      from: GST-051
+      optional: false
+    - name: venueId
+      from: session
+    - name: itemId
+      from: navigation
+      optional: true
     - name: cartId
       from: session
-    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
-    preloaded:
-    - Product.id
-    - Product.code
-    - Product.name
-    - Product.description
-    - Product.kind
+    coldEntry: A saved plan opened from a link or the Plan tab. A plan whose dates have passed says so
+      and offers to plan again; a plan that is not this guest's is refused without saying whose it is.
+      `itemId` is the plan item the guest taps Swap on, picked on this screen.
   wireframe:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-053
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: 'DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → Build your own
-        itinerary'
-      differences: Deferred in the YAML but present in the prototype.
+      view: Plan tab → answer the six questions → Make my plan (Your plan)
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formAddCartLine
-    component: modal
-    trigger: Add cart line
-    body: '**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`.
-      Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the
-      screen behind is unchanged.'
-    bindsTo: AddCartLineRequest
-    confirm:
-      label: Add cart line
-      operation: addCartLine
-    dismiss:
-      label: Cancel
-      discards:
-      - variantId
-      - quantity
-      - performanceId
-      - seatIds
-      - parentLineId
-      - attributes
-    provenance: client-verified
 - id: GST-054
-  name: AI Optimized Itinerary
+  name: AI Planner
   module: Engagement & Support
   requiresModule: ai
-  wave: 4
-  deferred:
-    release: later
-    decided: '2026-09-28'
-    decision: R187
-    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
-      nothing exists to build them against (decided 28 September, audit R187).
+  wave: 1
   capability: AI-35
   implementation:
     app: guest-app
@@ -10729,24 +11155,27 @@ screens:
     component: apps/guest-app/src/routes/general/AiOptimizedItineraryDetail.tsx
     status: notStarted
   navigation:
+    inferred: false
     entryFrom:
-    - GST-001
     - GST-053
-    inferred: true
     exitTo:
-    - GST-001
-    - GST-002
+    - GST-053
     - GST-059
+    - GST-001
     transitions:
-    - to: GST-001
-      trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-054 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+    - to: GST-053
+      trigger: Back to your plan
+      carries:
+      - planId
+      provenance: decided 29 September 2026 (P29), MOB-6
     - to: GST-059
       trigger: They follow it through the day
-      provenance: flow F49 step 4→5
       carries:
-      - suggestionId
+      - planId
+      provenance: decided 29 September 2026 (P29), MOB-6
+    - to: GST-001
+      trigger: Home tab
+      provenance: decided 29 September 2026 (P29), MOB-1
   notes: 'Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41).
     **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew
@@ -10762,173 +11191,182 @@ screens:
     anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.
 
 
-    **Rev 3 (decided 29 September).** Stays in wave 4 (GAP-C3): the itinerary screens are not built in
-    the first release, confirming audit R187.'
+    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    below.
+
+
+    **Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based
+    planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and
+    rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.
+
+
+    **Mobile v4 role (MOB-6): "AI Planner".** The agent refines the rules plan by chat; its tools are
+    the plan operations, and `requestSuggestion` gains the guest-allowed kind `itinerary` (what R209 said
+    to add if the planner ships). AI writes only `ai.*` stores; the plan change itself is `updateVisitPlan`.
+    **The rules plan never fails over to an error**: with AI off, not licensed or failing, the guest keeps
+    the rules plan and the Plan tab works in full.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
     act'
-  purpose: Let the assistant order the day around waits and opening times.
+  purpose: Ask the planner in your own words to change the plan; it refines the rules plan, and the rules
+    plan stays if AI is unavailable.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Venue id
-        operation: listProducts
-        notes: Sends `?venueId=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: textField
-        label: Kind
-        operation: listProducts
-        notes: Sends `?kind=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: toggle
-        label: Is sellable
-        operation: listProducts
-        notes: Sends `?isSellable=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: dataTable
-        label: Every product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        operation: listProducts
-        provenance: contract catalogue.yaml GET /products
+      - kind: timeline
+        label: Your plan
+        bindsTo: VisitPlanItem
+        operation: getVisitPlan
+        notes: The current plan version, updated as the agent changes it.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: assistantPanel
+        label: Ask the planner
+        operation: sendAiMessage
+        notes: e.g. *More shows, fewer coasters on day 2*. The agent calls `requestSuggestion` kind `itinerary`
+          and applies the result with `updateVisitPlan`; Undo on GST-053 reverts it.
+        provenance: decided 29 September 2026 (P29), MOB-6
     - name: contextPanel
       slot: selection
       components:
-      - kind: detailPanel
-        label: The selected product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        - Product.categoryId
-        - Product.lifecycleState
-        - Product.isSellable
-        - Product.isStockTracked
-        operation: listProducts
-        provenance: contract catalogue.yaml GET /products
+      - kind: banner
+        label: Planner unavailable
+        operation: getVisitPlan
+        notes: '**The rules plan never fails over to an error**: with AI off, not licensed or failing,
+          the guest keeps the rules plan and the Plan tab works in full. Shown when AI is off for the
+          venue, the tenant has no AI licence, or the call fails or times out.'
+        provenance: decided 29 September 2026 (P29), MOB-6
       - kind: detailPanel
         label: The wait time
-        bindsTo: WaitTime
-        columns:
-        - WaitTime.queueId
-        - WaitTime.queueName
-        - WaitTime.attractionProductId
-        - WaitTime.attractionCategoryId
-        - WaitTime.status
-        - WaitTime.waitMinutes
-        - WaitTime.source
-        - WaitTime.isStale
-        - WaitTime.heightRequirementCm
-        - WaitTime.zone
-        - WaitTime.asOf
         operation: getWaitTimes
+        notes: Live waits the agent plans around.
         provenance: contract queue.yaml GET /queues/wait-times
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Send AI message
-        operation: sendAiMessage
-        provenance: contract ai.yaml POST /conversations/{conversationId}/messages
+        label: Apply this change
+        operation: updateVisitPlan
+        notes: Saves the agent's proposal as a new plan version.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Back to your plan
+        notes: GST-053.
+        provenance: decided 29 September 2026 (P29), MOB-6
   states:
-    loading: The optimized itinerary list.
-    error: Could not load. Names which read failed and leaves the optimized itinerary untouched.
-    emptyFirstRun: No optimized itinerary yet. The itinerary suggestion was removed (audit R209); distinct
-      from a filter that matched nothing.
-    emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the optimized itinerary
-      are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    loading: The plan builds in place; the inputs stay on screen.
+    error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
+    emptyFirstRun: 'No conversation yet: the plan is shown with example requests.'
+    emptyNoResults: 'Nothing suits the whole party on that day (for example every ride is over a child''s
+      height): says so and offers to change the answers.'
+    emptyNoAccess: A guest holds no permission. A plan that is not theirs says so without saying whose
+      it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
+    aiUnavailable: '**Falls back to the rules plan, never to an error** (MOB-6): the plan from `getVisitPlan`
+      stays on screen with a short note, and the guest carries on editing it on GST-053.'
   apis:
   - operationId: getWaitTimes
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
-  - operationId: listProducts
-    contract: catalogue
-    purpose: List products
-    trigger: onLoad
   - operationId: sendAiMessage
     contract: ai
-    purpose: Ask
+    purpose: Chat with the planner agent; its tools are the plan operations, so a change it makes is a
+      new plan version
     trigger: onAction
     invalidates:
     - listProducts
+  - operationId: getVisitPlan
+    contract: venue-map
+    purpose: 'The plan: days, timed items and add-on suggestions, at its current version'
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: updateVisitPlan
+    contract: venue-map
+    purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: createAiConversation
+    contract: ai
+    purpose: Open the planner conversation for this plan
+    trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: 'A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent''s
+      proposal for the plan, applied through `updateVisitPlan`'
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
   entryState:
     params:
+    - name: planId
+      from: GST-053
     - name: conversationId
       from: deepLink
-    - name: suggestionId
-      from: deepLink
       optional: true
-    coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
-      and by whom. A suggestion opened from a saved plan.
-    preloaded:
-    - WaitTime.queueId
-    - WaitTime.queueName
-    - WaitTime.attractionProductId
-    - WaitTime.status
-    - WaitTime.waitMinutes
+    - name: venueId
+      from: session
+    coldEntry: 'A planner link from a notification: opens the plan and its conversation, or the plan alone
+      if the conversation was closed.'
   wireframe:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-054
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: 'DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → AI optimised itinerary'
-      differences: Deferred in the YAML but present in the prototype.
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
+      match: partial
+      view: Plan tab → Your plan; Chat with the assistant (Assistant screen)
+      differences: v4 draws the rules plan and a general assistant chat; it has no plan-specific chat.
+        Built from this definition.
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formSendAiMessage
-    component: modal
-    trigger: Send AI message
-    body: '**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional:
-      `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Send AI message
-      operation: sendAiMessage
-    dismiss:
-      label: Cancel
-      discards:
-      - content
-      - collectionIds
-    provenance: client-verified
+  machine:
+    key: plannerMode
+    initial: rulesPlan
+    provenance: 'decided 29 September 2026 (P29), MOB-6; BRIEF decision 1: the rules planner with the
+      AI planner agent on top'
+    states:
+      rulesPlan:
+        operation: getVisitPlan
+        note: The rules plan is shown; the chat is open.
+      refining:
+        operation: sendAiMessage
+        note: The agent is working on a request.
+      proposed:
+        operation: requestSuggestion
+        note: A change is proposed, not yet saved.
+      aiUnavailable:
+        note: '**The rules plan never fails over to an error**: with AI off, not licensed or failing,
+          the guest keeps the rules plan and the Plan tab works in full.'
+        retryTo: rulesPlan
+    transitions:
+    - from: rulesPlan
+      'on': Send
+      to: refining
+    - from: refining
+      'on': proposal returned
+      to: proposed
+    - from: proposed
+      'on': Apply this change
+      to: rulesPlan
+      note: updateVisitPlan saves a new version.
+    - from: proposed
+      'on': Discard
+      to: rulesPlan
+    - from: refining
+      'on': AI off, refused or timed out
+      to: aiUnavailable
+    - from: rulesPlan
+      'on': AI off for the venue
+      to: aiUnavailable
 - id: GST-055
   name: Dynamic QR Ticket
   module: Account & Self-Service
@@ -11143,17 +11581,30 @@ screens:
   navigation:
     entryFrom:
     - GST-001
+    - GST-004
     inferred: true
     exitTo:
     - GST-001
     - GST-002
+    - GST-041
     transitions:
     - to: GST-001
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-056 holds none of them, so the
         edge carries nothing and GST-001 opens cold
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    - to: GST-041
+      trigger: Add the meal combo (admission included) to the basket
+      operation: addCartLine
+      carries:
+      - cartId
+      provenance: decided 29 September 2026 (P29), MOB-4
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+
+
+    **29 September (MOB-4).** A **meal combo with admission** is a bundle with an admission component
+    and a meal component: *Buy meal combo* on Item Detail (GST-004) opens it here, and checkout is about
+    three steps.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listCatalogueBundles` reads the population and `getBundle` reads one of them — list,
@@ -11476,7 +11927,13 @@ screens:
 
 
     **Rev 3 (decided 29 September).** Where the venue''s spots are on an ingested map, availability is
-    shown on the map (GST-074, REV3-15); this list stays for capacity-sold resources.'
+    shown on the map (GST-074, REV3-15); this list stays for capacity-sold resources.
+
+
+    **29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana:
+    pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and
+    the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit.
+    Same venue-map back end as F&B and locations.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getAvailability` reads one of them — list,
@@ -11569,16 +12026,10 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: GST-059
-  name: Plan My Day – In Progress
+  name: Plan in Progress
   module: Engagement & Support
-  requiresModule: ai
-  wave: 4
-  deferred:
-    release: later
-    decided: '2026-09-28'
-    decision: R187
-    reason: The itinerary planner is deferred to a later release and its five screens leave Block A, since
-      nothing exists to build them against (decided 28 September, audit R187).
+  requiresModule: ticketing
+  wave: 1
   capability: C02
   implementation:
     app: guest-app
@@ -11586,19 +12037,28 @@ screens:
     component: apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx
     status: notStarted
   navigation:
+    inferred: false
     entryFrom:
-    - GST-001
+    - GST-022
+    - GST-041
+    - GST-053
     - GST-054
-    inferred: true
     exitTo:
+    - GST-053
+    - GST-038
     - GST-001
-    - GST-002
-    fromFlows: true
     transitions:
+    - to: GST-053
+      trigger: See the whole plan
+      carries:
+      - planId
+      provenance: decided 29 September 2026 (P29), MOB-6
+    - to: GST-038
+      trigger: Directions (At the Venue, Map)
+      provenance: decided 29 September 2026 (P29), MOB-6
     - to: GST-001
-      trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-059 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      trigger: Home tab
+      provenance: decided 29 September 2026 (P29), MOB-1
   notes: 'Minuted 10 Aug §4.9. **The in-visit half of GST-051** — one capability, two moments. ** wired
     24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with
     a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the
@@ -11613,104 +12073,61 @@ screens:
     no longer asks for a day plan.
 
 
-    **Rev 3 (decided 29 September).** Stays in wave 4 (GAP-C3): the itinerary screens are not built in
-    the first release, confirming audit R187.'
+    **Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan
+    below.
+
+
+    **Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based
+    planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and
+    rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.
+
+
+    **Mobile v4 role (MOB-6): "Plan in Progress".** Today''s plan against live waits (`getWaitTimes`);
+    rules-based, AI not required.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
     act'
-  purpose: The plan while you are in the venue, against live waits.
+  purpose: Today's plan while you are in the venue, re-ordered against live waits.
   layout:
     template: split
     regions:
     - name: contentBody
       slot: collection
       components:
-      - kind: textField
-        label: Venue id
-        operation: listProducts
-        notes: Sends `?venueId=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: textField
-        label: Kind
-        operation: listProducts
-        notes: Sends `?kind=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: toggle
-        label: Is sellable
-        operation: listProducts
-        notes: Sends `?isSellable=` to `listProducts`.
-        provenance: contract catalogue.yaml GET /products
-      - kind: dataTable
-        label: Every product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        operation: listProducts
-        provenance: contract catalogue.yaml GET /products
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected product
-        bindsTo: Product
-        columns:
-        - Product.id
-        - Product.code
-        - Product.name
-        - Product.description
-        - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
-        - Product.onSaleFrom
-        - Product.onSaleTo
-        - Product.categoryId
-        - Product.lifecycleState
-        - Product.isSellable
-        - Product.isStockTracked
-        operation: listProducts
-        provenance: contract catalogue.yaml GET /products
-      - kind: detailPanel
-        label: The wait time
-        bindsTo: WaitTime
-        columns:
-        - WaitTime.queueId
-        - WaitTime.queueName
-        - WaitTime.attractionProductId
-        - WaitTime.attractionCategoryId
-        - WaitTime.status
-        - WaitTime.waitMinutes
-        - WaitTime.source
-        - WaitTime.isStale
-        - WaitTime.heightRequirementCm
-        - WaitTime.zone
-        - WaitTime.asOf
+      - kind: timeline
+        label: Today
+        bindsTo: VisitPlanItem
+        operation: getVisitPlan
+        notes: Today's items with done, now and next; each ride with its live wait.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: banner
+        label: Waits changed
         operation: getWaitTimes
-        provenance: contract queue.yaml GET /queues/wait-times
+        notes: When a wait makes the next item late, proposes a re-order or a swap (`listVisitPlanAlternatives`);
+          the guest decides.
+        provenance: decided 29 September 2026 (P29), MOB-6
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Re-order my day
+        operation: updateVisitPlan
+        notes: Saves the proposed order as a new plan version.
+        provenance: decided 29 September 2026 (P29), MOB-6
+      - kind: secondaryButton
+        label: Swap
+        operation: listVisitPlanAlternatives
+        notes: Candidates that suit everyone, nearest first.
+        provenance: decided 29 September 2026 (P29), MOB-6
   states:
-    loading: The plan day progress list.
-    error: Could not load. Names which read failed and leaves the plan day progress untouched.
-    emptyFirstRun: No plan day progress yet. The itinerary suggestion was removed (audit R209); distinct
-      from a filter that matched nothing.
-    emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the plan day progress
-      are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    loading: The plan builds in place; the inputs stay on screen.
+    error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
+    emptyFirstRun: 'No plan for today: offers to make one (GST-051).'
+    emptyNoResults: 'Nothing suits the whole party on that day (for example every ride is over a child''s
+      height): says so and offers to change the answers.'
+    emptyNoAccess: A guest holds no permission. A plan that is not theirs says so without saying whose
+      it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
@@ -11719,22 +12136,32 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
-  - operationId: listProducts
-    contract: catalogue
-    purpose: List products
+  - operationId: getVisitPlan
+    contract: venue-map
+    purpose: 'The plan: days, timed items and add-on suggestions, at its current version'
     trigger: onLoad
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: updateVisitPlan
+    contract: venue-map
+    purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
+  - operationId: listVisitPlanAlternatives
+    contract: venue-map
+    purpose: Swap candidates for one item that suit everyone in the party
+    trigger: onAction
+    provenance: decided 29 September 2026 (P29), MOB-6
   entryState:
     params:
-    - name: suggestionId
-      from: deepLink
+    - name: planId
+      from: GST-053
+    - name: venueId
+      from: session
+    - name: itemId
+      from: navigation
       optional: true
-    coldEntry: A suggestion opened from a saved plan.
-    preloaded:
-    - WaitTime.queueId
-    - WaitTime.queueName
-    - WaitTime.attractionProductId
-    - WaitTime.status
-    - WaitTime.waitMinutes
+    coldEntry: 'Opened from a reminder on the visit day: today''s plan, or an offer to make one when there
+      is none. `itemId` is the plan item the guest taps Swap on, picked on this screen.'
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -11744,9 +12171,9 @@ screens:
       rev: rev 3
       verified: 2026-09-28
       match: exact
-      view: 'DEFERRED (R187), still in the prototype: Account → All screens → Wave 3 → Plan my day – in
-        progress'
-      differences: Deferred in the YAML but present in the prototype, and linked from Wait times.
+      view: Account → All screens → Wave 3 → Plan my day – in progress
+      differences: Mobile v4 draws no in-progress view of the plan; built from this definition in the
+        v4 style.
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -12000,7 +12427,7 @@ screens:
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
 - id: GST-063
-  name: Search
+  name: Explore – Search Results
   module: Discovery
   requiresModule: ticketing
   wave: 1
@@ -12013,9 +12440,12 @@ screens:
   navigation:
     exitTo:
     - GST-001
+    - GST-002
+    - GST-004
     inferred: false
     entryFrom:
     - GST-001
+    - GST-002
     notes: '**Reached from GST-001** — search is reached from home. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
     transitions:
@@ -12023,11 +12453,24 @@ screens:
       trigger: Home – Default
       provenance: derived — GST-001 declares entryState.params  and GST-063 holds none of them, so the
         edge carries nothing and GST-001 opens cold
+    - to: GST-002
+      trigger: Clears the search
+      provenance: decided 29 September 2026 (P29), MOB-1
+    - to: GST-004
+      trigger: Opens a result (Item Detail)
+      carries:
+      - productId
+      provenance: decided 29 September 2026 (P29), MOB-1, MOB-4
   notes: 'Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.
 
 
     **Rev 3 (decided 29 September).** Search returns info-only products flagged; they show `notBookableLabel`
-    and open their details, and are hidden when `showInfoOnly` is off (REV3-14).'
+    and open their details, and are hidden when `showInfoOnly` is off (REV3-14).
+
+
+    **Mobile v4 (decided 29 September, MOB-1).** The search-results state of GST-002 Explore: **one implementation
+    with GST-002, both ids kept** (as GAP-D3). `searchCatalogue` also takes `guidedAnswerIds` (W4) when
+    the guest came through Help me choose.'
   density: comfortable
   pattern: listDetail
   patternReason: '`searchCatalogue` reads a population and nothing reads one of them; the detail is the
@@ -12099,11 +12542,11 @@ screens:
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-063
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: mobile v4 (29 September build)
+      verified: '2026-09-29'
       match: exact
-      view: Account → All screens → Wave 1 → Search
+      view: Explore tab → search
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -14147,7 +14590,13 @@ screens:
     and unavailable spots are greyed. Tapping a free spot calls `createResourceHold` and starts the *Remaining
     time* counter from the hold''s `expiresAt` (8 minutes, extendable to 30 in all, audit R169); Add to
     basket sends `addCartLine` with the spot''s price-band `variantId` and the `resourceHoldId`, e.g.
-    *Cabana B09 · Large cabana · Beach, AED 1,855*. Picking another spot releases the first hold (`relinquishResourceHold`).'
+    *Cabana B09 · Large cabana · Beach, AED 1,855*. Picking another spot releases the first hold (`relinquishResourceHold`).
+
+
+    **29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana:
+    pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and
+    the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit.
+    Same venue-map back end as F&B and locations.'
   density: comfortable
   pattern: listDetail
   patternReason: '`getMapResourceAvailability` reads the population of spots and a tap holds one of them
@@ -14372,7 +14821,12 @@ screens:
     {startsAt, endsAt}, `endsAt` being the start plus the length, and `allocateResources` picks the room
     at checkout (26 August minute). Add-ons are lines with `parentLineId`. `422 windowLengthMismatch`,
     `windowRequired` and `windowNotAllowed` are programming errors; `409 windowUnavailable` says the time
-    filled and offers the next free start.'
+    filled and offers the next free start.
+
+
+    **29 September (W9).** Availability is checked against date, start time and length together (`listProductStartTimes`
+    with `variantId` = length); changing any of the three re-checks every room, and a busy room shows
+    *free from*. Starts every 15 minutes where the venue sets `stepMinutes` 15.'
   density: comfortable
   pattern: multiStepForm
   patternReason: A staged booking — date, start time, length, room type, attendees, add-ons — ending in

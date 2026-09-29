@@ -1,4 +1,4 @@
--- maintenance — 15 tables
+-- maintenance — 17 tables
 -- **Derived. Do not hand-edit.**
 
 -- A physical thing with a service history — a lift, a chiller, a ride. Distinct from a resource,
@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS maintenance.asset (
     category_id                       uuid,
     location_description              text CONSTRAINT asset_location_description_chk CHECK (char_length(location_description) <= 500),
     criticality                       text NOT NULL CONSTRAINT asset_criticality_chk CHECK (criticality IN ('safetyCritical', 'revenueCritical', 'standard', 'low')),
+    priority_override                 text,
     manufacturer                      text CONSTRAINT asset_manufacturer_chk CHECK (char_length(manufacturer) <= 200),
     model                             text CONSTRAINT asset_model_chk CHECK (char_length(model) <= 200),
     serial_number                     text CONSTRAINT asset_serial_number_chk CHECK (char_length(serial_number) <= 128),
@@ -223,6 +224,35 @@ CREATE TABLE IF NOT EXISTS maintenance.preventive_plan (
     is_active                         boolean
 );
 
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS maintenance.priority_scoring_model (
+    id                                uuid PRIMARY KEY,
+    venue_id                          uuid,
+    weights                           jsonb NOT NULL,
+    updated_at                        timestamptz,
+    updated_by_principal_id           uuid
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS maintenance.vendor_service_request (
+    id                                uuid PRIMARY KEY,
+    venue_id                          uuid,
+    work_order_id                     text NOT NULL,
+    supplier_id                       uuid NOT NULL,
+    scope                             text NOT NULL CONSTRAINT vendor_service_request_scope_chk CHECK (char_length(scope) <= 2000),
+    status                            text DEFAULT 'draft',
+    vendor_reference                  text CONSTRAINT vendor_service_request_vendor_reference_chk CHECK (char_length(vendor_reference) <= 100),
+    quoted_cost                       numeric(18,4),
+    final_cost                        numeric(18,4),
+    scheduled_visit_at                timestamptz,
+    note                              text CONSTRAINT vendor_service_request_note_chk CHECK (char_length(note) <= 1000),
+    raised_by_principal_id            uuid,
+    created_at                        timestamptz,
+    completed_at                      timestamptz
+);
+
 -- Something that needs doing to an asset, raised by a person, an inspection or a schedule. The
 -- evidence attaches here
 CREATE TABLE IF NOT EXISTS maintenance.work_order (
@@ -239,6 +269,10 @@ CREATE TABLE IF NOT EXISTS maintenance.work_order (
     asset_name                        text,
     status                            text NOT NULL CONSTRAINT work_order_status_chk CHECK (status IN ('open', 'assigned', 'inProgress', 'paused', 'awaitingParts', 'completed', 'verified', 'closed', 'cancelled')),
     priority                          text NOT NULL CONSTRAINT work_order_priority_chk CHECK (priority IN ('low', 'normal', 'high', 'urgent', 'emergency')),
+    priority_score                    integer,
+    priority_source                   text CONSTRAINT work_order_priority_source_chk CHECK (priority_source IN ('scored', 'assetOverride', 'manual')),
+    fault_assessment                  jsonb,
+    required_qualification_codes      text[],
     kind                              text NOT NULL CONSTRAINT work_order_kind_chk CHECK (kind IN ('corrective', 'planned', 'inspectionFollowUp', 'incidentCorrective', 'improvement')),
     assigned_to_principal_id          uuid,
     raised_by_principal_id            uuid,

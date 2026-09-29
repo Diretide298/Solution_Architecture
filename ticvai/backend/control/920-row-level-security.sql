@@ -118,7 +118,7 @@ BEGIN
 END
 $$;
 
--- **75 tables: 28 scoped by `scope_path`, 0 by `venue_id`, 5 through the parent that owns them, 41 with no policy.**
+-- **79 tables: 28 scoped by `scope_path`, 0 by `venue_id`, 5 through the parent that owns them, 0 by subject, 0 to the tenant root only, 45 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -166,7 +166,9 @@ SELECT platform.apply_parent_rls('control.partner_user'::regclass, 'partner_id',
 
 -- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a
 -- NOT NULL owning reference) before row-level security can hold for it.
---   control.api_client  -- no scope column and no declared owner
+--   control.api_anomaly  -- its owner control.api_client has no policy either
+--   control.api_anomaly_rule  -- only nullable references (client_id -> control.api_client)
+--   control.api_client  -- only nullable references (certification_listing_id -> control.integration_listing)
 --   control.api_licence  -- its owner control.tenant has no policy either
 --   control.api_limit  -- no scope column and no declared owner
 --   control.api_version  -- no scope column and no declared owner
@@ -192,6 +194,7 @@ SELECT platform.apply_parent_rls('control.partner_user'::regclass, 'partner_id',
 --   control.migration_run_cell  -- its owner control.migration_run has no policy either
 --   control.migration_run_tenant  -- its owner control.migration_run has no policy either
 --   control.onboarding_application  -- only nullable references (venue_type_template_id -> control.venue_type_template)
+--   control.production_access_request  -- its owners control.api_client, control.integration_listing have no policy either
 --   control.release  -- no scope column and no declared owner
 --   control.release_component  -- its owner control.release has no policy either
 --   control.rollout  -- its owner control.release has no policy either
@@ -200,6 +203,7 @@ SELECT platform.apply_parent_rls('control.partner_user'::regclass, 'partner_id',
 --   control.sandbox  -- no scope column and no declared owner
 --   control.scaling_policy  -- no scope column and no declared owner
 --   control.tenant  -- no scope column and no declared owner
+--   control.tenant_domain  -- its owner control.tenant has no policy either
 --   control.tenant_migration  -- its owners control.tenant, control.tenant_migration_plan have no policy either
 --   control.tenant_migration_plan  -- its owner control.tenant has no policy either
 --   control.upgrade_schedule  -- no scope column and no declared owner

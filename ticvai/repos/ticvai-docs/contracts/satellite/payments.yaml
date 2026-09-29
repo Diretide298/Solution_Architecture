@@ -51,6 +51,8 @@ info:
     '
 servers:
 - url: https://api.ticvai.com/v1
+security:
+- bearerAuth: []
 paths:
   /dunning-policy:
     get:
@@ -80,6 +82,7 @@ paths:
       operationId: setDunningPolicy
       x-ticvai-consumed-by:
         - "P09 ADM-606 Partial Payment, Failure & Recovery Manager\t100"
+      x-ticvai-conflict-policy: serverWins
       summary: Set the retry schedule and what happens when it runs out
       description: '2.14.19-2.14.23, BL-100. **Dunning retry and gateway retry are different axes
         and must never share a counter.** `setPaymentFailoverPolicy` governs retry *inside* one
@@ -106,6 +109,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -114,6 +118,8 @@ paths:
             schema:
               $ref: '#/components/schemas/DunningPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -281,6 +287,7 @@ paths:
       operationId: resolveDunningCase
       x-ticvai-consumed-by:
         - "P09 ADM-606 Partial Payment, Failure & Recovery Manager\t100"
+      x-ticvai-conflict-policy: serverWins
       summary: Stop chasing, with a reason
       description: 'BL-100. **The manual exit, and it is an operation rather than a status edit
         because somebody has to own it.** A guest who paid at a counter, a card replaced over the
@@ -375,6 +382,7 @@ paths:
       operationId: createPaymentMethod
       x-ticvai-consumed-by:
         - "P09 ADM-560 Payment Method Catalogue\t8"
+      x-ticvai-conflict-policy: serverWins
       summary: Add a payment method to the catalogue
       tags:
       - payments
@@ -420,6 +428,7 @@ paths:
         - "P09 ADM-566 Payment Fees, Surcharges & Commercial Rules\t14"
         - "P09 ADM-590 Digital & Alternative Payment Method Manager\t71"
         - "P09 ADM-591 Digital Wallet & Mobile Payment Configuration\t72"
+      x-ticvai-conflict-policy: serverWins
       summary: Change availability, fees and eligibility
       description: 'Boards 1.4, 1.7 and 1.8. **Eligibility, fees and availability travel together
         because they are one commercial decision.** Offering a method that costs 2.9% on a five-dirham
@@ -435,6 +444,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -443,6 +453,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentMethod'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -487,6 +499,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-570 Gateway, PSP & Acquirer Directory\t28"
         - "P09 ADM-571 Provider Connection & Adapter Configuration\t29"
+      x-ticvai-conflict-policy: serverWins
       summary: Connect a provider
       description: '**Credentials are written and never read back.** The response carries a fingerprint
         so somebody can confirm which key is in use without the key being retrievable from a screen.
@@ -530,6 +543,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-571 Provider Connection & Adapter Configuration\t29"
         - "P09 ADM-588 Terminal Simulator, Certification & AI Operations Advisor\t59"
+      x-ticvai-conflict-policy: serverWins
       summary: Prove the connection works before anybody pays through it
       description: 'Board 3.10. **A provider configured and never tested is a provider that fails on
         the first real transaction**, in front of a guest, at the busiest moment somebody chose to
@@ -554,6 +568,89 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProviderTestResult'
+  /payment-providers/{provider}/webhooks:
+    parameters:
+    - name: provider
+      in: path
+      required: true
+      description: The provider adapter the event is for.
+      schema:
+        type: string
+        enum:
+        - stripe
+        - networkInternational
+    post:
+      operationId: receivePaymentProviderWebhook
+      x-ticvai-idempotency-exempt: The provider sends no Idempotency-Key; each delivery is de-duplicated on the provider's own event id in payments.provider_event (SD-034), so a redelivery changes nothing.
+      x-ticvai-agreed: '29 September: system-design review SD-034 (payment gateway integration)'
+      summary: Take a payment provider's notification of what happened
+      description: '**The inbound half of the payment integration** (system-design review SD-034, 29 September).
+        A card-not-present payment (3-D Secure, hosted page, wallet pay) and a terminal payment complete
+        asynchronously; the provider tells the platform here, and polling `orders.inquirePaymentStatus` is the
+        fallback, not the path.
+
+
+        **Signature first.** The body is verified against the connection''s webhook secret (Stripe
+        `Stripe-Signature`, Network International''s HMAC header) before anything is parsed; a bad or missing
+        signature is refused `401` and nothing is written. **De-duplicated on the provider''s event id**: the event
+        is recorded in `payments.provider_event` (unique on provider and provider event id) and a redelivery
+        answers `200` without acting again. **Matched on `providerReference`** to the `orders.payment` it is about;
+        an event for an unknown reference is kept (`unmatched`) for the reconciler, never dropped.
+
+
+        An authorisation or capture moves the payment, writes a `payments.payment_attempt`, and, where the order is
+        now paid, runs the same transaction `orders.createPayment` runs: holds converted, cash-receipt posting,
+        `payment.captured` and `order.paid` to the outbox (SD-026). A failure or expiry moves the payment to
+        `declined` or `failed`. **Always `200` once the event is recorded**, so the provider stops retrying; the
+        processing is idempotent and can be replayed from the recorded row.
+
+        '
+      x-ticvai-make-or-break: 'Stripe and Network International sandbox credentials and webhook signing secrets
+        (client accounts, CLIENT-PAY-SANDBOX). The operation is specified; its adapters cannot be built or tested
+        until the client supplies them.'
+      tags:
+      - payments
+      x-ticvai-permission: null
+      x-ticvai-auth: service
+      x-ticvai-auth-note: Authenticated by the provider's signature over the body, not a token.
+      security: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-emits:
+      - payment.captured
+      - order.paid
+      x-ticvai-calls:
+      - catalogue.convertInventoryHold
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentProviderEvent'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded (or already recorded). The provider stops retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProviderEvent'
+        '401':
+          description: The signature is missing or does not verify (`webhook-signature-invalid`). Nothing is
+            written.
+          x-ticvai-problem-types:
+          - webhook-signature-invalid
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-routing-rules:
     get:
       operationId: listPaymentRoutingRules
@@ -581,6 +678,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-573 Payment Routing Rule Builder\t31"
         - "P09 ADM-574 Routing Strategy, Priority & Load Distribution\t33"
+      x-ticvai-conflict-policy: serverWins
       summary: Route by method, currency, venue, amount, cost or share
       description: 'Boards 2.5 and 2.6. **Priority and load distribution are both needed and they are
         not the same.** Priority says *this acquirer unless it cannot*; distribution says *sixty per
@@ -599,6 +697,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -614,6 +713,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/PaymentRoutingRule'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -636,6 +737,7 @@ paths:
       operationId: simulatePaymentRouting
       x-ticvai-consumed-by:
         - "P09 ADM-578 Payment Routing Simulator, Decision Trace & AI Advisor\t37"
+      x-ticvai-conflict-policy: serverWins
       summary: Where would this transaction go, and why
       description: 'Board 2.10. **The decision trace, including the rules that did not match.** Routing
         is the configuration most likely to be subtly wrong and least likely to announce it — a
@@ -668,6 +770,7 @@ paths:
       operationId: setPaymentFailoverPolicy
       x-ticvai-consumed-by:
         - "P09 ADM-575 Failover, Retry & Resilience Manager\t34"
+      x-ticvai-conflict-policy: serverWins
       summary: What happens when a provider fails, and when to stop trying
       description: 'Board 2.7. **A declined card and a broken gateway need opposite responses, and this
         is where they are told apart.** A decline is final and the till asks for another card; a
@@ -689,6 +792,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -697,6 +801,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentFailoverPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -825,6 +931,7 @@ paths:
         - "P09 ADM-581 Terminal Provisioning & Device Configuration\t51"
         - "P09 ADM-583 EMV & Card-Present Processing Configuration\t53"
         - "P09 ADM-586 Degraded, Offline & Store-and-Forward Manager\t56"
+      x-ticvai-conflict-policy: serverWins
       summary: Merchant account, acquirer, EMV and offline behaviour
       description: 'Boards 3.3, 3.5 and 3.8. **Store-and-forward is the setting that decides whether a
         venue can trade when the line drops**, and it is a risk decision rather than a technical one: a
@@ -840,6 +947,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -848,6 +956,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentTerminal'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -910,6 +1020,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-594 Hosted Checkout, Redirect & Return Flow Configuration\t75"
         - "P09 ADM-597 Digital Payment Exception, Recovery & Expiry Center\t79"
+      x-ticvai-conflict-policy: serverWins
       summary: Redirect, return and the journey back
       description: 'Board 4.6. **The return leg is where hosted checkout goes wrong.** A guest who pays
         on a provider''s page and closes the tab before the redirect has paid, and the platform does not
@@ -925,6 +1036,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -933,6 +1045,8 @@ paths:
             schema:
               $ref: '#/components/schemas/HostedCheckoutConfig'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -947,6 +1061,7 @@ paths:
       operationId: setPaymentAuthenticationPolicy
       x-ticvai-consumed-by:
         - "P09 ADM-596 Authentication, Tokenization & Recurring Payment Controls\t78"
+      x-ticvai-conflict-policy: serverWins
       summary: 3-D Secure, tokenisation and recurring mandates
       description: 'Board 4.8. **Strong authentication is a commercial trade as much as a security
         one.** Challenging every transaction raises abandonment; challenging none raises fraud and moves
@@ -965,6 +1080,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -973,6 +1089,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentAuthenticationPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1010,6 +1128,7 @@ paths:
         - "P09 ADM-604 Stored Value, Gift Card & Voucher Tender Controls\t97"
         - "P09 ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules\t98"
         - "P09 ADM-606 Partial Payment, Failure & Recovery Manager\t100"
+      x-ticvai-conflict-policy: serverWins
       summary: Split payment, tender sequence and restrictions
       description: 'Boards 5.2, 5.3 and 5.7. **Sequence is not cosmetic.** Stored value before card
         means a guest''s gift card is used up on a purchase they would happily have paid for with a
@@ -1028,6 +1147,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1036,6 +1156,8 @@ paths:
             schema:
               $ref: '#/components/schemas/MixedTenderRules'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1087,6 +1209,7 @@ paths:
       operationId: createB2bCreditAccount
       x-ticvai-consumed-by:
         - "P09 ADM-602 B2B Credit Account & Limit Manager\t95"
+      x-ticvai-conflict-policy: serverWins
       summary: Open an on-account relationship
       tags:
       - payments
@@ -1124,6 +1247,7 @@ paths:
       operationId: setB2bPaymentTerms
       x-ticvai-consumed-by:
         - "P09 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration\t96"
+      x-ticvai-conflict-policy: serverWins
       summary: Limit, terms, billing cycle and what happens at the limit
       description: 'Board 5.5. **What happens at the limit is the decision, not the limit.** Refuse,
         warn, or allow with an override — and a tour operator turned away at a gate with sixty children
@@ -1137,6 +1261,7 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1145,6 +1270,8 @@ paths:
             schema:
               $ref: '#/components/schemas/B2bPaymentTerms'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1186,6 +1313,7 @@ paths:
       operationId: setReconciliationSource
       x-ticvai-consumed-by:
         - "P09 ADM-620 Reconciliation Source & Import Manager\t141"
+      x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: tenant
       summary: Define a settlement or statement feed
       tags:
@@ -1195,6 +1323,7 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1203,6 +1332,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ReconciliationSource'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1217,6 +1348,7 @@ paths:
       operationId: setReconciliationMatchingRules
       x-ticvai-consumed-by:
         - "P09 ADM-621 Transaction Matching & Reconciliation Engine\t142"
+      x-ticvai-conflict-policy: serverWins
       summary: How a platform transaction is matched to a settled one
       description: 'Board 7.3. **Exact matching is not enough and never was.** An acquirer settles net
         of fees, rounds differently, batches across midnight and uses its own reference — so the rules
@@ -1232,6 +1364,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1240,6 +1373,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ReconciliationMatchingRules'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1280,6 +1415,7 @@ paths:
       operationId: setMerchantAccount
       x-ticvai-consumed-by:
         - "P09 ADM-625 Merchant Account & Settlement Calendar Manager\t146"
+      x-ticvai-conflict-policy: serverWins
       summary: Bind a merchant account to entities, venues and a calendar
       tags:
       - payments
@@ -1288,6 +1424,7 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1296,6 +1433,8 @@ paths:
             schema:
               $ref: '#/components/schemas/MerchantAccount'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1312,6 +1451,7 @@ paths:
         - "P09 ADM-630 Payment Risk Rule & Decision Engine\t167"
         - "P09 ADM-631 Velocity, Behavioral & Transaction Risk Controls\t168"
         - "P09 ADM-632 Risk Lists, Signals & Payment Control Center\t169"
+      x-ticvai-conflict-policy: serverWins
       summary: Velocity, behaviour, lists and what a hit does
       description: 'Boards 8.2, 8.3 and 8.4. **Distinct from `wallet` risk, which watches stored value.**
         This watches card presentation: the same card across many accounts, many cards from one device,
@@ -1338,6 +1478,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1346,6 +1487,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentRiskRules'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1367,6 +1510,7 @@ paths:
       operationId: submitChargebackEvidence
       x-ticvai-consumed-by:
         - "P09 ADM-635 Chargeback Evidence & Representment Workspace\t173"
+      x-ticvai-conflict-policy: append
       summary: Assemble and send a representment
       description: 'Board 8.7. **`respondToChargeback` existed and nothing assembled the case.** Winning
         a representment is almost entirely about producing the right documents inside the scheme''s
@@ -1459,6 +1603,7 @@ paths:
         - "P09 ADM-598 Digital Payment Simulator, Conversion & AI Advisor\t80"
         - "P09 ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor\t102"
         - "P09 ADM-638 Payment Executive Intelligence, Risk Simulator & AI Advisor\t176"
+      x-ticvai-conflict-policy: serverWins
       summary: What a guest would be offered, and what it would cost
       description: 'Boards 1.10 and 5.10. **Eight boards of configuration that compose**, and the
         failure is silent: a method enabled at a venue whose acquirer cannot take that currency looks
@@ -1522,6 +1667,7 @@ paths:
       operationId: setPaymentRules
       x-ticvai-consumed-by:
         - "P09 ADM-567 Payment Policy, Governance & Approval Manager\t15"
+      x-ticvai-conflict-policy: serverWins
       summary: Replace the payment rule set
       description: >
         **Whole, for the reason the read is composed.** An eligibility rule admitting a currency the
@@ -1534,6 +1680,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1542,6 +1689,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentRuleSet'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1591,6 +1740,7 @@ paths:
       operationId: recordDepositActivity
       x-ticvai-consumed-by:
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
+      x-ticvai-conflict-policy: append
       summary: Record a movement on a deposit
       description: >
         **A forfeit needs a reason and an author, which is why this is a row rather than a column
@@ -1703,6 +1853,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1711,6 +1862,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PayTerminalCertification'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1773,6 +1926,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1781,6 +1935,8 @@ paths:
             schema:
               $ref: '#/components/schemas/PayInstalmentPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1950,6 +2106,27 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Staff session token (common.yaml bearerAuth). Added 29 September (system-design review SD-054).
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
   schemas:
     PayTerminalCertification:
       type: object
@@ -3105,6 +3282,75 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         effectiveRatePercent:
           type: number
+    PaymentProviderEvent:
+      type: object
+      x-ticvai-persistence: payments.provider_event
+      x-ticvai-agreed: '29 September: system-design review SD-034'
+      description: '**One notification from a payment provider, recorded before it is acted on** (SD-034, 29
+        September). Unique on (`provider`, `providerEventId`), which is what makes a redelivered webhook a
+        no-op. Kept for reconciliation and dispute evidence.'
+      required:
+      - id
+      - provider
+      - providerEventId
+      - eventType
+      - receivedAt
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        provider:
+          type: string
+          enum:
+          - stripe
+          - networkInternational
+        providerEventId:
+          type: string
+          maxLength: 255
+          x-ticvai-unique: tenant
+          description: The provider's own event id. Unique per provider.
+        eventType:
+          type: string
+          maxLength: 120
+          description: The provider's event type, verbatim (for example `payment_intent.succeeded`).
+        providerReference:
+          type: string
+          nullable: true
+          description: The charge the event is about; matched to `orders.payment.providerReference`.
+        paymentId:
+          type: string
+          nullable: true
+          readOnly: true
+          x-ticvai-references: orders.payment
+          description: The payment it matched. Null while `unmatched`.
+        payload:
+          type: object
+          additionalProperties: true
+          description: The verified body, as received.
+        status:
+          type: string
+          readOnly: true
+          enum:
+          - received
+          - processed
+          - duplicate
+          - unmatched
+          - failed
+        receivedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        processedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005); the tenant root for a provider-level event.
     PaymentAttempt:
       type: object
       x-ticvai-persistence: payments.payment_attempt
@@ -3176,6 +3422,27 @@ components:
         declineReason:
           type: string
           nullable: true
+        providerReference:
+          type: string
+          nullable: true
+          description: The provider's id for this call (SD-034, 29 September).
+        providerIdempotencyKey:
+          type: string
+          nullable: true
+          description: The idempotency key sent with this call, the payment's id plus the attempt kind, so a
+            retried call is recognised by the provider (SD-034).
+        attemptKind:
+          type: string
+          nullable: true
+          enum:
+          - authorise
+          - capture
+          - refund
+          - void
+          - inquire
+          - terminal
+          description: Which adapter call this was (authorise, capture, refund, void, inquire; terminal for an
+            ECR instruction to a card terminal).
         latencyMs:
           type: integer
           nullable: true

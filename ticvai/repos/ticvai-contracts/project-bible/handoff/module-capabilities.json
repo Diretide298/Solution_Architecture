@@ -5,7 +5,7 @@
   "access": {
    "title": "3 — Admission and Access",
    "capabilityCount": 17,
-   "unguardedOperations": 4,
+   "unguardedOperations": 5,
    "capabilities": [
     {
      "key": "ACCESS_OVERRIDE",
@@ -395,7 +395,7 @@
      "key": "AI_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 31,
+     "operationCount": 33,
      "operations": [
       "backtestRiskStrategy",
       "configureAiCapability",
@@ -411,7 +411,7 @@
      "key": "AI_USE",
      "label": null,
      "group": "Operations",
-     "operationCount": 57,
+     "operationCount": 63,
      "operations": [
       "answerConfigurationQuestion",
       "attachConfigurationSource",
@@ -683,7 +683,7 @@
   "catalogue": {
    "title": "1 — Ticketing Catalogue",
    "capabilityCount": 12,
-   "unguardedOperations": 3,
+   "unguardedOperations": 4,
    "capabilities": [
     {
      "key": "AI_APPROVE",
@@ -925,7 +925,7 @@
   "finance": {
    "title": "5 — F&B & Guest Management (accounting and revenue recognition)",
    "capabilityCount": 8,
-   "unguardedOperations": 1,
+   "unguardedOperations": 2,
    "capabilities": [
     {
      "key": "ACCOUNT_CONFIGURE",
@@ -1554,10 +1554,12 @@
      "key": "PROCUREMENT_REQUEST",
      "label": "raise, amend and cancel a requisition",
      "group": "Procurement",
-     "operationCount": 3,
+     "operationCount": 5,
      "operations": [
       "cancelRequisition",
       "createRequisition",
+      "createStockReservation",
+      "releaseStockReservation",
       "updateRequisitionLines"
      ],
      "elevated": false,
@@ -1749,14 +1751,14 @@
      "key": "WORK_ORDER_MANAGE",
      "label": null,
      "group": "Maintenance & safety",
-     "operationCount": 6,
+     "operationCount": 9,
      "operations": [
       "cancelWorkOrder",
       "completeWorkOrder",
+      "createVendorServiceRequest",
       "createWorkOrder",
       "recordWorkOrderParts",
-      "recordWorkOrderTime",
-      "updateWorkOrder"
+      "recordWorkOrderTime"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1776,10 +1778,13 @@
      "key": "WORK_ORDER_VIEW",
      "label": null,
      "group": "Maintenance & safety",
-     "operationCount": 2,
+     "operationCount": 5,
      "operations": [
       "getWorkOrder",
-      "listWorkOrders"
+      "getWorkOrderPriorityPolicy",
+      "listVendorServiceRequests",
+      "listWorkOrders",
+      "suggestWorkOrderAssignee"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1949,11 +1954,12 @@
      "key": "MARKETING_SEND",
      "label": "launch or stop a campaign. Separate from MANAGE",
      "group": "Guest engagement",
-     "operationCount": 4,
+     "operationCount": 5,
      "operations": [
       "activateJourney",
       "launchCampaign",
       "retryMessageDispatch",
+      "sendTransactionalMessage",
       "stopCampaign"
      ],
      "elevated": false,
@@ -2271,7 +2277,7 @@
   "payments": {
    "title": "4 — Bundles and Promotions",
    "capabilityCount": 6,
-   "unguardedOperations": 2,
+   "unguardedOperations": 3,
    "capabilities": [
     {
      "key": "CREDIT_MANAGE",
@@ -2565,10 +2571,12 @@
      "key": "DEVELOPER_ADMIN",
      "label": "quotas, certification, licensing — TICVAI-side only",
      "group": "Guest engagement",
-     "operationCount": 4,
+     "operationCount": 6,
      "operations": [
       "certifyIntegration",
+      "decideProductionAccess",
       "deprecateApiVersion",
+      "setApiAnomalyRule",
       "setApiLicensing",
       "setApiQuota"
      ],
@@ -2579,14 +2587,14 @@
      "key": "DEVELOPER_MANAGE",
      "label": "own clients, credentials, sandboxes, subscriptions",
      "group": "Guest engagement",
-     "operationCount": 11,
+     "operationCount": 12,
      "operations": [
       "createApiClient",
       "createSandbox",
       "createWebhookSubscription",
       "replayEvents",
-      "resetSandbox",
-      "revokeApiCredential"
+      "requestProductionAccess",
+      "resetSandbox"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2595,14 +2603,14 @@
      "key": "DEVELOPER_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 10,
+     "operationCount": 13,
      "operations": [
       "getApiUsage",
       "issueApiToken",
+      "listApiAnomalies",
       "listApiClients",
-      "listApiVersions",
-      "listIntegrationListings",
-      "listSandboxes"
+      "listApiScopes",
+      "listApiVersions"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3542,7 +3550,7 @@
   "tenancy": {
    "title": "Cross-cutting — organisation hierarchy",
    "capabilityCount": 11,
-   "unguardedOperations": 1,
+   "unguardedOperations": 3,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",
@@ -3749,7 +3757,7 @@
   "venue-map": {
    "title": "21 — Seat Management & Venue Mapping",
    "capabilityCount": 3,
-   "unguardedOperations": 0,
+   "unguardedOperations": 5,
    "capabilities": [
     {
      "key": "VENUE_MAP_MANAGE",
@@ -3821,14 +3829,14 @@
      "key": "WALLET_OPERATE",
      "label": "adjust, reverse, freeze, relink a credential",
      "group": "Wallet and stored value",
-     "operationCount": 23,
+     "operationCount": 26,
      "operations": [
       "activateGiftCard",
       "adjustGameCard",
       "adjustWallet",
       "blockGiftCard",
-      "closeWallet",
-      "createSharedWallet"
+      "captureWalletHold",
+      "closeWallet"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3854,7 +3862,7 @@
   "white-label": {
    "title": "19 — Guest Mobile App & Branding (builder)",
    "capabilityCount": 3,
-   "unguardedOperations": 4,
+   "unguardedOperations": 5,
    "capabilities": [
     {
      "key": "MARKETING_VIEW",
@@ -3871,14 +3879,14 @@
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 54,
+     "operationCount": 67,
      "operations": [
       "claimCustomDomain",
       "createBanner",
+      "createBookingFlowDefinition",
       "createContentBlock",
       "createContentPage",
-      "createGuidedChoice",
-      "createPreview"
+      "createGuidedChoice"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3887,11 +3895,12 @@
      "key": "TENANT_PUBLISH",
      "label": "publish a configuration version, restore a prior one",
      "group": "Tenant experience",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
       "publishContentBlock",
       "publishGuidedChoice",
       "publishTenantConfig",
+      "requestAppBuild",
       "restoreConfigVersion",
       "unpublishGuidedChoice"
      ],
@@ -4058,8 +4067,8 @@
    "DEVELOPER_VIEW": [
     "getApiUsage",
     "issueApiToken",
-    "listApiClients",
-    "listApiVersions"
+    "listApiAnomalies",
+    "listApiClients"
    ],
    "DEVICE_CONFIGURE": [
     "cloneReaderConfiguration",
@@ -4342,11 +4351,13 @@
    "WORK_ORDER_MANAGE": [
     "cancelWorkOrder",
     "completeWorkOrder",
-    "createWorkOrder",
-    "recordWorkOrderParts"
+    "createVendorServiceRequest",
+    "createWorkOrder"
    ],
    "WORK_ORDER_VIEW": [
     "getWorkOrder",
+    "getWorkOrderPriorityPolicy",
+    "listVendorServiceRequests",
     "listWorkOrders"
    ]
   }

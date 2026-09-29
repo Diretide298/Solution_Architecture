@@ -9,6 +9,9 @@ aggregate: chargeback
 emittedWhen: recordChargeback creates the case in `received` (stage received, not a repeat notification), and
   recordChargebackOutcome or the deadline timer moves it to won, lost or expired (stage decided); respondToChargeback
   conceding it moves it to accepted (stage decided)
+emittedBy:
+- recordChargebackOutcome
+- respondToChargeback
 payload:
 - field: chargebackEventId
   type: string

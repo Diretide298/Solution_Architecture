@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS workforce.field_ownership (
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 0 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.forecast_requirement (
     id                                uuid PRIMARY KEY,
     requirement_id                    uuid NOT NULL,
@@ -320,7 +320,7 @@ CREATE TABLE IF NOT EXISTS workforce.shift_template (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it; 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.staff_conversation (
     id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS workforce.staff_conversation (
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 2 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.staff_conversation_participant (
     staff_conversation_id             uuid NOT NULL,
     principal_id                      uuid NOT NULL,
@@ -344,7 +344,7 @@ CREATE TABLE IF NOT EXISTS workforce.staff_conversation_participant (
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.staff_message (
     id                                text PRIMARY KEY NOT NULL,
     staff_conversation_id             uuid NOT NULL,

@@ -7,6 +7,8 @@ publisher: ledger
 description: A fiscal period is closed. Figures for it will not move again without a reopen.
 aggregate: fiscalPeriod
 emittedWhen: PeriodStatus closing to closed
+emittedBy:
+- closeFiscalPeriod
 payload:
 - field: fiscalPeriodId
   type: uuid

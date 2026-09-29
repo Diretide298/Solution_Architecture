@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS approvals.evidence_package (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.external_dispatch (
     id                                uuid PRIMARY KEY NOT NULL,
     request_id                        text NOT NULL,
@@ -245,7 +245,7 @@ CREATE TABLE IF NOT EXISTS approvals.external_dispatch (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 1 write it; 2 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.external_provider (
     id                                uuid PRIMARY KEY,
     code                              text NOT NULL,
@@ -324,8 +324,8 @@ CREATE TABLE IF NOT EXISTS approvals.retention_policy (
 );
 
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
--- off: reaches approvals.request through its keys; references approvals.matrix. Reached by: 15
--- operations read it and 2 write it; 3 tables reference it.
+-- off: reaches approvals.request through its keys; references approvals.external_provider,
+-- approvals.matrix. Reached by: 15 operations read it and 2 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.rule (
     id                                uuid PRIMARY KEY,
     sort_order                        integer NOT NULL,

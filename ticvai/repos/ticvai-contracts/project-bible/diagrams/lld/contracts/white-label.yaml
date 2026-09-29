@@ -1,5 +1,5 @@
 id: LLD-white-label
-title: white-label — 64 operations
+title: white-label — 79 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -34,6 +34,21 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.banner
+- operation: createBookingFlowDefinition
+  verb: POST
+  path: /venues/{venueId}/booking-flows
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
+  writes:
+  - cache:idempotency
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
 - operation: createContentBlock
   verb: POST
   path: /content-blocks
@@ -121,6 +136,22 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.tenant_config
+- operation: deleteBookingFlow
+  verb: DELETE
+  path: /booking-flows/{bookingFlowId}
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.product
+  - catalogue.product_category
+  - whitelabel.booking_flow
+  writes:
+  - cache:idempotency
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
 - operation: deleteContentPage
   verb: DELETE
   path: /tenant-config/pages/{pageId}
@@ -178,6 +209,17 @@ operations:
   reads:
   - whitelabel.tenant_config
   writes: []
+- operation: getAppBuild
+  verb: GET
+  path: /tenant-config/app-builds/{appBuildId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.app_build
+  writes: []
 - operation: getAppIcons
   verb: GET
   path: /tenant-config/app-icons
@@ -188,6 +230,18 @@ operations:
   offline: false
   reads:
   - whitelabel.tenant_config
+  writes: []
+- operation: getBookingFlow
+  verb: GET
+  path: /booking-flows/{bookingFlowId}
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
   writes: []
 - operation: getBookingFlowConfig
   verb: GET
@@ -275,6 +329,21 @@ operations:
   - whitelabel.navigation_item
   writes:
   - cache:resolution
+- operation: getPublishedBookingFlow
+  verb: GET
+  path: /venues/{venueId}/booking-flow
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - catalogue.product
+  - catalogue.product_category
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
+  - whitelabel.config_version
+  writes: []
 - operation: getPublishedGuidedChoice
   verb: GET
   path: /venues/{venueId}/guided-choice
@@ -287,6 +356,33 @@ operations:
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
+  writes: []
+- operation: getSiteSetupProgress
+  verb: GET
+  path: /tenant-config/site-setup
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.booking_flow
+  - whitelabel.config_version
+  - whitelabel.site_setup_progress
+  - whitelabel.tenant_config
+  writes: []
+- operation: getStoreAccounts
+  verb: GET
+  path: /tenant-config/store-accounts
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.config_version
+  - whitelabel.store_account
+  - whitelabel.tenant_config
   writes: []
 - operation: getStorefrontInsights
   verb: GET
@@ -322,7 +418,8 @@ operations:
   - guest
   offline: false
   reads:
-  - cache:resolution
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
   - whitelabel.feature_toggle
   - whitelabel.footer_config
   - whitelabel.footer_config_column
@@ -331,8 +428,7 @@ operations:
   - whitelabel.module_enablement
   - whitelabel.navigation_item
   - whitelabel.tenant_config
-  writes:
-  - cache:resolution
+  writes: []
 - operation: getTheme
   verb: GET
   path: /tenant-config/theme
@@ -358,6 +454,17 @@ operations:
   reads:
   - whitelabel.analytics_provider
   writes: []
+- operation: listAppBuilds
+  verb: GET
+  path: /tenant-config/app-builds
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.app_build
+  writes: []
 - operation: listBanners
   verb: GET
   path: /tenant-config/banners
@@ -368,6 +475,28 @@ operations:
   offline: false
   reads:
   - whitelabel.banner
+  writes: []
+- operation: listBookingFlowTypes
+  verb: GET
+  path: /booking-flow-types
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBookingFlows
+  verb: GET
+  path: /venues/{venueId}/booking-flows
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
   writes: []
 - operation: listConfigVersions
   verb: GET
@@ -492,10 +621,13 @@ operations:
   - staff
   offline: false
   reads:
+  - whitelabel.booking_flow
   - whitelabel.guided_choice
   - whitelabel.guided_choice_answer
   - whitelabel.guided_choice_question
-  writes: []
+  writes:
+  - cache:idempotency
+  - whitelabel.guided_choice
 - operation: publishTenantConfig
   verb: POST
   path: /tenant-config/publish
@@ -505,12 +637,12 @@ operations:
   - staff
   offline: false
   reads:
-  - cache:idempotency
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
   - whitelabel.config_version
+  - whitelabel.tenant_config
   writes:
   - cache:idempotency
-  - cache:resolution
-  - platform.outbox
   - whitelabel.config_version
 - operation: recordStorefrontSessionEvents
   verb: POST
@@ -538,6 +670,21 @@ operations:
   - whitelabel.custom_domain
   writes:
   - whitelabel.custom_domain
+- operation: requestAppBuild
+  verb: POST
+  path: /tenant-config/app-builds
+  scope: tenant
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.app_build
+  - whitelabel.config_version
+  - whitelabel.store_account
+  writes:
+  - cache:idempotency
+  - whitelabel.app_build
 - operation: restoreConfigVersion
   verb: POST
   path: /tenant-config/versions/{version}/restore
@@ -548,6 +695,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
   - whitelabel.feature_toggle
   - whitelabel.footer_config
   - whitelabel.footer_config_column
@@ -788,6 +937,33 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.policy
+- operation: setSiteSetupProgress
+  verb: PUT
+  path: /tenant-config/site-setup
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.config_version
+  - whitelabel.site_setup_progress
+  writes:
+  - cache:idempotency
+  - whitelabel.site_setup_progress
+- operation: setStoreAccounts
+  verb: PUT
+  path: /tenant-config/store-accounts
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.store_account
+  writes:
+  - cache:idempotency
+  - whitelabel.store_account
 - operation: setTheme
   verb: PUT
   path: /tenant-config/theme
@@ -830,6 +1006,21 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.banner
+- operation: updateBookingFlowDefinition
+  verb: PATCH
+  path: /booking-flows/{bookingFlowId}
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
+  writes:
+  - cache:idempotency
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
 - operation: updateContentPage
   verb: PUT
   path: /tenant-config/pages/{pageId}
@@ -872,6 +1063,20 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.promo_block
+- operation: validateBookingFlow
+  verb: POST
+  path: /booking-flows/{bookingFlowId}/validate
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
+  writes:
+  - cache:idempotency
+  - whitelabel.booking_flow_step
 - operation: validateTenantConfig
   verb: POST
   path: /tenant-config/validate
@@ -881,11 +1086,11 @@ operations:
   - staff
   offline: false
   reads:
-  - cache:idempotency
+  - whitelabel.booking_flow
+  - whitelabel.booking_flow_step
   - whitelabel.tenant_config
   writes:
   - cache:idempotency
-  - whitelabel.tenant_config
 - operation: verifyCustomDomain
   verb: POST
   path: /tenant-domains/{domainId}/verify

@@ -7,6 +7,8 @@ publisher: tenancy
 description: A registered device's reported status changed — it went offline, came back, reported a fault or ran low on a consumable.
 aggregate: device
 emittedWhen: RegisteredDevice.status changes (states/registered-device.yaml), on a heartbeat or on the heartbeat timeout
+emittedBy:
+- recordDeviceHeartbeat
 payload:
 - field: deviceId
   type: uuid

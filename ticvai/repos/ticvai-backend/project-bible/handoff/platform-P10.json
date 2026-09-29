@@ -7,11 +7,11 @@
  "audience": "partner",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 51,
-  "operations": 151,
+  "operations": 142,
   "contracts": 10,
   "modules": 9,
   "undrawn": 0,
@@ -98,12 +98,12 @@
    "operations": 26
   },
   {
-   "contract": "catalogue",
-   "operations": 24
-  },
-  {
    "contract": "identity",
    "operations": 16
+  },
+  {
+   "contract": "catalogue",
+   "operations": 12
   },
   {
    "contract": "marketing-crm",
@@ -112,6 +112,10 @@
   {
    "contract": "reporting",
    "operations": 8
+  },
+  {
+   "contract": "public-api",
+   "operations": 7
   },
   {
    "contract": "finance",
@@ -123,10 +127,6 @@
   },
   {
    "contract": "seating",
-   "operations": 4
-  },
-  {
-   "contract": "public-api",
    "operations": 4
   }
  ],
@@ -173,7 +173,7 @@
    "module": "Inventory & Pricing",
    "wave": 2,
    "route": "/general/inventory-and-allocation-view",
-   "operations": 19,
+   "operations": 16,
    "drawn": true
   },
   {
@@ -182,7 +182,7 @@
    "module": "Inventory & Pricing",
    "wave": 2,
    "route": "/general/product-catalog-b2b-pricing",
-   "operations": 17,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -299,7 +299,7 @@
    "module": "Access & Account",
    "wave": 3,
    "route": "/general/api-credentials-and-integration",
-   "operations": 4,
+   "operations": 7,
    "drawn": true
   },
   {

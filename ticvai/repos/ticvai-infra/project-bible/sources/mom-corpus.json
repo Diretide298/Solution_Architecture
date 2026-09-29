@@ -163,35 +163,39 @@
    "date": "2026-09-15",
    "format": "docx",
    "words": 2125
+  },
+  {
+   "file": "TICVAI_MoM_2026-09-17_AssetMgmt_Sandbox_API.docx",
+   "date": "2026-09-17",
+   "format": "docx",
+   "words": 3048
+  },
+  {
+   "file": "TICVAI_MoM_2026-09-18_AI_Governance_ConfigAssistant_Forecasting_UX.docx",
+   "date": "2026-09-18",
+   "format": "docx",
+   "words": 3207
+  },
+  {
+   "file": "TICVAI_MoM_2026-09-21_AI_Recommendation_CorePlatform_Fraud.docx",
+   "date": "2026-09-21",
+   "format": "docx",
+   "words": 3182
+  },
+  {
+   "file": "TICVAI_MoM_2026-09-24_BuildReadiness_Infra_UX.docx",
+   "date": "2026-09-24",
+   "format": "docx",
+   "words": 2694
+  },
+  {
+   "file": "TICVAI_MoM_2026-09-29_Licensing_B2C_Review.md",
+   "date": "2026-09-29",
+   "format": "markdown",
+   "words": 728
   }
  ],
  "items": [
-  {
-   "kind": "conflict",
-   "ref": "CF-172",
-   "name": "",
-   "text": "**The identity contract said both that an unverified guest buys and that it cannot.** `verifyGuestEmail`: *\"Unverified accounts still buy. Blocking purchase on verification loses the sale\"*; `registerGuest` and `GuestSession.isVerified`: *\"an unverified account may browse but not transact\"*. **The requirement matrix adds a third constraint**: 2.6.28 *\"An online sale can be done using Guest Checkout or Registration on the website or Login to SSO. This should be configurable per site\"*, and 2.6.67 lists Guest Checkout among the B2C logins; the minutes' reference checkout is *\"cart summary \u2192 login/guest checkout with dual OTP validation\"*. A decision unblocks the cart and checkout screens and `checkoutCart`'s refusals. **Decided 17 September: no order against an unproven contact.** On the guest web and app the site's existing `guestCheckout` feature decides, **off by default**: off, the guest signs in verified before the cart; on, a guest without an account proves the email or mobile with a one-time code at checkout. **The kiosk is exempt** \u2014 a walk-up takes printed tickets, so there is no address to prove. Written into `identity`, `orders` (`checkoutCart` 403) and `white-label`, and onto `WEB-010`/`GST-041` and their sign-in screens. **Refined 18 September by [ADR-0045](../adr/0045-every-order-carries-a-proven-contact.md), which corrected the placement and added what the 17 September rule left out.** **The gate is the checkout page, not the cart** \u2014 matrix 2.6.1 \u00a72.4 reads *\"On the check out page, users can log in or manually fill in the following details: name, email, mobile number, nationality\"*, and \u00a72.3 offers *\"Add to Cart or proceed directly to check out\"*. The 17 September edit had walled the cart, which also breaks 2.6.45's abandoned-cart reminder by leaving only identified guests able to abandon one. `WEB-010 \u2192 WEB-016` is removed and the fork moves to `WEB-011 Guest Details & Attendee Forms`, which *is* the page 2.6.1 describes; `GST-041 Checkout Entry` was already it. **And the profile half was never decided**: both routes produce a durable guest profile, a one-time checkout profile carries no credential (2.6.29 \u2014 access needs a login to recall previous transactions), and a returning verified contact **attaches the order to the profile already held and does not open it** (2.6.1's 22.2.8 automatic resolution, bounded). Matrix **22.2.8 and 7.3.7 contradict each other** \u2014 automatic merge versus authorised-user merge with audit and rollback \u2014 and both hold: automatic where the evidence is a code the guest just entered, staff-reviewed where it is an inference from passport, national id, an unproved phone or a similar name. Closed.",
-   "hits": [
-    {
-     "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
-     "date": "2026-08-10",
-     "score": 1.967,
-     "paragraph": "Sign-up: Simple registration via phone number or email, each verified with an OTP (sent via WhatsApp or SMS/email as configured), followed by minimal profile capture (first/last name)."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
-     "date": "2026-08-20",
-     "score": 1.845,
-     "paragraph": "Two reference sites were walked through end-to-end to illustrate target checkout simplicity: a Six Flags\u2013style attraction site (product selection \u2192 quantity/name capture \u2192 cart summary \u2192 login/guest checkout with dual OTP validation) and Platinum List (event \u2192 date \u2192 interactive seat map with colour-coded pricing \u2192 seat selection \u2192 one-page checkout via Quick Order/Apple/Google, completing in as few as four clicks, with an optional post-purchase profile-completion prompt)."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-09-09_Rental_POS_Licensing.docx",
-     "date": "2026-09-09",
-     "score": 1.792,
-     "paragraph": "The home screen shows gate/terminal identity, logged-in cashier, shift start time, denomination summary, TICVAI branding, hardware status, notifications, profile, and a global search bar, alongside quick actions (scan ticket via QR/RFID, recall held sale, open drawer, reprint, void sale) and a full module menu (ticketing, F&B, retail, etc.)."
-    }
-   ]
-  },
   {
    "kind": "conflict",
    "ref": "CF-171",
@@ -199,22 +203,22 @@
    "text": "**A third of the API surface is a provisional draft named after a screen title, and the count is exact.** Measured 8 September: **577 of the package's 1,626 operations carry `x-ticvai-provisional: true`, and for all 577 \u2014 every single one \u2014 the `summary` is verbatim the title of the screen in its own `x-ticvai-consumed-by`.** Not most of them; all of them. The operations state it themselves: *\"Drafted from the workshop pack; the shape below is read out of it, not invented... Still provisional. A shape read out of a PDF has not been agreed with anyone who has to build it, and the schema says so in its own persistence tag: it is a request, not a table.\"* **This is the same defect as the 423 title-stamped screens, one layer down**, and the two corroborate each other in the way that proves nothing: `check-screens` verifies that every screen's operations resolve to a contract, and 577 of those contracts were written from the screens. **Two derived artefacts agreeing is not corroboration** \u2014 Claude Design's own caution about the layout check, arriving from the contract side. **It is why CF-170's Class B cannot be fixed by adding operations** and why any count of *contracted* coverage is 35% softer than it reads. **Audited against the source packs 8 September, and the 577 are sound.** Every provisional description cites its origin as `<pack>, page N`. Checked against the 39 client Design Books in `OneDrive_1_8-9-2026.zip`: **577 of 577 citations resolve to a real pack, and not one cites a page beyond that pack's length** \u2014 573 distinct pages across 17 books, maximum cited page inside the book's page count in every case. **They are not invented and they are not unverifiable.** The `provisional` flag means *not yet agreed with whoever builds it*, which is an honest label rather than a defect, and the summaries matching screen titles is what you get when a screen and an operation are read out of the same page of the same pack. **The real gap is the other direction, and it is larger: 22 of the 39 Design Books have no operation drafted from them at all** \u2014 1,323 pages of client design material against 1,058 pages that were used. The biggest untouched are Retail (202pp), Inventory & Procurement (175pp), Resource Management (169pp), F&B Backend (130pp), Wallet (129pp) and Finance (123pp) \u2014 **which is CF-164 and CF-125 seen from the source side**: the F&B/Retail/Procurement/Inventory workshop that is outstanding in three consecutive MoMs is exactly the material nobody has drafted from. **Recommendation: stop treating the 577 as the problem.** Schedule the workshops to agree them, and open the 22 uncited books as the scoping question they actually are",
    "hits": [
     {
-     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
-     "date": "2026-08-12",
-     "score": 1.722,
-     "paragraph": "Allam then walked through a set of reference finance-module screens built from the shared finance requirement/metric sheet, explicitly framed as a base for TICVAI's own UI/UX design rather than a template to copy exactly. The first screen set covered: a finance dashboard showing gross revenue, net revenue, recognized revenue, deferred revenue, and refunds (with graphical charts, selectable by period); a legal entities view listing all tenant sites with country, currency, and active/inactive status for multi-tenant setups; the chart of accounts (with external-system codes for ERP/third-party mapping, and classification into assets, liability, income, or expense); a chart-of-accounts hierarchy"
-    },
-    {
      "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
      "date": "2026-08-21",
-     "score": 1.621,
+     "score": 1.761,
      "paragraph": "F&B, Retail, Procurement & Inventory workshop \u2014 not covered in this session (second consecutive session filed under this name without matching content); remains outstanding."
     },
     {
      "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
      "date": "2026-08-26",
-     "score": 1.616,
+     "score": 1.713,
      "paragraph": "Question (Chitrangi): can a guest rent a resource directly from the guest/mobile app? Allam confirmed: no \u2014 a guest books a product (e.g., a meeting room product, or an experience package), and the product's configuration determines which resources are associated and get booked; guests do not book raw resources directly."
+    },
+    {
+     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
+     "date": "2026-08-12",
+     "score": 1.66,
+     "paragraph": "Allam then walked through a set of reference finance-module screens built from the shared finance requirement/metric sheet, explicitly framed as a base for TICVAI's own UI/UX design rather than a template to copy exactly. The first screen set covered: a finance dashboard showing gross revenue, net revenue, recognized revenue, deferred revenue, and refunds (with graphical charts, selectable by period); a legal entities view listing all tenant sites with country, currency, and active/inactive status for multi-tenant setups; the chart of accounts (with external-system codes for ERP/third-party mapping, and classification into assets, liability, income, or expense); a chart-of-accounts hierarchy"
     }
    ]
   },
@@ -222,25 +226,25 @@
    "kind": "conflict",
    "ref": "CF-170",
    "name": "",
-   "text": "**Seventeen screens promise a publication their declared operations cannot perform, and five of them are a broken workflow rather than a naming defect.** Found by Claude Design 8 September, extending the rule package-wide from the nine already recorded. **Class B is the one to raise first: five screens can approve and cannot publish** \u2014 `BO-293` Membership Product Validation, `BO-353` Multi-Media Preview, `ADM-247` Versioning & Governance, `CMS-030` Privacy Configuration Testing and `CMS-050` Waiver Approval each declare only an `approve*` operation against a title ending in *Publication*. **An approval with nothing to release is a dead end in the workflow**, not a name to tidy: somebody signs off and the thing they signed off cannot go live. **Class A is eleven title-only screens** declaring a single `list*` \u2014 `BO-173`, `BO-193`, `BO-203`, `BO-213`, `BO-223`, `BO-233`, `ADM-085`, `ADM-143`, `ADM-227`, `ADM-307`, `CMS-033` \u2014 which is re-signature work and is why the six of them in the 8 September patch were correctly held rather than given `publishGate`. **Class C is one screen that monitors what it creates**: `ADM-115 Live Dynamic Price Execution & Deployment Monitor` declares `createLiveDynamicPrice`. **Class D is one false positive to exclude**: `ADM-029 Deployment Monitor` declares `startRollout`, `pauseRollout` and `rollbackRollout` and is a real deployment actor \u2014 the rule caught it because rollout control is not named `publish*`. **Each class needs a different remedy**, which is the reason for classing them: B needs operations added to contracts, A needs titles or operations decided, C needs one of the two names changed, D needs nothing. **Recommendation: take Class B first** \u2014 it is five contract additions against a workflow that currently cannot complete **Checked 8 September, and Class B is not five contract additions. Do not add the operations.** All five `approve*` operations carry `x-ticvai-provisional: true` and `tags: [drafted]`, and **every one of their summaries is verbatim the title of the screen that consumes it** \u2014 `approveMembershipProductValidation` summarises as *Membership Product Validation, Approval, Publication & Versioning*. Their own descriptions say so: *\"drafted from the workshop pack... a shape read out of a PDF has not been agreed with anyone who has to build it.\"* **So the approval step does not exist either** \u2014 the operation naming it is a provisional draft named after the screen, which is Class A's defect one layer down in the contracts. Adding five `publish*` siblings would invent agreed API surface on top of unagreed drafts. **The remedy is to de-provisionalise the five with someone who has to build them**, and the publication either falls out of that conversation or the titles were wrong. See CF-171 for the population this belongs to",
+   "text": "**Seventeen screens promise a publication their declared operations cannot perform, and five of them are a broken workflow rather than a naming defect.** Found by Claude Design 8 September, extending the rule package-wide from the nine already recorded. **Class B is the one to raise first: five screens can approve and cannot publish** \u2014 `BO-293` Membership Product Validation, `BO-353` Multi-Media Preview, `ADM-247` Versioning & Governance, `CMS-030` Privacy Configuration Testing and `CMS-050` Waiver Approval each declare only an `approve*` operation against a title ending in *Publication*. **An approval with nothing to release is a dead end in the workflow**, not a name to tidy: somebody signs off and the thing they signed off cannot go live. **Class A is eleven title-only screens** declaring a single `list*` \u2014 `BO-173`, `BO-193`, `BO-203`, `BO-213`, `BO-223`, `BO-233`, `ADM-085`, `ADM-143`, `ADM-227`, `ADM-307`, `CMS-033` \u2014 which is re-signature work and is why the six of them in the 8 September patch were correctly held rather than given `publishGate`. **Class C is one screen that monitors what it creates**: `ADM-115 Live Dynamic Price Execution & Deployment Monitor` declares `createLiveDynamicPrice`. **Class D is one false positive to exclude**: `ADM-029 Deployment Monitor` declares `startRollout`, `pauseRollout` and `rollbackRollout` and is a real deployment actor \u2014 the rule caught it because rollout control is not named `publish*`. **Each class needs a different remedy**, which is the reason for classing them: B needs operations added to contracts, A needs titles or operations decided, C needs one of the two names changed, D needs nothing. **Recommendation: take Class B first** \u2014 it is five contract additions against a workflow that currently cannot complete **Checked 8 September, and Class B is not five contract additions. Do not add the operations.** All five `approve*` operations carry `x-ticvai-provisional: true` and `tags: [drafted]`, and **every one of their summaries is verbatim the title of the screen that consumes it** \u2014 `approveMembershipProductValidation` summarises as *Membership Product Validation, Approval, Publication & Versioning*. Their own descriptions say so: *\"drafted from the workshop pack... a shape read out of a PDF has not been agreed with anyone who has to build it.\"* **So the approval step does not exist either** \u2014 the operation naming it is a provisional draft named after the screen, which is Class A's defect one layer down in the contracts. Adding five `publish*` siblings would invent agreed API surface on top of unagreed drafts. **The remedy is to de-provisionalise the five with someone who has to build them**, and the publication either falls out of that conversation or the titles were wrong. See CF-171 for the population this belongs to **Narrowed 20 September from seventeen screens to sixteen, by re-testing all of them against the current screen definitions.** **Class D is confirmed a false positive and is withdrawn**: `ADM-029 Deployment Monitor` declares twelve operations including `startRollout`, `pauseRollout` and `rollbackRollout`, and is a real deployment actor the rule caught only because rollout control is not named `publish*`. **Class B is confirmed still broken** \u2014 `BO-293`, `BO-353`, `ADM-247`, `CMS-030` and `CMS-050` each still declare exactly one operation and it is an `approve*`, so somebody signs off and the thing they signed off cannot go live. Five need contract work; the eleven of Class A need a title-or-operation decision, not an operation each.",
    "hits": [
     {
      "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
      "date": "2026-08-31",
-     "score": 1.646,
+     "score": 1.608,
      "paragraph": "Waiver versioning tracks template amendments over time; a mobile-optimized waiver view and an approval/testing/publication flow round out setup. Post-launch, a tracking dashboard shows per-participant completion status and delivery channel (email/WhatsApp/SMS), with minor/guardian handling and a verification workspace to check completeness and signatory validity, flagging missing, expired, or invalid waivers. Waivers can also be accessed via a QR code that opens the form directly."
     },
     {
      "mom": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
      "date": "2026-08-25",
-     "score": 1.517,
+     "score": 1.476,
      "paragraph": "AI-assisted draft: an AI wizard can ask the user what type of ticket they want to create and the relevant fields to capture, then auto-configure a draft ticket for review before approval and publish. Chinmay proposed extending this so the AI can also parse unstructured input (including OCR on images) and prompt the user for any missing details needed to complete the ticket \u2014 confirmed as a valid extension by Allam."
     },
     {
-     "mom": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
-     "date": "2026-09-08",
-     "score": 1.338,
-     "paragraph": "An AI intelligence layer sits across all the above dashboards, providing insights into why a metric changed (e.g., why revenue dropped on a given day) and recommending management actions based on sales, revenue, and attendance trends."
+     "mom": "TICVAI_MoM_2026-09-18_AI_Governance_ConfigAssistant_Forecasting_UX.docx",
+     "date": "2026-09-18",
+     "score": 1.445,
+     "paragraph": "Data/feature/evidence provenance shows what information contributed to a decision and where it came from; the candidate rule and decision path view connects an AI recommendation to the governance rule and any human override that changed the outcome (e.g., a manager overriding an AI-suggested price increase due to a configured price ceiling)."
     }
    ]
   },
@@ -251,74 +255,22 @@
    "text": "**Three places where the data model was built and no screen was ever written, and one where the reverse is true.** ADR-0041 turns 57 command centres into rows in `reporting.dashboard`, which needs **three or four authoring screens that do not exist**: a dashboard list separating mine from shared, an editor that adds a tile and binds it to a `report_definition`, a tile configuration panel for `visualisation`, `parameters` and `refresh_seconds`, and a viewer if the editor is not also one. Searching all 1,091 screen names for `widget`, `saved view`, `drag`, `layout editor` or `add a tile` returns **nothing**, while the tables, the four operations and a `tiles` array capped at 24 all exist. **Two further decisions ride on it**: the editor must surface `dashboard.aggregate_cost` and `report_definition.estimated_cost`, because 24 tiles on a short refresh is a performance incident nobody was warned about; and there is no `deleteDashboard` \u2014 `list`, `create`, `get`, `update` and nothing else \u2014 so a soft or hard delete has to be chosen where `is_shared` is true. **The same shape appears twice more, from the other side**: `seatp` has 13 boards and 130 screens of seat-map authoring with no package counterpart at all \u2014 no `canvas`, `section`, `suite` or `seating chart` screen exists against a `seating` schema of 14 tables \u2014 and `crm` has a Guest Directory, Activity Timeline and Corporate & Groups the package never specified. **Design that exists and specs that do not, next to specs that exist and screens that do not.** Recommendation: take the four dashboard screens as the first tranche, since the contract and DDL are already there and it unblocks deleting 57",
    "hits": [
     {
-     "mom": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
-     "date": "2026-09-08",
-     "score": 1.349,
-     "paragraph": "Sales, finance, operations and CRM boards"
-    },
-    {
      "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
      "date": "2026-08-21",
-     "score": 1.322,
+     "score": 1.419,
      "paragraph": "Action: Chinmay's team to confirm how the seat map builder will consolidate the reference tool's multiple configuration screens (canvas, standing zone, suite, best-seats, entrance/exits) into one unified screen."
     },
     {
-     "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
-     "date": "2026-08-20",
-     "score": 1.278,
-     "paragraph": "Allam walked through the reference CRM's guest dashboard (active/inactive/duplicate profile counts, lifetime value), guest directory/search, and customer segmentation by source (individual, corporate, group, travel agent, OTA)."
-    }
-   ]
-  },
-  {
-   "kind": "conflict",
-   "ref": "CF-168",
-   "name": "",
-   "text": "**A region may now hold more than one Postgres instance, and nothing decides which one a new tenant lands on.** ADR-0040 removed the ceiling by letting a cell add an instance, and left two things open that only a person can settle. **First, the trigger**: sustained concurrent server connections is the signal, but not the number \u2014 too low and a region grows hosts it does not need, too high and the first symptom is a Saturday evening. **Second, placement**: fullest-first packs tenants and leaves the last instance underused; emptiest-first spreads them and makes every instance equally busy; pinned lets a client buy a quiet neighbour and is the one a sales conversation will ask for. They diverge on the day a tenant grows, which is the day the choice is expensive to change. **Blocked behind this: `control.cell_instance` and an `instance_id` on `control.cell_tenant`** \u2014 without them a database name is not an address and the router cannot find a tenant on the second instance. **Recommendation: emptiest-first with a pin override.** It is the only one that degrades gently, and the pin is what a dedicated client is actually buying **Decided 8 September by [ADR-0042](../adr/0042-when-a-region-grows-and-where-a-tenant-lands.md), and it stays open on one number.** The recommendation is taken: placement is emptiest-first with a pin, where *emptiest* is **peak concurrent server connections over the trailing 7 days as a fraction of that instance's own `max_connections`** \u2014 not a count of databases, which would place a tenant onto the host with ten quiet neighbours and away from the one with three busy ones. The schema gap is closed with it: `control.cell_instance` exists and `cell_tenant.instance_id` is **required from the first row**, while every region still has one instance, because a column populated only once there are two is a column every reader guesses about \u2014 and the guess is wrong exactly once, on the first region that grows. **The trigger's shape is decided and its threshold is not**: add an instance when peak connections hold at or above **70%** of `max_connections` on three days in a rolling seven, at least two non-consecutive \u2014 three-in-seven separates a level that has moved from a concert, and a single five-minute period above 90% pages rather than provisions. **The 70% is the sign-off**: 89% is one busy tenant from exhaustion and adding an instance is a host, a template, a fan-out and a move, so the gap between the two is the runway, and how much runway to buy is a judgement rather than arithmetic",
-   "hits": [
-    {
-     "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
-     "date": "2026-08-24",
-     "score": 1.906,
-     "paragraph": "Confirmed: multiple databases can run on a single database server instance (e.g., separate DB instances within one SQL Server/Postgres/AWS RDS instance) \u2014 this does not require separate physical servers."
+     "mom": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+     "date": "2026-09-08",
+     "score": 1.416,
+     "paragraph": "Raised (Chinmay): explained that established BI tools (Power BI, Zoho) offer a large, well-defined catalog of prebuilt components (charts, tables, status/validation widgets) within a bounded canvas (e.g., single-page dashboards composed of configurable blocks). Since dashboard scope can otherwise expand indefinitely, he asked for a precise, itemized document specifying exactly which chart types, table components, status/rule widgets, and page/board limits TICVAI's dashboard designer should support at launch \u2014 noting the requirement matrix doesn't currently spell this out in enough detail (a keyword search for \u201ccustomize\u201d didn't surface it)."
     },
     {
-     "mom": "TICVAI_MoM_31Jul2026__1_.docx",
-     "date": "2026-07-31",
-     "score": 1.455,
-     "paragraph": "Qossai shared a cautionary example: a previous client site with poor internet connectivity ran an online-first architecture without a local database, which caused tickets to intermittently fail to reach the server. Allam acknowledged that some sites do rely on 4G SIM connections with weaker connectivity, though Qossai noted such cases are relatively rare compared to the overall client base, and suggested giving clients the choice between approaches. Chinmay agreed a comparative case study was warranted and committed to including a pros/cons comparison of online-first vs. offline-first architecture \u2014 particularly for POS \u2014 alongside the HLD/LLD diagrams he is preparing. He also proposed a mid"
-    },
-    {
-     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
-     "date": "2026-08-12",
-     "score": 1.359,
-     "paragraph": "Allam then walked through cash/shift (\"till\") management: a shift/session view showing open and closed sessions per workstation, expected cash and card totals, and a \"blind\" cash-out process where a cashier does not see their expected total when closing out (only their float plus sales should reconcile against what they physically deposit) \u2014 with the system flagging any shortage or overage for supervisor review, and optionally blocking shift closure entirely until the discrepancy is resolved or explained. Shift closure requires supervisor authorization, generates a denomination-itemized closing receipt, and triggers automatic email of the closing report to finance/leadership. A live till mon"
-    }
-   ]
-  },
-  {
-   "kind": "conflict",
-   "ref": "CF-167",
-   "name": "",
-   "text": "**The control plane holds personal data before a tenant exists, and it is also the thing that sits above every region.** Two sources want it in two places. `control.onboarding_application` carries `company_name`, `contact_email`, `contact_phone` and `country_code` \u2014 **a prospect's contact details, recorded before there is a tenant to own them** \u2014 which under a residency commitment belongs in the prospect's jurisdiction. ADR-0010 \u00a71 puts the Guest Link Registry *\"in the Control Plane, pseudonymous only\"* and orchestrates cross-region redemption *\"from the Control Plane by `guestLinkId`, fanning out to each linked cell\"* \u2014 **which needs one control plane above all regions, not one inside each.** ADR-0038 made residency structural by giving each region its own Postgres instance, and ADR-0039 gives the control plane a database of its own without saying how many of them there are. **A decision unblocks the provisioning script**, which has to connect to a control database by name, and the `control.cell` relation, which either lists every region's cells or only its own. **Recommendation: split on personal data, which is the line ADR-0023 and ADR-0010 already draw.** One global control plane holding what must be global and carries no personal data \u2014 the cell registry, placement, releases, licences, the pseudonymous Guest Link Registry \u2014 and a regional control database for anything with a natural person in it, onboarding applications first. The cost is one more database per region and a `control` schema that is read from two places; the alternative is either a prospect's phone number in the wrong country or a cross-region registry that cannot see across regions **Decided 8 September by [ADR-0043](../adr/0043-the-control-plane-splits-on-personal-data.md). Closed.** The recommendation is taken and **it is far cheaper than this entry assumed**: counting the columns rather than arguing from the shape, **only three of the 50 `control` tables carry a natural person inline** \u2014 `onboarding_application` (`contact_email`, `contact_phone`), `developer_account` (`contact_email`) and `tenant` (`billing_email`). The schema was already careful: `control.partner_user` holds a `principal_id` and not a name, which is the pattern the decision generalises. So `control` stays global with 47 tables including the cell registry and the pseudonymous Guest Link Registry, and a `control_regional` per region takes `onboarding_application` whole plus two extracted columns. **The rule, not the list, is the decision**: a table goes regional when its *subject* is a natural person, and otherwise stays global with the personal column extracted \u2014 moving every table that merely contains personal data would take `tenant` with it, and a tenant record in one region is a platform that cannot see its own customers. **The cost is one instance outside every region**, because a global control plane hosted inside a region turns that region's outage into a platform outage",
-   "hits": [
-    {
-     "mom": "TICVAI_MoM_2026-08-14.docx",
-     "date": "2026-08-14",
-     "score": 2.542,
-     "paragraph": "Chinmay raised a scenario around cross-region validity (e.g., a membership pass purchased in one region needing to work across other regions/countries, drawing an analogy to a globally valid F1 season pass). Allam explained that for a single client operating within one jurisdiction (e.g., Miral Experiences in the UAE), all venues/tenants share a single centralized database, distinguished by venue/site ID, even as new venues are added within that region. If a client's new venue falls under a different jurisdiction with data-residency requirements (e.g., a Qatar venue with local data-hosting law), a separate, isolated database would be created for that region, and cross-region-valid entitlemen"
-    },
-    {
-     "mom": "TICVAI_MoM_31Jul2026__1_.docx",
-     "date": "2026-07-31",
-     "score": 1.596,
-     "paragraph": "Dinesh raised the need for heavy replication to support both scaling and disaster recovery (DR) across regions. Allam clarified DR would be an optional, tenant-selectable module rather than a default for all clients, since it carries additional cost \u2014 some tenants may be comfortable keeping data within a single region (e.g., UAE only) without DR. Dinesh noted that even without DR, read replicas would likely be needed to support scalable architecture, implying eventual consistency rather than strict consistency, alongside liveliness checks/observability so a standby system can take over if a component fails."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-09-09_Rental_POS_Licensing.docx",
-     "date": "2026-09-09",
-     "score": 1.473,
-     "paragraph": "Revise the POS prototype incorporating today's feedback (cashier login, denomination images/manual entry, inline link-to-sale search, discount placement, simplified split payment, refund notes field) and share for further review"
+     "mom": "TICVAI_MoM_2026-09-21_AI_Recommendation_CorePlatform_Fraud.docx",
+     "date": "2026-09-21",
+     "score": 1.317,
+     "paragraph": "Confirmed: AI recommendations never override hard business rules or configured eligibility constraints \u2014 business rules always take precedence."
     }
    ]
   },
@@ -326,77 +278,25 @@
    "kind": "conflict",
    "ref": "CF-162",
    "name": "",
-   "text": "**Three deployment scenarios were requested and the package models one.** The 24 August session asks Softlabs to document (a) independent tenant deployment, (b) centralized/shared platform for small-to-medium tenants, (c) **dedicated infrastructure for large/mega events and flash sales** \u2014 each with an architecture diagram, auto-scaling behaviour and failure handling. **ADR-0001 models one cell per jurisdiction and nothing else.** (a) and (b) are variations on it; **(c) is new and nothing in the package describes it** \u2014 a short-lived environment standing up for one sale, taking tens of thousands of concurrent users within hours, then going away. **That is not a cell.** It has no tenancy of its own, it reads a catalogue it does not own, and its orders have to land in the permanent platform afterwards. **The reconciliation path back is the part with no design**, and it is the same shape as the offline sync problem one layer up.",
+   "text": "**Three deployment scenarios were requested and the package models one.** The 24 August session asks Softlabs to document (a) independent tenant deployment, (b) centralized/shared platform for small-to-medium tenants, (c) **dedicated infrastructure for large/mega events and flash sales** \u2014 each with an architecture diagram, auto-scaling behaviour and failure handling. **ADR-0001 models one cell per jurisdiction and nothing else.** (a) and (b) are variations on it; **(c) is new and nothing in the package describes it** \u2014 a short-lived environment standing up for one sale, taking tens of thousands of concurrent users within hours, then going away. **That is not a cell.** It has no tenancy of its own, it reads a catalogue it does not own, and its orders have to land in the permanent platform afterwards. **The reconciliation path back is the part with no design**, and it is the same shape as the offline sync problem one layer up. **Narrowed 20 September to the reconciliation path, which still has no design.** The environment's shape is settled by [ADR-0047](../adr/0047-how-long-data-is-kept-and-where-it-goes-next.md): a burst environment is a pinned `control.cell_instance` with `role: burst`, no `cell_tenant` of its own and a read-only catalogue replica. **It is never placed onto and never enters another instance's placement metric** \u2014 a flash sale that joined the trailing average would poison a region's placement for a week after it ended. Its data retention is `reconciled + 30 days` rather than a lifetime, so it is auditable like every other retention in the package.",
    "hits": [
     {
      "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
      "date": "2026-08-24",
-     "score": 5.278,
+     "score": 5.383,
      "paragraph": "Requested: the client asked Softlabs to document three illustrative deployment scenarios \u2014 (a) independent tenant deployment, (b) centralized/shared platform for small-to-medium tenants, and (c) dedicated infrastructure for large/mega events and flash sales \u2014 each with an architecture diagram, auto-scaling behavior and failure-handling response."
     },
     {
      "mom": "TICVAI_MoM_2026-08-14.docx",
      "date": "2026-08-14",
-     "score": 1.281,
+     "score": 1.636,
      "paragraph": "Chinmay raised a scenario around cross-region validity (e.g., a membership pass purchased in one region needing to work across other regions/countries, drawing an analogy to a globally valid F1 season pass). Allam explained that for a single client operating within one jurisdiction (e.g., Miral Experiences in the UAE), all venues/tenants share a single centralized database, distinguished by venue/site ID, even as new venues are added within that region. If a client's new venue falls under a different jurisdiction with data-residency requirements (e.g., a Qatar venue with local data-hosting law), a separate, isolated database would be created for that region, and cross-region-valid entitlemen"
     },
     {
      "mom": "TICVAI_MoM_31Jul2026__1_.docx",
      "date": "2026-07-31",
-     "score": 1.213,
+     "score": 1.442,
      "paragraph": "To illustrate the scale difference, Qossai gave two contrasting examples: a stadium such as Real Madrid's (~60,000 seats) could sell out within a few hours of tickets going live for a major event, generating extremely high concurrent load, whereas a client like a water park or museum might see a maximum of around 2,000 visitors per day \u2014 a much lower and steadier load (roughly five people per minute). The system therefore needs a plan that can fit both extremes without over- or under-provisioning either type of client, which points to an auto-scaling architecture rather than a fixed one. Dinesh summarized this back as an auto-scaling architecture requirement, which Qossai confirmed."
-    }
-   ]
-  },
-  {
-   "kind": "conflict",
-   "ref": "CF-163",
-   "name": "",
-   "text": "**`openDated` was missing from `ProductKind` and it is one of six main ticket types the client draws.** The *Create Ticket Flow* board names Open Dated, Group/Family, Membership/Subscription, Event, Gift Voucher and Money Card. Five had a kind; **open dated \u2014 valid on any date within an eligible range \u2014 had none.** The mechanism existed all along: `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which **is** an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it. **Added 24 August. The reason it matters is that `datedAdmission` was absorbing it**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*, and **a guest sold the first when they bought the second has the wrong ticket.**",
-   "hits": [
-    {
-     "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
-     "date": "2026-08-24",
-     "score": 2.982,
-     "paragraph": "Ticket configuration will support six core ticket types \u2014 Open-Dated, Group/Family, Membership/Subscription, Event, Gift Voucher, and Money Card \u2014 each with independently configurable guest-data capture."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
-     "date": "2026-08-25",
-     "score": 1.312,
-     "paragraph": "Ticket type deep-dive \u2014 open-dated, dated/special-day, time-slot (performance-based), multi-day, membership/pass, and camping/lesson-based tickets"
-    },
-    {
-     "mom": "TICVAI_MoM_2026-09-02_AccessControl.docx",
-     "date": "2026-09-02",
-     "score": 1.143,
-     "paragraph": "Validity and calendar rules define the date range a ticket is valid for, plus configurable blockout dates (e.g., certain tickets excluded from use on public holidays or special event days); an entitlement consumption engine tracks how many entries a ticket has used against its allowance and blocks further use once exhausted."
-    }
-   ]
-  },
-  {
-   "kind": "conflict",
-   "ref": "CF-164",
-   "name": "",
-   "text": "**The F&B, Retail, Procurement and Inventory workshop is outstanding in three consecutive MoMs and one session was filed under its name having covered none of it.** The 20 August minute says so directly: *\"This recording is filed under 'F&B, Retail, Procurement & Inventory,' but the session actually covered CRM, marketing automation, loyalty/wallet, RBAC and CMS/white-label configuration.\"* **It appears as an open action on 20, 21 and 24 August.** The package absorbed three F&B design packs and built 96 operations against them without the workshop ever happening \u2014 **which is why the counter-service gap existed**: six client F&B boards, none of them a counter till, and nobody in a room to say whether the client runs counter service at all. **The build ran ahead of the conversation and the conversation has not caught up.**",
-   "hits": [
-    {
-     "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
-     "date": "2026-08-20",
-     "score": 4.452,
-     "paragraph": "Note: This recording is filed under \u201cF&B, Retail, Procurement & Inventory,\u201d but the session actually covered CRM, marketing automation, loyalty/wallet, RBAC and CMS/white-label configuration \u2014 no F&B, retail, procurement or inventory content was discussed. This MoM reflects the content actually covered; the F&B/Retail/Procurement/Inventory workshop remains outstanding (see Open Items)."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
-     "date": "2026-08-21",
-     "score": 2.175,
-     "paragraph": "F&B, Retail, Procurement & Inventory workshop \u2014 not covered in this session (second consecutive session filed under this name without matching content); remains outstanding."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
-     "date": "2026-09-08",
-     "score": 1.349,
-     "paragraph": "Sales, finance, operations and CRM boards"
     }
    ]
   },
@@ -404,77 +304,25 @@
    "kind": "conflict",
    "ref": "CF-165",
    "name": "",
-   "text": "**Consent, retention and archival were walked in the 20 August CRM session and the package has consent only.** `recordConsent` exists, CF-160 settled that a merge takes the narrower of two consents, and `pii` is separate from `identity` so a subject-access export is answerable. **Retention and archival are not modelled anywhere.** The session covered *\"consent policy, data privacy and retention/archival\"* as one topic; the package treats the first two as solved and **has no operation, no column and no policy for how long a guest profile is kept or what happens to it afterwards.** CF-64 counts 89 retention requirements against two stated periods \u2014 **this is the same hole seen from the CRM side rather than the infrastructure side**, and the two registers have not been read against each other.",
+   "text": "**Consent, retention and archival were walked in the 20 August CRM session and the package has consent only.** `recordConsent` exists, CF-160 settled that a merge takes the narrower of two consents, and `pii` is separate from `identity` so a subject-access export is answerable. **Retention and archival are not modelled anywhere.** The session covered *\"consent policy, data privacy and retention/archival\"* as one topic; the package treats the first two as solved and **has no operation, no column and no policy for how long a guest profile is kept or what happens to it afterwards.** CF-64 counts 89 retention requirements against two stated periods \u2014 **this is the same hole seen from the CRM side rather than the infrastructure side**, and the two registers have not been read against each other. **Decided 20 September by [ADR-0047](../adr/0047-how-long-data-is-kept-and-where-it-goes-next.md) and not yet built**, which is why it stays open \u2014 the rule CF-135 set is decided *and* built. The archive is a separate instance rather than a tablespace, so archived personal data is not one query mistake from an operational read. **Derived stores purge at archive, not at erasure**: a knowledge base still answering from an archived profile is an archive that did not happen, and nothing cascades between Postgres and Qdrant. Five contract changes are named and ordered; `pii.subject` already carries `is_erased`, `erased_at` and `erasure_request_id`, so erasure is already a tombstone \u2014 **but no erase operation exists**, and `ai.yaml` names `pii.erase_subject` as the erasure path.",
    "hits": [
     {
      "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
      "date": "2026-08-20",
-     "score": 3.06,
+     "score": 2.96,
      "paragraph": "Consent policy, data privacy and retention/archival"
-    },
-    {
-     "mom": "TICVAI_MoM_2026-09-02_AccessControl.docx",
-     "date": "2026-09-02",
-     "score": 1.486,
-     "paragraph": "Review an existing client's live privacy policy (referenced venue-group app) as a reference for face-data retention tiers and consent language"
-    },
-    {
-     "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
-     "date": "2026-09-01",
-     "score": 0.91,
-     "paragraph": "To walk through the pricing engine in full detail (structure, rules, taxes, governance, dynamic pricing and AI forecasting), followed by ticket upgrade configuration, media/credential and wallet setup, order and reservation management, privacy/consent and cookie handling, and a deeper follow-up on the resale marketplace approach introduced the previous day \u2014 alongside a parallel discussion on infrastructure sizing benchmarks."
-    }
-   ]
-  },
-  {
-   "kind": "conflict",
-   "ref": "CF-166",
-   "name": "",
-   "text": "**Seat map reuse and comparison \u2014 three of four gaps closed, and the fourth was never a gap.** The 21 August decision reads: *\"full and partial (section-level) copy-paste between seat maps, and a layout version-comparison view\"*, plus *\"AI-assisted import (PDF/image + Excel/CSV)\"*.",
-   "hits": [
-    {
-     "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
-     "date": "2026-08-21",
-     "score": 5.233,
-     "paragraph": "Decision: the platform will support both manual seat map building and AI-assisted import (PDF/image + Excel/CSV), plus full and partial (section-level) copy-paste between seat maps, and a layout version-comparison view showing seat-count/configuration differences."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
-     "date": "2026-08-20",
-     "score": 1.336,
-     "paragraph": "Static list import (CSV/Excel) supports migrating historical customer/segment data during onboarding."
-    },
-    {
-     "mom": "TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
-     "date": "2026-08-07",
-     "score": 0.911,
-     "paragraph": "Report templates can be custom-built by advanced users with SQL/scripting knowledge, and exported in PDF or Excel format. Ticket and receipt document layouts are designed via a drag-and-drop template builder, placing dynamic variables (e.g., guest name, ticket number, QR code) onto a background image/layout \u2014 demonstrated using an existing venue's ticket template."
-    }
-   ]
-  },
-  {
-   "kind": "conflict",
-   "ref": "CF-64",
-   "name": "",
-   "text": "**89 retention requirements, two stated periods \u2014 and RPO/RTO is a narrower question than it looked.** Only 4.3.4 (10 years, payment) and 6.1.78 (7 years) name a period; the other 87 say \"configurable\". **Refined 17 Aug after counting the DR sheet (CF-60):** requirements 11 and 12 ask the platform to support **configurable** RPO and RTO, not to hit a number. That does not remove the question \u2014 **a configurable RPO still needs a floor**, and offering one near zero requires synchronous replication and a second site, which is a topology decision made once. **What is needed is the tightest RPO any tenant may buy**, not the RPO for Miral. A smaller and more answerable question than this row has carried since 6 August",
-   "hits": [
-    {
-     "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
-     "date": "2026-08-20",
-     "score": 1.377,
-     "paragraph": "Decision: data retention/archival periods (e.g., 3\u20135 years of \u201clive\u201d data before archival) will be configurable per tenant/venue at setup time, with a system default that administrators can override."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-08-14.docx",
-     "date": "2026-08-14",
-     "score": 0.903,
-     "paragraph": "Chinmay raised a scenario around cross-region validity (e.g., a membership pass purchased in one region needing to work across other regions/countries, drawing an analogy to a globally valid F1 season pass). Allam explained that for a single client operating within one jurisdiction (e.g., Miral Experiences in the UAE), all venues/tenants share a single centralized database, distinguished by venue/site ID, even as new venues are added within that region. If a client's new venue falls under a different jurisdiction with data-residency requirements (e.g., a Qatar venue with local data-hosting law), a separate, isolated database would be created for that region, and cross-region-valid entitlemen"
     },
     {
      "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
      "date": "2026-08-12",
-     "score": 0.896,
-     "paragraph": "The second screen set covered the financial transactions ledger: a list of all system transactions with daily counts and totals, a pending/failed sync status for transactions awaiting an external system integration, and a transaction detail view showing chart-of-account mapping, payment method, product-level detail, and whether a given line sits in sale, deferred, or redemption status. A journal entry list showed all posted debit/credit entries, alongside a manual journal entry capability (for cases such as manually booking revenue) and an approval workflow \u2014 a finance user posts a voucher, a finance manager/director reviews and approves it, and only then does it hit the ledger."
+     "score": 1.494,
+     "paragraph": "Chinmay raised the AI financial-assistant component and the plan to use a vector database, expressing concern that Postgres's native vector capability may not be sufficient at the expected data volume, and proposing Qdrant as an alternative \u2014 subject to confirming it satisfies UAE compliance requirements, to avoid discovering a limitation only after reaching production. Allam confirmed this was timely, as he has a meeting scheduled with the Dubai Compliance Authority on Friday and needs a list of the specific components/services planned for the AWS/Azure infrastructure (e.g., PostgreSQL as the database) in order to raise and validate them with the authority."
+    },
+    {
+     "mom": "TICVAI_MoM_2026-09-21_AI_Recommendation_CorePlatform_Fraud.docx",
+     "date": "2026-09-21",
+     "score": 1.472,
+     "paragraph": "Conversational context/session intelligence lets the assistant remember what's being discussed across a conversation (e.g., understanding a follow-up \u201ccompare that to this week\u201d after an initial attendance query); knowledge quality/freshness/feedback flags gaps where no relevant policy exists for a query (e.g., a new product with no configured rescheduling policy yet); assistant testing validates a new version before release."
     }
    ]
   },
@@ -485,21 +333,21 @@
    "text": "**The delivery plan prices 7,552 person-days and its priorities contradict the dependency order the walk found.** `sources/planning/TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx` had never entered the package either \u2014 23 epics, 445 features, 2,173 tasks, a milestone plan, a dependency matrix and a Jira import, covering 3,332 requirements. **It is a good document and two things in it need reconciling.** **(1) Resource Management is P3 \u2014 Could, at 63 matrix requirements**, and it is the single most-depended-on gap in the walk: CF-125 is cited by rows in five domains, and rentals, lockers, cabanas, instructor assignment, event resourcing, maintenance resource planning and 7.6's fifteen-row rental module all sit behind it. **A P3 prerequisite blocks every P1 that needs it.** **Access Control System is also P3 at 114 requirements**, which reads as a scoring artefact rather than a judgement \u2014 `access` is one of the best-covered contracts in the package and gate entry is the operational core. **(2) The plan splits one module across three priorities** \u2014 Notifications and Messaging appears at P1, P2 and P3; Loyalty at P1, P2 and P3; Portfolio at P1, P2 and P3; Digital Waivers at P1 and P2 \u2014 so a module is partly must-have and partly could-have, which is not a schedulable statement. **The plan's own *Missing Components* sheet independently reaches several of the walk's conclusions** \u2014 ABAC policy engine (CF-130), central monitoring and alerting (CF-134), a single notification service (BL-052), developer portal and OpenAPI docs (CF-135), performance budget (BL-098) \u2014 and marks **DevOps/IaC and CI/CD as outright MISSING**, which matches the package holding no SQL, no code and no Sprint 0. **Recommendation: re-derive priority from the dependency matrix rather than from requirement counts**, and reconcile against the 178 backlog entries before the plan is used to schedule anything **Deferred to the reconciliation \u2014 Chinmay, 18 August.** Finished once the milestone-to-wave reconciliation is done. **Resource Management's P3 rating is already resolved**: CF-125 puts it in scope, which was half of this conflict.",
    "hits": [
     {
-     "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
-     "date": "2026-08-26",
-     "score": 1.766,
-     "paragraph": "Confirmed: a guest always books a product or package \u2014 never a resource directly, and never a specific room/vehicle/instructor by itself \u2014 across all sales channels. The product's configuration determines which resources are associated and get booked behind the scenes."
+     "mom": "TICVAI_MoM_2026-09-17_AssetMgmt_Sandbox_API.docx",
+     "date": "2026-09-17",
+     "score": 1.716,
+     "paragraph": "To walk through two modules \u2014 asset management & safety (asset registry, preventive/corrective maintenance, safety incidents, spare parts, resourcing and analytics) and the developer sandbox/API management platform (developer portal, credentials, gateway security, monitoring and lifecycle) \u2014 completing essentially all core scope of work ahead of AI-focused sessions, plus a live, detailed feedback walkthrough of the guest web app prototype."
     },
     {
-     "mom": "TICVAI_MoM_2026-09-11_DAM_Gaming.docx",
-     "date": "2026-09-11",
-     "score": 1.427,
-     "paragraph": "Scope status (Allam/Qossai): with digital asset management and gaming now covered, essentially all core/conventional modules are complete except device management, maintenance/safety management (both scheduled next), and the AI-related components and developer sandbox/API management (deferred further)."
+     "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+     "date": "2026-08-26",
+     "score": 1.698,
+     "paragraph": "Confirmed: a guest always books a product or package \u2014 never a resource directly, and never a specific room/vehicle/instructor by itself \u2014 across all sales channels. The product's configuration determines which resources are associated and get booked behind the scenes."
     },
     {
      "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
      "date": "2026-08-12",
-     "score": 1.41,
+     "score": 1.445,
      "paragraph": "Chinmay outlined the broader billing/fees/reporting/ERP scope: subscription and membership billing, fee management, financial reporting, payment gateway management, payment device management, and ERP integration (the latter planned for phase two, consistent with the currently limited/agreed integration scope). The taxation model discussed in item 7 will also sit within this area and will be covered in a separate, dedicated workshop. Allam added that payment gateway integrations (Stripe, Network International) must be full end-to-end integrations that consume all relevant APIs \u2014 not just the \"happy path.\" He gave two examples: (a) a payment inquiry API to check whether a payment actually succ"
     }
    ]
@@ -513,19 +361,19 @@
     {
      "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
      "date": "2026-08-12",
-     "score": 2.352,
+     "score": 2.548,
      "paragraph": "VAT will be calculated per line item (not on the total basket), with configurable support for tax-on-tax (compound tax) and multi-country tax structures, inclusive or exclusive of discounts."
     },
     {
      "mom": "TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
      "date": "2026-08-07",
-     "score": 2.336,
+     "score": 2.523,
      "paragraph": "Tax configuration must support compound tax (tax-on-tax) calculation, in addition to standard inclusive/exclusive handling"
     },
     {
      "mom": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
      "date": "2026-08-25",
-     "score": 1.511,
+     "score": 1.654,
      "paragraph": "Confirm VAT/tax treatment for donation contributions and whether a taxation-module configuration is required"
     }
    ]
@@ -539,20 +387,20 @@
     {
      "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
      "date": "2026-09-01",
-     "score": 2.363,
+     "score": 2.18,
      "paragraph": "Cookie policy management supports a configurable consent banner (accept/reject) per website, with certain cookies flagged as mandatory (non-rejectable) and others optional, templated and configurable within the system."
+    },
+    {
+     "mom": "TICVAI_MoM_2026-09-18_AI_Governance_ConfigAssistant_Forecasting_UX.docx",
+     "date": "2026-09-18",
+     "score": 1.648,
+     "paragraph": "Acknowledged (Chinmay): agreed a persistent backend profile must be maintained even for guests who never formally register, and noted browser-level identifiers (cookies) could supplement this, though a durable backend identifier (email or phone) remains necessary."
     },
     {
      "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
      "date": "2026-08-10",
-     "score": 1.565,
+     "score": 1.604,
      "paragraph": "Font & layout guardrails (open question raised): Chinmay flagged that unrestricted custom fonts/sizes could break layouts (e.g., cursive/bold fonts overflowing banner or description components). Agreed that size/format restrictions and pixel limits (e.g., banner image \u2264 1024px) are needed, with validation on upload and an explanatory note shown to the tenant admin."
-    },
-    {
-     "mom": "TICVAI_MoM_31Jul2026__1_.docx",
-     "date": "2026-07-31",
-     "score": 1.542,
-     "paragraph": "Allam proposed an AI-assisted workflow: source text is entered in English, machine-translated into the target language, and then reviewed/validated by the tenant's own team via the back office/CMS before publishing \u2014 noting that translation is typically owned by the tenant since they understand their own brand voice and marketing style best. This should apply consistently everywhere text appears: the website, the point-of-sale interface (e.g., Arabic-only product names/menus for certain regions), and the mobile app."
     }
    ]
   },
@@ -560,51 +408,25 @@
    "kind": "conflict",
    "ref": "CF-35",
    "name": "",
-   "text": "**Biometric data is sensitive under PDPL** \u2014 heightened protection, explicit consent, DPIA, stricter transfer rules. Affects Face Pass, facial readers and fingerprint enrolment. Not previously flagged; the current design treats biometrics as ordinary identity data",
+   "text": "**Biometric data is sensitive under PDPL** \u2014 heightened protection, explicit consent, DPIA, stricter transfer rules. Affects Face Pass, facial readers and fingerprint enrolment. Not previously flagged; the current design treats biometrics as ordinary identity data. **A deviation was built on 21 September and is recorded here rather than discovered in UAT.** 3.2.44 describes Face Tag and states that it *\"does not require the customer to explicitly sign a consent form\"*. **BL-106 built it requiring explicit consent anyway.** **PDPL Article 4 admits no legitimate-interests basis** \u2014 its exceptions are an exhaustive list \u2014 so there is no lawful route to a consent-free biometric capture \u2014 a short life shortens what the consent is *for* and does not remove the need for it. **This is CF-130's shape**: a requirement asking for something the law does not allow, built the lawful way, with the difference written down. **What counsel needs to confirm is the form rather than the principle** \u2014 whether a notice acknowledged at a counter satisfies *explicit* for a same-visit tag, or whether a signature is required, because the first is operable at a gate and the second is not. `VenueSettings.biometrics` already makes the venue name a DPIA and acknowledge a consent notice before any of it can be switched on. **This conflict stays open on that one question** \u2014 the functionality is built and the principle is settled; what is outstanding is the form of consent counsel will accept at a gate.",
    "hits": [
     {
      "mom": "TICVAI_MoM_2026-09-02_AccessControl.docx",
      "date": "2026-09-02",
-     "score": 1.782,
+     "score": 2.622,
      "paragraph": "Facial recognition \u2014 Face Pass, Face Tag and enrollment"
     },
     {
-     "mom": "TICVAI_UIUX_MoM_03Aug2026.docx",
-     "date": "2026-08-03",
-     "score": 0.294,
-     "paragraph": "Aishwarya More sought clarification on scope, asking whether the earlier-shared reference link was for the customer-facing (B2C) side while today's demo was the cashier/admin-facing POS. Allam and Qossai clarified that both the current demo and the earlier link were cashier-facing POS interfaces \u2014 not a back-office configuration panel \u2014 and that the previously shared PDF was AI-generated inspiration material for color and theming only, not a literal design to follow."
+     "mom": "TICVAI_MoM_31Jul2026__1_.docx",
+     "date": "2026-07-31",
+     "score": 1.359,
+     "paragraph": "Chinmay walked through the team's current thinking on ticket validation, noting the architecture has largely been settled: validation must work completely offline, and should optionally integrate local BLE (Bluetooth) verification \u2014 requiring Bluetooth to be enabled on the validating device \u2014 as a way of confirming the staff member is physically present at the entry gate while scanning. This BLE requirement would be configurable, since not all venues will need it."
     },
     {
-     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
-     "date": "2026-08-12",
-     "score": 0.248,
-     "paragraph": "Chinmay walked through the deferred revenue and ledger posting flow: placing an order has no ledger impact; capturing payment triggers VAT calculation and receivables recognition, with the liability carried in the second ledger and reported by visit date. Ticket revenue is only recognized (moved into the primary ledger) once the visit/redemption occurs \u2014 refunds are deliberately excluded from the primary ledger until fully resolved, since including them earlier would complicate later corrections; revenue is instead held in a separate ledger until the visit date to allow refunds or transfers to be cleanly managed. Allam noted the revenue recognition rules should follow the document Qossai had"
-    }
-   ]
-  },
-  {
-   "kind": "conflict",
-   "ref": "CF-21",
-   "name": "",
-   "text": "**Three domains have no contract and no workshop scheduled** \u2014 Developer & API (94), Device Management (60), Accreditation (58). **212 requirements, and the only blocked work left on the project.** Packs prepared 17 August (`docs/active/workshop-packs.md`) so each is an hour reviewing a proposal rather than a discovery session. **Two are less blocked than the label suggests:** Device Management is a lifecycle over `platform.device`, which already carries 20 device kinds and a heartbeat \u2014 mechanical, one real blocker in CF-33's vendor SDKs. **Accreditation is an entitlement**: admission profiles already do zone and time-bounded access, `MediaKind` already covers QR, NFC, RFID and printed, and the blacklist already revokes \u2014 what is missing is the application and review front half, ~25 operations, **not a parallel access system**. Only Developer & API needs the conversation first, because **until \"is the API a product\" is answered the other five questions cannot be**. **Accreditation first \u2014 it is Wave 1 and its validation appears on the scanner** **Split three ways \u2014 Chinmay, 18 August.** **Device Management closes on the device list** (CF-136). **Developer & API needs no workshop** \u2014 the four questions are separable and CF-135 carries them. **Accreditation still needs a session.** So one workshop remains, not three.",
-   "hits": [
-    {
-     "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
-     "date": "2026-09-01",
-     "score": 1.368,
-     "paragraph": "Discussed (Chinmay): confirmed that a native Apple-certified NFC pass would work with any compatible reader, whereas the HID SDK-based approach would likely only work with HID's own readers \u2014 a meaningful compatibility trade-off. Chinmay will research how involved the direct-Apple-certification path is before committing to a direction, and lean toward that approach unless it proves to be a hard blocker, to avoid locking the platform into a single reader vendor."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-09-15_GuestAppReview_DeviceManagement.docx",
-     "date": "2026-09-15",
-     "score": 1.363,
-     "paragraph": "Device integration (delivered via each device's SDK) covers driver compatibility, command mapping, and communication protocol configuration once vendor SDKs are available."
-    },
-    {
-     "mom": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
-     "date": "2026-09-07",
-     "score": 1.152,
-     "paragraph": "An accreditation API allows an external partner to build their own accreditation front end while consuming TICVAI's accreditation platform underneath, for organizations that prefer not to use TICVAI's own portal directly."
+     "mom": "TICVAI_MoM_2026-09-24_BuildReadiness_Infra_UX.docx",
+     "date": "2026-09-24",
+     "score": 1.244,
+     "paragraph": "Clarified (Qossai): the current document describes functionality (e.g., \u201czone and area\u201d under venue management) without explaining what's actually configurable within it; that level of detail exists in the previously shared scope of work, which this document should be read alongside rather than treated as a replacement for."
     }
    ]
   },
@@ -617,19 +439,19 @@
     {
      "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
      "date": "2026-08-12",
-     "score": 1.298,
+     "score": 1.435,
      "paragraph": "Review payment gateway reconciliation file/API documentation (Stripe, Network International) to confirm the file-based reconciliation approach"
     },
     {
      "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
      "date": "2026-08-31",
-     "score": 1.164,
+     "score": 1.287,
      "paragraph": "Both redirect-based and embedded/iframe-based payment capture will be supported for gateway integrations (Network International, Stripe), subject to the certification required for embedded capture."
     },
     {
      "mom": "TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
      "date": "2026-08-07",
-     "score": 0.968,
+     "score": 1.071,
      "paragraph": "Chinmay asked whether the driver-based integration approach would be standard for TICVAI. Allam confirmed that Stripe and Network International integrations had already been agreed as part of the current scope, and that additional payment driver integrations can be added over time as needed \u2014 whatever isn't already integrated would need to be built."
     }
    ]
@@ -643,409 +465,171 @@
     {
      "mom": "TICVAI_Discry_Wrkshp_Day_1_Jul_28_2026.docx",
      "date": "2026-07-28",
-     "score": 1.826,
+     "score": 1.977,
      "paragraph": "Virtual waiting room or queue management"
     },
     {
      "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
      "date": "2026-08-10",
-     "score": 1.396,
+     "score": 1.506,
      "paragraph": "Branded virtual waiting room: Activates automatically above a configurable concurrent-buyer threshold (example discussed: 500 concurrent buyers) during high-demand on-sales; shows a wait time and is branded consistently with the tenant's mobile app theme."
     },
     {
      "mom": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
      "date": "2026-09-07",
-     "score": 0.611,
+     "score": 0.656,
      "paragraph": "Key concern: virtual queue guests must not be merged into the same physical line as VIP guests, since VIP guests pay specifically to minimize their wait and enter within minutes of arriving \u2014 mixing the two would erode the VIP guest's paid value. A virtual queue guest, while not waiting in a physical line, has still effectively \u201cwaited\u201d (e.g., 60 minutes) before their return window, so the operational model needs its own dedicated handling at the ride (e.g., a separate line, or scanning a QR code within a specific arrival window) distinct from both VIP and walk-in guests."
     }
    ]
   },
   {
    "kind": "openQuestion",
-   "ref": "P02 GST-001",
-   "name": "Home \u2013 Default",
-   "text": "Inventory cites `GET /catalogue, local` \u2014 no matching operation. Written before the contracts existed.",
+   "ref": "P01 WEB-049",
+   "name": "Transport \u2014 Route & Schedule",
+   "text": "The real network \u2014 stations, routes, fares and timetable \u2014 is an open value from the client (decided 29 September, rev 3 REV3-21); the prototype's Emirates Link stations and prices are illustrative.",
    "hits": [
-    {
-     "mom": "TICVAI_MoM_31Jul2026__1_.docx",
-     "date": "2026-07-31",
-     "score": 0.78,
-     "paragraph": "Qossai shared a cautionary example: a previous client site with poor internet connectivity ran an online-first architecture without a local database, which caused tickets to intermittently fail to reach the server. Allam acknowledged that some sites do rely on 4G SIM connections with weaker connectivity, though Qossai noted such cases are relatively rare compared to the overall client base, and suggested giving clients the choice between approaches. Chinmay agreed a comparative case study was warranted and committed to including a pros/cons comparison of online-first vs. offline-first architecture \u2014 particularly for POS \u2014 alongside the HLD/LLD diagrams he is preparing. He also proposed a mid"
-    }
-   ]
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-002",
-   "name": "Explore Categories",
-   "text": "Inventory cites `GET /catalogue` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-007",
-   "name": "Select Date & Time",
-   "text": "Inventory cites `GET /performances, POST /inventory-holds` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-008",
-   "name": "Tickets & Add-ons",
-   "text": "Inventory cites `local` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-011",
-   "name": "Wallet Overview",
-   "text": "Inventory cites `GET /wallet` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-012",
-   "name": "My Tickets",
-   "text": "Inventory cites `GET /tickets` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-013",
-   "name": "Ticket Details",
-   "text": "Inventory cites `GET /tickets/{id}` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-014",
-   "name": "Ticket Transfer",
-   "text": "Inventory cites `POST /tickets/{id}/transfer` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-015",
-   "name": "Memberships",
-   "text": "Inventory cites `GET /memberships` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-018",
-   "name": "Add to Calendar / Reminders",
-   "text": "Inventory cites `local` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": [
-    {
-     "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
-     "date": "2026-08-10",
-     "score": 0.815,
-     "paragraph": "Calendar integration & wishlist: Add bookings to Apple/Google/Outlook calendar with reminders; wishlist for F&B and retail items to purchase later on-site."
-    }
-   ]
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-020",
-   "name": "Saved Items / Wishlist",
-   "text": "Inventory cites `GET /wishlist` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-021",
-   "name": "Interactive Map",
-   "text": "Inventory cites `GET /venue-map` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": [
-    {
-     "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
-     "date": "2026-08-10",
-     "score": 1.611,
-     "paragraph": "Confirm final venue-map guidance/format standard for tenants (referencing Kidzania-style interactive map as a UX benchmark)."
-    }
-   ]
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-022",
-   "name": "Attraction Wait Times",
-   "text": "Inventory cites `GET /queue/wait-times` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": [
-    {
-     "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
-     "date": "2026-08-10",
-     "score": 0.792,
-     "paragraph": "Live wait times / virtual queue: Displays estimated wait time per ride/attraction (e.g., \u201c41 minutes\u201d). Confirmed this typically depends on a third-party camera/sensor system at the venue; TAIS/TICVAI will build the underlying functionality and expose a standard API for the client's chosen third-party system to feed queue data into."
-    },
     {
      "mom": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
      "date": "2026-09-07",
-     "score": 0.672,
-     "paragraph": "An operations view shows current wait time per ride (including separate general and virtual-queue wait times) with alerts for conditions like a growing express queue or unusually high overall queue length."
+     "score": 0.55,
+     "paragraph": "Wrap-up: Qossai and Allam asked Aishwarya to share the prototype link so they can review it independently and schedule a separate feedback call once reviewed."
+    }
+   ]
+  },
+  {
+   "kind": "openQuestion",
+   "ref": "P01 WEB-049",
+   "name": "Transport \u2014 Route & Schedule",
+   "text": "The street-map tile provider needs approval under audit R038; the approver is still to be named by the client.",
+   "hits": [
+    {
+     "mom": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+     "date": "2026-09-08",
+     "score": 1.046,
+     "paragraph": "Authority rules can be defined by amount and category \u2014 e.g., refunds under a threshold (such as AED 5,000) route to one approver, while larger amounts route to a different/higher approver \u2014 and can vary per tenant/venue via a tenant-and-venue approval matrix."
     },
     {
-     "mom": "TICVAI_MoM_2026-08-14.docx",
-     "date": "2026-08-14",
-     "score": 0.608,
-     "paragraph": "Chinmay asked how ride/attraction wait times would be sourced. Qossai explained that venues typically calculate wait time from entry-counting sensors or cameras (e.g., people entering \u00d7 average time per person) and expose this via a live API; TICVAI would consume that wait-time API/data feed and surface it in the guest mobile app, potentially feeding an AI recommendation ('which ride to visit next') in future phases."
+     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
+     "date": "2026-08-12",
+     "score": 0.502,
+     "paragraph": "Chinmay outlined a six-step refund flow: a refund initiated from the POS/ticketing software calls the refund service, which connects to the ledger; since committed funds are held in the ledger before being moved to the second ledger at the event, refunds can be initiated directly from the ledger without routing through the second ledger, calling an external worker which connects to the payment gateway to initiate the refund. The refund engine must support time-banded rules (refunds disallowed after a cut-off), chargeback handling, and full audit trail entries (credit memos, adjustments to an issued invoice without moving cash). Allam added further refund requirements: configurable refund per"
     }
    ]
   },
   {
    "kind": "openQuestion",
-   "ref": "P02 GST-026",
-   "name": "Retail / Merchandise",
-   "text": "Inventory cites `GET /products?kind=retail` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-027",
-   "name": "Parking \u2013 Reserve & Pay",
-   "text": "Inventory cites `POST /parking-reservations` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-028",
-   "name": "Parking \u2013 Reservation Confirmed",
-   "text": "Inventory cites `GET /parking-reservations/{id}` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-029",
-   "name": "Venue Info & Services",
-   "text": "Inventory cites `GET /venue-info` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-030",
-   "name": "In-Venue Notifications",
-   "text": "Inventory cites `GET /notifications` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-031",
-   "name": "AI Concierge \u2013 Home",
-   "text": "Inventory cites `POST /ai/concierge` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-032",
-   "name": "AI Concierge \u2013 Chat",
-   "text": "Inventory cites `POST /ai/concierge` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-033",
-   "name": "AI Concierge \u2013 Contextual Help",
-   "text": "Inventory cites `POST /ai/concierge` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-034",
-   "name": "Lost & Found",
-   "text": "Inventory cites `POST /lost-found/reports` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-036",
-   "name": "Loyalty & Rewards",
-   "text": "Inventory cites `GET /loyalty` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-037",
-   "name": "Offers & Promotions",
-   "text": "Inventory cites `GET /offers` \u2014 no matching operation. Written before the contracts existed.",
+   "ref": "P02 GST-076",
+   "name": "Intercity Trip \u2014 Route & Schedule",
+   "text": "The real network \u2014 stations, routes, fares and timetable \u2014 is an open value from the client (decided 29 September, rev 3 REV3-21); the prototype's Emirates Link stations and prices are illustrative.",
    "hits": [
     {
-     "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
-     "date": "2026-09-01",
-     "score": 0.735,
-     "paragraph": "Dynamic pricing covers several strategies: seasonal variation (as in 4.4); quantity-based promotions such as \u201cbuy 2, get the 3rd free\u201d or buy-one-get-one (BOGO) offers; and tiered sibling-style discounts (first child at full price, subsequent children at a reduced rate) as discussed in a prior session."
+     "mom": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
+     "date": "2026-09-07",
+     "score": 0.55,
+     "paragraph": "Wrap-up: Qossai and Allam asked Aishwarya to share the prototype link so they can review it independently and schedule a separate feedback call once reviewed."
     }
    ]
   },
   {
    "kind": "openQuestion",
-   "ref": "P02 GST-039",
-   "name": "Profile",
-   "text": "Inventory cites `GET /guests/me` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-040",
-   "name": "Help & Support",
-   "text": "Inventory cites `GET /support` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-041",
-   "name": "Checkout Entry",
-   "text": "Inventory cites `\u2014` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-043",
-   "name": "Arabic / RTL Experience",
-   "text": "Inventory cites `\u2014` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-044",
-   "name": "Multi-Currency & Pricing",
-   "text": "Inventory cites `GET /currencies` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-045",
-   "name": "Ticket Delivery & Sharing",
-   "text": "Inventory cites `POST /tickets/{id}/share` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-046",
-   "name": "Branded Queue / Waiting Room",
-   "text": "Inventory cites `GET /waiting-room` \u2014 no matching operation. Written before the contracts existed.",
+   "ref": "P02 GST-076",
+   "name": "Intercity Trip \u2014 Route & Schedule",
+   "text": "The street-map tile provider needs approval under audit R038; the approver is still to be named by the client.",
    "hits": [
     {
-     "mom": "TICVAI_Discry_Wrkshp_Day_1_Jul_28_2026.docx",
-     "date": "2026-07-28",
-     "score": 1.47,
-     "paragraph": "Virtual waiting room or queue management"
+     "mom": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+     "date": "2026-09-08",
+     "score": 1.046,
+     "paragraph": "Authority rules can be defined by amount and category \u2014 e.g., refunds under a threshold (such as AED 5,000) route to one approver, while larger amounts route to a different/higher approver \u2014 and can vary per tenant/venue via a tenant-and-venue approval matrix."
     },
     {
-     "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
-     "date": "2026-08-10",
-     "score": 1.175,
-     "paragraph": "Branded virtual waiting room: Activates automatically above a configurable concurrent-buyer threshold (example discussed: 500 concurrent buyers) during high-demand on-sales; shows a wait time and is branded consistently with the tenant's mobile app theme."
+     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
+     "date": "2026-08-12",
+     "score": 0.502,
+     "paragraph": "Chinmay outlined a six-step refund flow: a refund initiated from the POS/ticketing software calls the refund service, which connects to the ledger; since committed funds are held in the ledger before being moved to the second ledger at the event, refunds can be initiated directly from the ledger without routing through the second ledger, calling an external worker which connects to the payment gateway to initiate the refund. The refund engine must support time-banded rules (refunds disallowed after a cut-off), chargeback handling, and full audit trail entries (credit memos, adjustments to an issued invoice without moving cash). Allam added further refund requirements: configurable refund per"
     }
    ]
   },
   {
    "kind": "openQuestion",
-   "ref": "P02 GST-048",
-   "name": "Upsell / Cross-Sell",
-   "text": "Inventory cites `GET /recommendations` \u2014 no matching operation. Written before the contracts existed.",
+   "ref": "P02 GST-077",
+   "name": "Intercity Trip \u2014 Route & Passengers",
+   "text": "The real network \u2014 stations, routes, fares and timetable \u2014 is an open value from the client (decided 29 September, rev 3 REV3-21); the prototype's Emirates Link stations and prices are illustrative.",
    "hits": []
   },
   {
    "kind": "openQuestion",
-   "ref": "P02 GST-050",
-   "name": "Resource Booking \u2013 Cabana",
-   "text": "Inventory cites `POST /resource-bookings` \u2014 no matching operation. Written before the contracts existed.",
+   "ref": "P02 GST-077",
+   "name": "Intercity Trip \u2014 Route & Passengers",
+   "text": "The street-map tile provider needs approval under audit R038; the approver is still to be named by the client.",
    "hits": [
     {
-     "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
-     "date": "2026-08-10",
-     "score": 0.817,
-     "paragraph": "Seating & resource booking: Seated events use the previously agreed seat-map flow; resource bookings (e.g., cabana rental) decrement a capacity-based inventory on booking."
-    }
-   ]
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-051",
-   "name": "Plan Your Adventure \u2013 Start",
-   "text": "Inventory cites `POST /ai/itinerary` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": [
-    {
-     "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
-     "date": "2026-08-10",
-     "score": 2.403,
-     "paragraph": "4.9 \u201cPlan Your Adventure\u201d (Itinerary Planner)"
-    }
-   ]
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-052",
-   "name": "Suggested Itineraries",
-   "text": "Inventory cites `GET /itineraries/suggested` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-053",
-   "name": "Build Your Own Itinerary",
-   "text": "Inventory cites `POST /itineraries` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-054",
-   "name": "AI Optimized Itinerary",
-   "text": "Inventory cites `POST /ai/itinerary/optimise` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-055",
-   "name": "Dynamic QR Ticket",
-   "text": "Inventory cites `GET /tickets/{id}/dynamic-qr` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": [
-    {
-     "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
-     "date": "2026-08-26",
-     "score": 0.748,
-     "paragraph": "Dynamic resource assignment for experience tickets \u2014 skill matching, shared vs. private resources"
-    }
-   ]
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-057",
-   "name": "Accessibility Information",
-   "text": "Inventory cites `GET /accessibility` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": []
-  },
-  {
-   "kind": "openQuestion",
-   "ref": "P02 GST-058",
-   "name": "Resource Availability (Cabana)",
-   "text": "Inventory cites `GET /resources/availability` \u2014 no matching operation. Written before the contracts existed.",
-   "hits": [
-    {
-     "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
-     "date": "2026-08-26",
-     "score": 0.885,
-     "paragraph": "Dynamic resource assignment for experience tickets \u2014 skill matching, shared vs. private resources"
+     "mom": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+     "date": "2026-09-08",
+     "score": 1.046,
+     "paragraph": "Authority rules can be defined by amount and category \u2014 e.g., refunds under a threshold (such as AED 5,000) route to one approver, while larger amounts route to a different/higher approver \u2014 and can vary per tenant/venue via a tenant-and-venue approval matrix."
     },
     {
-     "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
-     "date": "2026-08-24",
-     "score": 0.398,
-     "paragraph": "Reviewed event ticket setup in detail: event validity window; performances (recurring date/time slots); admission models (general admission, capacity control, reserved seating, resource control, or no admission control); seat map, section and quota-per-sales-channel configuration (shared pool or split inventory); and resource management (e.g., allocating vehicle and driver resources for an activity such as a desert safari, checked against availability before a ticket can be sold)."
-    },
-    {
-     "mom": "TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
-     "date": "2026-08-07",
-     "score": 0.367,
-     "paragraph": "Resource management is an optional module for tracking bookable resources tied to a product or package \u2014 for example, a desert excursion package that requires both a vehicle and a driver. A resource \"template\" defines the required resource types for a given product; individual resources (specific vehicles, named drivers) are listed and can be scheduled with an availability calendar/roster (marking specific dates as unavailable). Once resources are linked to an event, the system checks both resource availability and remaining capacity at the time of sale \u2014 whether sold via POS or online \u2014 before allowing the booking to proceed."
+     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
+     "date": "2026-08-12",
+     "score": 0.502,
+     "paragraph": "Chinmay outlined a six-step refund flow: a refund initiated from the POS/ticketing software calls the refund service, which connects to the ledger; since committed funds are held in the ledger before being moved to the second ledger at the event, refunds can be initiated directly from the ledger without routing through the second ledger, calling an external worker which connects to the payment gateway to initiate the refund. The refund engine must support time-banded rules (refunds disallowed after a cut-off), chargeback handling, and full audit trail entries (credit memos, adjustments to an issued invoice without moving cash). Allam added further refund requirements: configurable refund per"
     }
    ]
   },
   {
    "kind": "openQuestion",
-   "ref": "P02 GST-059",
-   "name": "Plan My Day \u2013 In Progress",
-   "text": "Inventory cites `GET /itineraries/{id}` \u2014 no matching operation. Written before the contracts existed.",
+   "ref": "P02 GST-078",
+   "name": "Intercity Trip \u2014 Multi-trip Passes",
+   "text": "The real network \u2014 stations, routes, fares and timetable \u2014 is an open value from the client (decided 29 September, rev 3 REV3-21); the prototype's Emirates Link stations and prices are illustrative.",
    "hits": []
+  },
+  {
+   "kind": "openQuestion",
+   "ref": "P02 GST-078",
+   "name": "Intercity Trip \u2014 Multi-trip Passes",
+   "text": "The street-map tile provider needs approval under audit R038; the approver is still to be named by the client.",
+   "hits": [
+    {
+     "mom": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+     "date": "2026-09-08",
+     "score": 0.607,
+     "paragraph": "Authority rules can be defined by amount and category \u2014 e.g., refunds under a threshold (such as AED 5,000) route to one approver, while larger amounts route to a different/higher approver \u2014 and can vary per tenant/venue via a tenant-and-venue approval matrix."
+    },
+    {
+     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
+     "date": "2026-08-12",
+     "score": 0.502,
+     "paragraph": "Chinmay outlined a six-step refund flow: a refund initiated from the POS/ticketing software calls the refund service, which connects to the ledger; since committed funds are held in the ledger before being moved to the second ledger at the event, refunds can be initiated directly from the ledger without routing through the second ledger, calling an external worker which connects to the payment gateway to initiate the refund. The refund engine must support time-banded rules (refunds disallowed after a cut-off), chargeback handling, and full audit trail entries (credit memos, adjustments to an issued invoice without moving cash). Allam added further refund requirements: configurable refund per"
+    }
+   ]
+  },
+  {
+   "kind": "openQuestion",
+   "ref": "P02 GST-079",
+   "name": "Intercity Trip \u2014 Favourite Routes",
+   "text": "The real network \u2014 stations, routes, fares and timetable \u2014 is an open value from the client (decided 29 September, rev 3 REV3-21); the prototype's Emirates Link stations and prices are illustrative.",
+   "hits": []
+  },
+  {
+   "kind": "openQuestion",
+   "ref": "P02 GST-079",
+   "name": "Intercity Trip \u2014 Favourite Routes",
+   "text": "The street-map tile provider needs approval under audit R038; the approver is still to be named by the client.",
+   "hits": [
+    {
+     "mom": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+     "date": "2026-09-08",
+     "score": 0.607,
+     "paragraph": "Authority rules can be defined by amount and category \u2014 e.g., refunds under a threshold (such as AED 5,000) route to one approver, while larger amounts route to a different/higher approver \u2014 and can vary per tenant/venue via a tenant-and-venue approval matrix."
+    },
+    {
+     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
+     "date": "2026-08-12",
+     "score": 0.502,
+     "paragraph": "Chinmay outlined a six-step refund flow: a refund initiated from the POS/ticketing software calls the refund service, which connects to the ledger; since committed funds are held in the ledger before being moved to the second ledger at the event, refunds can be initiated directly from the ledger without routing through the second ledger, calling an external worker which connects to the payment gateway to initiate the refund. The refund engine must support time-banded rules (refunds disallowed after a cut-off), chargeback handling, and full audit trail entries (credit memos, adjustments to an issued invoice without moving cash). Allam added further refund requirements: configurable refund per"
+    }
+   ]
   },
   {
    "kind": "openQuestion",
@@ -1056,20 +640,20 @@
     {
      "mom": "TICVAI_MoM_2026-08-14.docx",
      "date": "2026-08-14",
-     "score": 6.636,
+     "score": 6.753,
      "paragraph": "Chinmay and Qossai reviewed three parking integration models: (1) no integration \u2014 TICVAI issues its own QR code and on-site security manually verifies it; (2) ANPR/plate-number integration \u2014 the guest enters their plate number at checkout, and TICVAI's API pushes the plate number to the parking system's whitelist so the barrier opens automatically; (3) QR-code handoff \u2014 TICVAI sends a QR code to the parking system's barrier for entry validation. A separate, pay-per-hour parking model (unrelated to ticketing) can be handled independently via the parking system's own POS. Qossai noted the team has integrated with such parking APIs before (consuming and pushing data) and that the architecture "
     },
     {
      "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
      "date": "2026-08-10",
-     "score": 2.453,
+     "score": 2.667,
      "paragraph": "Parking: Two supported models: (1) fully platform-native \u2014 guest purchases parking, receives a QR code scanned by a handheld device at the gate; (2) integrated with a third-party parking/ANPR system \u2014 guest enters their plate number, which is whitelisted so the barrier opens automatically on arrival. Both flows are to be supported in the app."
     },
     {
-     "mom": "TICVAI_Kickoff_MoM_12Aug2026.docx",
-     "date": "2026-08-12",
-     "score": 0.926,
-     "paragraph": "Chinmay opened by referencing the requirement matrix's \"one user per session\" rule for the POS and asked how breaks \u2014 where a live cashier needs to step away \u2014 should be handled. Allam confirmed the model: the logged-in user must either log out or suspend their shift before a second user can log into the same workstation; the workstation and user session are tied together, so no second user can log in over an active session. Qossai confirmed this matches the intended meaning of \"one user, one session\" \u2014 a user can take a break and a different user can log in afterward, but never concurrently on the same workstation."
+     "mom": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
+     "date": "2026-09-07",
+     "score": 0.868,
+     "paragraph": "Agreed direction (Qossai): the specific technology/vendor is secondary to achieving an accurate per-ride count, however it's implemented (sensor, camera/CCTV, or manual); requested Allam check with an existing large-scale operator (Warner Bros. World was cited, which has a visible wait-time display) to understand what counting technology they use as a real-world reference before committing to an approach."
     }
    ]
   },
@@ -1166,7 +750,7 @@
     {
      "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
      "date": "2026-08-24",
-     "score": 1.546,
+     "score": 1.5,
      "paragraph": "Client Q&A on cloud infrastructure sizing, costing models and scaling strategy (AWS/Azure)"
     }
    ]
@@ -1225,7 +809,14 @@
    "ref": "P10 PTR-019",
    "name": "API Credentials & Integration",
    "text": "Blocked \u2014 Developer & API workshop",
-   "hits": []
+   "hits": [
+    {
+     "mom": "TICVAI_MoM_2026-09-17_AssetMgmt_Sandbox_API.docx",
+     "date": "2026-09-17",
+     "score": 1.088,
+     "paragraph": "Developer accounts, API credentials, and sandbox/production separation"
+    }
+   ]
   },
   {
    "kind": "openQuestion",
@@ -1236,7 +827,7 @@
     {
      "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
      "date": "2026-08-31",
-     "score": 0.8,
+     "score": 0.74,
      "paragraph": "Intelligent routing: cases are automatically routed to the most suitable agent or department based on skill set, language, availability, workload and priority, with an assignment preview that can be manually overridden before confirming."
     }
    ]

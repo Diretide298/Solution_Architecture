@@ -7,6 +7,8 @@ publisher: orders
 description: Value has been returned to a guest, in whole or in part.
 aggregate: order
 emittedWhen: OrderStatus paid or completed to refunded or partiallyRefunded
+emittedBy:
+- createRefund
 payload:
 - field: orderId
   type: string

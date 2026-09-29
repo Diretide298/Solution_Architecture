@@ -88,8 +88,8 @@ screens:
       trigger: Programme Administration
       carries:
       - version
-      provenance: derived — DEV-008 declares entryState.params listingId, version and DEV-001 holds version,
-        so an edge into it carries them
+      provenance: derived — DEV-008 declares entryState.params listingId, requestId, version and DEV-001
+        holds version, so an edge into it carries them
   notes: CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather
     than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen
     and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up
@@ -140,6 +140,13 @@ screens:
 
           '
         provenance: carried from the previous definition
+      - kind: dataTable
+        label: Changelog for the selected version
+        bindsTo: ApiVersion.changes
+        operation: listApiVersions
+        notes: '**Every operation added, changed, deprecated or removed, with breaking changes marked**
+          (17 September minutes, M17-14; ADR-0026).'
+        provenance: 29 September pass (P29 group A)
     - name: contextPanel
       slot: selection
       components:
@@ -163,12 +170,12 @@ screens:
         label: Search operations
         provenance: carried from the previous definition
       - kind: treeNav
-        bindsTo: contracts
-        notes: 'Grouped by contract, not by tag. **A developer thinks in domains** — ticketing, access,
-          F&B — and the contracts already are the domains.
-
-          '
+        bindsTo: ApiScope
+        notes: '**Grouped by licensable module, then contract** (17 September minutes, M17-05 and M17-12):
+          a developer sees which operations each module brings and which scope opens them, so a CRM partner
+          reads the CRM operations and knows it will be granted nothing else.'
         provenance: carried from the previous definition
+        operation: listApiScopes
   states:
     loading: The operation list; the current version renders first.
     error: 'Could not load the reference. **Names which contract failed** — 28 files load independently
@@ -193,6 +200,11 @@ screens:
     contract: public-api
     purpose: Which versions exist and which is current
     trigger: onLoad
+  - operationId: listApiScopes
+    contract: public-api
+    purpose: The module scope catalogue the reference is grouped by
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
   entryState:
     preloaded:
     - ApiVersion.status
@@ -363,15 +375,24 @@ screens:
     exitTo:
     - DEV-004
     - DEV-005
+    - DEV-008
     transitions:
-    - to: DEV-004
-      trigger: They provision a sandbox and build against it
-      provenance: flow F27 step 3→4
-      operation: createApiClient
     - to: DEV-005
       trigger: Webhooks
       provenance: derived — DEV-005 declares entryState.params subscriptionId and DEV-003 holds none of
         them, so the edge carries nothing and DEV-005 opens cold
+    - to: DEV-004
+      trigger: They provision a sandbox and build against it
+      provenance: flow F27 step 3→4
+      operation: createApiClient
+      carries:
+      - clientId
+    - to: DEV-008
+      trigger: TICVAI decides the request
+      provenance: flow F36 step 4→5
+      operation: requestProductionAccess
+      carries:
+      - listingId
   notes: 'CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own. **Rotation
     carries an overlap window and revocation does not**: one is hygiene, the other is what you reach for
     when a secret has leaked, and a grace period defeats it.
@@ -415,11 +436,18 @@ screens:
         label: Create client
         provenance: carried from the previous definition
       - kind: banner
-        notes: '**The secret is shown once.** The banner says so before it is generated, not after — a
-          system that can show you a secret later is a system that stores one.
-
-          '
+        notes: "**The secret is shown once.** The banner says so before it is generated, not after — a\
+          \ system that can show you a secret later is a system that stores one.\n **A production client\
+          \ is never created here** (M17-06): it is issued by TICVAI on an approved production access\
+          \ request, and its first secret is taken once with Rotate."
         provenance: carried from the previous definition
+      - kind: multiSelect
+        label: Scopes, by module
+        bindsTo: ApiScope
+        operation: listApiScopes
+        notes: '**A scope picker grouped by module** (M17-05): `{module}.read` and `{module}.write`, with
+          unlicensed modules shown and disabled rather than hidden.'
+        provenance: 29 September pass (P29 group A)
     - name: contextPanel
       slot: selection
       components:
@@ -454,6 +482,13 @@ screens:
         label: Revoke API credential
         operation: revokeApiCredential
         provenance: contract public-api.yaml DELETE /api-clients/{clientId}/credentials
+      - kind: secondaryButton
+        label: Request production access
+        operation: requestProductionAccess
+        notes: '**Production keys only after certification** (M17-06). Enabled on a sandbox client whose
+          integration is certified; asks for the tenants, the scopes and the IP allow-list. TICVAI issues
+          the production client.'
+        provenance: 29 September pass (P29 group A)
   overlays:
   - id: confirmRevokeApiCredential
     component: confirmDialog
@@ -498,6 +533,25 @@ screens:
       discards:
       - overlapHours
     provenance: contract public-api.yaml POST /api-clients/{clientId}/credentials
+  - id: formRequestProductionAccess
+    component: modal
+    trigger: Request production access
+    body: '**Collects what `requestProductionAccess` sends before it is called.** Required: `listingId`
+      (a certified integration), `scopes`, `allowedTenantIds`, `ipAllowList` (at least one address, M17-07).
+      Optional: `note`. The form says that a new production key is issued and the sandbox key stays a
+      sandbox key.'
+    confirm:
+      label: Request production access
+      operation: requestProductionAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - listingId
+      - scopes
+      - allowedTenantIds
+      - ipAllowList
+      - note
+    provenance: 29 September pass (P29 group A)
   states:
     loading: Clients, sandbox first.
     error: Could not load clients. Existing credentials keep working.
@@ -531,6 +585,16 @@ screens:
     trigger: onAction
     invalidates:
     - listApiClients
+  - operationId: listApiScopes
+    contract: public-api
+    purpose: Scopes to choose from, by module
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: requestProductionAccess
+    contract: public-api
+    purpose: Ask for production keys for a certified integration
+    trigger: onAction
+    provenance: 29 September pass (P29 group A)
   entryState:
     params:
     - name: clientId
@@ -567,10 +631,15 @@ screens:
     - DEV-003
     exitTo:
     - DEV-005
+    - DEV-007
     transitions:
     - to: DEV-005
       trigger: They subscribe to the events they need and watch the deliveries
       provenance: flow F27 step 4→5
+    - to: DEV-007
+      trigger: They submit the integration for certification
+      provenance: flow F36 step 1→2
+      operation: createSandbox
   notes: 'Decisions D2 and D3. **One shared sandbox, synthetic data only** — which removes the PDPL and
     DESC exposure entirely. Tenant-specific validation runs on per-customer staging.
 
@@ -638,6 +707,13 @@ screens:
         - Sandbox.lastResetAt
         operation: listSandboxes
         provenance: contract public-api.yaml GET /sandboxes
+      - kind: detailPanel
+        label: Path to production
+        bindsTo: ProductionAccessRequest
+        operation: listProductionAccessRequests
+        notes: '**Sandbox, certification, production** (17 September minutes, M17-06): where this developer
+          stands, the certification and the production access request with its decision.'
+        provenance: 29 September pass (P29 group A)
     - name: actionBar
       slot: rowActions
       components:
@@ -649,6 +725,12 @@ screens:
         label: Reset sandbox
         operation: resetSandbox
         provenance: contract public-api.yaml POST /sandboxes/{sandboxId}/reset
+      - kind: secondaryButton
+        label: Promote to production
+        operation: requestProductionAccess
+        notes: Opens the production access request for the client tested here; disabled until the integration
+          is certified.
+        provenance: 29 September pass (P29 group A)
   overlays:
   - id: confirmResetSandbox
     component: confirmDialog
@@ -671,6 +753,23 @@ screens:
       - dataProfile
       - expiresAfterDays
     provenance: contract public-api.yaml POST /sandboxes
+  - id: formRequestProductionAccess
+    component: modal
+    trigger: Promote to production
+    body: '**Collects what `requestProductionAccess` sends before it is called.** Required: `listingId`,
+      `scopes`, `allowedTenantIds`, `ipAllowList`. Optional: `note`.'
+    confirm:
+      label: Promote to production
+      operation: requestProductionAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - listingId
+      - scopes
+      - allowedTenantIds
+      - ipAllowList
+      - note
+    provenance: 29 September pass (P29 group A)
   states:
     loading: Sandboxes with their data profile.
     error: Could not load. A running sandbox is unaffected.
@@ -698,10 +797,24 @@ screens:
     trigger: onAction
     invalidates:
     - listSandboxes
+  - operationId: listProductionAccessRequests
+    contract: public-api
+    purpose: The path to production and its state
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: requestProductionAccess
+    contract: public-api
+    purpose: Promote a tested integration to production
+    trigger: onAction
+    invalidates:
+    - listProductionAccessRequests
+    provenance: 29 September pass (P29 group A)
   entryState:
     params:
     - name: sandboxId
       from: deepLink
+    - name: clientId
+      from: navigation
     coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
       forwarded link between partners must not open another partner''s record. If the target is gone the
       screen says so and offers the partner''s own list. Arrives with `sandboxId`.'
@@ -736,7 +849,8 @@ screens:
     - DEV-006
     transitions:
     - to: DEV-006
-      trigger: They go live, and watch whether it is healthy
+      trigger: They go live (production keys only after certification, flow F36), and watch whether it
+        is healthy
       provenance: flow F27 step 5→6
   notes: '13.1.26 to 13.1.30, 13.3.17 to 13.3.23. **The 29 events already existed and nothing outside
     could receive one.**
@@ -756,9 +870,9 @@ screens:
       - kind: textField
         label: API client
         operation: listWebhookSubscriptions
-        notes: 'Sends `?clientId=` to `listWebhookSubscriptions`. Empty lists every subscription in the tenant;
-          a client narrows it to that client''s subscriptions. A partner sees only its own client''s whatever
-          it sends (decided 28 September, audit R214 (4)).'
+        notes: Sends `?clientId=` to `listWebhookSubscriptions`. Empty lists every subscription in the
+          tenant; a client narrows it to that client's subscriptions. A partner sees only its own client's
+          whatever it sends (decided 28 September, audit R214 (4)).
         provenance: contract public-api.yaml GET /webhook-subscriptions
       - kind: dataTable
         label: Every webhook subscription
@@ -1006,6 +1120,20 @@ screens:
         bindsTo: byOperation
         notes: Per operation, sorted by error rate rather than by volume.
         provenance: carried from the previous definition
+      - kind: dataTable
+        label: Flagged traffic
+        bindsTo: ApiAnomaly
+        columns:
+        - ApiAnomaly.clientId
+        - ApiAnomaly.measure
+        - ApiAnomaly.observed
+        - ApiAnomaly.baseline
+        - ApiAnomaly.actionTaken
+        - ApiAnomaly.detectedAt
+        operation: listApiAnomalies
+        notes: '**Abnormal volume on your own clients** (17 September minutes, M17-07), so a runaway integration
+          is seen here before a venue calls.'
+        provenance: 29 September pass (P29 group A)
   states:
     loading: Call volume; the current window renders first.
     error: Could not load usage. Your quota is unaffected.
@@ -1020,6 +1148,11 @@ screens:
     contract: public-api
     purpose: Calls, errors, latency
     trigger: onLoad
+  - operationId: listApiAnomalies
+    contract: public-api
+    purpose: Abnormal traffic flagged on the developer's clients
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
   wireframe:
     status: notStarted
     provenance: generated
@@ -1042,10 +1175,16 @@ screens:
     - DEV-006
     exitTo:
     - DEV-006
+    - DEV-008
     inferred: false
     notes: '**Returns to DEV-006.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
+    transitions:
+    - to: DEV-008
+      trigger: TICVAI reviews the integration and certifies it
+      provenance: flow F36 step 2→3
+      operation: submitIntegrationListing
   notes: '13.1.49 and 13.1.50, decision D1. **A listing, not an installation** — the integration runs
     on the developer''s own infrastructure, and third-party code does not execute inside TICVAI.
 
@@ -1082,10 +1221,9 @@ screens:
         label: Submit for certification
         provenance: carried from the previous definition
       - kind: banner
-        notes: '**Certification expires, and the date is shown.** An integration certified against v1
-          and still listed after v3 is Softlabs vouching for something nobody has looked at in two years.
-
-          '
+        notes: "**Certification expires, and the date is shown.** An integration certified against v1\
+          \ and still listed after v3 is Softlabs vouching for something nobody has looked at in two years.\n\
+          \ When it lapses, the production clients issued against it are suspended."
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
@@ -1117,10 +1255,9 @@ screens:
   states:
     loading: Listings with their certification status.
     error: Could not load listings.
-    emptyFirstRun: '**Nothing submitted. Certification gates the listing, not API access** — the state
-      says so, because a developer who thinks they need certifying to make a call will not make one.
-
-      '
+    emptyFirstRun: '**Nothing submitted. Certification gates production keys and the listing** (17 September
+      minutes, M17-06): build and test in the sandbox, submit here, and once certified request production
+      access. A private integration is certified without appearing in the marketplace.'
     emptyNoResults: No listing matches this category or status.
     emptyNoAccess: You do not have DEVELOPER_MANAGE.
   apis:
@@ -1189,10 +1326,17 @@ screens:
     - DEV-001
     exitTo:
     - DEV-001
+    - DEV-003
     inferred: false
     notes: '**Returns to DEV-001.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
+    transitions:
+    - to: DEV-003
+      trigger: They request production access for the certified integration
+      provenance: flow F36 step 3→4, F36 step 5→6
+      carries:
+      - clientId
   notes: '**`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial
     model configuration rather than code — this is the surface, and the rates themselves remain CF-135c.
     **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`,
@@ -1257,6 +1401,11 @@ screens:
 
           '
         provenance: carried from the previous definition
+      - kind: dataTable
+        label: Production access requests
+        bindsTo: ProductionAccessRequest
+        operation: listProductionAccessRequests
+        provenance: 29 September pass (P29 group A)
     - name: actionBar
       slot: publish
       components:
@@ -1276,11 +1425,19 @@ screens:
         label: Deprecate API version
         operation: deprecateApiVersion
         provenance: contract public-api.yaml POST /api-versions/{version}/deprecate
+      - kind: secondaryButton
+        label: Decide production access
+        operation: decideProductionAccess
+        provenance: 29 September pass (P29 group A)
+      - kind: secondaryButton
+        label: Save anomaly rule
+        operation: setApiAnomalyRule
+        provenance: 29 September pass (P29 group A)
     - name: sideNav
       slot: carried
       components:
       - kind: treeNav
-        notes: Quotas · Certification queue · Licensing · Versions.
+        notes: Quotas · Certification queue · Production access · Anomaly rules · Licensing · Versions.
         provenance: carried from the previous definition
   states:
     loading: Pending certifications first.
@@ -1290,6 +1447,8 @@ screens:
       page shown to a partner is worse than a refusal, because they will file a support ticket about it.
 
       '
+    emptyNoResults: No production access request with this status. Names the filter and offers to clear
+      it.
   apis:
   - operationId: setApiQuota
     contract: public-api
@@ -1307,12 +1466,31 @@ screens:
     contract: public-api
     purpose: Announce a sunset
     trigger: onAction
+  - operationId: listProductionAccessRequests
+    contract: public-api
+    purpose: The production key queue
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: decideProductionAccess
+    contract: public-api
+    purpose: Issue or refuse production keys
+    trigger: onAction
+    invalidates:
+    - listProductionAccessRequests
+    provenance: 29 September pass (P29 group A)
+  - operationId: setApiAnomalyRule
+    contract: public-api
+    purpose: When API traffic is flagged
+    trigger: onAction
+    provenance: 29 September pass (P29 group A)
   entryState:
     params:
     - name: listingId
       from: deepLink
     - name: version
       from: deepLink
+    - name: requestId
+      from: navigation
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `listingId`, `version`.'
@@ -1375,3 +1553,40 @@ screens:
       - reason
       - migrationGuideUrl
     provenance: contract public-api.yaml POST /api-versions/{version}/deprecate
+  - id: formDecideProductionAccess
+    component: modal
+    trigger: Decide production access
+    body: '**Collects what `decideProductionAccess` sends before it is called.** Required: `decision`.
+      Optional: `reason` (required to reject), `scopes` (narrow only), `credentialTtlDays`.'
+    confirm:
+      label: Decide production access
+      operation: decideProductionAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - reason
+      - scopes
+      - credentialTtlDays
+    provenance: 29 September pass (P29 group A)
+  - id: formSetApiAnomalyRule
+    component: modal
+    trigger: Save anomaly rule
+    body: '**Collects what `setApiAnomalyRule` sends before it is called.** Required: `ruleKey`, `measure`,
+      `comparison`, `threshold`, `action`.'
+    bindsTo: ApiAnomalyRule
+    confirm:
+      label: Save anomaly rule
+      operation: setApiAnomalyRule
+    dismiss:
+      label: Cancel
+      discards:
+      - ruleKey
+      - clientId
+      - measure
+      - comparison
+      - threshold
+      - windowMinutes
+      - action
+      - isActive
+    provenance: 29 September pass (P29 group A)

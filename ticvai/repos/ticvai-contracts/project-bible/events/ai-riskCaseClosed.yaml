@@ -7,6 +7,8 @@ publisher: ai
 description: A risk investigation was closed with an outcome.
 aggregate: aiRiskCase
 emittedWhen: AiRiskCase investigating or pendingAction to closed (closeRiskCase)
+emittedBy:
+- closeRiskCase
 payload:
 - field: tenantId
   type: uuid

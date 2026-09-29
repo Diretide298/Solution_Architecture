@@ -376,6 +376,46 @@ patterns:
       refresh: onFocus
 
   # ---------------------------------------------------------------------------------------
+  - id: calendar
+    name: Calendar
+    whenToUse: >
+      **Dated records an operator plans against**: performances, opening days, work orders, resource
+      bookings, campaigns, shifts (17 September minutes M17-03, added 30 September). Use it when the
+      question is *what happens when*, not *which record*: a list of dates in a table is the
+      `listDetail` pattern pretending to be a calendar.
+    template: calendar
+    regions: [appHeader, contentBody, contextPanel, actionBar]
+    slots:
+      - name: calendar
+        role: collection
+        required: true
+        components: [calendarView]
+        bindsTo: required
+        notes: >
+          Day, week, month and agenda views; the day starts at `VenueSettings.calendarDayStartHour`.
+          The visible window is the read's `from`/`to` where the operation takes them.
+      - name: filters
+        role: filters
+        required: false
+        components: [selectField, multiSelect, datePicker]
+        notes: The category filter, sent as `categoryId` where the operation takes it.
+      - name: record
+        role: selection
+        required: false
+        components: [detailPanel]
+        notes: The selected entry, opened beside the calendar rather than replacing it.
+      - name: actions
+        role: actions
+        required: false
+        components: [primaryButton, secondaryButton, destructiveButton]
+    states: [loading, empty, error, denied]
+    emptyVariants: [emptyFirstRun, emptyNoResults, emptyNoAccess]
+    overlays: []
+    fetch:
+      shape: singleFetch
+      refresh: onFocus
+
+  # ---------------------------------------------------------------------------------------
   - id: credentialView
     name: Credential
     whenToUse: >

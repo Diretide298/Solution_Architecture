@@ -26,6 +26,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
+| [CMS-102](#cms-102-site-builder) | Site Builder | White Label | 1 | 7 |
+| [CMS-103](#cms-103-booking-flows) | Booking Flows | White Label | 1 | 14 |
+| [CMS-104](#cms-104-app-build-store-publishing) | App Build & Store Publishing | White Label | 1 | 7 |
 | [ADM-016](#adm-016-white-label-branding-management) | White-Label Branding Management | Branding & Localisation | 2 | 13 |
 | [ADM-017](#adm-017-domain-certificate-management) | Domain & Certificate Management | Branding & Localisation | 2 | 6 |
 | [ADM-018](#adm-018-localisation-language-pack) | Localisation & Language Pack | Branding & Localisation | 2 | 7 |
@@ -37,18 +40,192 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 2 | 5 |
 | [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 2 | 11 |
 | [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 2 | 10 |
-| [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 2 | 6 |
+| [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 2 | 7 |
 | [CMS-010](#cms-010-media-library) | Media Library | White Label | 2 | 13 |
 | [CMS-011](#cms-011-translations) | Translations | White Label | 2 | 1 |
 | [CMS-012](#cms-012-rtl-preview) | RTL Preview | White Label | 2 | 2 |
 | [CMS-013](#cms-013-seo-metadata) | SEO & Metadata | White Label | 2 | 1 |
-| [CMS-014](#cms-014-publishing-workflow) | Publishing Workflow | White Label | 2 | 3 |
+| [CMS-014](#cms-014-publishing-workflow) | Publishing Workflow | White Label | 2 | 4 |
 | [CMS-015](#cms-015-version-history) | Version History | White Label | 2 | 3 |
-| [CMS-016](#cms-016-site-settings) | Site Settings | White Label | 2 | 7 |
+| [CMS-016](#cms-016-site-settings) | Site Settings | White Label | 2 | 6 |
 | [CMS-017](#cms-017-domain-certificate) | Domain & Certificate | White Label | 2 | 4 |
 | [CMS-018](#cms-018-consent-legal) | Consent & Legal | White Label | 2 | 8 |
 | [CMS-019](#cms-019-user-access) | User Access | White Label | 2 | 2 |
-| [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 2 | 11 |
+| [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 2 | 12 |
+
+## CMS-102 Site Builder
+
+**Build a working site in about 30 minutes: pick a preset, then walk seven saved steps (venue and modules, ticketing flows, compose steps, Help me choose, look and feel, mobile app, preview and publish), each opening the full screen for its details. **The preset keeps the minimum path short (M24-05)**: it proposes the modules, the booking flows with their default step order, the home sections and the mobile tabs, so the only things an operator must supply are a logo, four colours and a Publish; everything else keeps the preset or the contract default and can be refined later.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/site-builder` |
+| Component | `apps/venue-management-web/src/routes/white-label/SiteBuilder.tsx` |
+| Pattern | multiStepForm |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getSiteSetupProgress` | [WhiteLabelService](../backend/WhiteLabelService.md#getsitesetupprogress) | onLoad | Where the operator is in the seven steps, and the preset picked | `TENANT_CONFIGURE` |
+| `setSiteSetupProgress` | [WhiteLabelService](../backend/WhiteLabelService.md#setsitesetupprogress) | onAction | Save the preset and each step's state on every return | `TENANT_CONFIGURE` |
+| `listBookingFlowTypes` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflowtypes) | onLoad | The flow types the preset proposes for step 2 | `TENANT_CONFIGURE` |
+| `listBookingFlows` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflows) | onLoad | The venue's flows, to mark steps 2 and 3 done | `TENANT_CONFIGURE` |
+| `createBookingFlowDefinition` | [WhiteLabelService](../backend/WhiteLabelService.md#createbookingflowdefinition) | onAction | Add the preset's flows with their default steps in one go | `TENANT_CONFIGURE` |
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | Whether the site is live, for step 7 | `None` |
+| `validateTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#validatetenantconfig) | onAction | What still blocks a publish, each finding linked to its step | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The builder's progress, read by `getSiteSetupProgress`. |
+| error | Could not load. Names which read failed and leaves the progress untouched. |
+| emptyFirstRun | Nothing set up yet. Opens on Start from, with every step not started, and says the minimum path is a logo, four colours, the preset's flows and a publish. |
+| emptyNoResults | The venue has no flow of a type the preset proposes yet; the flow list says so and offers Add these flows rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getSiteSetupProgress` requires, and names that permission. Never an empty form — that reads as *there is nothing to set up*. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | 1 Venue and modules |  |  |
+| CMS-103 | 2 Ticketing flows | bookingFlowId |  |
+| CMS-103 | 3 Compose steps | bookingFlowId |  |
+| CMS-101 | 4 Help me choose |  |  |
+| CMS-007 | 5 Look and feel — header, footer and home |  |  |
+| CMS-009 | 5 Look and feel — navigation and menus |  |  |
+| CMS-002 | 5 Look and feel — brand kit |  |  |
+| CMS-004 | 5 Look and feel — logos |  |  |
+| CMS-008 | 5 Look and feel — banners |  |  |
+| CMS-005 | 5 Look and feel — theme |  |  |
+| CMS-003 | 5 Look and feel — fonts | version |  |
+| CMS-009 | 6 Mobile app — tabs and the Buy tickets button |  |  |
+| CMS-004 | 6 Mobile app — intro video |  |  |
+| CMS-007 | 6 Mobile app — home sections |  |  |
+| CMS-006 | 7 Preview | version |  |
+| CMS-012 | 7 Preview right to left |  |  |
+| CMS-014 | 7 Publish |  |  |
+| CMS-015 | Roll back a version | version |  |
+| CMS-104 | Build the mobile app |  | the tenant has published at least once |
+
+## CMS-103 Booking Flows
+
+**Pick the venue's booking flows, turn optional steps on or off, set the step order within the allowed limits with a live preview, assign flows to products and categories, and validate them before they publish with the site.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/booking-flows` |
+| Component | `apps/venue-management-web/src/routes/white-label/BookingFlows.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| bookingFlowId | CMS-102 |
+| productId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listBookingFlows` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflows) | onLoad | The venue's flows in the draft | `TENANT_CONFIGURE` |
+| `listBookingFlowTypes` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflowtypes) | onLoad | The flow types to pick from, with their steps and order constraints | `TENANT_CONFIGURE` |
+| `getBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getbookingflow) | onAction | One flow with every step, to compose | `TENANT_CONFIGURE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onAction | What guests book through now, beside the draft in the preview | `None` |
+| `createBookingFlowDefinition` | [WhiteLabelService](../backend/WhiteLabelService.md#createbookingflowdefinition) | onAction | Pick a flow type for the venue | `TENANT_CONFIGURE` |
+| `updateBookingFlowDefinition` | [WhiteLabelService](../backend/WhiteLabelService.md#updatebookingflowdefinition) | onAction | Save the step order, the optional steps and the flow's settings | `TENANT_CONFIGURE` |
+| `validateBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#validatebookingflow) | onAction | Check a proposed order before it is dropped, or the saved flow | `TENANT_CONFIGURE` |
+| `deleteBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#deletebookingflow) | onAction | Remove a flow nothing uses | `TENANT_CONFIGURE` |
+| `publishTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#publishtenantconfig) | onAction | Publish the site, flows included | `TENANT_PUBLISH` |
+| `listConsentQuestions` | [MarketingService](../backend/MarketingService.md#listconsentquestions) | onLoad | The consent questions a flow can ask (rev 3 REV3-26) | `GUEST_VIEW` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onAction | The products a flow is assigned to | `PRODUCT_VIEW` |
+| `updateProduct` | [CatalogueService](../backend/CatalogueService.md#updateproduct) | onAction | Assign the flow to a product (`bookingFlowId`) | `PRODUCT_CONFIGURE` |
+| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onAction | The categories a flow can be assigned to | `PRODUCT_VIEW` |
+| `setProductCategories` | [CatalogueService](../backend/CatalogueService.md#setproductcategories) | onAction | Assign the flow to a category (`bookingFlowId`) | `PRODUCT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The venue's flows and the flow-type catalogue, read by `listBookingFlows` and `listBookingFlowTypes`. |
+| error | Could not load. Names which read failed and leaves the flows untouched. |
+| emptyFirstRun | No flows at this venue yet. Guests book through each type's default order until one is picked. Offers the flow-type cards and, from the Site Builder, the preset's flows in one step. |
+| emptyNoResults | The flow-type filter matched nothing and the venue's other flows are still there. Names the filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires, and names that permission. Never an empty table — that reads as *there are no flows*. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-102 | Back to the Site Builder |  |  |
+| CMS-016 | Venue-wide booking settings |  |  |
+| CMS-101 | Help me choose |  |  |
+| CMS-014 | Publish with the site |  |  |
+
+## CMS-104 App Build & Store Publishing
+
+**Get the tenant's own app into the App Store and Google Play under the client's own accounts — checklist, store listing, request a build, download or submit it, follow its review — with a guide for the steps only the client can take.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/app-publishing` |
+| Component | `apps/venue-management-web/src/routes/white-label/AppPublishing.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| appBuildId | navigation |
+| conversationId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getStoreAccounts` | [WhiteLabelService](../backend/WhiteLabelService.md#getstoreaccounts) | onLoad | The client's store accounts and the checklist | `TENANT_CONFIGURE` |
+| `setStoreAccounts` | [WhiteLabelService](../backend/WhiteLabelService.md#setstoreaccounts) | onAction | Record the client's own Apple and Google accounts and the store listing | `TENANT_CONFIGURE` |
+| `listAppBuilds` | [WhiteLabelService](../backend/WhiteLabelService.md#listappbuilds) | onLoad | The builds and their store status | `TENANT_CONFIGURE` |
+| `getAppBuild` | [WhiteLabelService](../backend/WhiteLabelService.md#getappbuild) | onAction | One build, its package and its review status | `TENANT_CONFIGURE` |
+| `requestAppBuild` | [WhiteLabelService](../backend/WhiteLabelService.md#requestappbuild) | onAction | Build the app from a published version, for the client's account | `TENANT_PUBLISH` |
+| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | onAction | Open a conversation with the app publishing guide | `AI_USE` |
+| `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask the app publishing guide a question | `AI_USE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The checklist and the builds, read by `getStoreAccounts` and `listAppBuilds`. |
+| error | Could not load. Names which read failed. |
+| emptyFirstRun | No build yet. Shows the checklist first: nothing can be built until the client's store account for the platform is recorded and a version is published. |
+| emptyNoResults | No build for the platform picked. Names it and offers the other. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and names that permission. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-102 | Back to the Site Builder |  |  |
+| CMS-004 | App icons and splash |  |  |
+| CMS-014 | Publish the configuration first |  |  |
 
 ## ADM-016 White-Label Branding Management
 
@@ -215,7 +392,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-001 Tenant Workspace
 
-**Land a tenant somewhere that shows what is live and what is not.**
+**Land a tenant somewhere that shows what is live and what is not, and hold step 1 of the Site Builder (venue and modules).**
 
 |  |  |
 |---|---|
@@ -251,6 +428,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
+| CMS-102 | Site Builder |  |  |
 | CMS-002 | Brand Kit |  |  |
 | CMS-004 | Logo & Assets |  |  |
 | CMS-061 | Digital Asset Management Command Center |  |  |
@@ -367,7 +545,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-004 Logo & Assets
 
-**Hold the marks every surface needs, at the sizes it needs them.**
+**Hold the marks every surface needs, at the sizes it needs them, and the mobile app's intro video (Site Builder steps 5 and 6).**
 
 |  |  |
 |---|---|
@@ -550,7 +728,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-008 Content Blocks
 
-**Define what a block can and cannot contain.**
+**Define what a block can and cannot contain, and set the banners (Site Builder step 5).**
 
 |  |  |
 |---|---|
@@ -604,7 +782,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-009 Navigation & Menus
 
-**Decide what appears in the header and the footer.**
+**Decide what appears in the header, the footer and the mobile tab bar, with the Buy tickets button (Site Builder steps 5 and 6).**
 
 |  |  |
 |---|---|
@@ -625,12 +803,13 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
+| `getNavigation` | [WhiteLabelService](../backend/WhiteLabelService.md#getnavigation) | onLoad | The navigation and the mobile tab set (MOB-1) | `TENANT_CONFIGURE` |
 | `listMenus` | [FnbService](../backend/FnbService.md#listmenus) | onLoad | List menus | `PRODUCT_VIEW` |
 | `getMenu` | [FnbService](../backend/FnbService.md#getmenu) | onAction | Read a menu with sections and items | `PRODUCT_VIEW` |
 | `createMenu` | [FnbService](../backend/FnbService.md#createmenu) | onAction | Create a menu | `PRODUCT_CONFIGURE` |
 | `setMenuSections` | [FnbService](../backend/FnbService.md#setmenusections) | onAction | Set menu sections and their item ordering | `PRODUCT_CONFIGURE` |
 | `updateMenu` | [FnbService](../backend/FnbService.md#updatemenu) | onAction | Amend a menu | `PRODUCT_CONFIGURE` |
-| `setNavigation` | [WhiteLabelService](../backend/WhiteLabelService.md#setnavigation) | onAction | Set main and overflow navigation | `TENANT_CONFIGURE` |
+| `setNavigation` | [WhiteLabelService](../backend/WhiteLabelService.md#setnavigation) | onAction | Save the navigation, the mobile tabs and the Buy tickets button (MOB-1, MOB-2) | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -819,7 +998,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-014 Publishing Workflow
 
-**Move a change from draft to live, with someone accountable.**
+**Move a change from draft to live, with someone accountable (Site Builder step 7).**
 
 |  |  |
 |---|---|
@@ -830,6 +1009,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Component | `apps/venue-management-web/src/routes/white-label/PublishingWorkflowDetail.tsx` |
 | Pattern | statusTracker |
 
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
@@ -837,6 +1022,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `publishTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#publishtenantconfig) | onAction | Publish the working draft | `TENANT_PUBLISH` |
 | `validateTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#validatetenantconfig) | onAction | Validate the working draft | `TENANT_CONFIGURE` |
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and recent changes | `None` |
+| `listBookingFlows` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflows) | onLoad | The venue's flows and whether each is valid, for the gate (W12) | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -854,6 +1040,9 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-001 | Tenant Workspace |  |  |
 | CMS-002 | Brand Kit |  |  |
 | CMS-003 | Typography | version |  |
+| CMS-103 | Fix a booking flow | bookingFlowId |  |
+| CMS-104 | Build the mobile app |  |  |
+| CMS-102 | Back to the Site Builder |  |  |
 | CMS-015 | Rolls back when something is wrong | version |  |
 
 ## CMS-015 Version History
@@ -904,7 +1093,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-016 Site Settings
 
-**The values the whole site inherits from, and the booking-flow settings each venue may override (decided 29 September, rev 3 CFG-11).**
+**The values the whole site inherits from, and the venue-wide booking settings each venue may override (decided 29 September, rev 3 CFG-11); the settings of one flow are on CMS-103 (W12).**
 
 |  |  |
 |---|---|
@@ -922,7 +1111,6 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `getBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getbookingflowconfig) | onLoad | How the guest booking flow looks and steps | `TENANT_CONFIGURE` |
 | `setBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#setbookingflowconfig) | onAction | Preset, step indicator, cart layout, embed mode | `TENANT_CONFIGURE` |
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Full working configuration | `TENANT_CONFIGURE` |
-| `listConsentQuestions` | [MarketingService](../backend/MarketingService.md#listconsentquestions) | onLoad | The venue's consent questions, to attach to the booking flow (rev 3 REV3-26) | `GUEST_VIEW` |
 | `listOrgUnits` | [TenancyService](../backend/TenancyService.md#listorgunits) | onLoad | The tenant's venues, for the per-venue override picker (rev 3 CFG-11) | `SCOPE_VIEW` |
 | `listAnalyticsProviders` | [WhiteLabelService](../backend/WhiteLabelService.md#listanalyticsproviders) | onLoad | Connected analytics platforms | `TENANT_CONFIGURE` |
 | `setAnalyticsProvider` | [WhiteLabelService](../backend/WhiteLabelService.md#setanalyticsprovider) | onAction | Connect or change an analytics platform | `TENANT_CONFIGURE` |
@@ -946,6 +1134,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-003 | Typography | version |  |
 | CMS-017 | Domain & Certificate |  |  |
 | CMS-018 | Consent & Legal |  |  |
+| CMS-103 | Booking flows | bookingFlowId |  |
 | CMS-101 | Help me choose |  |  |
 
 ## CMS-017 Domain & Certificate
@@ -1085,7 +1274,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-101 Help Me Choose
 
-**Set up a venue's Help me choose, review what the assistant suggests from the venue's products, preview it and publish it.**
+**Set up a venue's Help me choose so its answers filter the catalogue, review the question set the assistant proposes from the venue's products, preview the filtered list and publish it (Site Builder step 4).**
 
 |  |  |
 |---|---|
@@ -1117,7 +1306,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onAction | Products an answer can open | `PRODUCT_VIEW` |
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onAction | Categories an answer can open | `PRODUCT_VIEW` |
 | `listEvents` | [CatalogueService](../backend/CatalogueService.md#listevents) | onAction | Events an answer can open | `PRODUCT_VIEW` |
-| `suggestGuidedChoice` | [AiService](../backend/AiService.md#suggestguidedchoice) | onAction | Suggest a Help me choose set-up from the venue's catalogue | `AI_USE` |
+| `listBookingFlows` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflows) | onAction | The venue's flows an answer can open (target kind bookingFlow, W12) | `TENANT_CONFIGURE` |
+| `suggestGuidedChoice` | [AiService](../backend/AiService.md#suggestguidedchoice) | onAction | Ask the assistant for a question set from product attributes (age and height rules, level tags, certifications); it lands here as a draft through white-label proposeGuidedChoice (W4) | `AI_USE` |
 | `getGuidedChoiceSuggestion` | [AiService](../backend/AiService.md#getguidedchoicesuggestion) | onAction | The reasons behind a Help me choose suggestion | `AI_USE` |
 
 **States**
@@ -1135,3 +1325,4 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | CMS-016 | Back to Site Settings |  |  |
+| CMS-102 | Back to the Site Builder |  |  |

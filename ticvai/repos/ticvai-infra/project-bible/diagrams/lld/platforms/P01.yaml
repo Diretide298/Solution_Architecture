@@ -1,5 +1,5 @@
 id: LLD-P01
-title: P01 Guest Web — Storefront — 49 screens
+title: P01 Guest Web — Storefront — 50 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: guest
@@ -20,7 +20,7 @@ deployment:
 why: null
 modulesUsed:
 - module: ticketing
-  screens: 19
+  screens: 20
 - module: marketing
   screens: 10
 - module: core
@@ -47,15 +47,15 @@ servicesCalled:
 - service: OrderService
   operationCalls: 63
 - service: CatalogueService
-  operationCalls: 45
+  operationCalls: 46
 - service: VenueOpsService
-  operationCalls: 36
+  operationCalls: 41
 - service: IdentityService
   operationCalls: 23
 - service: FnbService
   operationCalls: 21
 - service: WhiteLabelService
-  operationCalls: 11
+  operationCalls: 19
 - service: AiService
   operationCalls: 11
 - service: AccessService
@@ -67,9 +67,9 @@ servicesCalled:
 - service: RetailService
   operationCalls: 5
 coverage:
-  screens: 49
+  screens: 50
   inAFlow: 14
-  drawn: 49
+  drawn: 50
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -135,6 +135,7 @@ screens:
   - WEB-045
   - WEB-046
   - WEB-049
+  - WEB-050
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-001
   inFlows:
@@ -146,6 +147,7 @@ screens:
   wave: 1
   density: compact
   operations:
+  - getPublishedGuidedChoice
   - getWaitTimes
   - listPerformances
   - listProductCategories
@@ -161,6 +163,7 @@ screens:
   offlineState: true
   entryParams:
   - eventId<-deepLink
+  - venueId<-session
   goesTo:
   - WEB-001
   - WEB-003
@@ -238,6 +241,7 @@ screens:
   density: compact
   operations:
   - evaluatePromotions
+  - getPublishedBookingFlow
   - getPublishedGuidedChoice
   - listProductCategories
   - listProductVariants
@@ -276,6 +280,7 @@ screens:
   - getAvailability
   - getCart
   - getPerformance
+  - getPublishedBookingFlow
   - listPerformances
   - recordConsentAnswers
   states:
@@ -290,6 +295,7 @@ screens:
   - performanceId<-navigation
   - cartId<-navigation
   - eventId<-WEB-004
+  - venueId<-session
   goesTo:
   - WEB-001
   - WEB-005
@@ -309,6 +315,7 @@ screens:
   density: compact
   operations:
   - createSeatHold
+  - getPublishedBookingFlow
   - getSeatAvailability
   - listPerformances
   - recommendSeats
@@ -325,6 +332,7 @@ screens:
   - performanceId<-deepLink
   - eventId<-WEB-006
   - holdId<-navigation
+  - venueId<-session
   goesTo:
   - WEB-001
   - WEB-005
@@ -346,6 +354,7 @@ screens:
   - addCartLine
   - decideRecommendations
   - getBundle
+  - getPublishedBookingFlow
   - listCatalogueBundles
   - recordRecommendationEvents
   states:
@@ -359,6 +368,7 @@ screens:
   entryParams:
   - cartId<-session
   - bundleId<-navigation
+  - venueId<-session
   goesTo:
   - WEB-001
   - WEB-005
@@ -414,6 +424,7 @@ screens:
   - getCart
   - getCouponCode
   - getPerformance
+  - getPublishedBookingFlow
   - getResourceHold
   - removeCartLine
   - updateCartLine
@@ -430,6 +441,7 @@ screens:
   - lineId<-deepLink
   - performanceId<-navigation
   - holdId<-navigation
+  - venueId<-session
   goesTo:
   - WEB-001
   - WEB-011
@@ -453,6 +465,7 @@ screens:
   - addToWishlist
   - getCart
   - getGuestProfile
+  - getPublishedBookingFlow
   - getWishlist
   - listConsentPurposes
   - listGuestDevices
@@ -476,6 +489,7 @@ screens:
   - itemId<-deepLink
   - subjectId<-session
   - cartId<-session
+  - venueId<-session
   goesTo:
   - WEB-001
   - WEB-010
@@ -498,6 +512,7 @@ screens:
   - createOrder
   - createPayment
   - getOrder
+  - getPublishedBookingFlow
   - inquirePaymentStatus
   - transferOrderTickets
   states:
@@ -510,6 +525,7 @@ screens:
   entryParams:
   - orderId<-deepLink
   - paymentId<-navigation
+  - venueId<-session
   goesTo:
   - WEB-001
   - WEB-010
@@ -1661,4 +1677,36 @@ screens:
   - WEB-016
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-049
+  inFlows: null
+- screen: WEB-050
+  name: Plan Your Visit
+  module: Discovery & Browse
+  requiresModule: ticketing
+  wave: 1
+  density: compact
+  operations:
+  - bookVisitPlan
+  - generateVisitPlan
+  - getVisitPlan
+  - listProducts
+  - listVisitPlanAlternatives
+  - updateVisitPlan
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - venueId<-session
+  - planId<-deepLink
+  - itemId<-navigation
+  goesTo:
+  - WEB-001
+  - WEB-004
+  - WEB-010
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-050
   inFlows: null

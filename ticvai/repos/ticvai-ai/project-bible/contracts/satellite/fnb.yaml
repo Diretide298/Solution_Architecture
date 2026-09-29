@@ -137,6 +137,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -145,6 +146,8 @@ paths:
             schema:
               $ref: '#/components/schemas/FnbReservationPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -208,6 +211,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -216,6 +220,8 @@ paths:
             schema:
               $ref: '#/components/schemas/FnbServiceChargePolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -254,6 +260,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -269,6 +276,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/SubstitutionRule'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
@@ -717,6 +726,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -725,6 +735,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TableDefinition'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1106,6 +1118,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1121,6 +1134,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/ComboSlot'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1160,6 +1175,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1176,6 +1192,8 @@ paths:
                     type: string
                     format: uuid
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1416,6 +1434,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1424,6 +1443,8 @@ paths:
             schema:
               $ref: '#/components/schemas/KitchenSla'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           description: Set
           content:
@@ -1578,6 +1599,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1586,6 +1608,8 @@ paths:
             schema:
               $ref: '#/components/schemas/SectionLayout'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1628,6 +1652,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1643,6 +1668,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/TableCombination'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1812,7 +1839,7 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriterWins
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2450,7 +2477,7 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriterWins
+      x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2598,6 +2625,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2606,6 +2634,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CourseRules'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -2921,6 +2951,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2929,6 +2960,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TemperatureCheckpoint'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -2968,7 +3001,7 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriterWins
+      x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -3015,7 +3048,7 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriterWins
+      x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -3427,6 +3460,9 @@ paths:
         - "P02 GST-070 Reserve a Table"
         - "P06 EMP-056 Walk-In & Waitlist Management"
         - "P06 EMP-058 Live Table & Service Management"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Add a party to an outlet's waitlist
       description: 'BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has a
         party size, a seating preference and a walk-away point.
@@ -3577,6 +3613,9 @@ paths:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
         - "P06 EMP-055 Create / Edit Reservation"
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       summary: Book a table in advance
@@ -3627,6 +3666,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TableReservation'
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '201':
           headers:
             X-Consistency-Token:
@@ -3667,6 +3708,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-070 Reserve a Table"
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       summary: Change or cancel a booking
@@ -3688,6 +3732,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -3696,6 +3741,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TableReservation'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -4289,6 +4336,9 @@ paths:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
         - "P08 BO-044 F&B Outlets"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: How an outlet does takeaway and delivery
       description: '**One policy per outlet**, so the outlet is named. Without it the operation could not
         say which of a venue''s outlets it was answering for.
@@ -4346,6 +4396,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4354,6 +4405,8 @@ paths:
             schema:
               $ref: '#/components/schemas/FnbDeliveryPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -4435,6 +4488,8 @@ paths:
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-032 AI Concierge – Chat"
         - "P05 KSK-016 Order Food"
+      x-ticvai-emits:
+      - fnb.kitchenTicketCreated
       x-ticvai-audience:
       - guest
       summary: A guest orders food
@@ -4470,6 +4525,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateGuestOrderRequest'
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '201':
           headers:
             X-Consistency-Token:
@@ -4625,6 +4682,7 @@ paths:
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-024 Outlet Setup"
         - "P08 BO-007 Product Directory"
+        - "P08 BO-011 Packages & Bundles"
         - "P08 BO-045 Menu Management"
         - "P08 BO-104 Food & Beverage"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
@@ -4759,6 +4817,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4776,6 +4835,8 @@ paths:
                 isActive:
                   type: boolean
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -4813,6 +4874,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4828,6 +4890,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/MenuSection'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -4873,6 +4937,7 @@ paths:
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4911,6 +4976,8 @@ paths:
                   format: date-time
                   description: Device time of the act (offline-capable; replayed in this order).
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
@@ -4931,6 +4998,9 @@ paths:
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-061 Menu Item Detail"
         - "P04 POS-021 Sell — Food & Drink"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -5068,6 +5138,18 @@ paths:
         - "P06 EMP-058 Live Table & Service Management"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
         - "P08 BO-020 F&B Order Management"
+      x-ticvai-calls:
+      - access.validateAccess
+      x-ticvai-note: >-
+        **POS to kitchen** (system-design review SD-046, 29 September). A sale rung at a till that belongs to the
+        outlet (POS-022 Send to Kitchen) is accepted here, in the same transaction, and **creates one
+        `fnb.kitchen_ticket` per preparation station** from the outlet's routing rules (BO-135), exactly as
+        `createGuestFnbOrder` does for a guest order; `fnb.kitchenTicketCreated` goes to the outbox with each, and the
+        KDS reads them with `listKitchenTickets`. **Offline, the ticket still has to reach the kitchen**: the till
+        sends it to the KDS over the venue LAN and the server receives it when this order is replayed. That LAN
+        route (venue edge or a till acting as hub) is an open ADR (see the 29 September system-design pass, group S).
+      x-ticvai-emits:
+      - fnb.kitchenTicketCreated
       x-ticvai-audience:
       - staff
       summary: Place an F&B order
@@ -5096,8 +5178,9 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Created. The kitchen ticket is created when the outlet accepts it (`acceptFnbOrder`,
-            automatic where the outlet is configured for it)
+          description: Created. **A till order at the outlet is accepted in the same transaction and its
+            kitchen tickets are created there** (SD-046, 29 September); an order from elsewhere gets them when
+            the outlet accepts it (`acceptFnbOrder`, automatic where the outlet is configured for it)
           content:
             application/json:
               schema:
@@ -5105,8 +5188,10 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          description: 'An item is unavailable, modifier constraints are unmet, or a tracked item was
-            ordered offline. One reason per cause.
+          description: 'An item is unavailable, modifier constraints are unmet, a tracked item was
+            ordered offline, or a line''s `redeemEntitlementId` cannot be redeemed here
+            (`entitlementNotRedeemable`: used, another item or outlet, not yet valid; MOB-4). One reason per
+            cause.
 
             **`trackedItemOffline` is stock that ran out while the terminal was offline** (proposed, client
             to correct (audit R125 (11))): an order queued offline with a recipe-linked item is replayed, and
@@ -5125,6 +5210,7 @@ paths:
                       - itemUnavailable
                       - modifierConstraintUnmet
                       - trackedItemOffline
+                      - entitlementNotRedeemable
   /fnb-orders/{orderId}/accept:
     parameters:
     - name: orderId
@@ -5235,7 +5321,7 @@ paths:
       x-ticvai-permission-escalated: ORDER_VOID
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
-      x-ticvai-conflict-policy: lastWriterWins
+      x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -5360,6 +5446,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -5378,6 +5465,8 @@ paths:
                     type: string
                     pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -5463,6 +5552,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -5478,6 +5568,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/TableDefinition'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -6227,6 +6319,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - name: outletId
         in: query
         required: true
@@ -6249,6 +6342,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/KitchenStation'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '400':
           description: A workstation is assigned to more than one station (`displayWorkstationIds`, audit
             R277), or the body fails validation.
@@ -6336,6 +6431,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -6344,6 +6440,8 @@ paths:
             schema:
               $ref: '#/components/schemas/Recipe'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -6619,6 +6717,7 @@ paths:
       operationId: setIngredientSubstitutes
       x-ticvai-consumed-by:
         - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
+      x-ticvai-conflict-policy: serverWins
       summary: Define approved substitutions
       description: >
         Set whole per recipe: a substitution list is reviewed as a list, usually against an allergen
@@ -6633,6 +6732,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - name: recipeId
         in: path
         required: true
@@ -6649,6 +6749,8 @@ paths:
               items:
                 $ref: '#/components/schemas/FnbIngredientSubstitute'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -6714,6 +6816,9 @@ paths:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
         - "P06 EMP-056 Walk-In & Waitlist Management"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Take a party off an outlet's waitlist
       description: '**A guest could join a restaurant waitlist and not leave it** (decided 28 September,
         audit R073 (d)). A party that has gone elsewhere and cannot say so is a table held for nobody,
@@ -6855,6 +6960,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -6863,6 +6969,8 @@ paths:
             schema:
               $ref: '#/components/schemas/OutletTemplateInput'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -6912,6 +7020,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -6940,6 +7049,8 @@ paths:
                           type: string
                           format: uuid
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -7067,6 +7178,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -7092,6 +7204,8 @@ paths:
                   minimum: 0
                   nullable: true
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -9576,6 +9690,19 @@ components:
           type: integer
           nullable: true
           description: Course grouping, so the kitchen fires in sequence.
+        redeemEntitlementId:
+          type: string
+          nullable: true
+          x-ticvai-references: access.entitlement
+          description: '**A meal combo redeemed at the till or by a scan** (29 September, MOB-4; applied 30
+            September). The entitlement a bundle''s `fnbMenuItem` component issued (promotions
+            `BundleComponent.componentKind: fnbMenuItem`, `menuItemId`, `redeemAtOutletIds`). The line is
+            priced at zero against it, `menuItemId` must be the component''s menu item and the outlet one of
+            `redeemAtOutletIds` (or any outlet with the item on a live menu when that list is empty), and the
+            entitlement is marked used in the same step through access `validateAccess` at the outlet. An
+            entitlement already used, for another item or outlet, or not yet valid is refused 409
+            `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the
+            replay is refused the same way if it was used meanwhile.'
     CreateFnbOrderRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -9604,6 +9731,12 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/CreateFnbOrderLine'
+        salesOrderId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: The `orders.sales_order` this F&B order fulfils (SD-046, 29 September). A POS sale sends
+            the order it took payment on; the commercial order is the sales order and this is its fulfilment.
         recordedAt:
           type: string
           format: date-time
@@ -9651,10 +9784,12 @@ components:
                   $ref: ../shared/common.yaml#/components/schemas/Money
         salesOrderId:
           type: string
-          format: uuid
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
+          x-ticvai-references: orders.sales_order
           description: >
-            **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and
+            **Retyped 29 September (SD-046)**: `orders.sales_order.id` is a ULID, so a uuid here could never
+            join. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and
             kitchen ticket on an F&B order and nothing joining it to what was actually sold, so
             an F&B line could not be reconciled to the order that paid for it.
         updatedAt:
@@ -9672,6 +9807,14 @@ components:
           type: string
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
+        kitchenTickets:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The kitchen tickets this order created, one per station (SD-046). Returned, not stored
+            here; they are `fnb.kitchen_ticket` rows.
+          items:
+            $ref: '#/components/schemas/KitchenTicket'
         estimatedReadyAt:
           type: string
           format: date-time
@@ -10913,6 +11056,21 @@ components:
           format: date-time
           nullable: true
   securitySchemes:
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
     bearerAuth:
       type: http
       scheme: bearer

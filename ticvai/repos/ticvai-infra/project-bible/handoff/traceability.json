@@ -4665,8 +4665,8 @@
    "domain": "Ticketing Catalogue",
    "verdict": "CONTRACTED",
    "contract": "ai",
-   "evidence": "generateVenueLayout",
-   "note": "Seat map generated from a plan, entering the seating import pipeline at previewReady for a person to commit. Validated against the client sample on 18 August (CF-17). **Not parked, unlike the nine AI rows around it** — worth noting that CF-73 parked capabilities adjacent to one that is built."
+   "evidence": "proposeVenueLabels",
+   "note": "re-traced 29 September (P29): bound on Block A screen BO-093 with acceptVenueLabelProposals as the human half (AI2 review)"
   },
   {
    "packageRef": "1.4.25",
@@ -5338,8 +5338,8 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "ai",
-   "evidence": "sendAiMessage",
-   "note": "**CF-14, closed 17 August.** guestCapabilityScope is ticketSelection, promotions, faq, recommendations, checkout — verbatim this requirement. KSK-015 implements it with agent handover."
+   "evidence": "requestSuggestion",
+   "note": "re-traced 29 September (P29): guestCapabilityScope adds visitPlanning; guest kind itinerary for the visit planner (MOB-6)."
   },
   {
    "packageRef": "2.1.29",
@@ -5486,8 +5486,8 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "white-label",
-   "evidence": "setHomepageLayout",
-   "note": "Homepage sections, banners and promotional blocks are tenant-configured; products list by category through searchCatalogue."
+   "evidence": "BookingFlow",
+   "note": "re-traced 29 September (P29): the purchase process is a venue-composed booking flow from the system catalogue (W12)."
   },
   {
    "packageRef": "2.6.2",
@@ -5519,8 +5519,8 @@
    "domain": "Ticketing Sales",
    "verdict": "CONTRACTED",
    "contract": "white-label",
-   "evidence": "setTheme",
-   "note": "Theme, fonts, header, navigation and homepage under a tenant configuration with preview, validate and publish."
+   "evidence": "Theme",
+   "note": "re-traced 29 September (P29): per-element colours (Theme.componentColours, M17-11)."
   },
   {
    "packageRef": "2.6.5",
@@ -21679,8 +21679,8 @@
    "domain": "Unified Operations Dashboard",
    "verdict": "CONTRACTED",
    "contract": "ai",
-   "note": "re-traced 29 September (AI build): historical booking curves drive the pace producer and cold start (design 3.10); getForecast drivers show the booking-trend contribution; rules-first producer (same-weekday average plus bookings on hand, then seasonal smoothing) until a model is promoted per tenant (design 3.10, 3.12)",
-   "evidence": "getForecast"
+   "note": "re-traced 29 September (P29): AiForecastDefinition.coldStart and historyWindowMonths; baseline from the venue AI profile and imported history (importVenueHistory) with maturity on every version.",
+   "evidence": "setForecastDefinition"
   },
   {
    "packageRef": "8.2.17",
@@ -24950,8 +24950,8 @@
    "domain": "Unified Operations Dashboard",
    "verdict": "CONTRACTED",
    "contract": "ai",
-   "evidence": "generateConfiguration",
-   "note": "**CF-74 found only these five are the assistant.** GeneratedConfiguration targets a contract and operation with assumptions and clarificationsNeeded, entering as a ProposedAction a human approves — products, pricing, promotions, seating and calendars are all named target operations."
+   "evidence": "proposeVenueLabels",
+   "note": "re-traced 29 September (P29): as 1.4.24"
   },
   {
    "packageRef": "8.8.14",
@@ -27135,10 +27135,10 @@
    "domain": "Developer & API Management",
    "verdict": "CONTRACTED",
    "contract": "public-api",
-   "note": "**Contracted 18 August, closing CF-135a.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own credential model; **this is the one that exists.** The secret is returned once — a system that can show it later is a system that stores one.",
+   "note": "re-traced 29 September (P29): sandbox and production keys separate; production keys TICVAI-issued after certification, with configurable expiry (M17-06).",
    "backlog": "BL-080",
    "cf": "CF-21",
-   "evidence": "ApiClient"
+   "evidence": "decideProductionAccess"
   },
   {
    "packageRef": "13.1.13",
@@ -27383,7 +27383,7 @@
    "verdict": "CONTRACTED",
    "contract": "public-api",
    "evidence": "ApiVersion",
-   "note": "**Contracted 18 August by ADR-0026.** CF-141 is resolved for the public API: **one current version, one deprecated, twelve months notice, and the commitment is in the model rather than a policy document.**",
+   "note": "re-traced 29 September (P29): ApiVersion.changes developer changelog with breaking flag (M17-14).",
    "backlog": "BL-156",
    "cf": "CF-21"
   },
@@ -27473,7 +27473,7 @@
    "domain": "Developer & API Management",
    "verdict": "CONTRACTED",
    "contract": "public-api",
-   "note": "**Contracted 18 August.** `ipAllowList` — the strongest control available where an integrator has fixed egress.",
+   "note": "re-traced 29 September (P29): ipAllowList required on production clients and enforced at issueApiToken and per call (M17-07).",
    "backlog": "BL-146",
    "cf": "CF-21",
    "evidence": "ApiClient"
@@ -27486,8 +27486,8 @@
    "domain": "Developer & API Management",
    "verdict": "CONTRACTED",
    "contract": "public-api",
-   "evidence": "ApiClient",
-   "note": "**Contracted 18 August.** API audit and security monitoring resolve against `identity.audit_event`, which every public-api operation writes.",
+   "evidence": "setApiAnomalyRule",
+   "note": "re-traced 29 September (P29): security monitoring flags abnormal volume: setApiAnomalyRule, listApiAnomalies (M17-07).",
    "cf": "CF-69",
    "backlog": "BL-156"
   },
@@ -27609,10 +27609,10 @@
    "domain": "Developer & API Management",
    "verdict": "CONTRACTED",
    "contract": "public-api",
-   "note": "**Contracted 18 August (D1).** **Certification gates the listing, not API access** — a developer may call the API uncertified and may not appear in the marketplace uncertified, because a listing is TICVAI vouching for something. **And it expires.**",
+   "note": "re-traced 29 September (P29): certification now gates production keys and listing (M17-06); the old 'not on API access' note is superseded. requestProductionAccess, decideProductionAccess, certifyIntegration.",
    "backlog": "BL-156",
    "cf": "CF-21",
-   "evidence": "certifyIntegration"
+   "evidence": "requestProductionAccess"
   },
   {
    "packageRef": "13.1.50",
@@ -28169,9 +28169,9 @@
    "section": "13.3",
    "domain": "Developer & API Management",
    "verdict": "CONTRACTED",
-   "contract": "subscription",
-   "evidence": "getTenantLicences",
-   "note": "**Licence add-ons per module** — API access enabled for the modules a tenant has bought, which is exactly this row."
+   "contract": "public-api",
+   "evidence": "listApiScopes",
+   "note": "re-traced 29 September (P29): module scopes {module}.read/write and licensedModules as ModuleKey (M17-05)."
   },
   {
    "packageRef": "15.1.1",
@@ -35610,8 +35610,8 @@
    "domain": "Marketing & CRM",
    "verdict": "CONTRACTED",
    "contract": "white-label",
-   "evidence": "getTenantConfig",
-   "note": "Tenant configuration with brand, theme, fonts, header, navigation and homepage; scopePath gives multi-brand."
+   "evidence": "getSiteSetupProgress",
+   "note": "re-traced 29 September (P29): white-label branding through the step-based Site Builder (W12, M24-05)."
   },
   {
    "packageRef": "22.10.3",
@@ -35855,8 +35855,8 @@
    "domain": "Marketing & CRM",
    "verdict": "CONTRACTED",
    "contract": "white-label",
-   "evidence": "setHomepageLayout",
-   "note": "The same configuration drives the app home screen; ADR-0006 covers distribution."
+   "evidence": "requestAppBuild",
+   "note": "re-traced 29 September (P29): mobile app CMS now also builds the tenant's app for the client's own store accounts (M24-08), tabs and Buy button in NavigationConfig."
   },
   {
    "packageRef": "22.10.23",
@@ -35866,8 +35866,8 @@
    "domain": "Marketing & CRM",
    "verdict": "CONTRACTED",
    "contract": "white-label",
-   "evidence": "setHomepageLayout",
-   "note": "The same configuration drives the app home screen; ADR-0006 covers distribution."
+   "evidence": "HomepageSectionKind",
+   "note": "re-traced 29 September (P29): mobile Home venueOverview section, hero style and 1-2 highlights per type (MOB-3)."
   },
   {
    "packageRef": "22.10.24",

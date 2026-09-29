@@ -434,6 +434,7 @@ paths:
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-031 Report Catalogue & Library"
+      x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
       - staff
       - partner
@@ -488,6 +489,7 @@ paths:
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-032 Report Creation Wizard"
         - "P16 ANL-054 AI Report Generator"
+      x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
       - partner
@@ -553,6 +555,7 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-api-scope: analytics.read
       x-ticvai-audience:
       - staff
       - partner
@@ -586,6 +589,7 @@ paths:
         - "P16 ANL-036 Grouping, Aggregation & Calculation Builder"
         - "P16 ANL-037 Cross-Domain Report Composer"
         - "P16 ANL-038 Report Layout & Formatting Designer"
+      x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
       - partner
@@ -650,6 +654,7 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
       - partner
@@ -760,6 +765,7 @@ paths:
         - "P16 ANL-009 AI Assistant & Action Center"
         - "P16 ANL-039 Report Preview, Test & Validation"
         - "P16 ANL-040 Save, Run & Report Results Viewer"
+      x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
       - partner
@@ -1554,6 +1560,7 @@ paths:
         - "P16 ANL-019 AI Management Insights"
         - "P16 ANL-052 Ask TICVAI — Natural Language Analytics"
         - "P16 ANL-056 Root-Cause Analysis Explorer"
+      x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
       - partner
@@ -1669,6 +1676,7 @@ paths:
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
         - "P16 ANL-052 Ask TICVAI — Natural Language Analytics"
+      x-ticvai-api-scope: analytics.write
       x-ticvai-audience:
       - staff
       - partner

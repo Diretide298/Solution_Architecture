@@ -1,6 +1,6 @@
 # TICVAI AI subsystem: system design
 
-> **Status:** Draft, 28 September 2026. Decisions taken 29 September (section 8); awaiting final review before commit
+> **Status:** Draft, 28 September 2026. Decisions taken 29 September (section 8); awaiting final review before commit. **Updated 30 September** for the 29 September pass: baseline then learn (section 3.13), the visit planner in Block A, the minutes of 17, 18 and 21 September, and the staffing decision of 30 September (section 7)
 > **Owner:** Chinmay
 > **Inputs:** `audit/ticvai/steps/AI/req-core.md` (AIC-001..271), `req-predict.md` (AIP-001..219), `req-personal.md` (AIR-001..211); ADR-0009, 0020, 0021, 0033, 0034, 0038, 0041, 0046; `contracts/satellite/ai.yaml` (31 operations); `ai-platform.md`, `ai-credentials.md`; `registers/ai-applications.md`; `active/ai-scope-for-confirmation.md`, `active/ai-suggestion-rules-proposal.md`.
 > **Precedence used throughout:** a decided (Accepted) ADR beats the minutes and the books unless the client overruled it in the minutes; the minutes (M18, M21) beat the books; among the books, the governance books (GOV, CORE) beat the capability books (CFG, BI, R&P, UCS) on governance questions, because CORE says its modes "should align" to governance. Where this document departs from an ADR, section 8 lists the ADR change.
@@ -199,6 +199,23 @@ No LLM is on this path. An LLM writes case summaries later, from structured evid
 
 That is 89 new operations. The P09 blocks bind as follows: configuration assistant ADM-469..498 to **configure** and **actions**; forecasting ADM-499..518 to **forecast**; governance ADM-519..528 to **governance**, ADM-529..538 to **actions** and Approvals, ADM-539..548 to **audit**, and ADM-549..558 to **monitoring**.
 
+**Added 29 September (the 29 September pass, group A).**
+
+| Operation | Why |
+|---|---|
+| `requestSuggestion` (changed) | **Answers on day one** from the baseline and carries `maturity` on every answer; the 422 is narrowed to a missing setting (`AiMissingSettingProblem`). New guest-allowed kind `itinerary` for the visit planner (MOB-6; supersedes the deferral in R187 and R209) |
+| `getAiVenueSettings`, `setAiVenueSettings` | The venue AI profile entered at onboarding (capacity, opening hours, typical attendance, venue type, average spend, productivity), `ai.venue_settings` |
+| `importVenueHistory`, `listVenueHistoryImports`, `getVenueHistoryImport` | The venue's own historical exports, into `ai.history_import` and `ai.history_observation`, never the ledger |
+| `listAiCapabilityMaturity` | The AI maturity page: each answer's stage, `ai.capability_maturity` |
+| `listAiTrainingRuns` | The per-tenant training and backtest run registry, `ai.training_run`; a passed gate raises `promotionReady` (AI-D16) |
+| `listAiCapabilityHealth` | Availability, latency, error rate, breaker and freshness per capability (M21-13) |
+| `AiForecastDefinition` (changed) | `producer` adds `ensemble`; `historyWindowMonths` (default 36) and `coldStart` (M18-16) |
+| `AiProvider.taskKeys`, `fitnessWarnings`; `AiModel.taskFitness` (changed) | A provider bound per agent task (M21-03) and a fitness warning when a model is under- or over-powered for it (M21-09) |
+| `AiGovernanceRule.environments`, `searchAiDecisions` (changed) | `sandbox` environment (M18-01); search by `venueId` and by customer as `subjectRef` (M18-03) |
+| `AiTool` registrations | The planner agent's five tools, all in `venue-map`: `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`, always called as the guest |
+
+The visit plan itself lives in `venue-map` (`venuemap.visit_plan`, `venuemap.visit_plan_item`), because a plan is laid out on the map and is the guest's own, like a cart. **The planner agent never writes it directly**: it proposes changes through `requestSuggestion` kind `itinerary` or calls the plan operations as the guest, so AI still writes only `ai.*`, pgvector and `cache:*` (ADR-0020).
+
 **Three new permissions, no more.** `PLATFORM_AI_MANAGE`, from the platform token, for the platform layer of the model catalogue, tool registry and prompt registry. `RISK_REVIEW` and `RISK_INVESTIGATE` for fraud analysts, who are not "AI users" and must not need `AI_USE` to work a case. Everything else uses the four `AI_*` permissions: read with `AI_USE`, configure with `AI_CONFIGURE`, publish or approve with `AI_APPROVE`, audit with `AI_AUDIT_VIEW`. Platform staff reach tenant AI data only through an open platform-staff grant (AIC-265).
 
 ### 2.4 Storage choices
@@ -292,7 +309,19 @@ Consumers are idempotent and dead-letter after five attempts (ADR-0033). Velocit
 
 **Endpoints:**
 
-- **Default LLM:** Azure OpenAI in UAE North under TICVAI's subscription, with per-tenant keys for attribution: a small model for guest answers, extraction and classification, a stronger one for staff analysis and configuration planning. Which models UAE North offers at go-live is for the client to confirm (section 8).
+- **Default LLM:** Azure OpenAI in UAE North under TICVAI's subscription, with per-tenant keys for attribution: a small model for guest answers, extraction and classification, a stronger one for staff analysis and configuration planning. Which models UAE North offers at go-live is ours to confirm against the task list (section 8).
+
+**"Multiple providers", read against AI-D02 (21 September minutes, M21-03).** The minute asks for several providers with each agent on the model that fits its task. AI-D02 is the later decision and stands: **one managed provider by default**, and the choice per agent is a choice of model inside it. More providers and bring-your-own models are added only when TICVAI enables them for a tenant (AI-D14). `AiProvider.taskKeys` binds a provider to named agent tasks, so a second provider can serve one agent without touching the others. The default model per agent:
+
+| Agent | Tasks | Default model (Azure OpenAI, UAE North) |
+|---|---|---|
+| Guest (concierge, Help me choose wording, visit planner) | `assistant.guest.answer`, `planner.guest.refine` | Small |
+| Operations (staff assistant, configuration assistant, seat-map labels) | `assistant.staff.answer`, `config.extract`, `config.plan` | Stronger for planning, small for extraction |
+| Finance and analytics (analytics assistant, metric explanation wording) | `analytics.spec`, `analytics.narrate` | Stronger |
+| Marketing (content drafts, translations) | `content.draft`, `content.translate` | Small |
+| Security and risk (case summaries) | `case.summarise` | Stronger |
+
+**Model fitness (M21-09, our proposal).** Each task has a golden set; `runAiEvaluation` scores a model on it and the score lands in `AiModel.taskFitness` with the task's band. Binding a model outside the band returns `fitnessWarnings` on `setAiProvider` (underpowered, overpowered or never scored). A warning is recorded and shown on ADM-037; it never blocks.
 - **Embeddings and reranking:** BGE-M3 (dense plus sparse in one pass) and a multilingual cross-encoder, **self-hosted on CPU in the cell**, so search and retrieval call no external API (AIC-042). BGE-M3 is the default pending ADR-0021's two-stage evaluation (AIC-067).
 - **Customer endpoint:** any OpenAI-compatible or Azure OpenAI endpoint plus key, with no custom development (AIC-009). Any other protocol needs an adapter, and we say so.
 - **Self-hosted open LLM** (vLLM on GPU) for private-only tenants and `onPremiseIsolated` sites with a client GPU (ADR-0046), through the same gateway.
@@ -385,6 +414,10 @@ Prompt-prefix ordering and the model cascade apply to every LLM call (3.3). **Tw
 
 Lower scopes may tighten a ceiling, never raise it (AIC-151). Autonomy is separate from user permission (AIC-154): a manager who may change a price by hand still gets an AI-prepared price change routed for approval. `ProposedAction.approvalLevel` (1 or 2) is **the approval tier, not an autonomy level**, and the documentation is corrected to say so. It is the floor; the approvals matrix adds thresholds and escalation (M18 decision, AIC-174).
 
+**A step that breaks the owning module's limit is governance-blocked (18 September minutes, M18-01).** Plan validation checks every step against the owning module's own limits (a price above the configured maximum, a discount above the role's ceiling) as well as against governance policy. Such a step is marked governance-blocked, shown on ADM-526 with the conflict it met, and never applied; the rest of the plan may continue only where governance allows partial completion. Purely informational actions (explaining a report) are low risk and need no approval. Environments are `development`, `sandbox`, `staging` and `production`, so a rule can allow in a sandbox what it blocks in production.
+
+**Approval authority is the shared approvals service (M18-02).** AI actions are approval kind `aiRecommendation` in the approval matrix: an approver is authorised up to a value, anything above escalates, and delegation and SLA apply as they do to every other approval. ADM-530, ADM-532 and ADM-534 bind `setApprovalMatrix`, `evaluateApprovalRequirement`, `escalateApprovalRequest`, `createApprovalDelegation` and `setApprovalSlaPolicy` rather than keeping a second approval model for AI.
+
 **The executor** is the only component that calls owning modules, and only for tools registered in `ai.tool` (AIC-088). A step has success criteria, a retry policy (bounded at 3, AIC-135), compensation, and a reversibility flag. Non-reversible steps (a refund, a publish) require the stronger approval tier (AIC-099). A plan may complete partially only where governance allows it; otherwise it compensates in reverse dependency order (AIC-098, AIC-134).
 
 ### 3.9 Decision records, explainability and audit
@@ -397,7 +430,7 @@ Every governed decision writes one `ai.decision_record` to the log database. Tha
 
 | Engine | Day-one producer | Statistical producer (first release) | Model producer (promoted per tenant, section 3.5) |
 |---|---|---|---|
-| Forecast | Same-weekday average plus bookings on hand (suggestion rules) | Seasonal exponential smoothing with holiday and Ramadan regressors; pace-based pickup for T-7..T-0; cold start from category or sister-venue baselines with reduced confidence (AIP-041) | Global gradient-boosted model per tenant with weather, calendar, pace and price features |
+| Forecast | The baseline (section 3.13): venue AI profile x venue-type pattern x UAE calendar x weather, bookings on hand as a floor; then the same-weekday average as own weeks arrive | Seasonal exponential smoothing with holiday and Ramadan regressors; pace-based pickup for T-7..T-0; cold start from category or sister-venue baselines with reduced confidence (AIP-041) | Global gradient-boosted model per tenant with weather, calendar, pace and price features |
 | Anomaly | Configured thresholds | Seasonal baseline with robust z-score (median/MAD) per KPI; peer comparison across venues (AIP-082) | Only where a KPI's false-alarm rate warrants it |
 | Risk | Weighted rules (orders, payments, wallet, access rules stay with their owners) plus cross-module velocity | Entity baselines per entity type (AIP-128); graph features: shared device, token, account (AIP-111) | Gradient-boosted classifier on analyst-labelled outcomes |
 | Recommendation | Relationship map plus business priority | Co-purchase affinity with minimum-support thresholds (AIR-137); popularity by segment and daypart | Learning-to-rank on interaction outcomes |
@@ -437,6 +470,35 @@ Nothing on a dashboard waits for a trained model. Every engine ships with a rule
 | Assistants, analytics, configuration | Full function; they read the catalogue, the knowledge base and the semantic layer, not history | Knowledge gaps filled by content owners; golden sets grow | Not applicable: no per-tenant training |
 
 **The sequence for a new tenant:** rules, then statistics improve quietly, then a shadow model earns its place, then a person flips it. The dashboards look the same throughout; only the producer behind the number changes, and the decision record says which. The review lands as an `ai.governance_alert` of kind `promotionReady` and a tile on the P09 governance area, so nobody has to go looking for it.
+
+**What this table left open** is the first week of a new venue with one site and no history: "same weekday over 8 weeks, or a sister venue" has neither, and the contract answered 422 below each kind's minimum history. Section 3.13 closes it.
+
+### 3.13 Baseline, then learn: maturity stages and the estimator interface (added 30 September)
+
+The product owner's rule (29 September): data-driven AI is built right now and gets more accurate with time, and **no customer is told a feature comes later because they have no data**. The AI functions review (`audit/ticvai/steps/AI2/ai-functions-review.md`, its "packageFindings") showed that the rules themselves needed history, that `requestSuggestion` refused with 422 on Block A screens, and that there was no historical import and no cold-start setting. Decision 10 of 30 September adopted the review.
+
+**One estimator interface per question.** A question is a suggestion kind, a forecast definition, a risk score or a recommendation rank. Behind it sit three producers with the same contract:
+
+| Producer | What it reads | When it answers |
+|---|---|---|
+| **Prior** (baseline) | The venue AI profile (`setAiVenueSettings`), the starting pattern for the venue type (water park, theme park, family entertainment centre, museum, arena, zoo or aquarium; TICVAI-written from published sources and made-up curves, **never another tenant's data**, AIP-149), the UAE calendar (Sat–Sun weekend, public holidays, Ramadan and Eid by Hijri date, school holidays, summer heat for outdoor venues) and the weather (AI-D10) | Day one |
+| **Statistical** | Own data, imported history included, pulled toward the prior: `(k x prior + n x own mean) / (k + n)`, with `k` the prior's weight in observations (4 same weekdays by default, `coldStart.priorWeightObservations`) | Re-estimated nightly, each run a recorded producer version |
+| **Learned** | A model trained per tenant, weekly (`listAiTrainingRuns`), backtested, then run in shadow | Only after an admin promotes it (AI-D16) |
+
+The routing already existed (`setSuggestionProvider`, the forecast `producer`, the release pointer); what is new is the prior, the import and the maturity signal. Nightly re-estimation is not the online learning section 3.5 rules out: no model switches itself, and every re-estimate is a recorded version.
+
+**Maturity on every answer** (`AiMaturity` on `Suggestion` and `AiForecastVersion`; one row per question in `ai.capability_maturity`):
+
+| Stage | When | Behaviour | Switch |
+|---|---|---|---|
+| `starting` | Day 1 | The prior; wide range (forecast about +/-40%); "Limited historical data" | — |
+| `learning` | About 4 weeks | Weekly patterns and short-range answers come mostly from own data; accuracy is measured and shown | Automatic, recorded |
+| `established` | About 3 months, or at once with 12+ months imported | Own level and trend lead; the prior fills gaps such as a holiday not yet seen | Automatic, recorded |
+| `learned` | A season, plus a 6-week shadow that passes the gate in 3.5 | The trained model answers | **An admin promotes it** after a `promotionReady` alert |
+
+Every answer carries a "Based on" line (*your venue profile, UAE calendar, weather, 23 days of your sales*), the share of own data, and what the next stage needs. **422 survives for one case only: a missing setting** (no current cost for a price, no par level, no ride capacity), and the problem names the setting and the screen that sets it. The venue sees every question's stage on ANL-071 AI Maturity & Learning, where it also corrects its profile and imports history; platform staff see it on ADM-519.
+
+**What still cannot happen by 2 April:** a trained model live for a tenant, because promotion needs about a season of that tenant's data (or 12 months imported) and a 6-week shadow. The code for every model ships; promotion happens tenant by tenant.
 
 ---
 
@@ -623,6 +685,8 @@ Effort is in developer-weeks at the AI-assisted pace assumed in the six-month pl
 | Evaluation harness, golden sets, release pointer | C13 | 2 |
 | **Block A total** | | **32** |
 
+**Block A also carries the visit planner (29 September, MOB-6):** the rules planner in `venue-map` and the AI planner agent on top of it (the `itinerary` kind and the agent's five plan tools), about 1 dev-week of AI work beside the planner's own back end. It supersedes the deferral of 28 September (audits R187, R209; rev 3 GAP-C3).
+
 **Block B: first release, months 3–6. Rules-first engines and label capture.**
 
 | Work | Capabilities | Dev-weeks |
@@ -635,7 +699,10 @@ Effort is in developer-weeks at the AI-assisted pace assumed in the six-month pl
 | Recommendation engine runtime, decline store, events, attribution, experiment assignment, POS bundle list | C11 | 6 |
 | Governance monitoring: alerts, incidents, controls, risk register | C13 | 2 |
 | Owner-side .NET: Orders scoring call, Promotions forwarding, seven new events, `recommendationId` on cart lines | — | 4 |
-| **Block B total** | | **32** |
+| **Baseline then learn (section 3.13):** estimator interface and maturity block, venue AI profile, starting-pattern packs, historical import, per-tenant training and backtest job, promotion rule | all engines | 8 |
+| **Block B total** | | **40** |
+
+**Inside the six months, baseline first (decision 10, 30 September).** The six-month plan of 29 September had moved the configuration assistant, the analytics assistant and anomaly detection past month 6. They are back: none needs history, and each ships with its baseline. The configuration assistant runs in S3–S5 (seating and ticketing first), seat-map and layout generation in S6, anomaly detection in S6 from the venue's configured thresholds and "actual against the forecast", and the analytics assistant in S7. The `requestSuggestion` change (no refusal for little history) lands in S2, because its kinds sit on Block A screens.
 
 **Front-end binding** for ADM-469..558, the P16 AI screens and the recommendation boards is about 16 front-end weeks with generated screens.
 
@@ -643,16 +710,19 @@ Effort is in developer-weeks at the AI-assisted pace assumed in the six-month pl
 
 | Work | Dev-weeks |
 |---|---:|
-| Model producers: forecast GBM, fraud classifier, learning-to-rank, each through shadow | 12 |
+| Model producers going **live** per tenant: forecast GBM, fraud classifier, learning-to-rank. The code, training and shadow run are built inside the six months (section 3.13); promotion waits for each tenant's evidence | 12 |
 | L4 governed optimisation | 3 |
 | External knowledge connectors (SharePoint and similar), once their residency is settled | 3 |
 | AI dashboard and report generation (AIP-186, AIP-187) | 3 |
-| Guest itinerary planner (deferred 28 September) | 4 |
 | Partner and external product cross-sell; in-venue location triggers | 4 |
 | On-premise local-model packaging | 3 |
 | Qdrant scale-out, only if triggered | 3 |
 
-**The resourcing gap, stated plainly.** Blocks A and B are 64 AI and back-end dev-weeks in 26 weeks, which is 2.5 engineers. M21 staffs AI with one AI engineer and one front-end developer. Either a second back-end engineer joins from month 2, or Block B's risk and recommendation work (16 dev-weeks) moves to "later". The client must pick (section 8).
+**Staffing, decided (AI-D11, and the plan decision of 30 September).** Staffing is ours to decide, not the client's (AI-D11). **The second AI engineer starts Monday 5 October with Block A, and there is no third.** The two AI engineers carry the engine work: models, pipelines, backtests and the baseline-then-learn layer. The AI endpoints and screens are built by the developers like any other module (six-month plan, decision 11).
+
+**What that leaves.** The AI functions review needed about 50 AI-engineer weeks in Block B against about 35 with two engineers, and assumed the second engineer from 2 November and a third from 7 December. Starting the second engineer on 5 October recovers about four weeks; without a third, about 11 AI-weeks remain short. **The work that gives way first is the trained model producers** (forecast, fraud and ranking, about 9 AI-weeks): their code and training job are built, and they finish running in the background around April to June 2027. No customer notices, because no tenant can pass a promotion gate before then anyway (section 3.13). Everything with a baseline ships inside the six months. The gap is re-measured at the 23 October pace checkpoint.
+
+**The AI sessions with the client (21 September minutes, M21-07).** With risk and fraud covered, the AI workshop topics are complete. AI sessions pause until the conventional modules (POS, guest web, guest mobile) have their build readiness and UI sign-off, and resume later with the smaller AI team.
 
 ---
 
@@ -672,7 +742,10 @@ Chinmay answered every question in this section on 29 September, following the r
 | 8 | OTA and reseller channels | **No recommendations in the first release** | AIR-052 stays excluded |
 | 9 | Guest-visible reasons | **Yes, from templates, where the channel supports them** | 2.2 A stands |
 | 10 | Weather signal | **Yes, a commercial weather API, and its cost** | 3.10 stands; the adapter is in Block B |
-| 11 | Staffing | **Start with the minuted team.** If the pace does not meet Block B, we recommend the second back-end engineer at that point; risk and recommendation are the work that would move | Section 7 stands; the recommendation is raised on evidence, not up front |
+| 11 | Staffing | **Start with the minuted team.** If the pace does not meet Block B, we recommend the second back-end engineer at that point; risk and recommendation are the work that would move. **Updated 30 September:** a second AI engineer from 5 October, no third (six-month plan, decision 11) | Section 7: the trained model producers are what slips first; everything with a baseline ships in the six months |
+| 12 | Which AI ships in six months (30 September, AI-D17) | **Every AI function inside the six months, baseline first, then it learns per tenant.** Rules and starting patterns answer on day one; the tenant's own data takes over as it accumulates | Every suggestion carries its maturity stage (`Suggestion.maturity`); the minimums per kind are where own data takes over, not a refusal |
+| 13 | Model fitness scoring (30 September, AI-D18, our proposal) | **A task-fitness band per model and agent task; warn, never block** | `AiModel.taskFitness`; `setAiProvider` returns `fitnessWarnings` (underpowered, overpowered, unscored); ADM-037 shows them |
+| 14 | Second AI engineer (30 September, AI-D19) | **From 5 October; no third** | As decision 11: trained model producers slip first |
 
 **The trade-offs in section 5 were reviewed at the same time.** All were accepted, with these additions:
 
@@ -752,4 +825,4 @@ Chinmay answered every question in this section on 29 September, following the r
 | AIR-136 (partner and external cross-sell) | Deferred | Needs live sellability integrations that do not exist |
 | AIR-189 (location and zone triggers) | Deferred | In-venue location signals are not governed yet |
 | AIR-052 third-party channels (OTA, reseller) | Excluded from first release | Pending client decision 8 |
-| Guest itinerary planning | Deferred | Decided 28 September (R187, R209) |
+| Guest itinerary planning | **Superseded 29 September** | Now Block A (MOB-6): the rules planner in `venue-map` and the AI planner agent (`requestSuggestion` kind `itinerary`) |

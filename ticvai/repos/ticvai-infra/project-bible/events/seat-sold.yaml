@@ -7,6 +7,8 @@ publisher: seating
 description: A specific seat is no longer available for a performance.
 aggregate: seat
 emittedWhen: SeatStatus held to sold
+emittedBy:
+- createPayment
 payload:
 - field: seatId
   type: string

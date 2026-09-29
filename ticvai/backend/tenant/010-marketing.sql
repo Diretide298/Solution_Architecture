@@ -1,4 +1,4 @@
--- marketing — 132 tables
+-- marketing — 130 tables
 -- **Derived. Do not hand-edit.**
 
 -- Available, busy, away or offline, with a concurrency limit. Expires — an agent who forgets to go
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS marketing.booking_consent_record (
     person_subject_id                 uuid,
     answered_by_subject_id            uuid,
     answered_by_principal_id          uuid,
-    source                            text NOT NULL CONSTRAINT booking_consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner')),
+    source                            text NOT NULL CONSTRAINT booking_consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner', 'checkout')),
     answered_at                       timestamptz NOT NULL,
     superseded_at                     timestamptz,
     scope_path                        ltree NOT NULL
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS marketing.campaign_target (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 9 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.campaign_variant (
     id                                uuid PRIMARY KEY,
     campaign_id                       uuid,
@@ -515,7 +515,7 @@ CREATE TABLE IF NOT EXISTS marketing.communication_routing_rule (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.consent_capture_point (
     capture_point                     text NOT NULL CONSTRAINT consent_capture_point_capture_point_chk CHECK (capture_point IN ('accountRegistration', 'guestCheckout', 'ticketPurchase', 'membershipEnrolment', 'annualPassEnrolment', 'mobileAppRegistration', 'posCustomerCreation', 'kiosk', 'crmCustomerCreation', 'walletEnrolment', 'faceEnrolment', 'newsletterSignup', 'customerPortal', 'competitionPromotion', 'apiPartnerJourney')),
-    channel                           text NOT NULL CONSTRAINT consent_capture_point_channel_chk CHECK (channel IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner')),
+    channel                           text NOT NULL CONSTRAINT consent_capture_point_channel_chk CHECK (channel IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner', 'checkout')),
     brand_id                          uuid,
     country                           text,
     customer_type                     text CONSTRAINT consent_capture_point_customer_type_chk CHECK (customer_type IN ('individual', 'member', 'corporate', 'group', 'school')),
@@ -595,11 +595,13 @@ CREATE TABLE IF NOT EXISTS marketing.consent_record (
     purpose                           text NOT NULL CONSTRAINT consent_record_purpose_chk CHECK (purpose IN ('marketing', 'personalisation', 'profiling', 'thirdPartySharing', 'aiProcessing', 'transactional')),
     decision                          text NOT NULL CONSTRAINT consent_record_decision_chk CHECK (decision IN ('granted', 'withdrawn', 'notAsked')),
     notice_version                    text NOT NULL,
-    source                            text NOT NULL CONSTRAINT consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner')),
+    source                            text NOT NULL CONSTRAINT consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner', 'checkout')),
     recorded_at                       timestamptz NOT NULL,
     id                                text PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
     recorded_by_principal_id          uuid,
+    order_id                          text,
+    verified_contact_ref              text CONSTRAINT consent_record_verified_contact_ref_chk CHECK (char_length(verified_contact_ref) <= 128),
     superseded_at                     timestamptz
 );
 
@@ -716,8 +718,7 @@ CREATE TABLE IF NOT EXISTS marketing.cookie_banner_design (
 );
 
 -- How often each channel is scanned for cookies and trackers, and who is told when a scan finds
--- something undeclared. One row per channel; the scan runs land in marketing.cookie_scan_run.
--- Reached by: 3 operations read it and 1 write it.
+-- something undeclared. One row per channel; the scan runs land in marketing.cookie_scan_run
 CREATE TABLE IF NOT EXISTS marketing.cookie_scan_policy (
     id                                uuid PRIMARY KEY,
     channel                           text NOT NULL CONSTRAINT cookie_scan_policy_channel_chk CHECK (channel IN ('b2cWebsite', 'customerPortal', 'mobileApp', 'embeddedCheckout', 'whiteLabelSite', 'partnerMicrosite')),
@@ -734,7 +735,7 @@ CREATE TABLE IF NOT EXISTS marketing.cookie_scan_policy (
 
 -- One cookie and tracker scan of a storefront, taken in: what was found, which trackers the banner
 -- does not declare, and when. The difference between what a site sets and what its banner admits
--- to is the finding a regulator asks about. Reached by: 2 operations read it and 1 write it.
+-- to is the finding a regulator asks about
 CREATE TABLE IF NOT EXISTS marketing.cookie_scan_run (
     id                                uuid PRIMARY KEY,
     channel                           text NOT NULL CONSTRAINT cookie_scan_run_channel_chk CHECK (channel IN ('b2cWebsite', 'customerPortal', 'mobileApp', 'embeddedCheckout', 'whiteLabelSite', 'partnerMicrosite')),
@@ -767,7 +768,7 @@ CREATE TABLE IF NOT EXISTS marketing.customer_badge (
 -- a change of mind is a new row, so the trail from first decision to last is the evidence. Keyed
 -- for the visitor by consent_key, which the platform mints; claimed_by_subject_id is set once, by
 -- the claim at sign-in, and never cleared. No IP address or user agent here — those are in
--- pii.consent_identifier.
+-- pii.consent_identifier
 CREATE TABLE IF NOT EXISTS marketing.device_consent (
     id                                uuid PRIMARY KEY,
     consent_key                       text NOT NULL CONSTRAINT device_consent_consent_key_chk CHECK (char_length(consent_key) <= 64),
@@ -778,7 +779,7 @@ CREATE TABLE IF NOT EXISTS marketing.device_consent (
     notice_version                    text NOT NULL,
     language                          text CONSTRAINT device_consent_language_chk CHECK (char_length(language) <= 10),
     global_privacy_control            boolean DEFAULT false,
-    source                            text CONSTRAINT device_consent_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner')),
+    source                            text CONSTRAINT device_consent_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner', 'checkout')),
     country                           text,
     decided_at                        timestamptz NOT NULL,
     expires_at                        timestamptz,
@@ -1631,7 +1632,12 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_request (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.privacy_request_deadline (
     privacy_request_type_id           uuid NOT NULL,
-    verification_method               text NOT NULL,
+    jurisdiction                      text NOT NULL,
+    response_days                     integer NOT NULL,
+    calendar_basis                    text,
+    extension_days                    integer,
+    at_risk_days                      integer,
+    legal_reference                   text,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
@@ -1642,6 +1648,7 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_request_type (
     code                              text NOT NULL CONSTRAINT privacy_request_type_code_chk CHECK (char_length(code) <= 60),
     name                              text NOT NULL CONSTRAINT privacy_request_type_name_chk CHECK (char_length(name) <= 150),
     kind                              text NOT NULL CONSTRAINT privacy_request_type_kind_chk CHECK (kind IN ('access', 'dataExport', 'correction', 'deletion', 'anonymisation', 'restriction', 'objection', 'consentWithdrawal', 'marketingOptOut', 'other')),
+    verification_methods              text[] NOT NULL,
     allow_representatives             boolean DEFAULT true,
     status                            text NOT NULL DEFAULT 'active' CONSTRAINT privacy_request_type_status_chk CHECK (status IN ('active', 'retired')),
     scope_path                        ltree NOT NULL,
@@ -2173,31 +2180,6 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_signatory_rule (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
--- Holds 20 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition) (
-    id                                uuid PRIMARY KEY NOT NULL,
-    form_id                           uuid NOT NULL,
-    form_version                      integer NOT NULL,
-    primary_signatory                 text NOT NULL CONSTRAINT waiver_signatory_rule (guardian threshold and flag_9fcc822f_chk CHECK (primary_signatory IN ('ticketHolder', 'purchaser', 'participant', 'parent', 'legalGuardian', 'groupLeader', 'corporateRepresentative', 'member', 'rentalCustomer', 'otherAuthorizedSignatory')),
-    allowed_signatories               text[],
-    co_signature                      text CONSTRAINT waiver_signatory_rule (guardian threshold and flag_a1241dcb_chk CHECK (co_signature IN ('participantAndGuardian', 'customerAndAuthorizedRepresentative')),
-    is_signature_required             boolean DEFAULT true,
-    is_initials_required              boolean DEFAULT false,
-    acceptance_method                 text NOT NULL CONSTRAINT waiver_signatory_rule (guardian threshold and flag_b0814a86_chk CHECK (acceptance_method IN ('drawnSignature', 'typedName', 'checkbox')),
-    capture_relationship              boolean DEFAULT true,
-    identity_verification             text DEFAULT 'none' CONSTRAINT waiver_signatory_rule (guardian threshold and flag_318dfe24_chk CHECK (identity_verification IN ('none', 'signedInAccount', 'oneTimeCode', 'idDocumentCheck')),
-    requires_guardian_for_minors      boolean NOT NULL,
-    guardian_threshold_age            integer,
-    guardian_signs_for_each_minor     boolean DEFAULT true,
-    group_signing_modes               text[],
-    recorded_evidence                 text[],
-    legal_approved_by                 text,
-    legal_approved_at                 timestamptz,
-    scope_path                        ltree NOT NULL,
-    updated_at                        timestamptz
-);
-
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_signature (
@@ -2270,26 +2252,6 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_version_control (
     scope_path                        ltree NOT NULL,
     updated_at                        timestamptz,
     id                                uuid PRIMARY KEY NOT NULL
-);
-
--- Holds 15 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time) (
-    id                                uuid PRIMARY KEY NOT NULL,
-    form_id                           uuid NOT NULL,
-    form_version                      integer NOT NULL,
-    lifecycle_status                  text NOT NULL CONSTRAINT waiver_version_control (checklist, simulation and _1766f151_chk CHECK (lifecycle_status IN ('draft', 'review', 'pendingApproval', 'approved', 'scheduled', 'published', 'suspended', 'expired', 'archived')),
-    simulation                        jsonb,
-    change_reason                     text,
-    effective_from                    timestamptz,
-    effective_to                      timestamptz,
-    resign_rule                       text CONSTRAINT waiver_version_control (checklist, simulation and _ef43c00a_chk CHECK (resign_rule IN ('noResign', 'resignAtNextBooking', 'resignBeforeNextVisit')),
-    publication                       jsonb,
-    is_suspended                      boolean DEFAULT false,
-    suspension_reason                 text,
-    audit                             jsonb,
-    scope_path                        ltree NOT NULL,
-    updated_at                        timestamptz
 );
 
 -- Something a guest saved. Per guest, synced across their devices

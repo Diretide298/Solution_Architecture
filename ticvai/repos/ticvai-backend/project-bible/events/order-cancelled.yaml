@@ -8,6 +8,8 @@ description: An order was voided before any money was captured — the whole ord
   who did it.
 aggregate: order
 emittedWhen: OrderStatus pending to voided (voidOrder)
+emittedBy:
+- voidOrder
 payload:
 - field: orderId
   type: string

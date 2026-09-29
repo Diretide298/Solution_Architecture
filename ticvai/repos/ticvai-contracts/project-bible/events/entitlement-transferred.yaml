@@ -9,6 +9,9 @@ description: An entitlement changed holder — a guest's transfer was claimed, o
 aggregate: entitlement
 emittedWhen: TicketTransfer.status offered to claimed (claimTicketTransfer), or ResaleListing.status reserved
   to sold (createResaleListing)
+emittedBy:
+- claimTicketTransfer
+- createResaleListing
 payload:
 - field: entitlementId
   type: string

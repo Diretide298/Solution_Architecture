@@ -177,3 +177,15 @@ one as a source of truth, which is what the read-only rule is protecting.
 **Both exceptions are in `check-package.py` and this ADR now says so.** An absolute rule with an
 undocumented allowlist is worse than a rule with two stated exceptions, because the first invites
 a third that nobody argues for.
+
+### The rule extended to the AI tables of 29 September
+
+**Added 30 September** (the 29 September pass, AI2 baseline). The day-one baseline added five
+AI-owned tables: `ai.venue_settings` (the venue AI profile, `setAiVenueSettings`),
+`ai.history_import` and `ai.history_observation` (a venue's own history brought in by
+`importVenueHistory`), `ai.capability_maturity` (where each capability stands between baseline and
+learned) and `ai.training_run` (each per-tenant training run). **They are inside the boundary and
+the lineage rule covers them like every other `ai.*` table**: only AI operations write them, no
+non-AI contract writes them, and the operations that write them write nothing outside `ai.*`,
+`qdrant*` or `cache:*`. A history import reads the tenant's platform tables through their owners'
+read APIs and copies what it needs into `ai.history_observation`; it never writes back.

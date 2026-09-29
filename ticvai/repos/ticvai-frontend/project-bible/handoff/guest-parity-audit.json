@@ -1,20 +1,20 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "screens": {
-  "P01": 49,
+  "P01": 50,
   "P02": 77
  },
  "groups": {
-  "paired": 45,
+  "paired": 46,
   "webOnly": 1,
   "folded": 3,
-  "appOnly": 7
+  "appOnly": 6
  },
  "severity": {
-  "high": 33,
-  "medium": 185,
-  "low": 226,
+  "high": 34,
+  "medium": 203,
+  "low": 232,
   "info": 3
  },
  "findings": [
@@ -29,14 +29,14 @@
    "severity": "high",
    "dimension": "frontend manifest",
    "where": "frontend/guest-app.yaml",
-   "detail": "lists 80 screens against 77: missing 14 (GST-066, GST-067, GST-068, GST-069, GST-070, GST-071, GST-072, GST-073, GST-074, GST-075, GST-076, GST-077…); ghosts ['GST-060', 'GST-064']; 4 renamed, 6 in another wave",
+   "detail": "lists 80 screens against 77: missing 14 (GST-066, GST-067, GST-068, GST-069, GST-070, GST-071, GST-072, GST-073, GST-074, GST-075, GST-076, GST-077…); ghosts ['GST-060', 'GST-064']; 14 renamed, 6 in another wave",
    "fix": "derive-frontend.py carries `screens`, `screenCount` and `byWave` over from the previous file (`e.setdefault` on every existing key) and never recomputes them — derive them"
   },
   {
    "severity": "high",
    "dimension": "frontend manifest",
    "where": "frontend/guest-web.yaml",
-   "detail": "lists 35 screens against 49: missing 14 (WEB-036, WEB-037, WEB-038, WEB-039, WEB-040, WEB-041, WEB-042, WEB-043, WEB-044, WEB-045, WEB-046, WEB-047…); ghosts —; 7 renamed, 1 in another wave",
+   "detail": "lists 35 screens against 50: missing 15 (WEB-036, WEB-037, WEB-038, WEB-039, WEB-040, WEB-041, WEB-042, WEB-043, WEB-044, WEB-045, WEB-046, WEB-047…); ghosts —; 7 renamed, 1 in another wave",
    "fix": "derive-frontend.py carries `screens`, `screenCount` and `byWave` over from the previous file (`e.setdefault` on every existing key) and never recomputes them — derive them"
   },
   {
@@ -72,6 +72,13 @@
    "dimension": "licence",
    "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
    "detail": "web requires ['marketing'], app requires ['fnb'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "web requires ['ticketing'], app requires ['ai', 'ticketing'] — a tenant licensed for one and not the other sees it on one shell only",
    "fix": "one requiresModule for the capability"
   },
   {
@@ -252,6 +259,13 @@
   {
    "severity": "medium",
    "dimension": "bindings",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "web shows ['BookingFlow'] only, app shows — only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
    "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
    "detail": "web shows ['AiConversation'] only, app shows ['Cart', 'GuestOrderStatus'] only",
    "fix": "bind both twins to the same schemas"
@@ -280,6 +294,13 @@
   {
    "severity": "medium",
    "dimension": "bindings",
+   "where": "detail (WEB-004 ↔ GST-004/GST-006)",
+   "detail": "web shows — only, app shows ['VenuePoint'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
    "where": "help-and-cases (WEB-025 ↔ GST-068)",
    "detail": "web shows ['TenantAppStatus'] only, app shows ['AiConversation'] only",
    "fix": "bind both twins to the same schemas"
@@ -296,6 +317,13 @@
    "dimension": "bindings",
    "where": "home (WEB-001 ↔ GST-001)",
    "detail": "web shows ['HomepageLayout', 'Product'] only, app shows ['GuestProfileDetail', 'Money'] only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "web shows — only, app shows ['VisitPlan'] only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -352,6 +380,13 @@
    "dimension": "bindings",
    "where": "search (WEB-003 ↔ GST-063)",
    "detail": "web shows ['Product'] only, app shows — only",
+   "fix": "bind both twins to the same schemas"
+  },
+  {
+   "severity": "medium",
+   "dimension": "bindings",
+   "where": "seat-selection (WEB-007 ↔ GST-049)",
+   "detail": "web shows ['BookingFlow'] only, app shows — only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -440,13 +475,6 @@
   },
   {
    "severity": "medium",
-   "dimension": "contracts",
-   "where": "contracts/satellite/venue-map.yaml:8",
-   "detail": "x-ticvai-platforms names P02 and not P01",
-   "fix": "name both guest shells"
-  },
-  {
-   "severity": "medium",
    "dimension": "coverage",
    "where": "account-hub",
    "detail": "WEB-017 My Account Dashboard — web only (raise). The web has an account dashboard; the app reaches the same things from Home and Profile. A navigation difference rather than a capability one, but it is a difference.",
@@ -463,14 +491,7 @@
    "severity": "medium",
    "dimension": "coverage",
    "where": "digital-companion-mode",
-   "detail": "GST-038 Digital Companion Mode — app only (raise). Unsourced (CF-92) — reads as a framing for the in-venue screens rather than a capability. \"What is near you\" lives here and nowhere on the web.",
-   "fix": "ask the client whether it ships, then add it to both or remove it"
-  },
-  {
-   "severity": "medium",
-   "dimension": "coverage",
-   "where": "itinerary-planning",
-   "detail": "GST-051 Plan Your Adventure – Start, GST-052 Suggested Itineraries, GST-053 Build Your Own Itinerary, GST-054 AI Optimized Itinerary, GST-059 Plan My Day – In Progress — app only (raise). Five screens with no requirement (guest-surface-parity.md); GST-054 assumes parked AI. **Deferred to a later release** (decided 28 September, audit R187): all five are `wave: 4` with a `deferred` block and out of Block A; the itinerary suggestion is removed from them (audit R209). Confirmed on 29 September: the itinerary screens stay in wave 4 (rev 3 GAP-C3).",
+   "detail": "GST-038 At the Venue — app only (raise). Unsourced (CF-92) — reads as a framing for the in-venue screens rather than a capability. \"What is near you\" lives here and nowhere on the web.",
    "fix": "ask the client whether it ships, then add it to both or remove it"
   },
   {
@@ -540,8 +561,15 @@
    "severity": "medium",
    "dimension": "design",
    "where": "Claude Design",
-   "detail": "web 14/14 batches drawn, app 19/19 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames",
+   "detail": "web 13/14 batches drawn, app 19/19 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames",
    "fix": "draw the app batches against the web's house style, or decide which system is the guest's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "designer-drawn frame on the app only",
+   "fix": ""
   },
   {
    "severity": "medium",
@@ -568,7 +596,7 @@
    "severity": "medium",
    "dimension": "design bundles",
    "where": "P01-discovery-browse-01",
-   "detail": "4 of 4 screens differ from the YAML (WEB-001, WEB-002, WEB-003, WEB-004)",
+   "detail": "5 of 5 screens differ from the YAML (WEB-001, WEB-002, WEB-003, WEB-004, WEB-050)",
    "fix": "python3 tools/export-design-batch.py P01-discovery-browse-01"
   },
   {
@@ -777,9 +805,16 @@
   {
    "severity": "medium",
    "dimension": "documents",
-   "where": "docs/active/mom-digest.md:3903",
+   "where": "docs/active/mom-digest.md:3908",
    "detail": "\"can differ in functionality\" — a client minute says web and app may differ — the 12 September rule says they do not; worth confirming with the client",
    "fix": "confirm with the client"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "web opens with ['bundleId', 'cartId', 'venueId'], app with ['bundleId', 'cartId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
   },
   {
    "severity": "medium",
@@ -792,28 +827,28 @@
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "web opens with ['cartId', 'code', 'holdId', 'lineId', 'performanceId'], app with ['cartId', 'holdId', 'lineId', 'performanceId', 'productId'] — one shared link cannot open both",
+   "detail": "web opens with ['cartId', 'code', 'holdId', 'lineId', 'performanceId', 'venueId'], app with ['cartId', 'holdId', 'lineId', 'performanceId', 'productId', 'venueId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "web opens with ['cartId', 'deviceId', 'itemId', 'orderId', 'paymentId', 'subjectId', 'token'], app with ['cartId', 'orderId', 'paymentId', 'token'] — one shared link cannot open both",
+   "detail": "web opens with ['cartId', 'deviceId', 'itemId', 'orderId', 'paymentId', 'subjectId', 'token', 'venueId'], app with ['cartId', 'orderId', 'paymentId', 'token', 'venueId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "web opens with ['cartId', 'eventId', 'performanceId'], app with ['cartId', 'eventId'] — one shared link cannot open both",
+   "detail": "web opens with ['cartId', 'eventId', 'performanceId', 'venueId'], app with ['cartId', 'eventId', 'venueId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
    "severity": "medium",
    "dimension": "entry parameters",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
-   "detail": "web opens with ['eventId', 'productId'], app with ['eventId', 'performanceId', 'productId'] — one shared link cannot open both",
+   "detail": "web opens with ['eventId', 'productId'], app with ['bundleId', 'eventId', 'mapId', 'performanceId', 'productId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -842,6 +877,13 @@
    "dimension": "entry parameters",
    "where": "home (WEB-001 ↔ GST-001)",
    "detail": "web opens with —, app with ['subjectId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "web opens with ['itemId', 'planId', 'venueId'], app with ['cartId', 'conversationId', 'itemId', 'planId', 'venueId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -898,6 +940,13 @@
    "dimension": "entry parameters",
    "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
    "detail": "web opens with ['groupBookingId', 'productId', 'reservationId', 'resourceId'], app with ['reservationId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "seat-selection (WEB-007 ↔ GST-049)",
+   "detail": "web opens with ['eventId', 'holdId', 'performanceId', 'venueId'], app with ['eventId', 'holdId', 'performanceId'] — one shared link cannot open both",
    "fix": "one deep-link shape per capability"
   },
   {
@@ -1036,6 +1085,13 @@
   {
    "severity": "medium",
    "dimension": "flows",
+   "where": "F49",
+   "detail": "\"A guest plans a day and follows it\" walks app screens only, though its capabilities exist on the web (cart, itinerary-planning)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
    "where": "F50",
    "detail": "\"A guest arrives, parks, and gets in\" walks app screens only, though its capabilities exist on the web (dynamic-qr-ticket, parking, tickets)",
    "fix": "name both platforms, or say why the journey is one shell's"
@@ -1056,6 +1112,20 @@
   },
   {
    "severity": "medium",
+   "dimension": "machine",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "declared on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "the web calls getPublishedBookingFlow here; the app calls getPublishedBookingFlow on GST-007/GST-008/GST-009/GST-041",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
    "dimension": "operations",
    "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
    "detail": "the web calls listAiConversations here; the app calls listAiConversations on GST-068",
@@ -1072,7 +1142,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "the web calls addCartLine, getCouponCode here; the app calls addCartLine on GST-007/GST-008/GST-009/GST-026/GST-027/GST-032/GST-048/GST-050/GST-053/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; getCouponCode on GST-037",
+   "detail": "the web calls addCartLine, getCouponCode here; the app calls addCartLine on GST-007/GST-008/GST-009/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; getCouponCode on GST-037",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1107,14 +1177,14 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "the app calls listProductCategories, listProducts here; the web calls listProductCategories on WEB-002/WEB-005; listProducts on WEB-001/WEB-002/WEB-003/WEB-005/WEB-022/WEB-035/WEB-048",
+   "detail": "the app calls listProductCategories, listProducts here; the web calls listProductCategories on WEB-002/WEB-005; listProducts on WEB-001/WEB-002/WEB-003/WEB-005/WEB-022/WEB-035/WEB-048/WEB-050",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
    "severity": "medium",
    "dimension": "operations",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
-   "detail": "the app calls getPerformance here; the web calls getPerformance on WEB-006/WEB-010",
+   "detail": "the app calls getBundle, getPerformance, getVenueMap here; the web calls getBundle on WEB-008; getPerformance on WEB-006/WEB-010; getVenueMap on WEB-039/WEB-047",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1128,7 +1198,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "fnb-order (WEB-036 ↔ GST-024)",
-   "detail": "the web calls addCartLine, createTableReservation, joinRestaurantWaitlist, leaveRestaurantWaitlist here; the app calls addCartLine on GST-007/GST-008/GST-009/GST-026/GST-027/GST-032/GST-048/GST-050/GST-053/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; createTableReservation on GST-070; joinRestaurantWaitlist on GST-070; leaveRestaurantWaitlist on GST-070",
+   "detail": "the web calls addCartLine, createTableReservation, joinRestaurantWaitlist, leaveRestaurantWaitlist here; the app calls addCartLine on GST-007/GST-008/GST-009/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; createTableReservation on GST-070; joinRestaurantWaitlist on GST-070; leaveRestaurantWaitlist on GST-070",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1156,14 +1226,14 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "the web calls listProducts here; the app calls listProducts on GST-002/GST-003/GST-005/GST-007/GST-008/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-052/GST-053/GST-054/GST-058/GST-059/GST-075",
+   "detail": "the app calls getGuestProfile, listProductCategories, searchCatalogue here; the web calls getGuestProfile on WEB-011/WEB-020; listProductCategories on WEB-002/WEB-005; searchCatalogue on WEB-002/WEB-003",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
    "severity": "medium",
    "dimension": "operations",
-   "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "the app calls getGuestProfile, searchCatalogue here; the web calls getGuestProfile on WEB-011/WEB-020; searchCatalogue on WEB-002/WEB-003",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "the app calls createAiConversation, getCart, getWaitTimes, listCatalogueBundles, requestSuggestion, sendAiMessage here; the web calls createAiConversation on WEB-044; getCart on WEB-006/WEB-010/WEB-011; getWaitTimes on WEB-002/WEB-004/WEB-015/WEB-039/WEB-040; listCatalogueBundles on WEB-008; requestSuggestion on WEB-044; sendAiMessage on WEB-044",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1254,7 +1324,14 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "search (WEB-003 ↔ GST-063)",
-   "detail": "the web calls listProducts here; the app calls listProducts on GST-002/GST-003/GST-005/GST-007/GST-008/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-052/GST-053/GST-054/GST-058/GST-059/GST-075",
+   "detail": "the web calls listProducts here; the app calls listProducts on GST-001/GST-002/GST-003/GST-005/GST-007/GST-008/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-052/GST-053/GST-058/GST-075",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "seat-selection (WEB-007 ↔ GST-049)",
+   "detail": "the web calls getPublishedBookingFlow here; the app calls getPublishedBookingFlow on GST-007/GST-008/GST-009/GST-041",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1268,7 +1345,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "shop-and-drop (WEB-042 ↔ GST-062)",
-   "detail": "the web calls addCartLine, checkoutCart, createPayment, listMerchandise, lookupMerchandise here; the app calls addCartLine on GST-007/GST-008/GST-009/GST-026/GST-027/GST-032/GST-048/GST-050/GST-053/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; checkoutCart on GST-009/GST-026/GST-027/GST-032/GST-041; createPayment on GST-009/GST-026/GST-027; listMerchandise on GST-026; lookupMerchandise on GST-026",
+   "detail": "the web calls addCartLine, checkoutCart, createPayment, listMerchandise, lookupMerchandise here; the app calls addCartLine on GST-007/GST-008/GST-009/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; checkoutCart on GST-009/GST-026/GST-027/GST-032/GST-041; createPayment on GST-009/GST-026/GST-027; listMerchandise on GST-026; lookupMerchandise on GST-026",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1317,7 +1394,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
-   "detail": "the app calls listProducts here; the web calls listProducts on WEB-001/WEB-002/WEB-003/WEB-005/WEB-022/WEB-035/WEB-048",
+   "detail": "the app calls listProducts here; the web calls listProducts on WEB-001/WEB-002/WEB-003/WEB-005/WEB-022/WEB-035/WEB-048/WEB-050",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1365,6 +1442,13 @@
   {
    "severity": "medium",
    "dimension": "overlays",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "declared on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "overlays",
    "where": "loyalty (WEB-043 ↔ GST-036)",
    "detail": "declared on the web only",
    "fix": ""
@@ -1374,6 +1458,20 @@
    "dimension": "overlays",
    "where": "shop-and-drop (WEB-042 ↔ GST-062)",
    "detail": "declared on the web only",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "platform",
+   "where": "appShell",
+   "detail": "web null · app {\"buyButton\": \"A persistent **Buy tickets** button on every screen, opening GST-003 Buy Tickets. Style from `NavigationC",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "platform",
+   "where": "navigationSets",
+   "detail": "web null · app {\"appTabs\": {\"destinations\": [\"GST-001\", \"GST-002\", \"GST-003\", \"GST-051\", \"GST-012\", \"GST-038\"], \"members\": [\"GST-001\", ",
    "fix": ""
   },
   {
@@ -1421,8 +1519,22 @@
   {
    "severity": "medium",
    "dimension": "states",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "web only —, app only ['introVideo']",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
    "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
    "detail": "web only ['emptyNoAccess'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "web only —, app only ['aiUnavailable']",
    "fix": ""
   },
   {
@@ -1521,6 +1633,27 @@
    "dimension": "unbound operations",
    "where": "fnb-order (WEB-036 ↔ GST-024)",
    "detail": "WEB-036 declares addCartLine and no component in its layout calls it; the twin binds or lacks addCartLine",
+   "fix": "bind each to a component, or move it to the screen that calls it"
+  },
+  {
+   "severity": "medium",
+   "dimension": "unbound operations",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "GST-051 declares getWaitTimes and no component in its layout calls it; the twin binds or lacks getWaitTimes",
+   "fix": "bind each to a component, or move it to the screen that calls it"
+  },
+  {
+   "severity": "medium",
+   "dimension": "unbound operations",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "GST-053 declares getCart, listProducts and no component in its layout calls them; the twin binds or lacks getCart, listProducts",
+   "fix": "bind each to a component, or move it to the screen that calls it"
+  },
+  {
+   "severity": "medium",
+   "dimension": "unbound operations",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "GST-054 declares createAiConversation, requestSuggestion and no component in its layout calls them; the twin binds or lacks createAiConversation, requestSuggestion",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
   {
@@ -1640,6 +1773,13 @@
    "dimension": "capability code",
    "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
    "detail": "web —, app ['C61'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "web ['AI-35'], app ['AI-35', 'C02'] — traceability counts them as two",
    "fix": ""
   },
   {
@@ -1834,6 +1974,13 @@
   {
    "severity": "low",
    "dimension": "components",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "web only ['progressIndicator'], app only — (5 vs 6 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
    "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
    "detail": "web only ['cardList', 'dataTable'], app only ['multiSelect', 'textField'] (9 vs 16 components)",
    "fix": ""
@@ -1842,21 +1989,21 @@
    "severity": "low",
    "dimension": "components",
    "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
-   "detail": "web only ['multiSelect', 'searchField'], app only — (13 vs 19 components)",
+   "detail": "web only ['multiSelect'], app only — (16 vs 24 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "web only ['banner'], app only ['dataTable'] (15 vs 11 components)",
+   "detail": "web only ['banner'], app only ['dataTable'] (16 vs 12 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "web only ['banner', 'cartPanel', 'consentBlock', 'dataTable', 'destructiveButton', 'textField'], app only — (32 vs 9 components)",
+   "detail": "web only ['banner', 'cartPanel', 'dataTable', 'destructiveButton', 'textField'], app only — (36 vs 12 components)",
    "fix": ""
   },
   {
@@ -1870,14 +2017,14 @@
    "severity": "low",
    "dimension": "components",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
-   "detail": "web only ['detailPanel', 'secondaryButton'], app only — (12 vs 12 components)",
+   "detail": "web only ['detailPanel', 'secondaryButton'], app only — (13 vs 14 components)",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "components",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
-   "detail": "web only ['banner', 'primaryButton'], app only — (12 vs 12 components)",
+   "detail": "web only ['banner', 'primaryButton'], app only ['seatMap'] (14 vs 16 components)",
    "fix": ""
   },
   {
@@ -1912,7 +2059,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "web only ['cardList', 'iconButton', 'textField'], app only — (14 vs 12 components)",
+   "detail": "web only ['iconButton', 'textField'], app only — (14 vs 16 components)",
    "fix": ""
   },
   {
@@ -1920,6 +2067,13 @@
    "dimension": "components",
    "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
    "detail": "web only ['detailPanel'], app only — (8 vs 7 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "web only —, app only ['assistantPanel', 'banner', 'cardList', 'dataTable', 'destructiveButton'] (15 vs 36 components)",
    "fix": ""
   },
   {
@@ -1982,7 +2136,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "profile (WEB-020 ↔ GST-039)",
-   "detail": "web only ['dataTable', 'detailPanel'], app only ['textField'] (7 vs 8 components)",
+   "detail": "web only ['dataTable', 'detailPanel'], app only ['textField'] (8 vs 9 components)",
    "fix": ""
   },
   {
@@ -1996,7 +2150,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "seat-selection (WEB-007 ↔ GST-049)",
-   "detail": "web only ['banner'], app only — (9 vs 7 components)",
+   "detail": "web only ['banner', 'progressIndicator'], app only — (10 vs 7 components)",
    "fix": ""
   },
   {
@@ -2010,7 +2164,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "ticket-selection (WEB-005 ↔ GST-008)",
-   "detail": "web only ['dataTable', 'detailPanel', 'iconButton', 'selectField'], app only — (12 vs 6 components)",
+   "detail": "web only ['dataTable', 'detailPanel', 'iconButton', 'selectField'], app only — (14 vs 8 components)",
    "fix": ""
   },
   {
@@ -2072,7 +2226,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "contracts/spine/catalogue.yaml:964",
+   "where": "contracts/spine/catalogue.yaml:974",
    "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
    "fix": "rewrite to the 12 September rule"
   },
@@ -2108,7 +2262,7 @@
    "severity": "low",
    "dimension": "layout split",
    "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
-   "detail": "1 screen(s) on the web, 3 on the app: Event & Attraction Listing ↔ Explore Categories; Event & Attraction Listing; What's On",
+   "detail": "1 screen(s) on the web, 3 on the app: Event & Attraction Listing ↔ Explore; Buy Tickets; What's On",
    "fix": "fine if deliberate; a builder should know it is one capability"
   },
   {
@@ -2122,7 +2276,7 @@
    "severity": "low",
    "dimension": "layout split",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
-   "detail": "1 screen(s) on the web, 2 on the app: Attraction Details ↔ Attraction Details; Event / Exhibition Details",
+   "detail": "1 screen(s) on the web, 2 on the app: Attraction Details ↔ Item Detail; Item Detail – Event / Exhibition",
    "fix": "fine if deliberate; a builder should know it is one capability"
   },
   {
@@ -2130,6 +2284,13 @@
    "dimension": "layout split",
    "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
    "detail": "1 screen(s) on the web, 2 on the app: Help Centre & Accessibility ↔ Help & Support; Accessibility Information",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "1 screen(s) on the web, 5 on the app: Plan Your Visit ↔ Plan; Suggested Itineraries; Your Plan; AI Planner; Plan in Progress",
    "fix": "fine if deliberate; a builder should know it is one capability"
   },
   {
@@ -2227,7 +2388,7 @@
    "severity": "low",
    "dimension": "naming",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "\"Home / Landing\" ↔ \"Home – Default\"",
+   "detail": "\"Home / Landing\" ↔ \"Home\"",
    "fix": "one name for one journey (31 August rule)"
   },
   {
@@ -2248,7 +2409,7 @@
    "severity": "low",
    "dimension": "naming",
    "where": "search (WEB-003 ↔ GST-063)",
-   "detail": "\"Search Results\" ↔ \"Search\"",
+   "detail": "\"Search Results\" ↔ \"Explore – Search Results\"",
    "fix": "one name for one journey (31 August rule)"
   },
   {
@@ -2304,7 +2465,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
-   "detail": "leads on to ['cart', 'date-and-session', 'seat-selection', 'sign-in', 'ticket-selection'] on the web only and ['browse'] on the app only",
+   "detail": "leads on to ['date-and-session', 'seat-selection', 'sign-in', 'ticket-selection'] on the web only and ['browse'] on the app only",
    "fix": ""
   },
   {
@@ -2318,14 +2479,14 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
-   "detail": "leads on to ['search', 'ticket-selection'] on the web only and — on the app only",
+   "detail": "leads on to — on the web only and ['add-ons', 'date-and-session', 'map-booking', 'space-by-the-hour'] on the app only",
    "fix": ""
   },
   {
    "severity": "low",
    "dimension": "navigation",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "leads on to ['checkout-and-payment', 'confirmation', 'ticket-transfer'] on the web only and ['browse'] on the app only",
+   "detail": "leads on to ['checkout-and-payment', 'confirmation', 'ticket-transfer'] on the web only and ['browse', 'itinerary-planning'] on the app only",
    "fix": ""
   },
   {
@@ -2353,7 +2514,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
-   "detail": "leads on to ['search'] on the web only and — on the app only",
+   "detail": "leads on to ['search'] on the web only and ['add-ons', 'digital-companion-mode'] on the app only",
    "fix": ""
   },
   {
@@ -2388,7 +2549,7 @@
    "severity": "low",
    "dimension": "navigation",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "leads on to ['account-hub', 'newsletter', 'privacy-security-devices'] on the web only and ['add-to-calendar', 'cabana-booking', 'cart', 'checkout-and-payment', 'confirmation', 'date-and-session', 'digital-companion-mode', 'dynamic-qr-ticket', 'itinerary-planning', 'multi-currency', 'reservations', 'reserve-table-or-cabana', 'rtl-specimen', 'seat-selection', 'ticket-selection', 'ticket-transfer'] on the app only",
+   "detail": "leads on to ['account-hub', 'newsletter', 'privacy-security-devices'] on the web only and ['add-to-calendar', 'cabana-booking', 'cart', 'checkout-and-payment', 'confirmation', 'date-and-session', 'digital-companion-mode', 'dynamic-qr-ticket', 'multi-currency', 'reservations', 'reserve-table-or-cabana', 'rtl-specimen', 'seat-selection', 'ticket-selection', 'ticket-transfer'] on the app only",
    "fix": ""
   },
   {
@@ -2396,6 +2557,13 @@
    "dimension": "navigation",
    "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
    "detail": "leads on to — on the web only and ['ai-concierge', 'browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "leads on to ['detail'] on the web only and ['add-ons', 'digital-companion-mode'] on the app only",
    "fix": ""
   },
   {
@@ -2494,13 +2662,6 @@
    "dimension": "navigation",
    "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
    "detail": "leads on to ['multi-currency', 'ticket-transfer'] on the web only and ['browse'] on the app only",
-   "fix": ""
-  },
-  {
-   "severity": "low",
-   "dimension": "navigation",
-   "where": "search (WEB-003 ↔ GST-063)",
-   "detail": "leads on to ['browse', 'detail'] on the web only and — on the app only",
    "fix": ""
   },
   {
@@ -2606,6 +2767,13 @@
    "dimension": "section",
    "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
    "detail": "web section ['Support'], app ['Discovery & Browse', 'Engagement & Support']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "web section ['Discovery & Browse'], app ['Engagement & Support']",
    "fix": ""
   },
   {
@@ -2767,6 +2935,13 @@
    "dimension": "state wording",
    "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
    "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {

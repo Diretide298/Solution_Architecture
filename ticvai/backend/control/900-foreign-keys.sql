@@ -3,10 +3,13 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 24 of 778 declared references. The ones that reach the
+-- 31 of 799 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
+ALTER TABLE control.api_anomaly ADD CONSTRAINT api_anomaly_client_id_fkey FOREIGN KEY (client_id) REFERENCES control.api_client(id);
+ALTER TABLE control.api_anomaly_rule ADD CONSTRAINT api_anomaly_rule_client_id_fkey FOREIGN KEY (client_id) REFERENCES control.api_client(id);
+ALTER TABLE control.api_client ADD CONSTRAINT api_client_certification_listing_id_fkey FOREIGN KEY (certification_listing_id) REFERENCES control.integration_listing(id);
 ALTER TABLE control.api_licence ADD CONSTRAINT api_licence_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
 ALTER TABLE control.cell_job ADD CONSTRAINT cell_job_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
 ALTER TABLE control.credit_note_line ADD CONSTRAINT credit_note_line_credit_note_id_fkey FOREIGN KEY (credit_note_id) REFERENCES control.credit_note(id);
@@ -25,9 +28,13 @@ ALTER TABLE control.partner_application_review_task ADD CONSTRAINT partner_appli
 ALTER TABLE control.partner_commission_rule_tier ADD CONSTRAINT partner_commission_rule_tier_partner_commission_rule_id_fkey FOREIGN KEY (partner_commission_rule_id) REFERENCES control.partner_commission_rule(id);
 ALTER TABLE control.partner_rate_volume_band ADD CONSTRAINT partner_rate_volume_band_partner_rate_id_fkey FOREIGN KEY (partner_rate_id) REFERENCES control.partner_rate(id);
 ALTER TABLE control.partner_user ADD CONSTRAINT partner_user_partner_id_fkey FOREIGN KEY (partner_id) REFERENCES control.partner(id);
+ALTER TABLE control.production_access_request ADD CONSTRAINT production_access_request_listing_id_fkey FOREIGN KEY (listing_id) REFERENCES control.integration_listing(id);
+ALTER TABLE control.production_access_request ADD CONSTRAINT production_access_request_production_client_id_fkey FOREIGN KEY (production_client_id) REFERENCES control.api_client(id);
+ALTER TABLE control.production_access_request ADD CONSTRAINT production_access_request_sandbox_client_id_fkey FOREIGN KEY (sandbox_client_id) REFERENCES control.api_client(id);
 ALTER TABLE control.release_component ADD CONSTRAINT release_component_release_id_fkey FOREIGN KEY (release_id) REFERENCES control.release(id);
 ALTER TABLE control.rollout ADD CONSTRAINT rollout_release_id_fkey FOREIGN KEY (release_id) REFERENCES control.release(id);
 ALTER TABLE control.rollout_cell ADD CONSTRAINT rollout_cell_cell_id_fkey FOREIGN KEY (cell_id) REFERENCES control.cell(id);
+ALTER TABLE control.tenant_domain ADD CONSTRAINT tenant_domain_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
 ALTER TABLE control.tenant_migration ADD CONSTRAINT tenant_migration_plan_id_fkey FOREIGN KEY (plan_id) REFERENCES control.tenant_migration_plan(id);
 ALTER TABLE control.tenant_migration ADD CONSTRAINT tenant_migration_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
 ALTER TABLE control.tenant_migration_plan ADD CONSTRAINT tenant_migration_plan_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);

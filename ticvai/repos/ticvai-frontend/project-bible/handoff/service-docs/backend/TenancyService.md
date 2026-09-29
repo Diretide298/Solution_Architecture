@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy` |
-| Operations in the slice | 28 of 202 |
+| Operations in the slice | 28 of 204 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -33,14 +33,14 @@
 |---|---|---|---|---|---|---|
 | approvals | [`approveMatrixMultiLevel`](#approvematrixmultilevel) | PUT | `/matrix-multi-level` | setup | 1 |  |
 | approvals | [`approveRoleAuthorityDelegation`](#approveroleauthoritydelegation) | PUT | `/role-authority-delegation` | setup | 1 |  |
-| delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, BO-087, BO-385 |
+| delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, ADM-534, BO-087, BO-385 |
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, POS-016 |
 | matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers` | setup | 1 | ADM-354 |
 | matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333 … |
 | region | [`updateRegionSettings`](#updateregionsettings) | PUT | `/regions/{regionId}/settings` | setup | 1 | ADM-425, BO-1065 |
 | request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-243 … |
 | request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ADM-145, ADM-249, BO-084, BO-085, BO-133, BO-243 … |
-| request | [`evaluateApprovalRequirement`](#evaluateapprovalrequirement) | POST | `/approval-requests/evaluate` | core | 1 | ADM-337, BO-085, BO-368, POS-002, POS-004 |
+| request | [`evaluateApprovalRequirement`](#evaluateapprovalrequirement) | POST | `/approval-requests/evaluate` | core | 1 | ADM-337, ADM-530, ADM-532, BO-085, BO-368, POS-002 … |
 | rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | core | 1 | BO-055, BO-712, BO-884, BO-917, POS-009, POS-018 |
 | rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 1 | BO-055, BO-882, BO-883, EMP-021, EMP-022, EMP-023 … |
 | scope | [`createOrgUnit`](#createorgunit) | POST | `/org-units` | setup | 1 | ADM-006, ADM-420, BO-064, BO-145 |
@@ -268,7 +268,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Conflict policy | serverWins |
 | Reads | `approvals.delegation`, `cache:idempotency`, `identity.delegated_access`, `identity.principal` |
 | Writes | `approvals.delegation`, `cache:idempotency` |
-| Called by | ADM-243, BO-087, BO-385 |
+| Called by | ADM-243, ADM-534, BO-087, BO-385 |
 
 **Parameters**
 
@@ -339,6 +339,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Part of slice | core |
 | Wave | 1 |
 | Offline | no |
+| Conflict policy | serverWins |
 | Reads | `tenancy.device_assignment` |
 | Writes | `tenancy.device_assignment` |
 | Called by | ADM-582, POS-016 |
@@ -505,7 +506,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | Conflict policy | serverWins |
 | Reads | `approvals.external_provider`, `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
 | Writes | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
-| Called by | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, BO-086, BO-1120, BO-1149, BO-639, BO-863 |
+| Called by | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, ADM-530, BO-086, BO-1120, BO-1149, BO-639, BO-863 |
 
 **Parameters**
 
@@ -935,7 +936,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | Read routing | primary |
 | Reads | `approvals.delegation`, `approvals.matrix`, `approvals.rule`, `cache:idempotency`, `identity.delegated_access`, `platform.scope` |
 | Writes | `cache:idempotency` |
-| Called by | ADM-337, BO-085, BO-368, POS-002, POS-004 |
+| Called by | ADM-337, ADM-530, ADM-532, BO-085, BO-368, POS-002, POS-004 |
 
 **Parameters**
 
@@ -1349,6 +1350,7 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
+| calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
@@ -1526,6 +1528,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
+| calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
@@ -1620,6 +1623,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
+| calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
 | currencyCode | string |  | readOnly is the freeze. (pattern ^[A-Z]{3}$; read-only; nullable) |
 | currencyScale | integer |  | Scale travels with currency (ADR-0008), and so does the freeze. (min 0; max 4; read-only; nullable) |
 | supportHours | object |  | CF-100. |
@@ -2507,12 +2511,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| event_name | text | yes | One of the 29 declared events. |
-| aggregate_type | text | no | The table the change happened in. |
-| aggregate_id | uuid | no | Which row changed. |
+| event_id | text | yes | The envelope's event id, a ULID (system-design review SD-030, 29 September; applied 30 September). |
+| event_name | text | yes | The name of an event in events/ (aggregate.pastTenseFact). |
+| event_version | integer | no | The event's version, carried in the envelope so a consumer on an older version can tell. |
+| tenant_id | uuid | yes | The tenant the change belongs to (envelope field, SD-030). |
+| aggregate_type | text | yes | The table the change happened in. |
+| aggregate_id | text | yes | Which row changed, as text (SD-012, SD-030): order ids are ULIDs and most other keys UUIDs, so the column holds either; it was format: uuid, which no order event could satisfy. |
 | payload | jsonb | yes | The event as it happened, not a reference to a row that may have moved on. |
 | scope_path | text | no | The partition key (ADR-0005). |
-| sequence | integer | no | Monotonic per scope. |
+| sequence | integer | yes | Monotonic per aggregate (SD-030: was *per scope*), allocated in the writing transaction. |
+| trace_id | text | no | The W3C trace id of the request that made the change (envelope field, SD-030), so a consumer's work joins the producer's trace. |
 | published_at | timestamptz | no | Null until the relay publishes it. |
 | attempts | integer | no | Five, exponential from one second, jittered. |
 | last_error | text | no |  |
@@ -2595,6 +2603,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | no | Added 20 August. |
 | venue_id | uuid | no | From the path of setVenueSettings. |
+| calendar_day_start_hour | integer | no | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… |
 | currency_code | text | no | readOnly is the freeze. |
 | currency_scale | integer | no | Scale travels with currency (ADR-0008), and so does the freeze. |
 | support_hours | jsonb | no | CF-100. |
@@ -2685,7 +2694,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-174 operations, added to this service in later releases without changing any of the above.
+176 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -2702,6 +2711,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | request | `escalateApprovalRequest`, `listApprovalExternalDispatches`, `listApprovalRequests`, `listApprovedActionExecutions`, `recordExternalApprovalDecision`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
 | rota | `requestShiftSwap`, `updateRotaAssignment` |
 | scope | `getOrgUnit` |
-| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setVenueSettingsDefaults` |
+| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `resolveTenantHost`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping`, `setVenueSettingsDefaults` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `getOutlet`, `getWorkstation`, `registerDevice` |

@@ -47,6 +47,7 @@ ROOT = Path(__file__).resolve().parents[1]
 HANDOFF = ROOT / "handoff"
 OUT = HANDOFF / "service-docs"
 TEAM = ROOT / "docs" / "active" / "team.json"
+EXTRA = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
 MAX_DEPTH = 3
 
 # **The one authored table in this file.** The decomposition explains each service to an architect
@@ -792,6 +793,8 @@ def main() -> int:
     # (docs/active/developer-assignment-plan-23-september.md). One formula for every task, so two
     # tasks of the same points are comparable whoever scored them.
     team = json.loads(TEAM.read_text(encoding="utf-8")) if TEAM.exists() else {"areas": {}, "onboard": {}}
+    PACE = team.get("pace") or {}
+    HELPER_SHARE = team.get("helperShare") or {}
     areas = team.get("areas") or {}
     tasks = []
 
@@ -799,7 +802,7 @@ def main() -> int:
     # person scanning a list can tell them apart without opening the ticket.
     PREFIX = {"Frontend": "[FE]", "Backend": "[BE]", "Database": "[DB]", "DevOps": "[DevOps]",
               "Onboarding": "[Onboarding]", "Full stack": "[FE+BE]", "Setup": "[Setup]",
-              "Client": "[Client]"}
+              "Client": "[Client]", "AI": "[AI]"}
 
     def track_of(key, area):
         if key.startswith(("MIG", "VM-MIG", "VM-DB")):
@@ -811,7 +814,7 @@ def main() -> int:
         if area == "VM":
             return "Frontend" if key.startswith(("VM-BO-", "VM-FE")) else "Backend"
         return {"devops": "DevOps", "onboard": "Onboarding", "backend": "Backend",
-                "client": "Client"}.get(area, "Frontend")
+                "client": "Client", "ai": "AI"}.get(area, "Frontend")
 
     by_key: dict[str, dict] = {}
 
@@ -1262,7 +1265,9 @@ def main() -> int:
                  f"Back-office screens in {mod}.", 2, platform="Venue Management", area="VM", assignee=who_vm)
 
         def vm_assign(pts):
-            who = min(vm_team, key=lambda x: (load[x], x))
+            # **Load is compared at each person's pace** (team.json "pace", 30 September): Surendra at
+            # about 60% takes about 60% of an equal share.
+            who = min(vm_team, key=lambda x: (load[x] / PACE.get(x, 1.0), x))
             load[who] += pts
             return who
 
@@ -1296,7 +1301,10 @@ def main() -> int:
         if not able:
             continue
         h = min(able, key=lambda x: (taken[x], load[x], x))
-        if load[h] + pts <= load[owner] - pts:
+        # **A helper's share is proportional to their rating** (team.json "helperShare", 30 September):
+        # Deep at .NET 2 against owners at 3-4 carries about 55% of an owner's load, not an equal share.
+        share = HELPER_SHARE.get(h)
+        if (load[h] + pts <= share * (load[owner] - pts)) if share else (load[h] + pts <= load[owner] - pts):
             t_["assignee"] = h
             taken[h] += pts
             t_["description"] += f" Helper task: {owner} owns the service and reviews."
@@ -1312,9 +1320,27 @@ def main() -> int:
             load[x["assignee"]] -= int(x["points"] or 0)
         for x in sorted(vm_screens, key=lambda x: (0 if "(first batch)" in x["subject"] else 1, int(x["wave"] or 9),
                                                    step_of(x["key"]), x["key"])):
-            who = min(vm_team_, key=lambda y: (load[y], y))
+            who = min(vm_team_, key=lambda y: (load[y] / PACE.get(y, 1.0), y))
             x["assignee"] = who
             load[who] += int(x["points"] or 0)
+
+    # **Tasks no screen or operation implies** (docs/active/block-a-extra-tasks.json, 30 September): the
+    # platform kernel and offline machinery the system-design review found unticketed (SD-047, SD-063), and
+    # the AI engine work the two AI engineers carry. Backend-pool tasks go to the least-loaded owner, as
+    # services do; AI engine tasks carry no points, because the AI engineers' capacity is separate.
+    if EXTRA.exists():
+        ex = json.loads(EXTRA.read_text(encoding="utf-8"))
+        backend_ = areas.get("backend") or []
+        for e in ex.get("epics") or []:
+            task(e["key"], "", "Epic", e["subject"], e["detail"], 1, area=e.get("area", "backend"))
+        for t_ in ex.get("tasks") or []:
+            is_ai = t_["epic"] == "AI-ENGINE"
+            pts = "" if is_ai else int(t_["points"])
+            who = t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else "")
+            if not is_ai and who:
+                load[who] += pts
+            task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + t_["detail"], 1, pts=pts,
+                 area="ai" if is_ai else "backend", assignee=who, depends=t_.get("depends") or ())
 
     # **Acceptance that waits on the client** (audit R065): the payment-sandbox task blocks the
     # tickets whose testing needs its credentials. Wired here, after every ticket exists, so the
@@ -1329,7 +1355,7 @@ def main() -> int:
     # backend before frontend. `queue` is the same order within one person's list, so each developer's
     # board reads top to bottom as the order to work in.
     TRACK_ORDER = {"Setup": 0, "Client": 0, "DevOps": 1, "Onboarding": 1, "Database": 2, "Backend": 3,
-                   "Full stack": 4, "Frontend": 5}
+                   "AI": 3, "Full stack": 4, "Frontend": 5}
     for t_ in tasks:
         step_of(t_["key"])
     ordered = sorted(tasks, key=lambda t_: (t_["phase"], int(t_["wave"] or 9), step[t_["key"]],

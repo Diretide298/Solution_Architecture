@@ -287,7 +287,6 @@
 | POS-006 | Recall held | orderId | sale.resume |
 | BO-045 | The new price is wrong on eleven items |  |  |
 | POS-013 | A guest wants cash back and the drawer is heavy |  |  |
-| BO-084 | The manager sees it in their inbox | approvalRequestId |  |
 | BO-130 | Four transactions are rejected — a product retired while the till was offline |  |  |
 | BO-133 | The venue's offline exposure crosses a ceiling |  |  |
 | POS-007 | Close Shift | saleId |  |
@@ -295,6 +294,7 @@
 | POS-020 | Shift Exceptions & Alerts |  |  |
 | POS-008 | Reports |  |  |
 | POS-011 | Three days later the guest returns one item | orderId, outletId |  |
+| BO-084 | The manager sees it in their inbox | approvalRequestId |  |
 | GST-026 | Checks the balance in the app | cardCode |  |
 
 ## POS-003 Sell — Timed Entry
@@ -1526,7 +1526,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-025 | Till Home |  |  |
-| POS-022 | Send to Kitchen |  |  |
+| POS-022 | Send to Kitchen | orderId |  |
 
 ## KIT-001 Kitchen Operations Command Center
 

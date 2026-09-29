@@ -7,6 +7,11 @@ publisher: accreditation
 description: An accredited person was suspended, reactivated, revoked, expired, archived or had their validity extended by a renewal.
 aggregate: accreditationHolder
 emittedWhen: setAccreditationStatus succeeds; resolveIdentityConflict archives the non-surviving holders of a merge; the expiry run moves a holder past validTo to expired; a renewal extends validTo (renewAccreditation approved at once, or decideAccreditationApplication approving an application with renewsHolderId)
+emittedBy:
+- decideAccreditationApplication
+- renewAccreditation
+- resolveIdentityConflict
+- setAccreditationStatus
 payload:
 - field: holderId
   type: uuid

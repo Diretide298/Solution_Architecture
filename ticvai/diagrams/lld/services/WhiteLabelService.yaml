@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 64 operations, 20 tables
+title: WhiteLabelService — 79 operations, 25 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -9,20 +9,20 @@ why: Branding, content, navigation and the tenant's own app configuration. Separ
 scale: Read-heavy and heavily cached. Published, not queried.
 ifDown: Down freezes the current published config. Guests see the last good version.
 coverage:
-  operations: 64
+  operations: 79
   inAFlow: 24
-  percent: 38%
+  percent: 30%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: whitelabel
-  tables: 20
+  tables: 25
   stores:
   - postgres
   largestTable: whitelabel.tenant_config
 operationsByContract:
 - contract: white-label
-  count: 64
+  count: 79
   operations:
   - operation: claimCustomDomain
     verb: POST
@@ -40,6 +40,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createBookingFlowDefinition
+    verb: POST
+    path: /venues/{venueId}/booking-flows
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
   - operation: createContentBlock
     verb: POST
     path: /content-blocks
@@ -88,6 +96,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: deleteBookingFlow
+    verb: DELETE
+    path: /booking-flows/{bookingFlowId}
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 3
   - operation: deleteContentPage
     verb: DELETE
     path: /tenant-config/pages/{pageId}
@@ -120,6 +136,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getAppBuild
+    verb: GET
+    path: /tenant-config/app-builds/{appBuildId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getAppIcons
     verb: GET
     path: /tenant-config/app-icons
@@ -127,6 +151,14 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 1
+    writes: 0
+  - operation: getBookingFlow
+    verb: GET
+    path: /booking-flows/{bookingFlowId}
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
     writes: 0
   - operation: getBookingFlowConfig
     verb: GET
@@ -184,12 +216,36 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 1
+  - operation: getPublishedBookingFlow
+    verb: GET
+    path: /venues/{venueId}/booking-flow
+    scope: venue
+    permission: null
+    offline: true
+    reads: 5
+    writes: 0
   - operation: getPublishedGuidedChoice
     verb: GET
     path: /venues/{venueId}/guided-choice
     scope: venue
     permission: null
     offline: true
+    reads: 3
+    writes: 0
+  - operation: getSiteSetupProgress
+    verb: GET
+    path: /tenant-config/site-setup
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getStoreAccounts
+    verb: GET
+    path: /tenant-config/store-accounts
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
     reads: 3
     writes: 0
   - operation: getStorefrontInsights
@@ -214,8 +270,8 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 9
-    writes: 1
+    reads: 10
+    writes: 0
   - operation: getTheme
     verb: GET
     path: /tenant-config/theme
@@ -232,6 +288,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listAppBuilds
+    verb: GET
+    path: /tenant-config/app-builds
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listBanners
     verb: GET
     path: /tenant-config/banners
@@ -239,6 +303,22 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 1
+    writes: 0
+  - operation: listBookingFlowTypes
+    verb: GET
+    path: /booking-flow-types
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBookingFlows
+    verb: GET
+    path: /venues/{venueId}/booking-flows
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
     writes: 0
   - operation: listConfigVersions
     verb: GET
@@ -318,16 +398,16 @@ operationsByContract:
     scope: venue
     permission: TENANT_PUBLISH
     offline: false
-    reads: 3
-    writes: 0
+    reads: 4
+    writes: 2
   - operation: publishTenantConfig
     verb: POST
     path: /tenant-config/publish
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 2
-    writes: 4
+    reads: 4
+    writes: 2
   - operation: recordStorefrontSessionEvents
     verb: POST
     path: /storefront/session-events
@@ -344,13 +424,21 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: requestAppBuild
+    verb: POST
+    path: /tenant-config/app-builds
+    scope: tenant
+    permission: TENANT_PUBLISH
+    offline: false
+    reads: 3
+    writes: 2
   - operation: restoreConfigVersion
     verb: POST
     path: /tenant-config/versions/{version}/restore
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 9
+    reads: 11
     writes: 7
   - operation: setAnalyticsProvider
     verb: PUT
@@ -472,6 +560,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setSiteSetupProgress
+    verb: PUT
+    path: /tenant-config/site-setup
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setStoreAccounts
+    verb: PUT
+    path: /tenant-config/store-accounts
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 2
   - operation: setTheme
     verb: PUT
     path: /tenant-config/theme
@@ -496,6 +600,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: updateBookingFlowDefinition
+    verb: PATCH
+    path: /booking-flows/{bookingFlowId}
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
   - operation: updateContentPage
     verb: PUT
     path: /tenant-config/pages/{pageId}
@@ -520,14 +632,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: validateBookingFlow
+    verb: POST
+    path: /booking-flows/{bookingFlowId}/validate
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: validateTenantConfig
     verb: POST
     path: /tenant-config/validate
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 1
   - operation: verifyCustomDomain
     verb: POST
     path: /tenant-domains/{domainId}/verify
@@ -551,17 +671,21 @@ tables:
   writtenBy:
   - claimCustomDomain
   - createBanner
+  - createBookingFlowDefinition
   - createContentBlock
   - createContentPage
   - createPreview
   - createPromoBlock
   - deleteBanner
+  - deleteBookingFlow
   - deleteContentPage
   - deleteGuidedChoice
   - deletePromoBlock
   - publishContentBlock
+  - publishGuidedChoice
   - publishTenantConfig
   - recordStorefrontSessionEvents
+  - requestAppBuild
   - restoreConfigVersion
   - setAnalyticsProvider
   - setAppIcons
@@ -578,10 +702,14 @@ tables:
   - setModuleEnablement
   - setNavigation
   - setPolicy
+  - setSiteSetupProgress
+  - setStoreAccounts
   - setTheme
   - updateBanner
+  - updateBookingFlowDefinition
   - updateContentPage
   - updatePromoBlock
+  - validateBookingFlow
   - validateTenantConfig
   - verifyCustomDomain
   readBy:
@@ -596,7 +724,6 @@ tables:
   - deleteGuidedChoice
   - deletePromoBlock
   - publishContentBlock
-  - publishTenantConfig
   - recordStorefrontSessionEvents
   - restoreConfigVersion
   - setAnalyticsProvider
@@ -618,7 +745,6 @@ tables:
   - updateBanner
   - updateContentPage
   - updatePromoBlock
-  - validateTenantConfig
   - verifyCustomDomain
 - store: cache:resolution
   kind: cache
@@ -634,10 +760,8 @@ tables:
   - getFeatureToggles
   - getModuleEnablement
   - getNavigation
-  - getTenantConfig
   - getTheme
   - publishContentBlock
-  - publishTenantConfig
   - restoreConfigVersion
   - setBookingFlowConfig
   - setFeatureToggles
@@ -649,7 +773,6 @@ tables:
   - getFeatureToggles
   - getModuleEnablement
   - getNavigation
-  - getTenantConfig
   - getTheme
   gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
     or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
@@ -662,10 +785,31 @@ tables:
   writtenBy:
   - white-label
   foreignWriters: null
+- table: whitelabel.app_build
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
 - table: whitelabel.banner
   columns: 12
   store: postgres
   parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.booking_flow
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.booking_flow_step
+  columns: 7
+  store: postgres
+  parent: whitelabel.booking_flow
   writtenBy:
   - white-label
   foreignWriters: null
@@ -733,21 +877,21 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.guided_choice
-  columns: 11
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - white-label
   foreignWriters: null
 - table: whitelabel.guided_choice_answer
-  columns: 4
+  columns: 5
   store: postgres
   parent: whitelabel.guided_choice
   writtenBy:
   - white-label
   foreignWriters: null
 - table: whitelabel.guided_choice_question
-  columns: 4
+  columns: 5
   store: postgres
   parent: whitelabel.guided_choice
   writtenBy:
@@ -768,7 +912,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.navigation_item
-  columns: 3
+  columns: 4
   store: postgres
   parent: null
   writtenBy:
@@ -788,6 +932,20 @@ tables:
   writtenBy:
   - white-label
   foreignWriters: null
+- table: whitelabel.site_setup_progress
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
+- table: whitelabel.store_account
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - white-label
+  foreignWriters: null
 - table: whitelabel.tenant_config
   columns: 25
   store: postgres
@@ -798,6 +956,8 @@ tables:
 readsFrom:
 - service: PlatformService
   operations: 5
+- service: CatalogueService
+  operations: 2
 - service: IdentityService
   operations: 1
 - service: MarketingService
@@ -818,34 +978,45 @@ writesOutside:
     tables:
     - control.content_block
 - service: TenancyService
-  operations: 2
+  operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
     each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
-  - operation: publishTenantConfig
-    tables:
-    - platform.outbox
   - operation: recordStorefrontSessionEvents
     tables:
     - platform.outbox
 screens:
 - P01:WEB-001 Home / Landing
+- P01:WEB-002 Event & Attraction Listing
 - P01:WEB-005 Ticket Type Selection
+- P01:WEB-006 Date & Performance Selection
+- P01:WEB-007 Interactive Seat Selection
+- P01:WEB-008 Add-ons & Upsell
+- P01:WEB-010 Shopping Cart
+- P01:WEB-011 Guest Details & Attendee Forms
+- P01:WEB-012 Checkout — Payment
 - P01:WEB-025 Help Centre / FAQ
 - P01:WEB-028 Contact & Venue Information
 - P01:WEB-029 Error / Sold Out / Maintenance
 - P01:WEB-045 Help Centre & Accessibility
-- P02:GST-001 Home – Default
+- P02:GST-001 Home
+- P02:GST-003 Buy Tickets
+- P02:GST-007 Select Date & Time
 - P02:GST-008 Tickets & Add-ons
+- P02:GST-009 Review & Payment
 - P02:GST-029 Venue Info & Services
-- P02:GST-038 Digital Companion Mode
+- P02:GST-038 At the Venue
 - P02:GST-040 Help & Support
+- P02:GST-041 Checkout Entry
 - P02:GST-047 Maintenance / Upgrade Page
 - P02:GST-057 Accessibility Information
 - P05:KSK-002 Language Select
+- P08:BO-007 Product Directory
+- P08:BO-008 Product Detail & Variants
+- P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-243 Policy Approval, Audit, Analytics & AI Optimization
 - P08:BO-599 Manual Configuration Center
 - P08:BO-834 Digital Experience Center
@@ -876,6 +1047,9 @@ screens:
 - P13:CMS-017 Domain & Certificate
 - P13:CMS-018 Consent & Legal
 - P13:CMS-101 Help Me Choose
+- P13:CMS-102 Site Builder
+- P13:CMS-103 Booking Flows
+- P13:CMS-104 App Build & Store Publishing
 flows:
 - F01 Guest buys a ticket online
 - F07 Guest buys at a kiosk

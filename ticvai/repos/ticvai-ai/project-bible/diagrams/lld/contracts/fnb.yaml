@@ -15,6 +15,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   writes:
@@ -30,6 +32,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   writes:
@@ -100,6 +104,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   writes:
@@ -187,6 +193,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -204,6 +212,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -271,13 +281,19 @@ operations:
   - staff
   offline: true
   reads:
-  - cache:idempotency
+  - fnb.kitchen_station
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
+  - fnb.menu_item
   - fnb.service_order
   - fnb.service_order_line
   writes:
-  - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
+  - platform.idempotency_record
+  - platform.outbox
 - operation: createGuestFnbOrder
   verb: POST
   path: /guest-orders
@@ -360,12 +376,10 @@ operations:
   - fnb.dining_table
   - fnb.reservation_table
   - fnb.table_reservation
-  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
   writes:
   - cache:idempotency
   - fnb.reservation_table
   - fnb.table_reservation
-  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
 - operation: enterCountLine
   verb: POST
   path: /stock-counts/{countId}/lines
@@ -455,6 +469,8 @@ operations:
   - staff
   offline: true
   reads:
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   writes: []
@@ -577,6 +593,8 @@ operations:
   - staff
   offline: true
   reads:
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -671,6 +689,8 @@ operations:
   - staff
   offline: false
   reads:
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   writes: []
@@ -829,7 +849,6 @@ operations:
   - fnb.dining_table
   - fnb.reservation_table
   - fnb.table_reservation
-  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
   writes: []
 - operation: listTemperatureCheckpoints
   verb: GET
@@ -901,6 +920,7 @@ operations:
   reads:
   - cache:idempotency
   - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   writes:
@@ -917,6 +937,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -936,6 +958,7 @@ operations:
   - cache:idempotency
   - fnb.dining_table
   - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -983,6 +1006,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -1076,6 +1101,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -1201,6 +1228,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -1279,7 +1308,6 @@ operations:
   - fnb.dining_table
   - fnb.reservation_table
   - fnb.table_reservation
-  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
   writes:
   - cache:idempotency
   - fnb.table_reservation
@@ -1538,6 +1566,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -1642,6 +1672,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -1660,6 +1692,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit
@@ -1727,12 +1761,10 @@ operations:
   - cache:idempotency
   - fnb.reservation_table
   - fnb.table_reservation
-  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
   writes:
   - cache:idempotency
   - fnb.reservation_table
   - fnb.table_reservation
-  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
 - operation: updateTableVisit
   verb: PATCH
   path: /table-visits/{visitId}
@@ -1743,6 +1775,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_ticket
+  - fnb.kitchen_ticket_line
   - fnb.service_order
   - fnb.service_order_line
   - fnb.table_visit

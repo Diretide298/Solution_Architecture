@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 676 |
-| Operations | 706 |
+| Operations | 718 |
 | Contracts | 20 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 161 |
+| Operations with no screen | 162 |
 | Waves | wave1 12 · wave2 16 · wave3 648 |
 
 ## Gaps
 
-### 161 operations with no screen here
+### 162 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
-| … | | | 121 more |
+| … | | | 122 more |
 
 ### 4 modules split across waves
 
@@ -108,7 +108,7 @@
 | `ADM-012` | Tenant Isolation & Resource Pool | Tenants & Licensing | 1 | 8 | yes |
 | `ADM-013` | Tenant Performance Monitor | Overview & Health | 2 | 7 | yes |
 | `ADM-014` | Auto-Scaling Configuration | Infrastructure & Resilience | 3 | 8 | yes |
-| `ADM-015` | API Rate Limit & Quota Management | Tenants & Licensing | 3 | 9 | yes |
+| `ADM-015` | API Rate Limit & Quota Management | Tenants & Licensing | 3 | 13 | yes |
 | `ADM-016` | White-Label Branding Management | Branding & Localisation | 2 | 13 | yes |
 | `ADM-017` | Domain & Certificate Management | Branding & Localisation | 2 | 6 | yes |
 | `ADM-018` | Localisation & Language Pack | Branding & Localisation | 2 | 7 | yes |
@@ -560,7 +560,7 @@
 | `ADM-486` | Channel, Media & Fulfillment Configuration | Platform | 3 | 3 | yes |
 | `ADM-487` | Cross-Module Conflict & Dependency Validation | Platform | 3 | 2 | yes |
 | `ADM-488` | Configuration Preview & Impact Analysis | Platform | 3 | 2 | yes |
-| `ADM-489` | AI Configuration Readiness Center | Platform | 3 | 2 | yes |
+| `ADM-489` | AI Configuration Readiness Center | Platform | 3 | 4 | yes |
 | `ADM-490` | Configuration Validation Results | Platform | 3 | 2 | yes |
 | `ADM-491` | AI Recommendations & Best-Practice Review | Platform | 3 | 2 | yes |
 | `ADM-492` | Configuration Approval Workflow | Platform | 3 | 4 | yes |
@@ -590,7 +590,7 @@
 | `ADM-516` | Resource, Equipment & Facility Requirement Forecast | Analytics | 3 | 2 | yes |
 | `ADM-517` | Operational Scenario & Readiness Simulator | Analytics | 3 | 3 | yes |
 | `ADM-518` | Operational Forecast Review, Recommendations & Handover | Analytics | 3 | 2 | yes |
-| `ADM-519` | AI Governance Command Center | Platform | 3 | 4 | yes |
+| `ADM-519` | AI Governance Command Center | Platform | 3 | 5 | yes |
 | `ADM-520` | AI Capability Registry & Ownership | Platform | 3 | 2 | yes |
 | `ADM-521` | AI Risk Classification & Assessment | Platform | 3 | 2 | yes |
 | `ADM-522` | AI Autonomy Level Configuration | Platform | 3 | 3 | yes |
@@ -601,12 +601,12 @@
 | `ADM-527` | AI Policy Testing & Governance Simulation | Platform | 3 | 2 | yes |
 | `ADM-528` | AI Governance Policy Publication & Effective Policy Map | Platform | 3 | 3 | yes |
 | `ADM-529` | AI Human Oversight Command Center | Platform | 3 | 2 | yes |
-| `ADM-530` | AI Approval Requirement & Routing Configuration | Platform | 3 | 3 | yes |
+| `ADM-530` | AI Approval Requirement & Routing Configuration | Platform | 3 | 6 | yes |
 | `ADM-531` | AI Approval Review Workspace | Platform | 3 | 3 | yes |
-| `ADM-532` | Conditional Approval & Approval Conditions | Platform | 3 | 2 | yes |
+| `ADM-532` | Conditional Approval & Approval Conditions | Platform | 3 | 4 | yes |
 | `ADM-533` | Human Review, Challenge & AI Clarification Workspace | Platform | 3 | 3 | yes |
-| `ADM-534` | Escalation, Delegation & Approval SLA Management | Platform | 3 | 2 | yes |
-| `ADM-535` | Live AI Execution Oversight & Human Intervention | Platform | 3 | 4 | yes |
+| `ADM-534` | Escalation, Delegation & Approval SLA Management | Platform | 3 | 6 | yes |
+| `ADM-535` | Live AI Execution Oversight & Human Intervention | Platform | 3 | 5 | yes |
 | `ADM-536` | Human Override & Manual Control Center | Platform | 3 | 4 | yes |
 | `ADM-537` | Approval & Intervention History / Decision Timeline | Platform | 3 | 2 | yes |
 | `ADM-538` | Human Oversight Workflow Simulator & Readiness Center | Platform | 3 | 2 | yes |
@@ -620,12 +620,12 @@
 | `ADM-546` | Execution & Business Outcome Trace | Platform | 3 | 2 | yes |
 | `ADM-547` | AI Audit Record & Evidence Package | Platform | 3 | 2 | yes |
 | `ADM-548` | AI Trace Investigation & Replay Simulator | Platform | 3 | 2 | yes |
-| `ADM-549` | AI Governance Monitoring Command Center | Platform | 3 | 3 | yes |
+| `ADM-549` | AI Governance Monitoring Command Center | Platform | 3 | 5 | yes |
 | `ADM-550` | AI Risk Register & Risk Exposure Management | Platform | 3 | 2 | yes |
 | `ADM-551` | AI Governance Control Library & Control Effectiveness | Platform | 3 | 2 | yes |
 | `ADM-552` | AI Policy Compliance & Violation Monitoring | Platform | 3 | 2 | yes |
 | `ADM-553` | AI Data, Privacy & Usage Compliance Monitoring | Platform | 3 | 2 | yes |
-| `ADM-554` | AI Quality, Behavior & Governance Drift Monitoring | Platform | 3 | 5 | yes |
+| `ADM-554` | AI Quality, Behavior & Governance Drift Monitoring | Platform | 3 | 6 | yes |
 | `ADM-555` | AI Governance Alert & Detection Center | Platform | 3 | 3 | yes |
 | `ADM-556` | AI Incident & Remediation Management | Platform | 3 | 6 | yes |
 | `ADM-557` | AI Compliance, Assurance & Governance Reporting | Platform | 3 | 3 | yes |

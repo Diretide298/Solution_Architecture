@@ -110,6 +110,9 @@
  "document:docs\\active\\action-register-22-september.md": [
   "ai:names it"
  ],
+ "document:docs\\active\\ai-functions-review-30-september.md": [
+  "ai:names it"
+ ],
  "document:docs\\active\\ai-scope-for-confirmation.md": [
   "ai:names it"
  ],
@@ -189,6 +192,9 @@
   "ai:names it"
  ],
  "document:docs\\active\\spec-coverage-19-september.md": [
+  "ai:names it"
+ ],
+ "document:docs\\active\\system-design-review-30-september.md": [
   "ai:names it"
  ],
  "document:docs\\active\\undrafted-packs-scope-20-september.md": [
@@ -344,6 +350,9 @@
  "event:payment.attemptFailed": [
   "ai:consumes"
  ],
+ "event:payment.captured": [
+  "ai:consumes"
+ ],
  "event:performance.cancelled": [
   "ai:consumes"
  ],
@@ -390,6 +399,9 @@
   "ai:steps through"
  ],
  "flow:F26": [
+  "ai:steps through"
+ ],
+ "flow:F49": [
   "ai:steps through"
  ],
  "flow:F77": [
@@ -530,6 +542,9 @@
  "operation:getAiUsage": [
   "ai:seed"
  ],
+ "operation:getAiVenueSettings": [
+  "ai:seed"
+ ],
  "operation:getApprovalRequestScore": [
   "ai:seed"
  ],
@@ -557,10 +572,22 @@
  "operation:getRiskCase": [
   "ai:seed"
  ],
+ "operation:getVenueHistoryImport": [
+  "ai:seed"
+ ],
+ "operation:importVenueHistory": [
+  "ai:seed"
+ ],
  "operation:ingestKnowledgeDocument": [
   "ai:seed"
  ],
  "operation:listAiCapabilities": [
+  "ai:seed"
+ ],
+ "operation:listAiCapabilityHealth": [
+  "ai:seed"
+ ],
+ "operation:listAiCapabilityMaturity": [
   "ai:seed"
  ],
  "operation:listAiControls": [
@@ -597,6 +624,9 @@
   "ai:seed"
  ],
  "operation:listAiTools": [
+  "ai:seed"
+ ],
+ "operation:listAiTrainingRuns": [
   "ai:seed"
  ],
  "operation:listAnomalyDetectors": [
@@ -648,6 +678,9 @@
   "ai:seed"
  ],
  "operation:listRiskAlerts": [
+  "ai:seed"
+ ],
+ "operation:listVenueHistoryImports": [
   "ai:seed"
  ],
  "operation:openAiIncident": [
@@ -782,6 +815,9 @@
  "operation:setAiTool": [
   "ai:seed"
  ],
+ "operation:setAiVenueSettings": [
+  "ai:seed"
+ ],
  "operation:setForecastDefinition": [
   "ai:seed"
  ],
@@ -885,7 +921,7 @@
   "ai:calls 2"
  ],
  "screen:ADM-489": [
-  "ai:calls 2"
+  "ai:calls 4"
  ],
  "screen:ADM-490": [
   "ai:calls 2"
@@ -975,7 +1011,7 @@
   "ai:calls 2"
  ],
  "screen:ADM-519": [
-  "ai:calls 4"
+  "ai:calls 5"
  ],
  "screen:ADM-520": [
   "ai:calls 2"
@@ -1023,7 +1059,7 @@
   "ai:calls 2"
  ],
  "screen:ADM-535": [
-  "ai:calls 4"
+  "ai:calls 5"
  ],
  "screen:ADM-536": [
   "ai:calls 4"
@@ -1065,7 +1101,7 @@
   "ai:calls 2"
  ],
  "screen:ADM-549": [
-  "ai:calls 2"
+  "ai:calls 4"
  ],
  "screen:ADM-550": [
   "ai:calls 2"
@@ -1080,7 +1116,7 @@
   "ai:calls 2"
  ],
  "screen:ADM-554": [
-  "ai:calls 5"
+  "ai:calls 6"
  ],
  "screen:ADM-555": [
   "ai:calls 3"
@@ -1162,6 +1198,9 @@
  ],
  "screen:ANL-060": [
   "ai:calls 8"
+ ],
+ "screen:ANL-071": [
+  "ai:calls 6"
  ],
  "screen:BO-005": [
   "ai:calls 1"
@@ -1316,6 +1355,9 @@
  "screen:CMS-101": [
   "ai:calls 2"
  ],
+ "screen:CMS-104": [
+  "ai:calls 2"
+ ],
  "screen:EMP-019": [
   "ai:calls 3"
  ],
@@ -1350,7 +1392,7 @@
   "ai:calls 2"
  ],
  "screen:GST-054": [
-  "ai:calls 1"
+  "ai:calls 3"
  ],
  "screen:GST-068": [
   "ai:calls 1"
@@ -1547,6 +1589,9 @@
  "table:ai.capability": [
   "ai:owned"
  ],
+ "table:ai.capability_maturity": [
+  "ai:owned"
+ ],
  "table:ai.case_action": [
   "ai:owned"
  ],
@@ -1617,6 +1662,12 @@
   "ai:owned"
  ],
  "table:ai.guided_choice_suggestion": [
+  "ai:owned"
+ ],
+ "table:ai.history_import": [
+  "ai:owned"
+ ],
+ "table:ai.history_observation": [
   "ai:owned"
  ],
  "table:ai.incident": [
@@ -1706,9 +1757,6 @@
  "table:ai.risk_strategy": [
   "ai:owned"
  ],
- "table:ai.signal_observation": [
-  "ai:owned"
- ],
  "table:ai.signal_source": [
   "ai:owned"
  ],
@@ -1721,6 +1769,12 @@
  "table:ai.tool": [
   "ai:owned"
  ],
+ "table:ai.training_run": [
+  "ai:owned"
+ ],
+ "table:ai.venue_settings": [
+  "ai:owned"
+ ],
  "table:approvals.request": [
   "ai:read or written"
  ],
@@ -1728,6 +1782,9 @@
   "ai:read or written"
  ],
  "table:assets.media_asset": [
+  "ai:read or written"
+ ],
+ "table:cache:ai-breaker": [
   "ai:read or written"
  ],
  "table:cache:answer": [
@@ -1887,6 +1944,12 @@
   "ai:read or written"
  ],
  "table:venuemap.point": [
+  "ai:read or written"
+ ],
+ "table:venuemap.visit_plan": [
+  "ai:read or written"
+ ],
+ "table:venuemap.visit_plan_item": [
   "ai:read or written"
  ],
  "table:whitelabel.banner": [

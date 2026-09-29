@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 61
+  x-ticvai-screen-count: 77
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -56,15 +56,15 @@ info:
     \ content carries per-language versions.\n\n## Draft, published and live\n**One working draft per\
     \ tenant.** It is the tenant's `whitelabel.tenant_config` row (`isDraft` true) and the rows that hang\
     \ off it: brand, app icons, booking flow, theme, fonts, header, footer, navigation, homepage, module\
-    \ enablement, feature toggles and languages. Every `set*` operation on those parts writes the draft,\
+    \ enablement, feature toggles, languages and each venue's booking flows (29 September, W12). Every `set*` operation on those parts writes the draft,\
     \ and nothing a guest sees changes. The first `set*` call creates the draft row; until a part has\
     \ been saved once, its read returns 404 `not-configured`, which a screen shows as its first-run state.\n\
     **Published versions are snapshots.** `publishTenantConfig` copies the draft into a new `ConfigVersion`\
     \ (its `snapshot`) and makes that version current. Guests read the current version, never the draft.\
     \ `restoreConfigVersion` copies a snapshot back into the draft and does not publish.\n**Outside the\
     \ draft:** `setMaintenanceMode` (live at once, and neither published nor restored), `setPolicy` (each\
-    \ call publishes a policy version), content blocks and banners (each has its own schedule), and custom\
-    \ domains.\n\n## Fields the server owns\nA `readOnly` field (an id, a `status` or `state` that an operation\
+    \ call publishes a policy version), content blocks and banners (each has its own schedule), custom\
+    \ domains, the Site Builder's progress, the client's store accounts and app builds (29 September, W12 and M24-08).\n\n## Fields the server owns\nA `readOnly` field (an id, a `status` or `state` that an operation\
     \ or a timer moves, `scopePath`, a computed field) is returned and never taken: a request that carries\
     \ one has it ignored. `x-ticvai-derived` says how a computed field is kept current: `onWrite` (in the\
     \ same transaction as the write that changes it), `onRead` (computed when read, never stored) or `sweeper`\
@@ -86,6 +86,8 @@ tags:
 - name: content
 - name: modules
 - name: publishing
+- name: bookingFlows
+- name: appPublishing
 paths:
   /tenant-domains:
     get:
@@ -208,7 +210,17 @@ paths:
         **Retried by a job rather than by the tenant.** DNS propagation takes hours and a tenant clicking
         *verify* every ten minutes is a tenant who will give up before it resolves.
 
+
+        **Verification routes the hostname** (system-design review SD-021, 29 September; applied 30
+        September). In the same step that marks the domain verified, it calls tenancy
+        `setTenantDomainMapping`, which writes `control.tenant_domain` (hostname, tenant, cell, database,
+        channel, status `active`) so the edge''s `resolveTenantHost` can route the host. Until that write
+        succeeds the domain is not reported live. A hostname already routed to another tenant is refused
+        409 `hostname-taken` and nothing is issued.
+
         '
+      x-ticvai-calls:
+      - tenancy.setTenantDomainMapping
       tags:
       - white-label
       x-ticvai-permission: TENANT_CONFIGURE
@@ -229,6 +241,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomDomain'
+        '409':
+          description: The hostname is already routed to another tenant (`hostname-taken`, from tenancy
+            `setTenantDomainMapping`, SD-021); nothing was verified or issued.
+          x-ticvai-problem-types:
+          - hostname-taken
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /tenant-domains/{domainId}:
     parameters:
     - name: domainId
@@ -251,7 +272,14 @@ paths:
         tenant has a current `ConfigVersion` (`TenantAppStatus.isPublished` true) for the app the domain
         serves. Maintenance mode does not make an app less live.
 
+
+        **Detaching unroutes the hostname** (SD-021, applied 30 September): the release calls tenancy
+        `setTenantDomainMapping` with status `detached`, so the edge stops routing the host to this
+        tenant in the same step; the row is kept for the audit trail, not deleted.
+
         '
+      x-ticvai-calls:
+      - tenancy.setTenantDomainMapping
       tags:
       - white-label
       x-ticvai-permission: TENANT_CONFIGURE
@@ -420,7 +448,7 @@ paths:
       operationId: getTenantConfig
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
         - "P05 KSK-002 Language Select"
         - "P08 BO-599 Manual Configuration Center"
         - "P08 BO-834 Digital Experience Center"
@@ -484,14 +512,15 @@ paths:
         - "P01 WEB-028 Contact & Venue Information"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P01 WEB-045 Help Centre & Accessibility"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
         - "P02 GST-029 Venue Info & Services"
-        - "P02 GST-038 Digital Companion Mode"
+        - "P02 GST-038 At the Venue"
         - "P02 GST-040 Help & Support"
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P05 KSK-002 Language Select"
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-014 Publishing Workflow"
+        - "P13 CMS-102 Site Builder"
       x-ticvai-audience:
       - device
       - guest
@@ -811,9 +840,15 @@ paths:
         boundaries (REV3-1), where sign-in is asked (REV3-3), date and time on seated events (REV3-4), the
         seat-view box position (REV3-5), the time bar above the seat map (REV3-6), the floating cart icon
         and the cart side in Arabic (REV3-10), ticket categories (REV3-16), the quick tour (REV3-20), tags
-        on tickets (23SEP-3), extra info on cards (23SEP-6), category display (23SEP-18), dates in the
+        on tickets (23SEP-3), extra info on cards (23SEP-6), dates in the
         event banner (23SEP-19), the card layout, size and density enums (DG-6), and the concierge mascot
         (CFG-5). Help me choose is a venue''s `GuidedChoice`, not a field here (REV3-11).
+
+        **What is left here is venue-wide (decided 29 September, W12).** `performanceReveal`, `signInAt`,
+        `seatEventDateMode`, `extrasStep`, `quickTour` and `consentQuestionIds` belong to one booking flow and
+        moved to `BookingFlow.settings` (`updateBookingFlowDefinition`, CMS-103); `categoryDisplay` is removed
+        (W7, superseding 23SEP-18: `cardLayout` carries rows or grid). Added: `guestContactFields` (W1) and
+        `dateStripDays` (M17-08).
 
         **Per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** `venueOverrides`
         holds the fields a venue changes; everything else it inherits. A `venueId` not among the tenant''s
@@ -1045,6 +1080,8 @@ paths:
   /tenant-config/navigation:
     get:
       operationId: getNavigation
+      x-ticvai-consumed-by:
+        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2225,11 +2262,15 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-014 Publishing Workflow"
+        - "P13 CMS-102 Site Builder"
       x-ticvai-audience:
       - staff
       summary: Validate the working draft
       description: 'Run before publishing. Reports missing translations, navigation pointing at disabled
         modules, unset required assets, contrast failures, and policies without a current version.
+
+        **And the booking flows (decided 29 September, W12):** an enabled flow that fails `validateBookingFlow`
+        is `bookingFlowInvalid`; a venue with bookable products and no flow serving their kind is `bookingFlowMissing`.
 
         '
       tags:
@@ -2258,6 +2299,7 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-006 Component Preview"
         - "P13 CMS-014 Publishing Workflow"
+        - "P13 CMS-103 Booking Flows"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -2270,6 +2312,10 @@ paths:
         The response names any build-time change in the draft that will **not** reach guests until the
         next release. A tenant who changed their app icon and published should be told plainly that the
         icon has not shipped.
+
+        **Booking flows are published here (decided 29 September, W12).** Each venue''s enabled flows are copied
+        into the snapshot with the rest of the draft; `getPublishedBookingFlow` reads them from the current
+        version. An invalid enabled flow fails validation (409, `bookingFlowInvalid`).
 
         '
       tags:
@@ -2612,7 +2658,9 @@ paths:
     get:
       operationId: getPublishedGuidedChoice
       x-ticvai-consumed-by:
+        - "P01 WEB-002 Event & Attraction Listing"
         - "P01 WEB-005 Ticket Type Selection"
+        - "P02 GST-003 Buy Tickets"
         - "P02 GST-008 Tickets & Add-ons"
       x-ticvai-audience:
       - guest
@@ -2690,10 +2738,17 @@ paths:
                   - 'off'
                 showBanner:
                   type: boolean
+                behaviour:
+                  type: string
+                  enum:
+                  - filter
+                  - recommend
+                showEverything:
+                  type: boolean
                 questions:
                   type: array
                   minItems: 1
-                  maxItems: 2
+                  maxItems: 4
                   description: Replaces the whole question list; same shape and bounds as `GuidedChoice.questions`.
                   items:
                     type: object
@@ -2766,7 +2821,8 @@ paths:
       description: '**A person publishes, always (decided 29 September, rev 3 REV3-11).** Needs a staff
         session; a service caller is refused with 403, so an AI suggestion cannot publish itself. Every
         target is checked at this moment: a product or event not on sale, a category with no products on
-        sale, or a module not enabled is refused with 422 naming the answer. **One published choice per
+        sale, or a module not enabled is refused with 422 naming the answer, and so is an answer without the
+        `filter` (`behaviour` `filter`) or the last-question `target` (`recommend`) it needs (W4). **One published choice per
         venue**: publishing this one returns the venue''s previously published choice to `draft` in the
         same transaction. Live at once; not part of `publishTenantConfig`.
 
@@ -2801,7 +2857,8 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          description: An answer's target is not on sale or not enabled; the problem names the answer
+          description: An answer's target is not on sale or not enabled, or an answer lacks the filter or
+            target its behaviour needs; the problem names the answer
           content:
             application/problem+json:
               schema:
@@ -2855,7 +2912,7 @@ paths:
       operationId: listAnalyticsProviders
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
         - "P13 CMS-016 Site Settings"
       x-ticvai-audience:
       - staff
@@ -3053,7 +3110,7 @@ paths:
       operationId: recordStorefrontSessionEvents
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
       x-ticvai-audience:
       - guest
       - anonymous
@@ -3114,6 +3171,746 @@ paths:
         '429':
           $ref: ../shared/common.yaml#/components/responses/TooManyRequests
 
+  /booking-flow-types:
+    get:
+      operationId: listBookingFlowTypes
+      x-ticvai-consumed-by:
+        - "P13 CMS-102 Site Builder"
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-agreed: '29 September: W12 (the CMS is step-based; decision 8 of the 29 September brief, the CMS is a
+        flow builder); impact.md b "Flow types the catalogue must offer"; shape follows listGuidedChoices'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: The booking flow types a venue can pick from, with their steps
+      description: '**The system catalogue of booking flows (decided 29 September, W12).** Shipped with the
+        service and the same for every tenant; a venue never edits it, it picks from it (`createBookingFlowDefinition`).
+        Each type lists its steps, each `required`, `optional` or `conditional` (with the condition), the
+        order constraints the venue''s own order must respect (for example payment is last, and the seat map
+        comes after date and time), and the settings each step owns. The full catalogue is `x-ticvai-system-catalogue`
+        on `BookingFlowType`.
+
+        '
+      tags:
+      - bookingFlows
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: productKind
+        in: query
+        required: false
+        description: Only the types that serve this catalogue product kind.
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The flow types, in catalogue order
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/BookingFlowType'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /venues/{venueId}/booking-flows:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listBookingFlows
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-008 Product Detail & Variants"
+        - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
+        - "P13 CMS-014 Publishing Workflow"
+        - "P13 CMS-101 Help Me Choose"
+        - "P13 CMS-102 Site Builder"
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-agreed: '29 September: W12, W6, W8 (a venue picks its flows and orders their steps); shape follows
+        listGuidedChoices'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: A venue's booking flows, in the working draft
+      description: 'The flows this venue has picked, each with its steps in the venue''s order. Draft rows:
+        guests read the published copy through `getPublishedBookingFlow` (decided 29 September, W12).
+
+        '
+      tags:
+      - bookingFlows
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: flowTypeKey
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/BookingFlowTypeKey'
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The venue's flows, defaults first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/BookingFlow'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    post:
+      operationId: createBookingFlowDefinition
+      x-ticvai-consumed-by:
+        - "P13 CMS-102 Site Builder"
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-agreed: '29 September: W12 (pick flows from the catalogue); agreed as `createBookingFlow`, named
+        `createBookingFlowDefinition` so check-config-scope IS_CONFIG reaches it (a flow is a definition every
+        booking at the venue resolves against); shape follows createGuidedChoice'
+      x-ticvai-audience:
+      - staff
+      summary: Pick a booking flow for a venue
+      description: '**A venue picks a flow type and gets its steps (decided 29 September, W12).** Steps left
+        out of the body are filled from the type: every step of the type, `enabled` at the type''s default
+        and in the type''s default order. The body may reorder, turn off an optional step or set a step''s
+        own settings. **Saved even when it does not validate**, so an operator can work step by step; `isValid`
+        says whether it does and `validateBookingFlow` says why. `publishTenantConfig` refuses a draft holding
+        an invalid flow. **A step the type does not have**, or a step given twice, is refused with 400.
+        `isDefaultForType` true makes this the venue''s flow for every product of the type''s kinds that
+        names no flow (catalogue `Product.bookingFlowId`); the venue''s previous default for the type loses
+        the flag in the same transaction.
+
+        '
+      tags:
+      - bookingFlows
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingFlow'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created in the working draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingFlow'
+        '400':
+          description: An unknown flow type, a step the type does not have, or a step given twice
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /venues/{venueId}/booking-flow:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getPublishedBookingFlow
+      x-ticvai-consumed-by:
+        - "P01 WEB-005 Ticket Type Selection"
+        - "P01 WEB-006 Date & Performance Selection"
+        - "P01 WEB-007 Interactive Seat Selection"
+        - "P01 WEB-008 Add-ons & Upsell"
+        - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-011 Guest Details & Attendee Forms"
+        - "P01 WEB-012 Checkout — Payment"
+        - "P02 GST-007 Select Date & Time"
+        - "P02 GST-008 Tickets & Add-ons"
+        - "P02 GST-009 Review & Payment"
+        - "P02 GST-041 Checkout Entry"
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-agreed: '29 September: W12 (guest screens WEB-005..012, GST-007..009, GST-041 order their steps
+        from the published flow); shape follows getPublishedGuidedChoice'
+      x-ticvai-audience:
+      - guest
+      x-ticvai-read-routing: replica
+      summary: The published booking flow a product or category books through
+      description: '**What the guest booking screens read to order their steps (decided 29 September, W12).**
+        Public and cacheable, like the rest of the published app; reads the current `ConfigVersion`, never
+        the draft. Resolved in this order: the product''s own `bookingFlowId` (catalogue), then its category''s,
+        then the venue''s default flow for the type serving the product''s kind. With `flowTypeKey` alone,
+        the venue''s default for that type. Returns only the enabled steps, in order, with their settings and
+        the flow-level settings; `name` is left out of this view. 404 when nothing resolves, and the guest
+        screens use the type''s default order.
+
+        '
+      tags:
+      - bookingFlows
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - {}
+      - guestAuth: []
+      parameters:
+      - name: productId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: productCategoryId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: flowTypeKey
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/BookingFlowTypeKey'
+      responses:
+        '200':
+          description: The published flow, enabled steps only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingFlow'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /booking-flows/{bookingFlowId}:
+    parameters:
+    - name: bookingFlowId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getBookingFlow
+      x-ticvai-consumed-by:
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-agreed: '29 September: W12; shape follows getBrandIdentity'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: Read one of a venue's booking flows, every step included
+      tags:
+      - bookingFlows
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The flow, disabled steps included
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingFlow'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    patch:
+      operationId: updateBookingFlowDefinition
+      x-ticvai-consumed-by:
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-agreed: '29 September: W12 (set their own step order within the constraints); agreed as `updateBookingFlow`,
+        named `updateBookingFlowDefinition` so check-config-scope IS_CONFIG reaches it; shape follows updateGuidedChoice'
+      x-ticvai-audience:
+      - staff
+      summary: Reorder a flow's steps, switch optional steps, change its settings
+      description: 'A partial update of the working draft; guests see it after `publishTenantConfig`. `steps`
+        replaces the whole step list (same rules as on create: a step the type does not have, or given twice,
+        is 400). Saved even when the order breaks a constraint; `isValid` turns false and the publish refuses
+        it until it is fixed.
+
+        '
+      tags:
+      - bookingFlows
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name:
+                  type: string
+                  maxLength: 80
+                isDefaultForType:
+                  type: boolean
+                isEnabled:
+                  type: boolean
+                steps:
+                  type: array
+                  minItems: 1
+                  maxItems: 30
+                  items:
+                    $ref: '#/components/schemas/BookingFlowStep'
+                settings:
+                  $ref: '#/components/schemas/BookingFlowLevelSettings'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingFlow'
+        '400':
+          description: A step the type does not have, or a step given twice
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    delete:
+      operationId: deleteBookingFlow
+      x-ticvai-consumed-by:
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-agreed: '29 September: W12; shape follows deleteGuidedChoice'
+      x-ticvai-audience:
+      - staff
+      summary: Remove a booking flow from a venue
+      description: 'Removed from the working draft; guests keep the published copy until the next publish.
+        **Refused with 409 while a product or category names it** (catalogue `bookingFlowId`) or while it
+        is the venue''s default for its type and products of that kind are on sale: reassign them first,
+        so no product is left without a way to book.
+
+        '
+      tags:
+      - bookingFlows
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Removed from the draft
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: A product or category still names this flow, or it is the default for products on
+            sale; the problem names them
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /booking-flows/{bookingFlowId}/validate:
+    parameters:
+    - name: bookingFlowId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: validateBookingFlow
+      x-ticvai-consumed-by:
+        - "P13 CMS-103 Booking Flows"
+      x-ticvai-agreed: '29 September: W12 (refuse a flow with a required step off or steps out of order); shape
+        follows validateTenantConfig'
+      x-ticvai-audience:
+      - staff
+      summary: Check a flow against its type
+      description: '**Says whether a flow can be published, and why not (decided 29 September, W12).** With
+        no body it checks the saved flow; with `steps` it checks that order without saving it, so the builder
+        can mark a drag that breaks a constraint before it is dropped. A required step turned off, a step out
+        of its allowed order, a conditional step whose condition can never hold, a step the type does not
+        have and a step given twice are each a problem. Writes nothing.
+
+        '
+      tags:
+      - bookingFlows
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                steps:
+                  type: array
+                  maxItems: 30
+                  items:
+                    $ref: '#/components/schemas/BookingFlowStep'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The findings; `valid` false lists every problem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingFlowValidation'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /tenant-config/site-setup:
+    get:
+      operationId: getSiteSetupProgress
+      x-ticvai-consumed-by:
+        - "P13 CMS-102 Site Builder"
+      x-ticvai-agreed: '29 September: W12, M24-05 (a working site in about 30 minutes); shape follows getBrandIdentity'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: Where the tenant is in the Site Builder
+      description: 'The builder''s checklist (decided 29 September, W12 and M24-05): the preset picked, each
+        of the seven steps and its state. Before the first save every step comes back `notStarted` and no preset;
+        there is no `not-configured` for this part.
+
+        '
+      tags:
+      - publishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteSetupProgress'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setSiteSetupProgress
+      x-ticvai-consumed-by:
+        - "P13 CMS-102 Site Builder"
+      x-ticvai-agreed: '29 September: W12, M24-05; shape follows setBookingFlowConfig'
+      x-ticvai-audience:
+      - staff
+      summary: Save the Site Builder's progress
+      description: 'Records the preset and which steps are done, skipped or in progress, so the builder reopens
+        where the operator left it. **Progress, not configuration**: it changes nothing a guest sees and is
+        neither published nor restored, like `setMaintenanceMode`, so it carries no config scope. Marking
+        `previewAndPublish` done while the tenant has never published is refused with 409.
+
+        '
+      tags:
+      - publishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteSetupProgress'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SiteSetupProgress'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: '`previewAndPublish` marked done while no version has been published'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tenant-config/store-accounts:
+    get:
+      operationId: getStoreAccounts
+      x-ticvai-consumed-by:
+        - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-agreed: '29 September: M24-08 (impact.json names it getStorePublishingChecklist; the read half
+        of setStoreAccounts); shape follows getBrandIdentity'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: The client's store accounts and the publishing checklist
+      description: 'The Apple and Google accounts the client has recorded, and the checklist CMS-104 shows:
+        Apple D-U-N-S number, Apple Developer account, Google Play developer account, store listing, app icons
+        and a published configuration. Secrets are never returned: a stored credential shows as `hasApiCredential`.
+
+        '
+      tags:
+      - appPublishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Accounts and checklist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorePublishingChecklist'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setStoreAccounts
+      x-ticvai-consumed-by:
+        - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-agreed: '29 September: M24-08 (every client creates and owns its own Apple Developer (DUNS) and
+        Google Play accounts); shape follows setBrandIdentity'
+      x-ticvai-make-or-break: 'Each client must register its own Apple Developer account (which needs a D-U-N-S
+        number for the legal entity) and Google Play developer account; TICVAI never publishes under its own
+        (M24-08). Has the first tenant registered both, and under which legal entity?'
+      x-ticvai-audience:
+      - staff
+      summary: Record the client's own Apple and Google store accounts and listings
+      description: '**The client''s accounts, never TICVAI''s (decided 24 September, M24-08).** One entry per
+        store; the body replaces both. A fact about the client rather than configuration a guest resolves
+        against, and not part of the published draft: it takes effect at once and carries no config scope.
+        An Apple entry without a nine-digit `dunsNumber`, a store given twice, or a listing text missing a
+        tenant language, is refused with 400. A credential is kept in the secret store and only its reference
+        is stored here.
+
+        '
+      tags:
+      - appPublishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - accounts
+              properties:
+                accounts:
+                  type: array
+                  maxItems: 2
+                  items:
+                    $ref: '#/components/schemas/StoreAccount'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved; the checklist as it now stands
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorePublishingChecklist'
+        '400':
+          description: An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing
+            text missing a tenant language
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tenant-config/app-builds:
+    get:
+      operationId: listAppBuilds
+      x-ticvai-consumed-by:
+        - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-agreed: '29 September: M24-08 (submission status); shape follows listConfigVersions'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: The tenant's app builds, newest first
+      tags:
+      - appPublishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: platform
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - ios
+          - android
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Builds, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AppBuild'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    post:
+      operationId: requestAppBuild
+      x-ticvai-consumed-by:
+        - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-agreed: '29 September: M24-08 (the client builds its app package via the CMS); shape follows
+        publishTenantConfig'
+      x-ticvai-audience:
+      - staff
+      summary: Build the branded app for a store
+      description: '**Builds the tenant''s app from a published configuration (decided 24 September, M24-08).**
+        The build-time parts (app icons, splash, custom fonts, wallet and payment integrations: `ChangeScope`
+        `buildTime`) come from the version named, or the current one; the intro video is streamed and needs
+        no build. Signed for the client''s own account and bundle id, never TICVAI''s. Accepted as `queued`;
+        the package is downloaded from `getAppBuild` for the client to upload, or submitted with the client''s
+        API credential when one is recorded and `submitToStore` is true. **Refused with 409** when the store''s
+        account is not recorded (`setStoreAccounts`), when no version has been published, or while a build
+        for the same platform is running.
+
+        '
+      tags:
+      - appPublishing
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - platform
+              properties:
+                platform:
+                  type: string
+                  enum:
+                  - ios
+                  - android
+                configVersion:
+                  type: string
+                  description: A published `ConfigVersion.version`. Absent builds the current one.
+                releaseNotes:
+                  $ref: '#/components/schemas/LocalisedText'
+                submitToStore:
+                  type: boolean
+                  default: false
+                  description: Submit with the client's recorded API credential once built. False leaves
+                    the package for the client to upload.
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppBuild'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: No store account for the platform, nothing published yet, or a build for the platform
+            already running; the problem says which
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /tenant-config/app-builds/{appBuildId}:
+    parameters:
+    - name: appBuildId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getAppBuild
+      x-ticvai-consumed-by:
+        - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-agreed: '29 September: M24-08 (download the package, submission status); shape follows getBrandIdentity'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: One app build, with its package and store status
+      tags:
+      - appPublishing
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The build
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppBuild'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
 components:
   schemas:
     WhiteLabelStorefrontSessionBatch:
@@ -3420,6 +4217,7 @@ components:
           - productCategory
           - event
           - module
+          - bookingFlow
         productId:
           type: string
           format: uuid
@@ -3440,6 +4238,12 @@ components:
           - $ref: '#/components/schemas/ModuleKey'
           nullable: true
           description: Required when `kind` is `module`. The module must be enabled.
+        bookingFlowId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Required when `kind` is `bookingFlow` (decided 29 September, W12; BUILD-YOUR-EXPERIENCE
+            "each answer points to one booking flow"). One of the venue's enabled `BookingFlow`s.
     GuidedChoice:
       x-ticvai-persistence: whitelabel.guided_choice + whitelabel.guided_choice_question + whitelabel.guided_choice_answer
       type: object
@@ -3453,6 +4257,13 @@ components:
         **Two sources, one review.** `manual` is written by staff; `aiSuggested` is proposed by the `ai`
         service from the venue''s uploaded products (a suggestion, reviewed and published by a person,
         never auto-published). Both arrive as `draft`.
+
+        **Help me choose filters the catalogue (decided 29 September, W4).** With `behaviour` `filter`, the
+        default, each answer''s `filter` narrows the products the guest sees (web, mobile and kiosk alike,
+        through catalogue `listProducts` and `searchCatalogue` `guidedAnswerIds`), with a "Show everything"
+        link; `recommend` keeps the rev 3 result card from the last answer''s `target`. **It is never a consent
+        step**: an answer may pre-fill a REV3-26 consent question (`consentPrefill`), which the guest still
+        confirms, so the question is not asked twice and the consent stays explicit.
 
         '
       required:
@@ -3496,12 +4307,28 @@ components:
           default: true
           description: The dark banner under the products ("Choose from the experiences above or let us
             help you decide") with a Help me choose button. Ignored when `mode` is `off`.
+        behaviour:
+          type: string
+          enum:
+          - filter
+          - recommend
+          default: filter
+          description: '**`filter` (default) narrows the list; `recommend` ends on one result card (decided
+            29 September, W4).** With `filter`, every answer needs a `filter` and `target` is optional; with
+            `recommend`, every answer on the last question needs a `target`. `publishGuidedChoice` refuses
+            the other case with 422.
+
+            '
+        showEverything:
+          type: boolean
+          default: true
+          description: The "Show everything" link under a filtered list, which clears the answers (W4).
         questions:
           type: array
           minItems: 1
-          maxItems: 2
-          description: '**One or two questions**, as the prototype''s Questions setting offers (proposed,
-            client to correct; decided 29 September, rev 3 REV3-11). Shown in `sortOrder`.
+          maxItems: 4
+          description: '**One to four questions** (decided 29 September, W4: the Deep Dive reference asks
+            three or four; rev 3 REV3-11 allowed two). Shown in `sortOrder`.
 
             '
           items:
@@ -3518,6 +4345,21 @@ components:
                 description: ULID. The row's own key.
               title:
                 $ref: '#/components/schemas/LocalisedText'
+              kind:
+                type: string
+                enum:
+                - choice
+                - yesNo
+                - age
+                - level
+                - certification
+                default: choice
+                description: '**What the question asks (decided 29 September, W4).** `choice` free answers;
+                  `yesNo` two answers (e.g. "Can everyone swim?"); `age` answers carrying an age range; `level`
+                  answers carrying a level tag; `certification` answers saying whether the guest holds a certificate
+                  (e.g. a diving licence). The kind decides which `filter` fields its answers use.
+
+                  '
               sortOrder:
                 type: integer
                 minimum: 0
@@ -3531,7 +4373,6 @@ components:
                   type: object
                   required:
                   - title
-                  - target
                   - sortOrder
                   properties:
                     id:
@@ -3559,7 +4400,77 @@ components:
                       type: integer
                       minimum: 0
                     target:
-                      $ref: '#/components/schemas/GuidedChoiceTarget'
+                      allOf:
+                      - $ref: '#/components/schemas/GuidedChoiceTarget'
+                      nullable: true
+                      description: Required with `behaviour` `recommend` on the last question; optional with
+                        `filter`, where it is the card shown above the filtered list.
+                    filter:
+                      type: object
+                      nullable: true
+                      description: '**What this answer keeps in the list (decided 29 September, W4).** Every
+                        field set must hold; answers to different questions are combined with AND. Required with
+                        `behaviour` `filter`. The server applies it (catalogue `guidedAnswerIds`), so web, mobile
+                        and kiosk show the same list.
+
+                        '
+                      properties:
+                        productIds:
+                          type: array
+                          items:
+                            type: string
+                            format: uuid
+                        productCategoryIds:
+                          type: array
+                          items:
+                            type: string
+                            format: uuid
+                        segmentTags:
+                          type: array
+                          description: Catalogue `Product.segmentTags`, e.g. a level tag.
+                          items:
+                            type: string
+                        minAgeYears:
+                          type: integer
+                          minimum: 0
+                          nullable: true
+                        maxAgeYears:
+                          type: integer
+                          minimum: 0
+                          nullable: true
+                          description: With `minAgeYears`, checked against each product's age rule (catalogue
+                            `ProductEligibilityRule`).
+                        requiresSwimmer:
+                          type: boolean
+                          nullable: true
+                          description: False hides products whose eligibility needs a swimmer; true keeps only
+                            those.
+                        certificationCode:
+                          type: string
+                          nullable: true
+                          maxLength: 40
+                          description: Keeps products that need this certificate, or with `holdsCertification`
+                            false, hides them.
+                        holdsCertification:
+                          type: boolean
+                          nullable: true
+                    consentPrefill:
+                      type: object
+                      nullable: true
+                      description: '**Pre-fills a REV3-26 consent question from this answer (decided 29 September,
+                        W4).** The guest still ticks it at the consent step; nothing is recorded as consent until
+                        they do.
+
+                        '
+                      required:
+                      - consentQuestionId
+                      - answer
+                      properties:
+                        consentQuestionId:
+                          type: string
+                          format: uuid
+                        answer:
+                          type: boolean
                     result:
                       type: object
                       nullable: true
@@ -3607,6 +4518,890 @@ components:
           type: string
           format: date-time
           readOnly: true
+    BookingFlowTypeKey:
+      type: string
+      description: '**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).**
+        `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize`
+        are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation`
+        opens on the location switcher.
+
+        '
+      enum:
+      - datedDayPass
+      - timedEntry
+      - openDated
+      - seatedFixedPerformance
+      - seatedDateTimeSeatMap
+      - experienceWorkshop
+      - surfSession
+      - meetingRoomHourly
+      - cabanaMap
+      - cabanaBySize
+      - guidedTourByLanguage
+      - transport
+      - tableReservation
+      - membership
+      - giftCard
+      - multiLocation
+    BookingFlowStepKey:
+      type: string
+      description: 'Every step a guest booking flow can hold (decided 29 September, W12). What each step does
+        on WEB and MOB, and which screen draws it, is in the screen definitions of P01 and P02; which types
+        carry which steps is `x-ticvai-system-catalogue` on `BookingFlowType`. `payment` is always last. Sign-in
+        is not a step: it is asked where the flow''s `signInAt` says.
+
+        '
+      enum:
+      - location
+      - helpMeChoose
+      - product
+      - date
+      - time
+      - performance
+      - level
+      - language
+      - duration
+      - route
+      - partySize
+      - resourceMap
+      - resourceSize
+      - seatMap
+      - tickets
+      - attendees
+      - membershipPlan
+      - giftCardValue
+      - recipient
+      - consent
+      - extras
+      - review
+      - payment
+    BookingFlowType:
+      x-ticvai-persistence: none — system catalogue, shipped with the service and the same for every tenant
+      type: object
+      description: '**A flow type from the system catalogue (decided 29 September, W12).** Read-only: a venue
+        picks one (`createBookingFlowDefinition`) and orders its steps within `orderConstraints`. `requirement`
+        is `required` (cannot be turned off), `optional` (the venue chooses) or `conditional` (shown to a guest
+        only when `condition` holds; the venue may still turn it off where it is not also required by law or
+        by a product, as the condition says). `settingsOwned` names the settings, venue-wide (`BookingFlowSettings`)
+        or flow-level (`BookingFlowLevelSettings`), that the CMS shows beside the step; `stepSettings` are the
+        step''s own settings, kept in `BookingFlowStep.settings`.
+
+        '
+      x-ticvai-system-catalogue:
+        commonConstraints:
+        - {kind: last, stepKey: payment}
+        - {kind: first, stepKey: location}
+        - {kind: before, stepKey: helpMeChoose, otherStepKey: tickets}
+        - {kind: before, stepKey: helpMeChoose, otherStepKey: product}
+        - {kind: before, stepKey: tickets, otherStepKey: extras}
+        - {kind: before, stepKey: tickets, otherStepKey: consent}
+        - {kind: before, stepKey: review, otherStepKey: payment}
+        commonConditions:
+          location: the tenant has more than one active venue and `locationSwitcher` is on
+          helpMeChoose: the venue has a published `GuidedChoice`
+          consent: the flow's `consentQuestionIds` or a product in the cart asks a consent question (REV3-26);
+            cannot be turned off while either does
+          attendees: a product in the cart asks attendee details
+        types:
+        - key: datedDayPass
+          productKinds: [admission, datedAdmission]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: helpMeChoose, requirement: conditional}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays, performanceReveal]}
+          - {stepKey: tickets, requirement: required, settingsOwned: [ticketCategories, ticketTags, cardInfo, cardLayout, cardSize, showInfoOnly]}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+        - key: timedEntry
+          productKinds: [timedAdmission]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: helpMeChoose, requirement: conditional}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays, performanceReveal]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries, performanceReveal]}
+          - {stepKey: tickets, requirement: required, settingsOwned: [ticketCategories, ticketTags, cardInfo, cardLayout, cardSize, showInfoOnly]}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: date, otherStepKey: time}
+        - key: openDated
+          productKinds: [openDated, admission]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: helpMeChoose, requirement: conditional}
+          - {stepKey: tickets, requirement: required, settingsOwned: [ticketCategories, ticketTags, cardInfo, cardLayout, cardSize, showInfoOnly]}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+        - key: seatedFixedPerformance
+          productKinds: [seated]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: performance, requirement: required, condition: skipped for the guest when the event has one on-sale performance}
+          - {stepKey: seatMap, requirement: required, settingsOwned: [seatPicker, seatViewPosition, seatTimeBar, mapView]}
+          - {stepKey: tickets, requirement: conditional, condition: "the seat's price category has more than one ticket type (adult or child)"}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: performance, otherStepKey: seatMap}
+        - key: seatedDateTimeSeatMap
+          productKinds: [seated]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays, seatEventDateMode]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries, seatEventDateMode]}
+          - {stepKey: seatMap, requirement: required, settingsOwned: [seatPicker, seatViewPosition, seatTimeBar, mapView, seatEventDateMode]}
+          - {stepKey: tickets, requirement: conditional, condition: the seat's price category has more than one ticket type}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: date, otherStepKey: time}
+          - {kind: before, stepKey: time, otherStepKey: seatMap}
+        - key: experienceWorkshop
+          productKinds: [timedAdmission, admission]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: helpMeChoose, requirement: conditional}
+          - {stepKey: product, requirement: required, settingsOwned: [cardLayout, cardSize, cardInfo, showInfoOnly]}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays, performanceReveal]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
+          - {stepKey: tickets, requirement: required, settingsOwned: [ticketCategories, ticketTags]}
+          - {stepKey: attendees, requirement: conditional}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: product, otherStepKey: date}
+          - {kind: before, stepKey: date, otherStepKey: time}
+        - key: surfSession
+          productKinds: [timedAdmission, rental]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
+          - {stepKey: level, requirement: required, stepSettings: [{name: levels, type: 'string[]', note: level tags offered, from the products' segmentTags}]}
+          - {stepKey: tickets, requirement: required, settingsOwned: [ticketTags, cardInfo]}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: date, otherStepKey: time}
+          - {kind: before, stepKey: time, otherStepKey: level}
+        - key: meetingRoomHourly
+          productKinds: [rental]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
+          - {stepKey: duration, requirement: required, stepSettings: [{name: minHours, type: integer, default: 1}, {name: maxHours, type: integer, default: 8}, {name: stepMinutes, type: integer, default: 60}]}
+          - {stepKey: partySize, requirement: optional, stepSettings: [{name: minGuests, type: integer, default: 1}, {name: maxGuests, type: integer}]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: date, otherStepKey: time}
+          - {kind: before, stepKey: time, otherStepKey: duration}
+        - key: cabanaMap
+          productKinds: [rental]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
+          - {stepKey: resourceMap, requirement: required, condition: "the venue's resource selection policy lets the guest choose (resources setResourceSelectionPolicy guestMayChoose; REV3-15)", settingsOwned: [mapView]}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: date, otherStepKey: resourceMap}
+        - key: cabanaBySize
+          productKinds: [rental]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
+          - {stepKey: partySize, requirement: required, stepSettings: [{name: minGuests, type: integer, default: 1}, {name: maxGuests, type: integer}]}
+          - {stepKey: resourceSize, requirement: required, note: the server assigns a unit of the chosen size}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: date, otherStepKey: resourceSize}
+          - {kind: before, stepKey: partySize, otherStepKey: resourceSize}
+        - key: guidedTourByLanguage
+          productKinds: [timedAdmission]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
+          - {stepKey: language, requirement: required, stepSettings: [{name: languages, type: 'string[]', note: ISO 639-1 codes the tours run in}]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
+          - {stepKey: tickets, requirement: required, settingsOwned: [ticketCategories, ticketTags]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: date, otherStepKey: time}
+          - {kind: before, stepKey: language, otherStepKey: time}
+        - key: transport
+          productKinds: [admission, timedAdmission]
+          steps:
+          - {stepKey: route, requirement: required}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter]}
+          - {stepKey: tickets, requirement: required, settingsOwned: [ticketCategories]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: route, otherStepKey: time}
+          - {kind: before, stepKey: date, otherStepKey: time}
+        - key: tableReservation
+          productKinds: [fnb]
+          steps:
+          - {stepKey: location, requirement: conditional}
+          - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
+          - {stepKey: partySize, requirement: required, stepSettings: [{name: minGuests, type: integer, default: 1}, {name: maxGuests, type: integer, default: 12}]}
+          - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
+          - {stepKey: extras, requirement: optional, note: pre-order, settingsOwned: [extrasStep]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: conditional, condition: the venue takes a deposit or pre-order for the table, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: date, otherStepKey: time}
+          - {kind: before, stepKey: partySize, otherStepKey: time}
+        - key: membership
+          productKinds: [membership]
+          steps:
+          - {stepKey: membershipPlan, requirement: required}
+          - {stepKey: attendees, requirement: required, note: each member's details}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: membershipPlan, otherStepKey: attendees}
+        - key: giftCard
+          productKinds: [giftCard]
+          steps:
+          - {stepKey: giftCardValue, requirement: required}
+          - {stepKey: recipient, requirement: required}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+        - key: multiLocation
+          productKinds: [admission, timedAdmission, datedAdmission]
+          steps:
+          - {stepKey: location, requirement: required, settingsOwned: [locationSwitcher]}
+          - {stepKey: helpMeChoose, requirement: conditional}
+          - {stepKey: product, requirement: required, settingsOwned: [cardLayout, cardSize, cardInfo]}
+          - {stepKey: date, requirement: conditional, condition: the product is dated or timed, settingsOwned: [dateStripDays, performanceReveal]}
+          - {stepKey: time, requirement: conditional, condition: the product is timed, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
+          - {stepKey: tickets, requirement: required, settingsOwned: [ticketCategories, ticketTags]}
+          - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
+          - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
+          - {stepKey: review, requirement: optional}
+          - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
+          orderConstraints:
+          - {kind: before, stepKey: location, otherStepKey: product}
+          - {kind: before, stepKey: date, otherStepKey: time}
+      required:
+      - key
+      - name
+      - productKinds
+      - steps
+      - orderConstraints
+      properties:
+        key:
+          $ref: '#/components/schemas/BookingFlowTypeKey'
+        name:
+          $ref: '#/components/schemas/LocalisedText'
+        description:
+          $ref: '#/components/schemas/LocalisedText'
+        productKinds:
+          type: array
+          description: The catalogue `ProductKind` values this type books. A venue's default flow for a type
+            serves every product of these kinds that names no flow of its own.
+          items:
+            type: string
+        steps:
+          type: array
+          description: In the type's default order.
+          items:
+            type: object
+            required:
+            - stepKey
+            - requirement
+            - defaultSortOrder
+            properties:
+              stepKey:
+                $ref: '#/components/schemas/BookingFlowStepKey'
+              requirement:
+                type: string
+                enum:
+                - required
+                - optional
+                - conditional
+              condition:
+                allOf:
+                - $ref: '#/components/schemas/LocalisedText'
+                nullable: true
+                description: For `conditional`, when a guest meets the step.
+              defaultEnabled:
+                type: boolean
+                default: true
+              defaultSortOrder:
+                type: integer
+                minimum: 0
+              settingsOwned:
+                type: array
+                description: Names of `BookingFlowSettings` (venue-wide) or `BookingFlowLevelSettings` (this
+                  flow) fields shown beside the step.
+                items:
+                  type: string
+              stepSettings:
+                type: array
+                description: The step's own settings, kept in `BookingFlowStep.settings`.
+                items:
+                  type: object
+                  required:
+                  - name
+                  - type
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                    default:
+                      description: The value when the venue sets none.
+        orderConstraints:
+          type: array
+          description: '`first` and `last` pin a step; `before` puts `stepKey` somewhere ahead of `otherStepKey`.
+            The common constraints (payment last, location first, Help me choose before the products) apply
+            to every type as well as these.'
+          items:
+            type: object
+            required:
+            - kind
+            - stepKey
+            properties:
+              kind:
+                type: string
+                enum:
+                - first
+                - last
+                - before
+              stepKey:
+                $ref: '#/components/schemas/BookingFlowStepKey'
+              otherStepKey:
+                allOf:
+                - $ref: '#/components/schemas/BookingFlowStepKey'
+                nullable: true
+                description: Required when `kind` is `before`.
+    BookingFlowLevelSettings:
+      x-ticvai-persistence: none — jsonb column on whitelabel.booking_flow
+      type: object
+      description: '**The settings that belong to one flow, not to the venue (decided 29 September, W12).**
+        Moved here from `BookingFlowSettings`, which keeps the venue-wide ones. Each keeps its rev 3 meaning
+        and default. A field left out takes its default.
+
+        '
+      properties:
+        performanceReveal:
+          type: string
+          enum:
+          - dateTimeTicket
+          - allAtOnce
+          default: dateTimeTicket
+          description: '**Performance reveal (rev 3 REV3-2).** `dateTimeTicket` shows the times only once
+            a date is picked and the tickets only once a time is picked; `allAtOnce` shows them together. Product-first
+            (W8) is the step order of `experienceWorkshop`, not a value here.
+
+            '
+        signInAt:
+          type: string
+          enum:
+          - afterAddOns
+          - atPayment
+          default: afterAddOns
+          description: '**Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3).**
+            `afterAddOns` asks as the guest leaves the extras step; `atPayment` asks at payment. The basket
+            is kept either way.
+
+            '
+        seatEventDateMode:
+          type: string
+          enum:
+          - inlineStep
+          - popupOnSeatMap
+          default: inlineStep
+          description: '**Date and time on a seated event (rev 3 REV3-4).** `inlineStep` asks for them before
+            the seat map; `popupOnSeatMap` opens the seat map with a date and time pop-up. Read only by the
+            seated flow types.
+
+            '
+        extrasStep:
+          type: string
+          enum:
+          - auto
+          - always
+          - never
+          default: auto
+          description: '`auto` shows the extras step only when the cart''s products have add-ons; `never`
+            is the same as turning the optional `extras` step off.'
+        quickTour:
+          type: boolean
+          default: false
+          description: '**Quick tour (rev 3 REV3-20).** A first visit gets a coach-mark tour of this flow''s
+            steps, replayable from a Quick tour button. Seen-state kept on the device only.
+
+            '
+        consentQuestionIds:
+          type: array
+          maxItems: 10
+          uniqueItems: true
+          default: []
+          description: '**The flow''s own consent questions (rev 3 REV3-26).** Asked on every booking through
+            this flow, together with those of each product in the cart, each question once. Each id names
+            an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may
+            pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.
+
+            '
+          items:
+            type: string
+            format: uuid
+    BookingFlowStep:
+      x-ticvai-persistence: whitelabel.booking_flow_step
+      type: object
+      description: One step of a venue's flow, in the venue's order (decided 29 September, W12).
+      required:
+      - stepKey
+      - enabled
+      - sortOrder
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        bookingFlowId:
+          type: string
+          format: uuid
+          readOnly: true
+        stepKey:
+          $ref: '#/components/schemas/BookingFlowStepKey'
+        enabled:
+          type: boolean
+          description: A `required` step cannot be off; the flow saves and `isValid` turns false.
+        sortOrder:
+          type: integer
+          minimum: 0
+        requirement:
+          type: string
+          enum:
+          - required
+          - optional
+          - conditional
+          readOnly: true
+          x-ticvai-derived: onRead
+          description: From the flow type, so the CMS can mark the step without a second read.
+        settings:
+          type: object
+          additionalProperties: true
+          default: {}
+          description: The step's own settings, by the names the type's `stepSettings` gives for this step
+            (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused
+            with 400.
+    BookingFlow:
+      x-ticvai-persistence: whitelabel.booking_flow
+      type: object
+      description: '**A venue''s booking flow (decided 29 September, W12: operators pick their flows, see which
+        steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft
+        and reaches guests with `publishTenantConfig`, which copies the venue''s flows into the version''s snapshot.
+        A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue''s default for
+        the type serving its kind applies.
+
+        '
+      required:
+      - flowTypeKey
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of `createBookingFlowDefinition`.
+        flowTypeKey:
+          $ref: '#/components/schemas/BookingFlowTypeKey'
+        name:
+          type: string
+          maxLength: 80
+          description: Staff-facing, e.g. "Day pass, date first". Not shown to guests.
+        isDefaultForType:
+          type: boolean
+          default: false
+          description: At most one per venue and type; setting it takes it from the previous default.
+        isEnabled:
+          type: boolean
+          default: true
+          description: A disabled flow is kept and not published; products naming it fall back to the default.
+        steps:
+          type: array
+          maxItems: 30
+          description: Every step of the type, in the venue's order. Filled from the type when left out on create.
+          items:
+            $ref: '#/components/schemas/BookingFlowStep'
+        settings:
+          $ref: '#/components/schemas/BookingFlowLevelSettings'
+        isValid:
+          type: boolean
+          readOnly: true
+          x-ticvai-derived: onWrite
+          description: Whether the flow passes `validateBookingFlow`; worked out in the same transaction as
+            each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow.
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `venue` scope.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    BookingFlowValidation:
+      x-ticvai-persistence: none — computed
+      type: object
+      required:
+      - valid
+      - problems
+      properties:
+        valid:
+          type: boolean
+        problems:
+          type: array
+          items:
+            type: object
+            required:
+            - kind
+            - stepKey
+            - message
+            properties:
+              kind:
+                type: string
+                enum:
+                - requiredStepDisabled
+                - orderConstraintBroken
+                - conditionNeverHolds
+                - stepNotInType
+                - duplicateStep
+                - unknownStepSetting
+              stepKey:
+                $ref: '#/components/schemas/BookingFlowStepKey'
+              otherStepKey:
+                allOf:
+                - $ref: '#/components/schemas/BookingFlowStepKey'
+                nullable: true
+                description: For `orderConstraintBroken`, the step it must come before or after.
+              message:
+                type: string
+    SiteSetupStepKey:
+      type: string
+      description: 'The seven Site Builder steps, in order (decided 29 September, W12): venue and modules
+        (CMS-001), ticketing flows (CMS-103), compose steps (CMS-103), Help me choose (CMS-101), look and feel
+        (CMS-007, CMS-009, CMS-002, CMS-004, CMS-008, CMS-005, CMS-003), mobile app (CMS-009, CMS-004, CMS-007),
+        preview and publish (CMS-006, CMS-012, CMS-014).
+
+        '
+      enum:
+      - venueAndModules
+      - ticketingFlows
+      - composeSteps
+      - helpMeChoose
+      - lookAndFeel
+      - mobileApp
+      - previewAndPublish
+    SiteSetupProgress:
+      x-ticvai-persistence: whitelabel.site_setup_progress
+      type: object
+      description: '**The Site Builder''s saved progress, one row per tenant (decided 29 September, W12 and
+        M24-05).** Not configuration and not published. `presetKey` is the starting point the operator picked;
+        the builder pre-fills each step from it, which is what keeps the minimum path to a working site at
+        about 30 minutes.
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        presetKey:
+          type: string
+          nullable: true
+          enum:
+          - themePark
+          - waterPark
+          - museum
+          - theatreAndArena
+          - singleAttraction
+          - playCentre
+          - multiVenue
+          - null
+          description: 'The starting point. Each preset proposes the modules, the booking flow types (with
+            their default step order), the homepage sections, the mobile tabs and a booking-flow `preset`;
+            nothing is written until the operator accepts a step.'
+        currentStep:
+          allOf:
+          - $ref: '#/components/schemas/SiteSetupStepKey'
+          nullable: true
+        steps:
+          type: object
+          description: One entry per `SiteSetupStepKey`.
+          additionalProperties:
+            type: object
+            required:
+            - status
+            properties:
+              status:
+                type: string
+                enum:
+                - notStarted
+                - inProgress
+                - done
+                - skipped
+              completedAt:
+                type: string
+                format: date-time
+                nullable: true
+              completedByPrincipalId:
+                type: string
+                format: uuid
+                nullable: true
+        minimumPathDone:
+          type: boolean
+          readOnly: true
+          x-ticvai-derived: onRead
+          description: 'True once the minimum path is done: a logo, the four theme colours, at least one enabled
+            valid booking flow and a published version. Everything else keeps its preset or schema default.'
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `tenant` scope.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    StoreAccount:
+      x-ticvai-persistence: whitelabel.store_account
+      type: object
+      description: '**One of the client''s own store accounts (decided 24 September, M24-08).** TICVAI never
+        publishes under its own developer account.
+
+        '
+      required:
+      - store
+      - accountHolderName
+      - developerAccountId
+      - appIdentifier
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        store:
+          type: string
+          enum:
+          - appleAppStore
+          - googlePlay
+        accountHolderName:
+          type: string
+          maxLength: 200
+          description: The client's legal entity as the store knows it.
+        dunsNumber:
+          type: string
+          nullable: true
+          pattern: ^[0-9]{9}$
+          description: Required for `appleAppStore`; Apple enrols an organisation only with its D-U-N-S number.
+        developerAccountId:
+          type: string
+          maxLength: 64
+          description: Apple Team ID, or the Google Play developer account id.
+        appIdentifier:
+          type: string
+          maxLength: 155
+          pattern: ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$
+          description: The bundle id (Apple) or application id (Google) the app is signed with.
+        apiCredentialSecretRef:
+          type: string
+          nullable: true
+          writeOnly: true
+          description: App Store Connect API key or Play service-account key, sent once and kept in the secret
+            store; this is its reference. Needed only for `submitToStore`.
+        hasApiCredential:
+          type: boolean
+          readOnly: true
+          x-ticvai-derived: onRead
+        listing:
+          type: object
+          description: The store listing.
+          properties:
+            appName:
+              $ref: '#/components/schemas/LocalisedText'
+            subtitle:
+              $ref: '#/components/schemas/LocalisedText'
+            description:
+              $ref: '#/components/schemas/LocalisedText'
+            keywords:
+              $ref: '#/components/schemas/LocalisedText'
+            category:
+              type: string
+            supportUrl:
+              type: string
+              format: uri
+            privacyPolicyUrl:
+              type: string
+              format: uri
+            screenshotAssetRefs:
+              type: array
+              items:
+                type: string
+                format: uuid
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `tenant` scope.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    StorePublishingChecklist:
+      x-ticvai-persistence: none — computed
+      type: object
+      required:
+      - accounts
+      - items
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoreAccount'
+        items:
+          type: array
+          items:
+            type: object
+            required:
+            - item
+            - done
+            properties:
+              item:
+                type: string
+                enum:
+                - appleDunsNumber
+                - appleDeveloperAccount
+                - googlePlayDeveloperAccount
+                - storeListing
+                - appIcons
+                - publishedConfiguration
+              done:
+                type: boolean
+              clientOwned:
+                type: boolean
+                description: True for the three accounts, which only the client can open.
+              guidance:
+                type: string
+                description: What to do next, in the operator's language.
+    AppBuild:
+      x-ticvai-persistence: whitelabel.app_build
+      type: object
+      description: '**One build of the tenant''s branded app (decided 24 September, M24-08).** Made from a published
+        `ConfigVersion`, signed for the client''s own store account.
+
+        '
+      required:
+      - id
+      - platform
+      - configVersion
+      - status
+      - requestedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        platform:
+          type: string
+          enum:
+          - ios
+          - android
+        configVersion:
+          type: string
+          description: The `ConfigVersion.version` built.
+        storeAccountId:
+          type: string
+          format: uuid
+          readOnly: true
+        versionName:
+          type: string
+          readOnly: true
+          description: The marketing version, e.g. 1.4.0.
+        buildNumber:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+          enum:
+          - queued
+          - building
+          - built
+          - failed
+          - submitted
+          - inReview
+          - approved
+          - rejected
+          - released
+          description: '`queued` to `built` or `failed` is the build service''s; from `submitted` on it is
+            read from the store with the client''s credential, or stays `built` when the client uploads by
+            hand.'
+        failureReason:
+          type: string
+          nullable: true
+          readOnly: true
+        packageAssetRef:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The signed .ipa or .aab in the `assets` library, for the client to download and upload.
+        releaseNotes:
+          $ref: '#/components/schemas/LocalisedText'
+        submitToStore:
+          type: boolean
+          default: false
+        requestedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `tenant` scope.
     LocalisedText:
       x-ticvai-persistence: none — jsonb column
       type: object
@@ -4223,6 +6018,24 @@ components:
           readOnly: true
           description: Always `buildTime` for native apps. The guest web app takes a splash change at
             the publish, with no build (audit R163).
+        introVideoAssetRef:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The optional intro video (decided 29 September, MOB-5).** A video `MediaAsset` from
+            the media library (CMS-010). Streamed, so a change reaches guests with the publish and needs no
+            app build.
+
+            '
+        introVideoMode:
+          type: string
+          enum:
+          - 'off'
+          - firstLaunch
+          - everyLaunch
+          default: 'off'
+          description: When GST-001 plays it full screen. "Skip introduction" is always shown. Anything but
+            `off` needs `introVideoAssetRef`, or 400.
     AppIcons:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -4276,6 +6089,9 @@ components:
         plus `venueOverrides`; a `BookingFlowVenueOverride` carries any subset of them for one venue
         (decided 29 September, rev 3 CFG-11). The Rev 3 settings (`timesPerPage` onwards) are the options
         the client''s rev 3 prototype shows under Config → Booking rules and Build your experience.
+
+        **Venue-wide only (decided 29 September, W12).** The settings that belong to one flow moved to
+        `BookingFlowLevelSettings` on each `BookingFlow`; `categoryDisplay` was removed (W7).
 
         '
       properties:
@@ -4350,21 +6166,6 @@ components:
           default: compact
           description: Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6).
             `standard` replaces `regular`.
-        categoryDisplay:
-          type: string
-          enum:
-          - grid
-          - rowStrip
-          default: grid
-          description: How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid
-            or a single scrolling row (decided 29 September, rev 3 23SEP-18).
-        extrasStep:
-          type: string
-          enum:
-          - auto
-          - always
-          - never
-          default: auto
         seatPicker:
           type: string
           enum:
@@ -4457,30 +6258,6 @@ components:
               type: string
               pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               default: '17:00'
-        signInAt:
-          type: string
-          enum:
-          - afterAddOns
-          - atPayment
-          default: afterAddOns
-          description: '**Where the guest is asked to sign in, or for a guest-checkout code (decided 29
-            September, rev 3 REV3-3).** `afterAddOns` asks as the guest leaves Add-ons (WEB-008 on web, GST-041
-            on mobile); `atPayment` asks at payment (WEB-012). The basket is kept either way: the sign-in
-            gates checkout, never the cart (`FeatureToggle` `guestCheckout`).
-
-            '
-        seatEventDateMode:
-          type: string
-          enum:
-          - inlineStep
-          - popupOnSeatMap
-          default: inlineStep
-          description: '**Date and time on a seated event (decided 29 September, rev 3 REV3-4).** `inlineStep`
-            asks for them on WEB-006 or GST-007 before the seat map; `popupOnSeatMap` opens the seat map
-            with a date and time pop-up over it. An event with exactly one on-sale performance skips the
-            question in both modes.
-
-            '
         seatViewPosition:
           type: string
           enum:
@@ -4526,31 +6303,11 @@ components:
             type''s description, who it is for and what it includes, under its name.
 
             '
-        quickTour:
-          type: boolean
-          default: false
-          description: '**Quick tour (decided 29 September, rev 3 REV3-20).** On, a first visit gets a
-            four-step coach-mark tour (date, time, tickets, basket) with Back, Next and End, replayable from
-            a Quick tour button. Whether the guest has seen it is kept on the device only, never on the
-            server.
-
-            '
         conciergeMascot:
           type: boolean
           default: true
           description: '**The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5).**
             Read only where the `aiConciergeChat` feature is on.
-
-            '
-        performanceReveal:
-          type: string
-          enum:
-          - dateTimeTicket
-          - allAtOnce
-          default: dateTimeTicket
-          description: '**Performance reveal (decided 29 September, rev 3 REV3-2).** `dateTimeTicket` shows
-            the times only once a date is picked and the tickets only once a time is picked, with Continue
-            off until both are chosen; `allAtOnce` shows the three together.
 
             '
         showInfoOnly:
@@ -4569,21 +6326,36 @@ components:
             Off unless the tenant or venue enables it; it has no effect for a tenant with one venue.
 
             '
-        consentQuestionIds:
+        guestContactFields:
           type: array
-          maxItems: 10
+          minItems: 1
+          maxItems: 3
           uniqueItems: true
-          default: []
-          description: '**The booking flow''s own consent questions (decided 29 September, rev 3 REV3-26).**
-            Asked on every booking where these settings are in force (a venue sets its own through
-            `venueOverrides`), together with those of each product in the cart (`Product.consentQuestionIds`,
-            catalogue), each question once. Each id names an active `ConsentQuestion` of the tenant in
-            marketing-crm, or 400. Empty asks none.
-
-            '
+          default:
+          - email
           items:
             type: string
-            format: uuid
+            enum:
+            - email
+            - mobile
+            - name
+          description: '**What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1).**
+            The prototype''s Email only, + name and + mobile. Must include the contact the guest''s code is sent
+            to and matched on (identity `GuestMatchPolicy.matchBy`), or 400. After the code is verified the
+            guest is not asked for these again: the flow goes to the terms and payment, and the profile is
+            completed later (WEB-020, GST-039). Read only where the `guestCheckout` feature is on.
+
+            '
+        dateStripDays:
+          type: integer
+          minimum: 3
+          maximum: 31
+          default: 7
+          description: '**The date strip (decided 17 September, M17-08).** How many days from today the date
+            step shows as a strip before the calendar icon that opens the full month; later dates are picked
+            from the calendar.
+
+            '
     BookingFlowVenueOverride:
       type: object
       x-ticvai-persistence: none — embedded in tenant_config
@@ -4683,6 +6455,37 @@ components:
           - pill
           default: solid
           description: Button shape (decided 29 September, rev 3 CFG-3).
+        componentColours:
+          type: object
+          description: '**Colours for single interactive elements (decided 17 September, M17-11).** Each is
+            optional and falls back to the theme colours. Every pair passes the same contrast check as the
+            theme (`ContrastProblem`), or `setTheme` refuses it with 400. The guest flow stays the standard
+            one; only the colours change.
+
+            '
+          properties:
+            primaryCta:
+              $ref: '#/components/schemas/ThemeComponentColour'
+            payButton:
+              $ref: '#/components/schemas/ThemeComponentColour'
+            addToCart:
+              $ref: '#/components/schemas/ThemeComponentColour'
+            buyTicketsButton:
+              $ref: '#/components/schemas/ThemeComponentColour'
+            link:
+              $ref: '#/components/schemas/ThemeComponentColour'
+            badge:
+              $ref: '#/components/schemas/ThemeComponentColour'
+    ThemeComponentColour:
+      x-ticvai-persistence: none — embedded in tenant_config
+      type: object
+      properties:
+        background:
+          type: string
+          pattern: ^#[0-9A-Fa-f]{6}$
+        text:
+          type: string
+          pattern: ^#[0-9A-Fa-f]{6}$
     ContrastProblem:
       x-ticvai-persistence: none — error shape
       allOf:
@@ -4777,9 +6580,24 @@ components:
           - product
           - event
           - externalUrl
+          - appSection
           - none
+          description: '`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1),
+            so the bottom navigation can hold Home, Explore, Plan and Tickets.'
         moduleKey:
           $ref: '#/components/schemas/ModuleKey'
+        appSection:
+          type: string
+          enum:
+          - home
+          - explore
+          - plan
+          - tickets
+          - map
+          - account
+          - buyTickets
+          description: Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map`
+            the `map` module enabled, or `setNavigation` refuses it.
         contentPageId:
           type: string
           format: uuid
@@ -4794,6 +6612,12 @@ components:
     NavigationConfig:
       x-ticvai-persistence: whitelabel.navigation_item
       type: object
+      description: '**The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision
+        6).** Before a tenant saves its own, `bottomNavigation` is Home, Explore, Plan and Tickets (each an
+        `appSection` link), with the Buy tickets button beside them; Map is an optional tab. Plan is left out
+        while `visitPlanner` is off.
+
+        '
       required:
       - kind
       - items
@@ -4846,13 +6670,34 @@ components:
                 description: At most five may be visible in bottom navigation; the rest overflow.
               sortOrder:
                 type: integer
+        buyButton:
+          type: object
+          nullable: true
+          description: '**The persistent Buy tickets button (decided 29 September, MOB-2).** On every screen
+            of the mobile app except the booking and checkout steps; it opens GST-003. Read with `bottomNavigation`.
+
+            '
+          properties:
+            style:
+              type: string
+              enum:
+              - raised
+              - floating
+              - flat
+              - hidden
+              default: raised
+              description: '`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden`
+                turns it off.'
+            label:
+              $ref: '#/components/schemas/LocalisedText'
     HomepageSectionKind:
       type: string
       description: '**Which module each section needs, proposed, client to correct (decided 28 September,
         audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions`
         needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop`
-        needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent` and
-        `spacer` need no module. `setHomepageLayout` refuses a visible section whose module is not
+        needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent`,
+        `venueOverview` and `spacer` need no module. `venueOverview` (decided 29 September, MOB-3) is the
+        mobile Home''s description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not
         enabled, and `setModuleEnablement` refuses to disable a module a section still needs.
 
         '
@@ -4868,6 +6713,7 @@ components:
       - promotions
       - map
       - customContent
+      - venueOverview
       - spacer
     HomepageLayout:
       x-ticvai-persistence: whitelabel.homepage_section
@@ -4919,6 +6765,18 @@ components:
               maxItems:
                 type: integer
                 nullable: true
+                description: How many items the section shows. On the mobile Home, `attractions`, `dining`,
+                  `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3).
+              heroStyle:
+                type: string
+                nullable: true
+                enum:
+                - carousel
+                - video
+                - poster
+                - split
+                - null
+                description: For `heroBanner` only (decided 29 September, MOB-3).
     Banner:
       x-ticvai-persistence: whitelabel.banner
       type: object
@@ -5254,6 +7112,9 @@ components:
       - loyalty
       - lostAndFound
       - map
+      - visitPlanner
+      description: '`visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab
+        and WEB-050; off, the tab and the page are not shown.'
     ModuleEnablement:
       x-ticvai-persistence: whitelabel.module_enablement
       type: object
@@ -5428,6 +7289,8 @@ components:
       - noVisibleNavigationItems
       - unlicensedModuleEnabled
       - arabicFontMissing
+      - bookingFlowInvalid
+      - bookingFlowMissing
     ConfigValidationReport:
       x-ticvai-persistence: none — computed
       type: object
@@ -5629,6 +7492,14 @@ components:
           $ref: '#/components/schemas/AppIcons'
         bookingFlow:
           $ref: '#/components/schemas/BookingFlowConfig'
+        bookingFlows:
+          type: array
+          readOnly: true
+          x-ticvai-derived: onRead
+          description: Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish
+            snapshots them with the rest (decided 29 September, W12).
+          items:
+            $ref: '#/components/schemas/BookingFlow'
         theme:
           $ref: '#/components/schemas/Theme'
         fonts:

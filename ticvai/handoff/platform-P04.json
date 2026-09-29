@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 30,
@@ -15,7 +15,7 @@
   "contracts": 20,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 151
+  "operationsWithNoScreen": 153
  },
  "waves": {
   "wave1": 27,
@@ -91,11 +91,11 @@
    "operations": 6
   },
   {
-   "contract": "promotions",
+   "contract": "finance",
    "operations": 5
   },
   {
-   "contract": "finance",
+   "contract": "promotions",
    "operations": 5
   },
   {
@@ -103,11 +103,11 @@
    "operations": 4
   },
   {
-   "contract": "queue",
+   "contract": "approvals",
    "operations": 3
   },
   {
-   "contract": "approvals",
+   "contract": "queue",
    "operations": 3
   },
   {
@@ -115,11 +115,11 @@
    "operations": 3
   },
   {
-   "contract": "games",
+   "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "workforce",
+   "contract": "games",
    "operations": 2
   },
   {
@@ -127,11 +127,11 @@
    "operations": 1
   },
   {
-   "contract": "wallet",
+   "contract": "inventory",
    "operations": 1
   },
   {
-   "contract": "inventory",
+   "contract": "wallet",
    "operations": 1
   }
  ],
@@ -704,12 +704,6 @@
     "summary": "Tick what they may do"
    },
    {
-    "operation": "listStockReservations",
-    "contract": "inventory",
-    "verb": "GET",
-    "summary": "Soft holds on stock"
-   },
-   {
     "operation": "actOnWaiverRequirements",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -1280,6 +1274,12 @@
     "summary": "Block a gift card"
    },
    {
+    "operation": "captureWalletHold",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Debit a held amount"
+   },
+   {
     "operation": "closeWallet",
     "contract": "wallet",
     "verb": "POST",
@@ -1292,6 +1292,12 @@
     "summary": "A wallet's balance"
    },
    {
+    "operation": "holdWalletFunds",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Hold wallet funds for a spend in progress"
+   },
+   {
     "operation": "listWalletHolds",
     "contract": "wallet",
     "verb": "GET",
@@ -1302,6 +1308,12 @@
     "contract": "wallet",
     "verb": "POST",
     "summary": "Unfreeze a wallet"
+   },
+   {
+    "operation": "releaseWalletHold",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Give held wallet funds back"
    },
    {
     "operation": "broadcastToGuests",

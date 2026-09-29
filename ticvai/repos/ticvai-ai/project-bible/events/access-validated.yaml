@@ -7,6 +7,8 @@ publisher: access
 description: An entitlement was presented and admitted.
 aggregate: entitlement
 emittedWhen: Entitlement issued to partiallyConsumed or fullyConsumed
+emittedBy:
+- validateAccess
 payload:
 - field: scanId
   type: string

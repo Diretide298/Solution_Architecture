@@ -1,5 +1,5 @@
 id: LLD-payments
-title: payments — 47 operations
+title: payments — 48 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -302,6 +302,30 @@ operations:
   reads:
   - payments.stored_forward
   writes: []
+- operation: receivePaymentProviderWebhook
+  verb: POST
+  path: /payment-providers/{provider}/webhooks
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - orders.payment
+  - orders.sales_order
+  - payments.provider_connection
+  - payments.provider_event
+  writes:
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - ledger.journal_entry
+  - ledger.journal_line
+  - orders.order_event
+  - orders.payment
+  - payments.payment_attempt
+  - payments.provider_event
+  - platform.idempotency_record
+  - platform.outbox
 - operation: recordDepositActivity
   verb: POST
   path: /deposits/{depositId}/activity

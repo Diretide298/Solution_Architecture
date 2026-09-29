@@ -1,5 +1,5 @@
 id: LLD-WalletService
-title: WalletService — 63 operations, 31 tables
+title: WalletService — 66 operations, 31 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -17,7 +17,7 @@ ifDown: '**It holds a liability owed to a customer.** A wallet that double-spend
   not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than
   per caller.'
 coverage:
-  operations: 63
+  operations: 66
   inAFlow: 3
   percent: 5%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -30,7 +30,7 @@ schemas:
   largestTable: wallet.wallet_type
 operationsByContract:
 - contract: wallet
-  count: 63
+  count: 66
   operations:
   - operation: activateGiftCard
     verb: POST
@@ -64,6 +64,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: captureWalletHold
+    verb: POST
+    path: /wallet-holds/{walletHoldId}/capture
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 2
+    writes: 5
   - operation: closeWallet
     verb: POST
     path: /wallets/{walletId}/close
@@ -192,6 +200,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: holdWalletFunds
+    verb: POST
+    path: /wallets/{walletId}/holds
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 3
+    writes: 5
   - operation: issueGiftCard
     verb: POST
     path: /gift-cards
@@ -320,6 +336,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: releaseWalletHold
+    verb: POST
+    path: /wallet-holds/{walletHoldId}/release
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 2
+    writes: 5
   - operation: resolveWalletDispute
     verb: POST
     path: /wallet-disputes/{disputeId}/resolve
@@ -635,7 +659,8 @@ tables:
   columns: 9
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - wallet
   foreignWriters: null
 - table: wallet.channel_rules
   columns: 10
@@ -732,7 +757,8 @@ tables:
   columns: 12
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - wallet
   foreignWriters: null
 - table: wallet.integration_mapping
   columns: 5
@@ -805,9 +831,9 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.wallet_transaction
-  columns: 10
+  columns: 12
   store: postgres
-  parent: null
+  parent: wallet.wallet
   writtenBy:
   - orders
   - wallet
@@ -828,6 +854,29 @@ readsFrom:
 - service: IdentityService
   operations: 1
 writesOutside:
+- service: TenancyService
+  operations: 4
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event TenancyService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: captureWalletHold
+    tables:
+    - platform.idempotency_record
+    - platform.outbox
+  - operation: holdWalletFunds
+    tables:
+    - platform.idempotency_record
+    - platform.outbox
+  - operation: releaseWalletHold
+    tables:
+    - platform.idempotency_record
+    - platform.outbox
+  - operation: settleWalletAtExit
+    tables:
+    - platform.outbox
 - service: VenueOpsService
   operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -854,17 +903,6 @@ writesOutside:
     tables:
     - orders.payment
     - orders.refund
-- service: TenancyService
-  operations: 1
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event TenancyService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: settleWalletAtExit
-    tables:
-    - platform.outbox
 screens:
 - P01:WEB-021 Wallet & Gift Cards
 - P02:GST-011 Wallet Overview

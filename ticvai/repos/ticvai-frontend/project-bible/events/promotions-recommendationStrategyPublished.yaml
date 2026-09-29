@@ -12,6 +12,10 @@ emittedWhen: createRecommendationStrategy or updateRecommendationStrategy leaves
   relationship or suppression set; concludeRecommendationExperiment rolls a winning variant's strategy
   out; a promotion marked `recommendable` goes live, is paused, resumes, ends or expires (kind offers, 29
   September, build pass, group G2)
+emittedBy:
+- endPromotion
+- pausePromotion
+- publishPromotion
 payload:
 - field: kind
   type: string

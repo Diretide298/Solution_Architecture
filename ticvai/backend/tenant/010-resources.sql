@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS resources.performance_participant (
 -- What a person resource is certified to do, and until when (BL-042). A lapsed lifeguard
 -- certificate is a safety failure, not a data-quality one. Hangs off: a child of
 -- resources.resource; reaches resources.resource through its keys; references assets.media_asset,
--- resources.resource. Reached by: 2 operations read it and 1 write it.
+-- resources.resource. Reached by: 3 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS resources.qualification (
     resource_id                       uuid,
     code                              text NOT NULL,
@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS resources.resource (
     attributes                        jsonb,
     setup_minutes                     integer DEFAULT 0,
     teardown_minutes                  integer DEFAULT 0,
+    cleaning_policy                   jsonb,
     requires_qualification            text[],
     deposit_amount                    numeric(18,4),
     status                            text CONSTRAINT resource_status_chk CHECK (status IN ('available', 'booked', 'checkedOut', 'maintenance', 'retired')),

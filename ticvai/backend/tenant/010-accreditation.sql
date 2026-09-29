@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS accreditation.credential (
 -- One export of accreditation data, asynchronous: what was asked for (holders, applications,
 -- credentials, access or documents, filtered), in which format, why, by whom, and where the file
 -- is until it expires. Personal data leaves only with a stated purpose, and this row is that
--- record. Reached by: 3 operations read it and 1 write it.
+-- record
 CREATE TABLE IF NOT EXISTS accreditation.data_export (
     id                                uuid PRIMARY KEY,
     dataset                           text NOT NULL CONSTRAINT data_export_dataset_chk CHECK (dataset IN ('holders', 'applications', 'credentials', 'accessAssignments', 'documents')),
@@ -189,8 +189,7 @@ CREATE TABLE IF NOT EXISTS accreditation.identity_conflict (
 
 -- One send of a mobile accreditation credential to its holder — wallet pass, email or SMS link —
 -- and how far it got: queued, sent, delivered, opened, failed or superseded by a later send. A
--- credential that never arrived is a person at a gate with nothing to show. Reached by: 2
--- operations read it and 2 write it.
+-- credential that never arrived is a person at a gate with nothing to show
 CREATE TABLE IF NOT EXISTS accreditation.mobile_credential_delivery (
     id                                uuid PRIMARY KEY,
     credential_id                     uuid NOT NULL,

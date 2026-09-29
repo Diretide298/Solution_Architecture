@@ -199,6 +199,21 @@ TYPE_MAP = {
 
 POSTGRES_STORES = {"postgres", "postgres-analytical"}
 
+# **A table name is `<schema>.<table>` in lower-case identifiers, and nothing else is a table.**
+# Until 29 September (system-design review SD-007) the schema reference carried two "tables" named
+# `embedded as attributes (jsonb) on orders.cart_line and orders.order_line` and `embedded as
+# window_starts_at and window_ends_at on ...`: the text after `none —` in an `x-ticvai-persistence`
+# tag, kept by an additive lineage entry and re-derived every run. This file created two schemas,
+# two tables and six foreign keys from them, so the first migration (MIG-BASELINE) failed on
+# `CREATE SCHEMA IF NOT EXISTS embedded as ...`. A name that is not an identifier pair is refused
+# here whatever upstream says, and a column pointing at one is dropped with it.
+VALID_TABLE = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
+
+
+def is_not_persisted(tag) -> bool:
+    """`x-ticvai-persistence` values that name no table: anything starting with `none`."""
+    return isinstance(tag, str) and tag.strip().strip('"').lower().startswith("none")
+
 # **A row that belongs to two scopes at once.** A stock transfer is owned at the source venue and
 # has to be read and received at the destination (decided 28 September, audit R183). It used to
 # sit at the tenant above both, where neither venue could see it. The second path is named here
@@ -380,6 +395,75 @@ END
 $$;
 """
 
+# **No tenant table is left open** (system-design review SD-015, 29 September). Until then 212 tenant
+# tables -- `pii.subject*`, `payments.token`, `wallet.*`, `identity.principal` among them -- had no policy
+# and were readable by every connection to the tenant database. A table with neither a scope column nor
+# a protected owner now gets one of two policies instead of none:
+#
+#   * **by subject** where it carries `subject_id`: the row is visible to the session whose
+#     `ticvai.subject_id` it is (a guest reading their own wallet), and to a tenant-root grant;
+#   * **tenant root only** otherwise: visible only to a connection whose grant *is* the tenant root --
+#     head office and the system scope workers run under -- and to nobody scoped below it.
+#
+# `pii.*` and `payments.token` are additionally meant to be reached only through their owning service's
+# role (grants, not RLS); that is recorded in the file, and the policy is the floor under it.
+RLS_TENANT = """
+-- True when the connection holds the tenant root itself (head office, or a worker's system scope).
+CREATE OR REPLACE FUNCTION platform.tenant_root_in_scope()
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT cardinality(platform.current_scope_paths()) > 0
+       AND EXISTS (SELECT 1 FROM platform.scope s
+                    WHERE s.level = 'tenant'
+                      AND s.path = ANY (platform.current_scope_paths()));
+$$;
+
+-- True when the row belongs to the session's own subject, or the connection holds the tenant root.
+CREATE OR REPLACE FUNCTION platform.subject_in_scope(row_subject_id uuid)
+    RETURNS boolean
+    LANGUAGE sql
+    STABLE
+    PARALLEL SAFE
+AS $$
+    SELECT (row_subject_id IS NOT NULL
+            AND row_subject_id::text = NULLIF(current_setting('ticvai.subject_id', true), ''))
+        OR platform.tenant_root_in_scope();
+$$;
+
+CREATE OR REPLACE FUNCTION platform.apply_tenant_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING (platform.tenant_root_in_scope()) '
+                   'WITH CHECK (platform.tenant_root_in_scope())', policy_name, target);
+END
+$$;
+
+CREATE OR REPLACE FUNCTION platform.apply_subject_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    policy_name text := platform.rls_policy_name(target);
+BEGIN
+    EXECUTE format('ALTER TABLE %s ENABLE ROW LEVEL SECURITY', target);
+    EXECUTE format('ALTER TABLE %s FORCE ROW LEVEL SECURITY', target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', policy_name, target);
+    EXECUTE format('CREATE POLICY %I ON %s USING (platform.subject_in_scope(subject_id)) '
+                   'WITH CHECK (platform.subject_in_scope(subject_id))', policy_name, target);
+END
+$$;
+"""
+
 # Where the venue half of RLS_HEAD starts; the control database's file is cut here.
 VENUE_MARKER = "-- **{n_venue} tables carry `venue_id`"
 assert VENUE_MARKER in RLS_HEAD
@@ -501,7 +585,8 @@ CREATE TABLE IF NOT EXISTS platform.schema_version (
 
 
 def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: list,
-             total: int, has_scope_table: bool, shared: dict | None = None) -> str:
+             total: int, has_scope_table: bool, shared: dict | None = None,
+             by_subject: list | None = None, tenant_only: list | None = None) -> str:
     """The functions, then one call per table -- by `scope_path` where it has one, by `venue_id`
     where it does not, and through its owning parent where it has neither.
 
@@ -519,8 +604,12 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         cut = head.index(VENUE_MARKER.replace("{n_venue}", str(len(by_venue))))
         head = head[:cut].replace("-- Row-level security.", "-- Row-level security, control database.")
     body = [head]
+    by_subject = by_subject or []
+    tenant_only = tenant_only or []
     if by_parent:
         body.append(RLS_PARENT)
+    if by_subject or tenant_only:
+        body.append(RLS_TENANT)
     n_venue = len(by_venue) if db == "tenant" else 0
     # **Counted, not asserted.** The line this replaced called every table with neither column
     # "reference data, a registry, or the migration log", and the audit of 26 September found
@@ -528,7 +617,8 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     # the reason, so the claim can be checked rather than believed.
     body.append(
         f"-- **{total} tables: {len(scoped)} scoped by `scope_path`, {n_venue} by `venue_id`, "
-        f"{len(by_parent)} through the parent that owns them, {len(unscoped)} with no policy.**\n"
+        f"{len(by_parent)} through the parent that owns them, {len(by_subject)} by subject, "
+        f"{len(tenant_only)} to the tenant root only, {len(unscoped)} with no policy.**\n"
         "-- A table with no policy is listed at the end of this file with the reason. It is not\n"
         "-- claimed to be reference data: for most of them that is a scoping decision nobody has\n"
         "-- made yet, and they stay readable by every connection to this database until it is.\n")
@@ -566,6 +656,15 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         body.append("\n-- Scoped through the parent that owns the row (a NOT NULL declared foreign key).")
         body += [f"SELECT platform.apply_parent_rls('{qual(t)}'::regclass, '{col}', "
                  f"'{qual(par)}'::regclass, '{key}');" for t, col, par, key in by_parent]
+    if by_subject:
+        body.append("\n-- By subject (SD-015): the session's own subject, or the tenant root.")
+        body += [f"SELECT platform.apply_subject_rls('{qual(t)}'::regclass);" for t, _ in by_subject]
+    if tenant_only:
+        body.append("\n-- Tenant root only (SD-015): no scope column and no protected owner, so visible only\n"
+                    "-- to a connection holding the tenant root. `pii.*` and `payments.token` are also\n"
+                    "-- reached only through their owning service's role; this policy is the floor.")
+        body += [f"SELECT platform.apply_tenant_rls('{qual(t)}'::regclass);  -- was: {why}"
+                 for t, why in tenant_only]
     if unscoped:
         body.append("\n-- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a\n"
                     "-- NOT NULL owning reference) before row-level security can hold for it.")
@@ -743,6 +842,15 @@ def main() -> int:
     store = S.get("store") or {}
     real = {t for t in cols if "." in t and ":" not in t
             and store.get(t, "postgres") in POSTGRES_STORES}
+    refused = sorted(t for t in real if not VALID_TABLE.match(t))
+    real -= set(refused)
+    for t in refused:
+        print(f"  ! refused a table whose name is not <schema>.<table>: {t!r}")
+    # ...and every column whose only job was to point at one (`attributes_id`, `booked_window_id`).
+    for t in list(cols):
+        cols[t] = [c for c in cols[t] if not (
+            c.get("references") and "." in str(c["references"]) and ":" not in str(c["references"])
+            and not VALID_TABLE.match(str(c["references"])))]
 
     by_schema: dict[str, list] = defaultdict(list)
     for t in sorted(real):
@@ -865,6 +973,12 @@ def main() -> int:
             tkey = key_of(t, cols)
             for c in cols[t]:
                 col = c["column"]
+                # A column that exists only to point at a refused pseudo-table (`attributes_id`
+                # -> `embedded as ...`, SD-007) is not a column either.
+                _ref = c.get("references")
+                if (_ref and "." in str(_ref) and ":" not in str(_ref)
+                        and not VALID_TABLE.match(str(_ref))):
+                    continue
                 typ = pg_type(c.get("type"))
                 # **`scope_path` is an ltree** (ADR-0011, naming-and-style 5.3). Until 24 September it
                 # came through as the contract's `string`, so 515 tables stored text and `in_scope`
@@ -976,6 +1090,14 @@ def main() -> int:
                 idx_lines.append((schema,
                     f"CREATE INDEX IF NOT EXISTS {index_name(schema, short, 'scope_path')} "
                     f"ON {q(schema)}.{q(short)} USING gist ({q('scope_path')});"))
+                n_idx += 1
+            # **The relay's queue is the unpublished rows** (system-design review SD-030, 29 September).
+            # Its only index was the GiST one on `scope_path`, so every poll scanned the table.
+            if t == "platform.outbox" and {"published_at", "created_at"} <= set(names):
+                idx_lines.append((schema,
+                    "-- the relay polls unpublished rows oldest first (SD-030)\n"
+                    "CREATE INDEX IF NOT EXISTS outbox_unpublished_idx ON platform.outbox (created_at) "
+                    "WHERE published_at IS NULL;"))
                 n_idx += 1
             # **The scope tree's own path, GiST-indexed** as 001-extensions says it is: every venue
             # policy resolves a venue through it with `<@`.
@@ -1173,6 +1295,7 @@ def main() -> int:
                 f"{c['column']} -> {c['references']}" for c in nullable) + ")")
         return "no scope column and no declared owner"
 
+    n_subject_rls, n_tenant_rls = [0], [0]
     unscoped_all = [t for t in sorted(real)
                     if t not in protected and t not in venue_only and t != SCOPE_TABLE]
     for db in ("tenant", CONTROL):
@@ -1180,11 +1303,22 @@ def main() -> int:
         vmine = [t for t in venue_only if area(t.split(".")[0]) == db]
         pmine = [p for p in by_parent if area(p[0].split(".")[0]) == db]
         umine = [(t, why_unscoped(t)) for t in unscoped_all if area(t.split(".")[0]) == db]
+        smine, tmine = [], []
+        if db == "tenant" and SCOPE_TABLE in real:
+            for t, why in umine:
+                if any(c["column"] == "subject_id" for c in cols[t]):
+                    smine.append((t, why))
+                else:
+                    tmine.append((t, why))
+            umine = []
+            n_subject_rls[0] += len(smine)
+            n_tenant_rls[0] += len(tmine)
         total = len(by_schema.get(CONTROL) or []) if db == CONTROL else n_tenant_tables
         files[f"{db}/920-row-level-security.sql"] = rls_file(
             db, mine, vmine, pmine, umine, total,
             has_scope_table=(SCOPE_TABLE in real and db == "tenant"),
-            shared={t: c for t, c in shared_scope.items() if t in mine})
+            shared={t: c for t, c in shared_scope.items() if t in mine},
+            by_subject=smine, tenant_only=tmine)
 
     # **The venue partition mechanism** (ADR-0005, ADR-0044). The helper only; the tables that use
     # it declare their own partitioning where they are created.
@@ -1209,6 +1343,14 @@ def main() -> int:
         for stale in sorted(OUT.glob("0*.sql")) + sorted(OUT.glob("9*.sql")):
             if stale.name not in files:
                 stale.unlink()
+        # **A per-schema file this run did not write is a schema that no longer exists** (SD-007, 29
+        # September): `tenant/010-embedded as attributes (jsonb) on orders.sql` outlived the fix that
+        # stopped generating it, and initdb would still have applied it.
+        for area_dir in (CONTROL, "tenant"):
+            for stale in sorted((OUT / area_dir).glob("*.sql")):
+                if f"{area_dir}/{stale.name}" not in files:
+                    print(f"  removed stale {area_dir}/{stale.name}")
+                    stale.unlink()
         for name, text in files.items():
             dest = OUT / name
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -1223,7 +1365,9 @@ def main() -> int:
         for u in no_unique:
             print(f"     {u}")
     print(f"  row-level security: {len(scoped)} by scope_path · {len(venue_only)} carry venue_id · "
-          f"{len(by_parent)} through their owner · {len(unscoped_all)} with no policy")
+          f"{len(by_parent)} through their owner · {n_subject_rls[0]} by subject · "
+          f"{n_tenant_rls[0]} tenant root only · "
+          f"{len(unscoped_all) - n_subject_rls[0] - n_tenant_rls[0]} with no policy")
     print(f"  {len(by_schema.get(CONTROL) or [])} control tables · "
           f"{n_tenant_tables} tenant tables in {len(tenant_schemas)} schemas")
     if n_xdb:

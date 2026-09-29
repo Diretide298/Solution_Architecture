@@ -134,7 +134,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
   <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
   <div class="head">
     <div><span class="mark">TICVAI</span>
-      <h1>TICVAI Venue Management <span style="font-weight:600;color:#6B7280">(1383 screens)</span></h1></div>
+      <h1>TICVAI Venue Management <span style="font-weight:600;color:#6B7280">(1387 screens)</span></h1></div>
     <div class="meta">P08 Venue Management &middot; P12 Venue Support &middot; P13 Venue CMS &middot; P16 Venue Analytics</div>
   </div>
   <p class="lede">**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.</p>
@@ -556,7 +556,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; assetId&larr;deepLink, gameId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-070">BO-070</a>  &mdash; <i>Work Orders</i> <span class="car">workOrderId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateAsset &middot; <i>Create asset</i> &middot; <b>Create asset</b> &middot; Cancel <span class="dis">discards assetTag · name · venueId · criticality · categoryId · locationDescription · manufacturer · model · serialNumber · commissionedAt · warrantyExpiresAt · supplierId · linkedProductIds · linkedAccessPointId · requiresInspectionToReturn · documents · documentRefs</span></div><div class="ov"><b>modal</b> formSetAssetStatus &middot; <i>Save asset status</i> &middot; <b>Save asset status</b> &middot; Cancel <span class="dis">discards status · reason · recordedAt · inspectionId · raiseWorkOrder</span></div><div class="ov"><b>modal</b> formUpdateAsset &middot; <i>Save asset</i> &middot; <b>Save asset</b> &middot; Cancel <span class="dis">discards name · locationDescription · categoryId · warrantyExpiresAt · supplierId · documents · documentRefs</span></div><div class="ov"><b>modal</b> formUpdateGame &middot; <i>Save game</i> &middot; <b>Save game</b> &middot; Cancel <span class="dis">discards name · creditCost · minPointsAwarded · maxPointsAwarded · status · heightRequirementCm</span></div><div class="ov"><b>modal</b> formRecordGamePlay &middot; <i>Record game play</i> &middot; <b>Record game play</b> &middot; Cancel <span class="dis">discards id · cardCode · gameId · recordedAt · creditsUsed · pointsAwarded · sequence</span></div><div class="ov"><b>modal</b> formSyncGamePlays &middot; <i>Sync game plays</i> &middot; <b>Sync game plays</b> &middot; Cancel <span class="dis">discards readerId · plays</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateAsset &middot; <i>Create asset</i> &middot; <b>Create asset</b> &middot; Cancel <span class="dis">discards assetTag · name · venueId · criticality · categoryId · locationDescription · manufacturer · model · serialNumber · commissionedAt · warrantyExpiresAt · supplierId · linkedProductIds · linkedAccessPointId · requiresInspectionToReturn · documents · documentRefs · priorityOverride</span></div><div class="ov"><b>modal</b> formSetAssetStatus &middot; <i>Save asset status</i> &middot; <b>Save asset status</b> &middot; Cancel <span class="dis">discards status · reason · recordedAt · inspectionId · raiseWorkOrder</span></div><div class="ov"><b>modal</b> formUpdateAsset &middot; <i>Save asset</i> &middot; <b>Save asset</b> &middot; Cancel <span class="dis">discards name · locationDescription · categoryId · warrantyExpiresAt · supplierId · documents · documentRefs · priorityOverride</span></div><div class="ov"><b>modal</b> formUpdateGame &middot; <i>Save game</i> &middot; <b>Save game</b> &middot; Cancel <span class="dis">discards name · creditCost · minPointsAwarded · maxPointsAwarded · status · heightRequirementCm</span></div><div class="ov"><b>modal</b> formRecordGamePlay &middot; <i>Record game play</i> &middot; <b>Record game play</b> &middot; Cancel <span class="dis">discards id · cardCode · gameId · recordedAt · creditsUsed · pointsAwarded · sequence</span></div><div class="ov"><b>modal</b> formSyncGamePlays &middot; <i>Sync game plays</i> &middot; <b>Sync game plays</b> &middot; Cancel <span class="dis">discards readerId · plays</span></div></div>
         </div>
       </div>
       <div id="bo-071" class="scr">
@@ -697,18 +697,17 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The venue map</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>The venue map graph</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Publishing a map moves people.** The gate names what changes before it happens — which routes, which closures, which points become unreachable.
-</span></div></div><div class="side"><div class="panel"><b>Bookable places on the map</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Each placed resource with its label, kind, zone, capacity and price band** (decided 29 September, rev 3 REV3-15, superseding audit R073 (c) for resources on an ingested</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Item description</b><div class="chip">Item description</div><span class="why">**What the guest reads on Item Detail** (decided 29 September, MOB-4): rides, shows, restaurants and shops. Per language.</span></div><div class="panel"><b>Photos and video</b><div class="chip">Photos and video</div><span class="why">From the asset library; the first is the gallery cover on GST-004 Item Detail (MOB-4).</span></div><div class="panel"><b>Featured offer</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The product or bundle the item detail proposes** (decided 29 September, MOB-4), on any kind of point, e.g. a restaurant&#x27;s *meal combo with admission* (a bundle fro</span></div></div><div class="side"><div class="panel"><b>Typical visit (minutes)</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">What the Plan tab&#x27;s planner allows for this stop (MOB-6).</span></div><div class="panel"><b>Interests</b><div class="chip">Interests</div><span class="why">Matched against the guest&#x27;s interests on the Plan tab (MOB-6).</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getVenueMap · setVenuePoint · publishVenueMap · validateVenueMapGraph +3</div>
+          <div><b>OPERATIONS</b> &middot; searchMedia · listProducts · listCatalogueBundles · getVenueMap +6</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; mapId&larr;deepLink, pathId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-092">BO-092</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetVenuePoint &middot; <i>Save venue point</i> &middot; <b>Save venue point</b> &middot; Cancel <span class="dis">discards id · mapId · kind · name · position · nameLocalised · outletId · productId · accessPointId · isStepFree · openingHours · iconRef · isActive · isNavigable · isDestination · pointId</span></div><div class="ov"><b>modal</b> formPublishVenueMap &middot; <i>Publish venue map</i> &middot; <b>Publish venue map</b> &middot; Cancel <span class="dis">discards note</span></div><div class="ov"><b>modal</b> formSetPathClosure &middot; <i>Save path closure</i> &middot; <b>Save path closure</b> &middot; Cancel <span class="dis">discards isClosed · reason · note · force · expectedReopenAt</span></div><div class="ov"><b>modal</b> formSetPlacedResource &middot; <i>Place resource</i> &middot; <b>Place resource</b> &middot; Cancel <span class="dis">discards resourceId · label · kind · zone · capacity · priceBandCode · position · boundary · isBookable · placedResourceId</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetVenuePoint &middot; <i>Save venue point</i> &middot; <b>Save venue point</b> &middot; Cancel <span class="dis">discards id · mapId · kind · name · position · nameLocalised · outletId · productId · accessPointId · isStepFree · openingHours · iconRef · isActive · isNavigable · isDestination · pointId · description · media · featuredOffer · typicalDurationMinutes · interestTags · cuisineTags</span></div><div class="ov"><b>modal</b> formPublishVenueMap &middot; <i>Publish venue map</i> &middot; <b>Publish venue map</b> &middot; Cancel <span class="dis">discards note</span></div><div class="ov"><b>modal</b> formSetPathClosure &middot; <i>Save path closure</i> &middot; <b>Save path closure</b> &middot; Cancel <span class="dis">discards isClosed · reason · note · force · expectedReopenAt</span></div><div class="ov"><b>modal</b> formSetPlacedResource &middot; <i>Place resource</i> &middot; <b>Place resource</b> &middot; Cancel <span class="dis">discards resourceId · label · kind · zone · capacity · priceBandCode · position · boundary · isBookable · placedResourceId</span></div></div>
         </div>
       </div>
       <div id="bo-095" class="scr">
@@ -758,7 +757,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The resource availability</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">timeline</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Setup and teardown render as their own bands, not as part of the booking — **a 30-minute turnaround is invisible if it is drawn inside the booking**</span></div><div class="panel"><b>Book</b><div class="chip cta">Book</div></div></div><div class="side"><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Conflicts, named with times. *Not available* on something a guest can see is not an answer</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Each resource&#x27;s bookings, blocks and cleanings placed by hour. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. Filters </span></div><div class="panel"><b>The resource availability</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">timeline</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Setup and teardown render as their own bands, not as part of the booking — **a 30-minute turnaround is invisible if it is drawn inside the booking**</span></div></div><div class="side"><div class="panel"><b>Book</b><div class="chip cta">Book</div></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Conflicts, named with times. *Not available* on something a guest can see is not an answer</span></div></div></div>
             </div>
           </div>
         </div>
@@ -1148,7 +1147,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>normal operating days</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>weekends</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>holidays</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>seasonal schedules</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>private events</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Operating days and special access days on the month view. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. Filters the catego</span></div><div class="panel"><b>normal operating days</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>weekends</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>holidays</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>seasonal schedules</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -11348,12 +11347,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Create API client</b><div class="chip cta">Create API client</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Scopes, by module</b><div class="chip">Scopes, by module</div><span class="why">**A scope picker grouped by module** (M17-05): `{module}.read` and `{module}.write`, with unlicensed modules shown and disabled rather than hidden. No scope opens a catal</span></div><div class="panel"><b>Production access</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">**Where production access stands** (M17-06): sandbox only, requested (pending), approved (a production client issued by TICVAI) or rejected with the reason. Production ke</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div><div class="side"><div class="panel"><b>Create API client</b><div class="chip cta">Create API client</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listApiClients · createApiClient</div>
+          <div><b>OPERATIONS</b> &middot; listApiScopes · listProductionAccessRequests · listApiClients · createApiClient</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1071">BO-1071</a>  &mdash; <i>Back to Integration Command Center</i></div>
@@ -11593,12 +11592,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · getProduct · createProduct · listAlternativeCodes +10</div>
+          <div><b>OPERATIONS</b> &middot; listBookingFlows · listProducts · getProduct · createProduct +11</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; productId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;deepLink, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · variantId</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i><br><a href="#bo-010">BO-010</a>  &mdash; <i>Promotions &amp; Coupons</i> <span class="car">code</span><br><a href="#bo-045">BO-045</a>  &mdash; <i>Menu Management</i> <span class="car">menuId</span><br><a href="#bo-112">BO-112</a>  &mdash; <i>Production Planning &amp; Production Sheets</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateProduct &middot; <i>Create product</i> &middot; <b>Create product</b> &middot; Cancel <span class="dis">discards code · name · kind · venueId · description · channels · entitlementTemplateId · dataMaskValues · guestListing · notBookableLabel · displayTags · media · consentQuestionIds · requiresTimeWindow</span></div><div class="ov"><b>modal</b> formSetAlternativeCodes &middot; <i>Save alternative codes</i> &middot; <b>Save alternative codes</b> &middot; Cancel <span class="dis">discards codes</span></div><div class="ov"><b>modal</b> formSetProductAttributes &middot; <i>Save product attributes</i> &middot; <b>Save product attributes</b> &middot; Cancel <span class="dis">discards axes</span></div><div class="ov"><b>modal</b> formTransitionProductLifecycle &middot; <i>Transition product lifecycle</i> &middot; <b>Transition product lifecycle</b> &middot; Cancel <span class="dis">discards transition · reason · effectiveAt</span></div><div class="ov"><b>modal</b> formUpdateProduct &middot; <i>Save product</i> &middot; <b>Save product</b> &middot; Cancel <span class="dis">discards name · description · channels · dataMaskValues · guestListing · notBookableLabel · displayTags · media · consentQuestionIds · requiresTimeWindow</span></div><div class="ov"><b>modal</b> formCreateMerchandise &middot; <i>Create merchandise</i> &middot; <b>Create merchandise</b> &middot; Cancel <span class="dis">discards sku · name · outletId · variantId · barcode · description · categoryId · inventoryItemId · isReturnable · returnWindowDays · requiresSerialNumber · imageAssetRef</span></div><div class="ov"><b>modal</b> formBulkUpdateProducts &middot; <i>Bulk update products</i> &middot; <b>Bulk update products</b> &middot; Cancel <span class="dis">discards selector · changes · previewOnly</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateProduct &middot; <i>Create product</i> &middot; <b>Create product</b> &middot; Cancel <span class="dis">discards code · name · kind · venueId · description · channels · entitlementTemplateId · dataMaskValues · guestListing · notBookableLabel · displayTags · media · consentQuestionIds · requiresTimeWindow · salesContact · bookingFlowId</span></div><div class="ov"><b>modal</b> formSetAlternativeCodes &middot; <i>Save alternative codes</i> &middot; <b>Save alternative codes</b> &middot; Cancel <span class="dis">discards codes</span></div><div class="ov"><b>modal</b> formSetProductAttributes &middot; <i>Save product attributes</i> &middot; <b>Save product attributes</b> &middot; Cancel <span class="dis">discards axes</span></div><div class="ov"><b>modal</b> formTransitionProductLifecycle &middot; <i>Transition product lifecycle</i> &middot; <b>Transition product lifecycle</b> &middot; Cancel <span class="dis">discards transition · reason · effectiveAt</span></div><div class="ov"><b>modal</b> formUpdateProduct &middot; <i>Save product</i> &middot; <b>Save product</b> &middot; Cancel <span class="dis">discards name · description · channels · dataMaskValues · guestListing · notBookableLabel · displayTags · media · consentQuestionIds · requiresTimeWindow · salesContact · bookingFlowId</span></div><div class="ov"><b>modal</b> formCreateMerchandise &middot; <i>Create merchandise</i> &middot; <b>Create merchandise</b> &middot; Cancel <span class="dis">discards sku · name · outletId · variantId · barcode · description · categoryId · inventoryItemId · isReturnable · returnWindowDays · requiresSerialNumber · imageAssetRef</span></div><div class="ov"><b>modal</b> formBulkUpdateProducts &middot; <i>Bulk update products</i> &middot; <b>Bulk update products</b> &middot; Cancel <span class="dis">discards selector · changes · previewOnly</span></div></div>
         </div>
       </div>
       <div id="bo-009" class="scr">
@@ -11684,7 +11683,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getGroupPackageDefinition · setGroupPackageDefinition · listCatalogueBundles · getLatestBundle +8</div>
+          <div><b>OPERATIONS</b> &middot; listMenus · getGroupPackageDefinition · setGroupPackageDefinition · listCatalogueBundles +9</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; version&larr;deepLink, productId&larr;navigation, bundleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span><br><a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">productId · version</span><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i> <span class="car">priceListId</span></div>
@@ -11800,7 +11799,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>From</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?from=` to `listPerformances`.</span></div><div class="panel"><b>To</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?to=` to `listPerformances`.</span></div><div class="panel"><b>Every performance</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Every event</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it dest</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Performances by day, week or month; a slot opens its performance. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. Sends the </span></div><div class="panel"><b>From</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?from=` to `listPerformances`.</span></div><div class="panel"><b>To</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?to=` to `listPerformances`.</span></div></div><div class="side"><div class="panel"><b>Every performance</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Every event</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -11981,7 +11980,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Today</b><span>AED 48,210</span></div><div class="kpi"><b>Orders</b><span>312</span></div><div class="kpi"><b>Avg basket</b><span>AED 154</span></div><div class="kpi"><b>Refunds</b><span>4</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>From</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?from=` to `listPerformances`.</span></div><div class="panel"><b>To</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?to=` to `listPerformances`.</span></div><div class="panel"><b>Every performance</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Every event</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Confirm</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it dest</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Opening days and performances placed in the venue calendar. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. Sends the visibl</span></div><div class="panel"><b>From</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?from=` to `listPerformances`.</span></div><div class="panel"><b>To</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?to=` to `listPerformances`.</span></div></div><div class="side"><div class="panel"><b>Every performance</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Every event</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -12226,7 +12225,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProductCategories · setProductCategories · listSaleBoards · requestSuggestion +1</div>
+          <div><b>OPERATIONS</b> &middot; listBookingFlows · listProductCategories · setProductCategories · listSaleBoards +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, reportId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-102">BO-102</a>  &mdash; <i>Sell</i><br><a href="#bo-116">BO-116</a>  &mdash; <i>Merchandising &amp; Product Presentation</i> <span class="car">saleBoardId</span></div>
@@ -14866,12 +14865,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getProduct · listProductVariants · setProductAttributes · updateProduct +7</div>
+          <div><b>OPERATIONS</b> &middot; listBookingFlows · getProduct · listProductVariants · setProductAttributes +8</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, productId&larr;deepLink, variantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i> <span class="car">productId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetProductAttributes &middot; <i>Save product attributes</i> &middot; <b>Save product attributes</b> &middot; Cancel <span class="dis">discards axes</span></div><div class="ov"><b>modal</b> formUpdateProduct &middot; <i>Save product</i> &middot; <b>Save product</b> &middot; Cancel <span class="dis">discards name · description · channels · dataMaskValues · guestListing · notBookableLabel · displayTags · media · consentQuestionIds · requiresTimeWindow</span></div><div class="ov"><b>modal</b> formUpdateProductVariant &middot; <i>Save ticket type</i> &middot; <b>Save ticket type</b> &middot; Cancel <span class="dis">discards name · description · barcode · isDefault</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetProductAttributes &middot; <i>Save product attributes</i> &middot; <b>Save product attributes</b> &middot; Cancel <span class="dis">discards axes</span></div><div class="ov"><b>modal</b> formUpdateProduct &middot; <i>Save product</i> &middot; <b>Save product</b> &middot; Cancel <span class="dis">discards name · description · channels · dataMaskValues · guestListing · notBookableLabel · displayTags · media · consentQuestionIds · requiresTimeWindow · salesContact · bookingFlowId</span></div><div class="ov"><b>modal</b> formUpdateProductVariant &middot; <i>Save ticket type</i> &middot; <b>Save ticket type</b> &middot; Cancel <span class="dis">discards name · description · barcode · isDefault</span></div></div>
         </div>
       </div>
       <div id="bo-022" class="scr">
@@ -19421,12 +19420,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Takings</b><span>AED 62,480</span></div><div class="kpi"><b>Settled</b><span>18</span></div><div class="kpi"><b>Variance</b><span>AED 40</span></div><div class="kpi"><b>Open</b><span>3</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Integration identity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Application/client</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Tenant scope</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Venue scope</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>API scope</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Production access</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">**Where production access stands** (M17-06): sandbox only, requested (pending), approved (a production client issued by TICVAI) or rejected with the reason. Production ke</span></div><div class="panel"><b>Integration identity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Application/client</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Tenant scope</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Venue scope</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccessPolicies · createApiClient</div>
+          <div><b>OPERATIONS</b> &middot; listApiScopes · listProductionAccessRequests · listAccessPolicies · createApiClient</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1173">BO-1173</a>  &mdash; <i>Back to Wallet Integration Command Center</i> <span class="car">clientId</span></div>
@@ -20027,12 +20026,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWorkOrders · getWorkOrder · createWorkOrder · updateWorkOrder +5</div>
+          <div><b>OPERATIONS</b> &middot; suggestWorkOrderAssignee · listVendorServiceRequests · createVendorServiceRequest · updateVendorServiceRequest +9</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; workOrderId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; workOrderId&larr;deepLink, vendorServiceRequestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-108">BO-108</a>  &mdash; <i>Venue Operations</i><br><a href="#bo-036">BO-036</a>  &mdash; <i>The till is confirmed healthy again</i><br><a href="#bo-030">BO-030</a>  &mdash; <i>Verify the completed work</i> <span class="car">workOrderId</span><br><a href="#bo-031">BO-031</a>  &mdash; <i>Open the asset</i> <span class="car">assetId</span><br><a href="#bo-071">BO-071</a>  &mdash; <i>Planned maintenance</i><br><a href="#bo-072">BO-072</a>  &mdash; <i>Incident log</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateWorkOrder &middot; <i>Raise work order</i> &middot; <b>Raise work order</b> &middot; Cancel <span class="dis">discards title · description · assetId · locationDescription · kind · priority · categoryId · assignedToPrincipalId · dueAt · attachmentRefs</span></div><div class="ov"><b>modal</b> formUpdateWorkOrder &middot; <i>Save work order</i> &middot; <b>Save work order</b> &middot; Cancel <span class="dis">discards priority · assignedToPrincipalId · dueAt</span></div><div class="ov"><b>modal</b> formPauseWorkOrder &middot; <i>Pause work order</i> &middot; <b>Pause work order</b> &middot; Cancel <span class="dis">discards reason · note</span></div><div class="ov"><b>modal</b> formRejectWorkOrder &middot; <i>Reject work order</i> &middot; <b>Reject work order</b> &middot; Cancel <span class="dis">discards reason · note</span></div><div class="ov"><b>modal</b> formCompleteWorkOrder &middot; <i>Complete work order</i> &middot; <b>Complete work order</b> &middot; Cancel <span class="dis">discards resolution</span></div><div class="ov"><b>modal</b> formCloseWorkOrder &middot; <i>Close work order</i> &middot; <b>Close work order</b> &middot; Cancel <span class="dis">discards outcome · note · duplicateOfWorkOrderId</span></div><div class="ov"><b>confirmDialog</b> confirmCancelWorkOrder &middot; <i>Cancel work order</i></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateWorkOrder &middot; <i>Raise work order</i> &middot; <b>Raise work order</b> &middot; Cancel <span class="dis">discards title · description · assetId · locationDescription · kind · priority · categoryId · assignedToPrincipalId · dueAt · attachmentRefs · faultAssessment · requiredQualificationCodes</span></div><div class="ov"><b>modal</b> formUpdateWorkOrder &middot; <i>Save work order</i> &middot; <b>Save work order</b> &middot; Cancel <span class="dis">discards priority · assignedToPrincipalId · dueAt</span></div><div class="ov"><b>modal</b> formPauseWorkOrder &middot; <i>Pause work order</i> &middot; <b>Pause work order</b> &middot; Cancel <span class="dis">discards reason · note</span></div><div class="ov"><b>modal</b> formRejectWorkOrder &middot; <i>Reject work order</i> &middot; <b>Reject work order</b> &middot; Cancel <span class="dis">discards reason · note</span></div><div class="ov"><b>modal</b> formCompleteWorkOrder &middot; <i>Complete work order</i> &middot; <b>Complete work order</b> &middot; Cancel <span class="dis">discards resolution</span></div><div class="ov"><b>modal</b> formCloseWorkOrder &middot; <i>Close work order</i> &middot; <b>Close work order</b> &middot; Cancel <span class="dis">discards outcome · note · duplicateOfWorkOrderId</span></div><div class="ov"><b>confirmDialog</b> confirmCancelWorkOrder &middot; <i>Cancel work order</i></div></div>
         </div>
       </div>
       <div id="bo-100" class="scr">
@@ -25843,7 +25842,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Rental availability by day and hour. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. Filters the category on what it read.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -25873,7 +25872,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Equipment timeline</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">One row per serialised resource; `segments` drawn as coloured blocks across the hours, as in the pack&#x27;s BIKE-001 to BIKE-004 grid.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Resource and equipment bookings by hour. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. Filters the category on what it rea</span></div><div class="panel"><b>Equipment timeline</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">One row per serialised resource; `segments` drawn as coloured blocks across the hours, as in the pack&#x27;s BIKE-001 to BIKE-004 grid.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -27583,7 +27582,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Asset</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Maintenance Type</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Start Date/Time</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Expected Completion</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Technician</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Maintenance falling due, by day, week or month; a task opens a work order. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. S</span></div><div class="panel"><b>Asset</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Maintenance Type</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Start Date/Time</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Expected Completion</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -27618,9 +27617,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWorkOrders · getWorkOrder · createWorkOrder · updateWorkOrder +1</div>
+          <div><b>OPERATIONS</b> &middot; getWorkOrderPriorityPolicy · setWorkOrderPriorityPolicy · suggestWorkOrderAssignee · listVendorServiceRequests +7</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; workOrderId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; workOrderId&larr;navigation, vendorServiceRequestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-574">BO-574</a>  &mdash; <i>Back to Maintenance Command Center</i></div>
           
           
@@ -27678,9 +27677,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; recordWorkOrderParts</div>
+          <div><b>OPERATIONS</b> &middot; listStockReservations · createStockReservation · releaseStockReservation · recordWorkOrderParts</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; workOrderId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; workOrderId&larr;navigation, stockReservationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-574">BO-574</a>  &mdash; <i>Back to Maintenance Command Center</i></div>
           
           
@@ -28213,12 +28212,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Active status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Reservable status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Rentable status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Capacity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Unit of measure</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Cleaning</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**How the room is cleaned between uses** (decided 29 September, W10). *After every booking* blocks a fixed buffer after each booking (e.g. 15 minutes); *N times a day* le</span></div><div class="panel"><b>Minutes per cleaning</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Cleanings per day</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Shown for *N times a day* only.</span></div></div><div class="side"><div class="panel"><b>Cleaning window from</b><div class="chip">Cleaning window from</div></div><div class="panel"><b>Cleaning window to</b><div class="chip">Cleaning window to</div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getResource · getResourceQualifications · createResource · updateResource +2</div>
+          <div><b>OPERATIONS</b> &middot; getResourceAvailability · getResource · getResourceQualifications · createResource +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; resourceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-854">BO-854</a>  &mdash; <i>Back to Resource Management Command Center</i></div>
@@ -28423,7 +28422,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Every resource&#x27;s bookings and blocks on one calendar. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. Filters the categ</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -28483,12 +28482,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Available days</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Opening time</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Closing time</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Effective date</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Expiry date</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Cleaning</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**How the room is cleaned between uses** (decided 29 September, W10). *After every booking* blocks a fixed buffer after each booking (e.g. 15 minutes); *N times a day* le</span></div><div class="panel"><b>Minutes per cleaning</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Cleanings per day</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Shown for *N times a day* only.</span></div></div><div class="side"><div class="panel"><b>Cleaning window from</b><div class="chip">Cleaning window from</div></div><div class="panel"><b>Cleaning window to</b><div class="chip">Cleaning window to</div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getResourceSchedule · setResourceSchedule</div>
+          <div><b>OPERATIONS</b> &middot; getResourceAvailability · updateResource · getResourceSchedule · setResourceSchedule</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; resourceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-864">BO-864</a>  &mdash; <i>Back to Resource Calendar Command Center</i></div>
@@ -30523,7 +30522,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every schedule calendar</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The signed-in person&#x27;s schedule and assignments. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. Filters the category o</span></div><div class="panel"><b>Every schedule calendar</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -32863,7 +32862,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Campaigns placed across their run dates. Day, week, month and agenda views; the day starts at the venue&#x27;s `calendarDayStartHour`. Filters the category on what it rea</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -36565,12 +36564,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           
         </div>
-      </div></div><div class="shell"><b>P13 &middot; Venue CMS</b> <span>web shell &middot; 100 screens &middot; staff &middot; venue-management-web</span></div><div class="grp">20 &mdash; P13 White Label &middot; 20 screens</div><div class="stack">
+      </div></div><div class="shell"><b>P13 &middot; Venue CMS</b> <span>web shell &middot; 103 screens &middot; staff &middot; venue-management-web</span></div><div class="grp">20 &mdash; P13 White Label &middot; 23 screens</div><div class="stack">
       <div id="cms-001" class="scr">
         <div>
           <div class="hdr"><span class="code">CMS-001</span>
             <span class="ttl">Tenant Workspace</span><span class="pill named" title="Board archived to _dump/; the link is history and no drawn frame for this screen is in wireframes/">archived: Marketing Board 7.dc.html#crm-7f</span></div>
-          <div class="pur">Land a tenant somewhere that shows what is live and what is not.</div>
+          <div class="pur">Land a tenant somewhere that shows what is live and what is not, and hold step 1 of the Site Builder (venue and modules).</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -36591,7 +36590,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getTenantConfig · getModuleEnablement · getFeatureToggles +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; entry point · <a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i><br><a href="#cms-008">CMS-008</a>  &mdash; <i>Content Blocks</i><br><a href="#cms-009">CMS-009</a>  &mdash; <i>Navigation &amp; Menus</i><br><a href="#cms-010">CMS-010</a>  &mdash; <i>Media Library</i><br><a href="#cms-011">CMS-011</a>  &mdash; <i>Translations</i><br><a href="#cms-016">CMS-016</a>  &mdash; <i>Site Settings</i><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Version History</i> <span class="car">version</span><br><a href="#cms-019">CMS-019</a>  &mdash; <i>User Access</i><br><a href="#cms-021">CMS-021</a>  &mdash; <i>Privacy &amp; Consent Configuration Command Cent</i><br><a href="#cms-031">CMS-031</a>  &mdash; <i>Privacy Operations Command Center</i><br><a href="#cms-041">CMS-041</a>  &mdash; <i>Waiver &amp; Consent Command Center</i><br><a href="#cms-051">CMS-051</a>  &mdash; <i>Waiver Operations Command Center</i><br><a href="#cms-061">CMS-061</a>  &mdash; <i>Digital Asset Management Command Center</i><br><a href="#cms-071">CMS-071</a>  &mdash; <i>AI Asset Intelligence Command Center</i><br><a href="#cms-081">CMS-081</a>  &mdash; <i>DAM Governance &amp; Rights Command Center</i><br><a href="#cms-091">CMS-091</a>  &mdash; <i>Asset Distribution &amp; Delivery Command Center</i></div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-004">CMS-004</a>  &mdash; <i>Logo &amp; Assets</i><br><a href="#cms-008">CMS-008</a>  &mdash; <i>Content Blocks</i><br><a href="#cms-009">CMS-009</a>  &mdash; <i>Navigation &amp; Menus</i><br><a href="#cms-010">CMS-010</a>  &mdash; <i>Media Library</i><br><a href="#cms-011">CMS-011</a>  &mdash; <i>Translations</i><br><a href="#cms-016">CMS-016</a>  &mdash; <i>Site Settings</i><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Version History</i> <span class="car">version</span><br><a href="#cms-019">CMS-019</a>  &mdash; <i>User Access</i><br><a href="#cms-021">CMS-021</a>  &mdash; <i>Privacy &amp; Consent Configuration Command Cent</i><br><a href="#cms-031">CMS-031</a>  &mdash; <i>Privacy Operations Command Center</i><br><a href="#cms-041">CMS-041</a>  &mdash; <i>Waiver &amp; Consent Command Center</i><br><a href="#cms-051">CMS-051</a>  &mdash; <i>Waiver Operations Command Center</i><br><a href="#cms-061">CMS-061</a>  &mdash; <i>Digital Asset Management Command Center</i><br><a href="#cms-071">CMS-071</a>  &mdash; <i>AI Asset Intelligence Command Center</i><br><a href="#cms-081">CMS-081</a>  &mdash; <i>DAM Governance &amp; Rights Command Center</i><br><a href="#cms-091">CMS-091</a>  &mdash; <i>Asset Distribution &amp; Delivery Command Center</i><br><a href="#cms-102">CMS-102</a>  &mdash; <i>Site Builder</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetModuleEnablement &middot; <i>Save module enablement</i> &middot; <b>Save module enablement</b> &middot; Cancel <span class="dis">discards modules</span></div><div class="ov"><b>modal</b> formSetFeatureToggles &middot; <i>Save feature toggles</i> &middot; <b>Save feature toggles</b> &middot; Cancel <span class="dis">discards features</span></div><div class="ov"><b>modal</b> formSetMaintenanceMode &middot; <i>Save maintenance mode</i> &middot; <b>Save maintenance mode</b> &middot; Cancel <span class="dis">discards isInMaintenance · message · expectedBackAt · minimumAppVersion · contact · availability · availabilityMessage</span></div></div>
         </div>
@@ -36660,7 +36659,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div>
           <div class="hdr"><span class="code">CMS-004</span>
             <span class="ttl">Logo &amp; Assets</span></div>
-          <div class="pur">Hold the marks every surface needs, at the sizes it needs them.</div>
+          <div class="pur">Hold the marks every surface needs, at the sizes it needs them, and the mobile app&#x27;s intro video (Site Builder steps 5 and 6).</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -36673,7 +36672,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The brand identity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>The app icons</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The brand identity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Intro video (decided 29 September, MOB-5).** Picked from the media library (CMS-010); plays off, on first launch or on every launch, always with Skip introduction. Stre</span></div><div class="panel"><b>The app icons</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -36683,7 +36682,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAppIcons &middot; <i>Save app icons</i> &middot; <b>Save app icons</b> &middot; Cancel <span class="dis">discards sourceAssetRef</span></div><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards logoAssetRef · logoDarkAssetRef · logoVariant · faviconAssetRef · splashImageAssetRefs · splashDurationSeconds · splashBackgroundColour · showLoadingIndicator · splashChangeScope</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAppIcons &middot; <i>Save app icons</i> &middot; <b>Save app icons</b> &middot; Cancel <span class="dis">discards sourceAssetRef</span></div><div class="ov"><b>modal</b> formSetBrandIdentity &middot; <i>Save brand identity</i> &middot; <b>Save brand identity</b> &middot; Cancel <span class="dis">discards logoAssetRef · logoDarkAssetRef · logoVariant · faviconAssetRef · splashImageAssetRefs · splashDurationSeconds · splashBackgroundColour · showLoadingIndicator · splashChangeScope · introVideoAssetRef · introVideoMode</span></div></div>
         </div>
       </div>
       <div id="cms-005" class="scr">
@@ -36703,7 +36702,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The theme</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The theme</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Per-element colours (decided 17 September, M17-11).** Pickers for the main call to action, the pay button, add to cart, the Buy tickets button, links and badges, each w</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -36713,7 +36712,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-006">CMS-006</a>  &mdash; <i>Component Preview</i><br><a href="#cms-007">CMS-007</a>  &mdash; <i>Rearranges the homepage</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTheme &middot; <i>Save theme</i> &middot; <b>Save theme</b> &middot; Cancel <span class="dis">discards primaryColour · secondaryColour · backgroundColour · textColour · accentColour · darkMode · cornerRadius · surfaceStyle · buttonStyle</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTheme &middot; <i>Save theme</i> &middot; <b>Save theme</b> &middot; Cancel <span class="dis">discards primaryColour · secondaryColour · backgroundColour · textColour · accentColour · darkMode · cornerRadius · surfaceStyle · buttonStyle · componentColours</span></div></div>
         </div>
       </div>
       <div id="cms-006" class="scr">
@@ -36764,7 +36763,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The homepage layout</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Modules the sections need</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A section whose module is off (mapping on `HomepageSectionKind`) is shown disabled and cannot be added or made visible (decided 28 September, audit R163 (4)).</span></div><div class="panel"><b>Every content page</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The homepage layout</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Also the mobile Home editor (decided 29 September, MOB-3; Site Builder steps 5 and 6).** The `venueOverview` section (description, opening hours, type tiles), the hero&</span></div><div class="panel"><b>Modules the sections need</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A section whose module is off (mapping on `HomepageSectionKind`) is shown disabled and cannot be added or made visible (decided 28 September, audit R163 (4)).</span></div><div class="panel"><b>Every content page</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -36781,7 +36780,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div>
           <div class="hdr"><span class="code">CMS-008</span>
             <span class="ttl">Content Blocks</span></div>
-          <div class="pur">Define what a block can and cannot contain.</div>
+          <div class="pur">Define what a block can and cannot contain, and set the banners (Site Builder step 5).</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -36811,7 +36810,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div>
           <div class="hdr"><span class="code">CMS-009</span>
             <span class="ttl">Navigation &amp; Menus</span></div>
-          <div class="pur">Decide what appears in the header and the footer.</div>
+          <div class="pur">Decide what appears in the header, the footer and the mobile tab bar, with the Buy tickets button (Site Builder steps 5 and 6).</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -36829,12 +36828,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listMenus · getMenu · createMenu · setMenuSections +2</div>
+          <div><b>OPERATIONS</b> &middot; getNavigation · listMenus · getMenu · createMenu +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; menuId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateMenu &middot; <i>Create menu</i> &middot; <b>Create menu</b> &middot; Cancel <span class="dis">discards code · name · outletId · availability</span></div><div class="ov"><b>modal</b> formSetMenuSections &middot; <i>Save menu sections</i> &middot; <b>Save menu sections</b> &middot; Cancel <span class="dis">discards sections</span></div><div class="ov"><b>modal</b> formUpdateMenu &middot; <i>Save menu</i> &middot; <b>Save menu</b> &middot; Cancel <span class="dis">discards name · availability · isActive</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetNavigation &middot; <i>Save navigation and tabs</i> &middot; <b>Save navigation</b> &middot; Cancel <span class="dis">discards kind · items · buyButton</span></div><div class="ov"><b>modal</b> formCreateMenu &middot; <i>Create menu</i> &middot; <b>Create menu</b> &middot; Cancel <span class="dis">discards code · name · outletId · availability</span></div><div class="ov"><b>modal</b> formSetMenuSections &middot; <i>Save menu sections</i> &middot; <b>Save menu sections</b> &middot; Cancel <span class="dis">discards sections</span></div><div class="ov"><b>modal</b> formUpdateMenu &middot; <i>Save menu</i> &middot; <b>Save menu</b> &middot; Cancel <span class="dis">discards name · availability · isActive</span></div></div>
         </div>
       </div>
       <div id="cms-010" class="scr">
@@ -36961,7 +36960,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div>
           <div class="hdr"><span class="code">CMS-014</span>
             <span class="ttl">Publishing Workflow</span></div>
-          <div class="pur">Move a change from draft to live, with someone accountable.</div>
+          <div class="pur">Move a change from draft to live, with someone accountable (Site Builder step 7).</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -36974,16 +36973,15 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The tenant app status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.
-</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The tenant app status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate. **B</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; publishTenantConfig · validateTenantConfig · getTenantAppStatus</div>
+          <div><b>OPERATIONS</b> &middot; publishTenantConfig · validateTenantConfig · getTenantAppStatus · listBookingFlows</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Rolls back when something is wrong</i> <span class="car">version</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Rolls back when something is wrong</i> <span class="car">version</span><br><a href="#cms-103">CMS-103</a>  &mdash; <i>Fix a booking flow</i> <span class="car">bookingFlowId</span><br><a href="#cms-104">CMS-104</a>  &mdash; <i>Build the mobile app</i><br><a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPublishTenantConfig &middot; <i>Publish tenant config</i> &middot; <b>Publish tenant config</b> &middot; Cancel <span class="dis">discards note · scheduledFor</span></div></div>
         </div>
@@ -37022,7 +37020,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div>
           <div class="hdr"><span class="code">CMS-016</span>
             <span class="ttl">Site Settings</span></div>
-          <div class="pur">The values the whole site inherits from, and the booking-flow settings each venue may override (decided 29 September, rev 3 CFG-11).</div>
+          <div class="pur">The values the whole site inherits from, and the venue-wide booking settings each venue may override (decided 29 September, rev 3 CFG-11); the setting</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -37035,17 +37033,17 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>The tenant config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>The booking flow config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**The rev 3 booking rules, each with its default** (decided 29 September, rev 3). `timesPerPage` 8, 12, 24 or all (24) and `dayPartFilter` (on), with `dayPartBoundaries` </span></div><div class="panel"><b>Settings for</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Which level is being edited** (decided 29 September, rev 3 CFG-11). *All venues* edits the tenant settings; picking a venue edits that venue&#x27;s entry in `venueOverr</span></div></div><div class="side"><div class="panel"><b>Venues that differ from the tenant</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**One row per venue that overrides anything** (decided 29 September, rev 3 CFG-11). The editor sets only the fields that differ; a field left empty inherits the tenant va</span></div><div class="panel"><b>Consent questions this booking flow asks</b><div class="chip">Consent questions this booking flow asks</div><span class="why">**The questions every booking in this flow asks, whatever the product** (decided 29 September, rev 3 REV3-26), e.g. a water park&#x27;s &quot;Are you able to swim?&quot;.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The tenant config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>The booking flow config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Venue-wide booking settings only (decided 29 September, W12).** The settings that belong to one flow (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`</span></div><div class="panel"><b>Settings for</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Which level is being edited** (decided 29 September, rev 3 CFG-11). *All venues* edits the tenant settings; picking a venue edits that venue&#x27;s entry in `venueOverr</span></div></div><div class="side"><div class="panel"><b>Venues that differ from the tenant</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**One row per venue that overrides anything** (decided 29 September, rev 3 CFG-11). The editor sets only the fields that differ; a field left empty inherits the tenant va</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getBookingFlowConfig · setBookingFlowConfig · getTenantConfig · listConsentQuestions +3</div>
+          <div><b>OPERATIONS</b> &middot; getBookingFlowConfig · setBookingFlowConfig · getTenantConfig · listOrgUnits +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyNoResults · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-013">CMS-013</a> <br><a href="#cms-017">CMS-017</a>  &mdash; <i>Domain &amp; Certificate</i><br><a href="#cms-018">CMS-018</a>  &mdash; <i>Consent &amp; Legal</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i> <span class="car">version</span><br><a href="#cms-013">CMS-013</a> <br><a href="#cms-017">CMS-017</a>  &mdash; <i>Domain &amp; Certificate</i><br><a href="#cms-018">CMS-018</a>  &mdash; <i>Consent &amp; Legal</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i><br><a href="#cms-103">CMS-103</a>  &mdash; <i>Booking flows</i> <span class="car">bookingFlowId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBookingFlowConfig &middot; <i>Save booking flow config</i> &middot; <b>Save booking flow config</b> &middot; Cancel <span class="dis">discards preset · stepIndicator · cartLayout · cardLayout · cardSize · extrasStep · seatPicker · mapView · density · embedMode · heroBanner · searchInBanner · singleEventPage · quantitiesOnAddOns · cartSideInRtl · categoryDisplay · eventBannerDates · timesPerPage · dayPartFilter · dayPartBoundaries · performanceReveal · signInAt · seatEventDateMode · seatViewPosition · seatTimeBar · ticketCategories · ticketTags · cardInfo · quickTour · conciergeMascot · showInfoOnly · locationSwitcher · consentQuestionIds · venueOverrides</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBookingFlowConfig &middot; <i>Save booking flow config</i> &middot; <b>Save booking flow config</b> &middot; Cancel <span class="dis">discards preset · stepIndicator · cartLayout · cardLayout · cardSize · seatPicker · mapView · density · embedMode · heroBanner · searchInBanner · singleEventPage · quantitiesOnAddOns · cartSideInRtl · eventBannerDates · timesPerPage · dayPartFilter · dayPartBoundaries · seatViewPosition · seatTimeBar · ticketCategories · ticketTags · cardInfo · conciergeMascot · showInfoOnly · locationSwitcher · guestContactFields · dateStripDays · venueOverrides</span></div></div>
         </div>
       </div>
       <div id="cms-017" class="scr">
@@ -37142,7 +37140,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         <div>
           <div class="hdr"><span class="code">CMS-101</span>
             <span class="ttl">Help Me Choose</span></div>
-          <div class="pur">Set up a venue&#x27;s Help me choose, review what the assistant suggests from the venue&#x27;s products, preview it and publish it.</div>
+          <div class="pur">Set up a venue&#x27;s Help me choose so its answers filter the catalogue, review the question set the assistant proposes from the venue&#x27;s product</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -37160,12 +37158,102 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listGuidedChoices · createGuidedChoice · updateGuidedChoice · deleteGuidedChoice +7</div>
+          <div><b>OPERATIONS</b> &middot; listGuidedChoices · createGuidedChoice · updateGuidedChoice · deleteGuidedChoice +8</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, guidedChoiceId&larr;navigation, suggestionId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#cms-016">CMS-016</a>  &mdash; <i>Back to Site Settings</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-016">CMS-016</a>  &mdash; <i>Back to Site Settings</i><br><a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateGuidedChoice &middot; <i>New set-up</i> &middot; <b>Create draft</b> &middot; Cancel <span class="dis">discards name · mode · showBanner · questions</span></div><div class="ov"><b>confirmDialog</b> confirmPublishGuidedChoice &middot; <i>Publish</i> &middot; <b>Publish to guests</b> &middot; Cancel</div><div class="ov"><b>confirmDialog</b> confirmDeleteGuidedChoice &middot; <i>Delete draft or dismiss suggestion</i> &middot; <b>Delete</b> &middot; Keep it</div></div>
+        </div>
+      </div>
+      <div id="cms-102" class="scr">
+        <div>
+          <div class="hdr"><span class="code">CMS-102</span>
+            <span class="ttl">Site Builder</span></div>
+          <div class="pur">Build a working site in about 30 minutes: pick a preset, then walk seven saved steps (venue and modules, ticketing flows, compose steps, Help me choos</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Site Builder</h2>
+                <small>Venue CMS &middot; wave 1 &middot; compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the wizard template — not declared on the screen.</span></div><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">Implied by the wizard template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getSiteSetupProgress · setSiteSetupProgress · listBookingFlowTypes · listBookingFlows +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>1 Venue and modules</i><br><a href="#cms-103">CMS-103</a>  &mdash; <i>2 Ticketing flows</i> <span class="car">bookingFlowId</span><br><a href="#cms-101">CMS-101</a>  &mdash; <i>4 Help me choose</i><br><a href="#cms-007">CMS-007</a>  &mdash; <i>5 Look and feel — header, footer and home</i><br><a href="#cms-009">CMS-009</a>  &mdash; <i>5 Look and feel — navigation and menus</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>5 Look and feel — brand kit</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>5 Look and feel — logos</i><br><a href="#cms-008">CMS-008</a>  &mdash; <i>5 Look and feel — banners</i><br><a href="#cms-005">CMS-005</a>  &mdash; <i>5 Look and feel — theme</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>5 Look and feel — fonts</i> <span class="car">version</span><br><a href="#cms-006">CMS-006</a>  &mdash; <i>7 Preview</i> <span class="car">version</span><br><a href="#cms-012">CMS-012</a>  &mdash; <i>7 Preview right to left</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>7 Publish</i><br><a href="#cms-015">CMS-015</a>  &mdash; <i>Roll back a version</i> <span class="car">version</span><br><a href="#cms-104">CMS-104</a>  &mdash; <i>Build the mobile app</i></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddPresetFlows &middot; <i>Add these flows</i> &middot; <b>Add flows</b> &middot; Cancel <span class="dis">discards flowTypeKey · name</span></div></div>
+        </div>
+      </div>
+      <div id="cms-103" class="scr">
+        <div>
+          <div class="hdr"><span class="code">CMS-103</span>
+            <span class="ttl">Booking Flows</span></div>
+          <div class="pur">Pick the venue&#x27;s booking flows, turn optional steps on or off, set the step order within the allowed limits with a live preview, assign flows to </div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Booking Flows</h2>
+                <small>Venue CMS &middot; wave 1 &middot; compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The venue&#x27;s flows</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">An invalid flow is marked and blocks the site&#x27;s publish until it is fixed.</span></div><div class="panel"><b>Flow types to pick from</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Each card lists the type&#x27;s steps with their required, optional or conditional mark, so the choice is made knowing what the guest will go through.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listBookingFlows · listBookingFlowTypes · getBookingFlow · getPublishedBookingFlow +10</div>
+          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, bookingFlowId&larr;CMS-102, productId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i><br><a href="#cms-016">CMS-016</a>  &mdash; <i>Venue-wide booking settings</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Publish with the site</i></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateBookingFlowDefinition &middot; <i>Add a flow</i> &middot; <b>Add flow</b> &middot; Cancel <span class="dis">discards flowTypeKey · name · isDefaultForType · steps · settings</span></div><div class="ov"><b>confirmDialog</b> confirmDeleteBookingFlow &middot; <i>Remove flow</i> &middot; <b>Remove</b> &middot; Keep it</div><div class="ov"><b>confirmDialog</b> confirmPublishSite &middot; <i>Publish site</i> &middot; <b>Publish</b> &middot; Cancel</div></div>
+        </div>
+      </div>
+      <div id="cms-104" class="scr">
+        <div>
+          <div class="hdr"><span class="code">CMS-104</span>
+            <span class="ttl">App Build &amp; Store Publishing</span></div>
+          <div class="pur">Get the tenant&#x27;s own app into the App Store and Google Play under the client&#x27;s own accounts — checklist, store listing, request a build, dow</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>White Label</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">White Label</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>App Build &amp; Store Publishing</h2>
+                <small>Venue CMS &middot; wave 1 &middot; compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Builds</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getStoreAccounts · setStoreAccounts · listAppBuilds · getAppBuild +3</div>
+          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; appBuildId&larr;navigation, conversationId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-102">CMS-102</a>  &mdash; <i>Back to the Site Builder</i><br><a href="#cms-004">CMS-004</a>  &mdash; <i>App icons and splash</i><br><a href="#cms-014">CMS-014</a>  &mdash; <i>Publish the configuration first</i></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetStoreAccounts &middot; <i>Save store accounts and listing</i> &middot; <b>Save</b> &middot; Cancel <span class="dis">discards accounts</span></div><div class="ov"><b>confirmDialog</b> confirmRequestAppBuild &middot; <i>Request a build</i> &middot; <b>Build</b> &middot; Cancel</div></div>
         </div>
       </div></div><div class="grp">21 &mdash; P13 Policy &middot; 40 screens</div><div class="stack">
       <div id="cms-021" class="scr" data-ws="WS41">
@@ -39567,7 +39655,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           
         </div>
-      </div></div><div class="shell"><b>P16 &middot; Venue Analytics</b> <span>web shell &middot; 69 screens &middot; staff &middot; venue-management-web</span></div><div class="grp">23 &mdash; P16 Analytics &middot; 69 screens</div><div class="stack">
+      </div></div><div class="shell"><b>P16 &middot; Venue Analytics</b> <span>web shell &middot; 70 screens &middot; staff &middot; venue-management-web</span></div><div class="grp">23 &mdash; P16 Analytics &middot; 70 screens</div><div class="stack">
       <div id="anl-001" class="scr">
         <div>
           <div class="hdr"><span class="code">ANL-001</span>
@@ -39855,15 +39943,15 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Kind</b><div class="chip">Kind</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**The basis is on the card, not behind a tap.** A manager must see that today’s answer is a margin rule and next quarter’s is a model — the same screen, a different basis</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The explanation in plain words and the inputs it used. **Advice computed from data the manager cannot see is advice they will not trust.**</span></div></div><div class="side"><div class="panel"><b>Take it</b><div class="chip cta">Take it</div></div><div class="panel"><b>Do something else</b><div class="chip">Do something else</div><span class="why">**Records the outcome either way.** A rejected suggestion is the case the current rule got wrong, which is exactly what a model is trained to beat.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Kind</b><div class="chip">Kind</div></div><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**The basis and the stage are on the card, not behind a tap.** Every answer shows a &quot;Based on&quot; chip (*your venue profile, UAE calendar, weather, 23 days of your</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The explanation in plain words and the inputs it used. **Advice computed from data the manager cannot see is advice they will not trust.**</span></div></div><div class="side"><div class="panel"><b>Take it</b><div class="chip cta">Take it</div></div><div class="panel"><b>Do something else</b><div class="chip">Do something else</div><span class="why">**Records the outcome either way.** A rejected suggestion is the case the current rule got wrong, which is exactly what a model is trained to beat.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; requestSuggestion · recordSuggestionOutcome</div>
-          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
+          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, suggestionId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i><br><a href="#anl-071">ANL-071</a>  &mdash; <i>AI maturity</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecordSuggestionOutcome &middot; <i>Record suggestion outcome</i> &middot; <b>Record suggestion outcome</b> &middot; Cancel <span class="dis">discards id · suggestionId · decision · actualValue · decidedByPrincipalId · decidedAt · realisedOutcome · note</span></div></div>
         </div>
@@ -41637,10 +41725,40 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           
           
         </div>
+      </div>
+      <div id="anl-071" class="scr">
+        <div>
+          <div class="hdr"><span class="code">ANL-071</span>
+            <span class="ttl">AI Maturity &amp; Learning</span></div>
+          <div class="pur">See where each AI answer stands, what it is based on and what it needs next; set the venue AI profile; import the venue&#x27;s own history.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Analytics</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Analytics</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>AI Maturity &amp; Learning</h2>
+                <small>Venue Analytics &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Revenue MTD</b><span>AED 4.86M</span></div><div class="kpi"><b>vs budget</b><span>+3.1%</span></div><div class="kpi"><b>Margin</b><span>38.4%</span></div><div class="kpi"><b>Alerts</b><span>6</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Every AI answer, by stage</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Stage badge, the &quot;Based on&quot; line, the share of own data and what the next stage needs.</span></div><div class="panel"><b>Stage</b><div class="chip">Stage</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listAiCapabilityMaturity · getAiVenueSettings · setAiVenueSettings · listVenueHistoryImports +2</div>
+          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, importId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#anl-010">ANL-010</a>  &mdash; <i>Suggestions &amp; Advice</i></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetAiVenueSettings &middot; <i>Save venue AI profile</i> &middot; <b>Save venue AI profile</b> &middot; Cancel <span class="dis">discards venueType · isOutdoor · capacity · openingHours · typicalWeekdayAttendance · typicalWeekendAttendance · peakMonths · averageSpend · fnbAttachRate · staffProductivity</span></div><div class="ov"><b>modal</b> formImportVenueHistory &middot; <i>Import history</i> &middot; <b>Import history</b> &middot; Cancel <span class="dis">discards dataKind · assetId · columnMapping · sourceSystem · dryRun</span></div></div>
+        </div>
       </div></div>
   <div class="bottom">
     <span>Generated by tools/derive-wireframes.py &mdash; one board per shipped app, composed from
       the platform files. Do not hand-edit</span>
-    <span>venue-management &middot; 1383 screens &middot; 4 platform(s)</span>
+    <span>venue-management &middot; 1387 screens &middot; 4 platform(s)</span>
   </div>
 </div></body></html>

@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `ai` |
 | Schemas owned | `ai`, `qdrant` |
-| Operations in the slice | 39 of 133 |
+| Operations in the slice | 50 of 141 |
 | Scale | Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else. |
 | If it is down | Down degrades suggestions and the concierge. Nothing that takes money depends on it. |
 
@@ -22,59 +22,153 @@
 | [CatalogueService](CatalogueService.md) | `catalogue.entitlement_template`, `catalogue.event`, `catalogue.product`, `promotions.promotion` |
 | [FnbService](FnbService.md) | `fnb.menu_item`, `fnb.production_plan` |
 | [InventoryService](InventoryService.md) | `inventory.movement`, `inventory.stock_batch` |
-| [MarketingService](MarketingService.md) | `marketing.attribution_touch`, `marketing.campaign`, `marketing.case`, `marketing.guest_profile`, `marketing.message_template`, `marketing.segment` |
-| [OrderService](OrderService.md) | `orders.order_line` |
+| [MarketingService](MarketingService.md) | `marketing.attribution_touch`, `marketing.campaign`, `marketing.case`, `marketing.message_template`, `marketing.message_template_version`, `marketing.segment` |
 | [PlatformService](PlatformService.md) | `control.content_block` |
 | [ReportingService](ReportingService.md) | `reporting.report_definition` |
 | [RetailService](RetailService.md) | `retail.merchandise` |
-| [VenueOpsService](VenueOpsService.md) | `assets.media_asset`, `maintenance.inspection_template`, `queue.queue`, `queue.reading` |
+| [VenueOpsService](VenueOpsService.md) | `assets.media_asset`, `maintenance.inspection_template`, `queue.queue`, `queue.reading`, `venuemap.import_job`, `venuemap.point`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
 | [WhiteLabelService](WhiteLabelService.md) | `whitelabel.banner`, `whitelabel.content_page`, `whitelabel.faq_entry`, `whitelabel.homepage_section`, `whitelabel.policy`, `whitelabel.promo_block` |
 
 ## Operations in the first release
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| ai | [`requestSuggestion`](#requestsuggestion) | POST | `/ai/suggestions` | core | 2 | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005 … |
-| ai | [`setAiCredential`](#setaicredential) | PUT | `/ai-providers/{providerId}/credential` | setup | 2 | ADM-037 |
-| ai | [`setSuggestionProvider`](#setsuggestionprovider) | PUT | `/ai/suggestion-providers` | setup | 2 |  |
-| assist | [`createAiConversation`](#createaiconversation) | POST | `/conversations` | core | 2 | BO-928, BO-932, EMP-019, EMP-020, GST-031, WEB-044 |
+| ai | [`proposeTranslations`](#proposetranslations) | POST | `/ai/translate` | core | 1 | BO-785, BO-793 |
+| ai | [`proposeVenueLabels`](#proposevenuelabels) | POST | `/ai/venue-map/{mapId}/propose-labels` | core | 1 | BO-093 |
+| ai | [`requestSuggestion`](#requestsuggestion) | POST | `/ai/suggestions` | core | 1 | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005 … |
+| ai | [`setAiCredential`](#setaicredential) | PUT | `/ai-providers/{providerId}/credential` | setup | 1 | ADM-037 |
+| ai | [`setSuggestionProvider`](#setsuggestionprovider) | PUT | `/ai/suggestion-providers` | setup | 1 |  |
+| assist | [`createAiConversation`](#createaiconversation) | POST | `/conversations` | core | 1 | BO-928, BO-932, CMS-104, EMP-019, EMP-020, GST-031 … |
 | assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 2 | BO-932, EMP-019, EMP-020, GST-068, WEB-044 |
-| assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 2 | ADM-533, BO-928, BO-929, BO-932, EMP-019, EMP-020 … |
-| config | [`setAiByokEnablement`](#setaibyokenablement) | PUT | `/tenants/{tenantId}/byok` | setup | 2 | ADM-037 |
-| config | [`setAiPolicy`](#setaipolicy) | PUT | `/policy` | setup | 2 | BO-091 |
-| config | [`setAiProvider`](#setaiprovider) | PUT | `/providers` | setup | 2 | ADM-037 |
+| assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 1 | ADM-533, BO-928, BO-929, BO-932, CMS-104, EMP-019 … |
+| config | [`getAiPolicy`](#getaipolicy) | GET | `/policy` | core | 1 | BO-091 |
+| config | [`setAiByokEnablement`](#setaibyokenablement) | PUT | `/tenants/{tenantId}/byok` | setup | 1 | ADM-037 |
+| config | [`setAiPolicy`](#setaipolicy) | PUT | `/policy` | setup | 1 | BO-091 |
+| config | [`setAiProvider`](#setaiprovider) | PUT | `/providers` | setup | 1 | ADM-037 |
 | configure | [`getGuidedChoiceSuggestion`](#getguidedchoicesuggestion) | GET | `/guided-choice-suggestions/{suggestionId}` | core | 2 | CMS-101 |
 | configure | [`suggestGuidedChoice`](#suggestguidedchoice) | POST | `/venues/{venueId}/guided-choice-suggestions` | core | 2 | CMS-101 |
-| forecast | [`createForecastScenario`](#createforecastscenario) | POST | `/forecast-scenarios` | setup | 2 | ADM-507, ADM-517, ANL-057, BO-919, BO-931 |
-| forecast | [`decideOperationalRequirement`](#decideoperationalrequirement) | POST | `/operational-requirements/{requirementId}/decide` | setup | 2 | ADM-518, BO-927 |
-| forecast | [`publishForecastVersion`](#publishforecastversion) | POST | `/forecast-versions/{versionId}/publish` | setup | 2 | ADM-508 |
-| forecast | [`runForecast`](#runforecast) | POST | `/forecast-definitions/{definitionKey}/runs` | setup | 2 | ADM-500, ADM-508 |
+| forecast | [`createForecastScenario`](#createforecastscenario) | POST | `/forecast-scenarios` | setup | 1 | ADM-507, ADM-517, ANL-057, BO-919, BO-931 |
+| forecast | [`decideOperationalRequirement`](#decideoperationalrequirement) | POST | `/operational-requirements/{requirementId}/decide` | setup | 1 | ADM-518, BO-927 |
+| forecast | [`getAiVenueSettings`](#getaivenuesettings) | GET | `/venues/{venueId}/ai-settings` | core | 1 | ADM-489, ANL-071 |
+| forecast | [`getVenueHistoryImport`](#getvenuehistoryimport) | GET | `/history-imports/{importId}` | core | 1 | ANL-071 |
+| forecast | [`importVenueHistory`](#importvenuehistory) | POST | `/venues/{venueId}/history-imports` | core | 1 | ANL-071 |
+| forecast | [`listVenueHistoryImports`](#listvenuehistoryimports) | GET | `/venues/{venueId}/history-imports` | core | 1 | ANL-071 |
+| forecast | [`publishForecastVersion`](#publishforecastversion) | POST | `/forecast-versions/{versionId}/publish` | setup | 1 | ADM-508 |
+| forecast | [`runForecast`](#runforecast) | POST | `/forecast-definitions/{definitionKey}/runs` | setup | 1 | ADM-500, ADM-508 |
+| forecast | [`setAiVenueSettings`](#setaivenuesettings) | PUT | `/venues/{venueId}/ai-settings` | core | 1 | ADM-489, ANL-071 |
 | generate | [`proposeMarketingContent`](#proposemarketingcontent) | POST | `/ai/content-drafts` | core | 2 | BO-766, BO-772, BO-785, BO-786, BO-787, BO-789 … |
-| governance | [`configureAiCapability`](#configureaicapability) | PUT | `/governance/capabilities/{capabilityKey}` | setup | 2 | ADM-520, ADM-521, ADM-522, ANL-060 |
+| governance | [`configureAiCapability`](#configureaicapability) | PUT | `/governance/capabilities/{capabilityKey}` | setup | 1 | ADM-520, ADM-521, ADM-522, ANL-060 |
 | governance | [`createAiGovernancePolicyDraft`](#createaigovernancepolicydraft) | POST | `/governance/policy-drafts` | setup | 2 | ADM-523, ADM-524, ADM-525, ADM-530 |
+| governance | [`createAiPolicyException`](#createaipolicyexception) | POST | `/governance/policy-exceptions` | setup | 1 | ADM-526 |
 | governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 2 | ADM-492, ADM-531, ADM-532, ANL-009, BO-762, BO-793 … |
+| governance | [`evaluateAiGovernance`](#evaluateaigovernance) | POST | `/governance/evaluate` | core | 1 |  |
+| governance | [`getAiUsage`](#getaiusage) | GET | `/usage` | core | 1 | ADM-549, BO-091 |
 | governance | [`publishAiGovernancePolicy`](#publishaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/publish` | setup | 2 | ADM-528 |
-| governance | [`resumeAiCapability`](#resumeaicapability) | POST | `/governance/capabilities/{capabilityKey}/resume` | setup | 2 | ADM-536 |
+| governance | [`resumeAiCapability`](#resumeaicapability) | POST | `/governance/capabilities/{capabilityKey}/resume` | setup | 1 | ADM-536 |
 | governance | [`simulateAiGovernancePolicy`](#simulateaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/simulate` | setup | 2 | ADM-527, ADM-538 |
-| insights | [`decideAiInsight`](#decideaiinsight) | POST | `/insights/{insightId}/decide` | setup | 2 | ANL-019, ANL-059, BO-772, BO-782 |
-| insights | [`explainMetricChange`](#explainmetricchange) | POST | `/insights/explain-metric-change` | setup | 2 | ADM-506, ANL-019, ANL-056 |
-| knowledge | [`configureAssistantProfile`](#configureassistantprofile) | PUT | `/assistant-profiles/{profileKey}` | setup | 2 | BO-091, SUP-018 |
+| insights | [`decideAiInsight`](#decideaiinsight) | POST | `/insights/{insightId}/decide` | setup | 1 | ANL-019, ANL-059, BO-772, BO-782 |
+| insights | [`explainMetricChange`](#explainmetricchange) | POST | `/insights/explain-metric-change` | setup | 1 | ADM-506, ANL-019, ANL-056 |
+| knowledge | [`configureAssistantProfile`](#configureassistantprofile) | PUT | `/assistant-profiles/{profileKey}` | setup | 1 | BO-091, SUP-018 |
 | knowledge | [`recordAnswerFeedback`](#recordanswerfeedback) | POST | `/messages/{messageId}/feedback` | core | 2 | EMP-020, GST-032, KSK-015, WEB-044 |
 | models | [`promoteAiRelease`](#promoteairelease) | POST | `/releases/{releaseId}/promote` | setup | 1 | ADM-519, ADM-554 |
 | models | [`publishPromptTemplate`](#publishprompttemplate) | POST | `/prompt-templates/{templateKey}/versions` | setup | 1 | ADM-037, ANL-060 |
 | models | [`rollbackAiRelease`](#rollbackairelease) | POST | `/releases/{releaseId}/rollback` | setup | 1 | ADM-554, ADM-556 |
 | models | [`runAiEvaluation`](#runaievaluation) | POST | `/evaluations` | setup | 1 | ADM-554, ANL-060 |
-| models | [`setAiModel`](#setaimodel) | PUT | `/models/{modelId}` | setup | 2 | ADM-037 |
+| models | [`setAiModel`](#setaimodel) | PUT | `/models/{modelId}` | setup | 1 | ADM-037 |
 | monitoring | [`containAiIncident`](#containaiincident) | POST | `/incidents/{incidentId}/contain` | setup | 1 | ADM-556 |
 | recommend | [`decideRecommendations`](#deciderecommendations) | POST | `/recommendations/decide` | core | 1 | BO-102, BO-1048, BO-119, GST-001, GST-036, GST-048 … |
 | recommend | [`recordRecommendationEvents`](#recordrecommendationevents) | POST | `/recommendations/events` | core | 1 | BO-102, GST-001, GST-036, GST-048, WEB-001, WEB-008 … |
 | retrieval | [`createKnowledgeCollection`](#createknowledgecollection) | POST | `/collections` | setup | 2 |  |
-| retrieval | [`ingestKnowledgeDocument`](#ingestknowledgedocument) | POST | `/collections/{collectionId}/documents` | setup | 2 |  |
-| retrieval | [`reindexSource`](#reindexsource) | POST | `/index-sources/{sourceId}/reindex` | setup | 2 |  |
+| retrieval | [`ingestKnowledgeDocument`](#ingestknowledgedocument) | POST | `/collections/{collectionId}/documents` | setup | 1 |  |
+| retrieval | [`reindexSource`](#reindexsource) | POST | `/index-sources/{sourceId}/reindex` | setup | 1 |  |
 | retrieval | [`semanticSearch`](#semanticsearch) | POST | `/search` | core | 2 | CMS-010, CMS-062, EMP-040, EMP-041 |
-| retrieval | [`setIndexSource`](#setindexsource) | PUT | `/index-sources` | setup | 2 |  |
+| retrieval | [`setIndexSource`](#setindexsource) | PUT | `/index-sources` | setup | 1 |  |
 
 ## Group: ai
+
+### proposeTranslations
+
+**`POST /ai/translate`**: Fill translation gaps with a first pass, for a human to edit
+
+BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps` reports content missing a version. What was absent is filling it.
+**A first pass, never a publish.** Every proposal lands as a draft on the block it translates, and **a tenant's own words in a language nobody at the venue reads is exactly the content that must not go live unreviewed.**
+**Lives here rather than in `white-label` because it calls a model.** ADR-0020: only the AI contract writes AI tables — and the boundary caught this on the day it was written, for the third time in one session. **A rule I had just described in the description above and then broke in the lineage below it.**
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `control.content_block`, `marketing.message_template`, `marketing.message_template_version` |
+| Writes | `ai.activity`, `ai.proposed_action`, `cache:idempotency` |
+| Called by | BO-785, BO-793 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| targetLocale | string | yes |  |
+| scope | enum (allGaps, contentBlocks, productNames, emailTemplates, messageTemplates) |  | messageTemplates (29 September, build; 22.9.18) covers every channel of a marketing-crm message template: email, SMS, push, WhatsApp and in-app. |
+| glossaryRef | string |  | Terms that must not be translated — a venue's ride names, its brand, its membership tiers. (nullable) |
+
+**Response**: `TranslationProposals`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| targetLocale | string | yes |  |
+| drafts | array of object | yes |  |
+| drafts[].targetKind | enum (contentBlock, productName, emailTemplate, messageTemplate) | yes |  |
+| drafts[].targetRef | string | yes | The id of the block, product or template the draft sits on. |
+| drafts[].draftText | string | yes | The first-pass translation, as saved on the draft. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Proposed as drafts, for review |
+
+### proposeVenueLabels
+
+**`POST /ai/venue-map/{mapId}/propose-labels`**: Suggest what each extracted shape is
+
+1.4.24 and 8.8.13. **Reads shapes that `venue-map.importVenueGeometry` already extracted and proposes what each one is.** A polygon on the toilet layer beside an entrance is probably a restroom; a large shape with a ride name in the label layer is probably an attraction.
+**It does not parse the drawing.** Extraction is deterministic and lives in `venue-map`, carrying the four defects CF-122 found on the seat importer. **Two failure modes kept apart** — a mis-parsed layer and a bad suggestion look identical if one operation does both, and *"the map is wrong"* is then unactionable.
+**Lives here rather than in `venue-map` because it calls a model.** ADR-0020: only the AI contract writes AI tables, and the boundary caught `venue-map` trying to write `ai.proposed_action` on the day it was drafted.
+Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
+
+|  |  |
+|---|---|
+| Permission | `VENUE_MAP_MANAGE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `qdrant:knowledge`, `venuemap.import_job`, `venuemap.point` |
+| Writes | `ai.activity`, `ai.proposed_action`, `cache:idempotency` |
+| Called by | BO-093 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| mapId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Proposals, for review. |
 
 ### requestSuggestion
 
@@ -88,18 +182,22 @@
 
 **Three kinds added 29 September (build)**, each answered from a stated rule first and applied by a person in the owning module: `sendTime` (22.3.19, 22.9.16) gives the best send hour and channel per recipient inside a send window, for marketing-crm to schedule; `wasteRisk` (4.1.19, 4.8.15) gives the items at risk of waste with quantity, value and a recommended action (reduce prep, promote, transfer, use in a recipe), applied through `fnb.planProductionRun`, promotions or `inventory.createStockTransfer`; `queueBalancing` (5.6.27, 8.9.9) gives per queue the forecast wait against capacity, a virtual-queue return-slot allocation by queue type and where to redirect guests, applied through `queue.updateQueue`. Rules and minimum history are on `SuggestionKind`. All three are staff-only.
 
+**Answers from day one, then learns (29 September, AI functions review, decided by the product owner).** Below a kind's own-data threshold the answer is no longer a 422: it comes from the baseline producer (the venue's AI settings entered at onboarding, `setAiVenueSettings`; the TICVAI starting pattern for the venue type; the UAE calendar; the weather) and says so. As the venue trades, the statistical producer blends own data in, weighting the starting value by k and own data by n observations, `(k x prior + n x own mean) / (k + n)`, re-estimated nightly and recorded as a new producer version; imported history (`importVenueHistory`) counts as own data. **Every answer carries `maturity`**: the stage (`starting`, `learning`, `established`, `learned`), what it is based on, how much of it is own data, and what the next stage needs. A trained model reaches `learned` only when an admin promotes it after a shadow run (`promotionReady`, AI-D16). **422 is kept for one case only**: a setting the kind cannot answer without (no current cost for `price`, no par level for `replenishment`, no ride capacity for `waitTime`), and the problem names the setting and the screen that sets it.
+
+**`itinerary` (added 29 September, MOB-6; supersedes the deferral in audits R187 and R209).** The AI planner agent refines a guest's visit plan: `subjectRef` is the `venue-map` plan id, `context` carries the guest's request in words (*"less walking after lunch"*), and `value` is `{planId, baseVersion, changes: [VisitPlanUpdate changes], rationale}`. **It proposes; it does not write the plan.** The app applies the changes with `updateVisitPlan` as the guest (or the planner agent does, through its registered tools, as the guest), so the change is a version the guest can undo and AI writes only `ai.suggestion` (ADR-0020). When AI is off or fails, the answer is the rules plan unchanged, with `basis` `heuristic`, never an error.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `ai.forecast_point`, `ai.forecast_version`, `ai.insight`, `ai.operational_requirement`, `ai.policy`, `ai.provider`, `ai.rec_decline`, `ai.release`, `ai.suggestion`, `cache:idempotency`, `cache:rec-candidates`, `fnb.production_plan`, `inventory.movement`, `inventory.stock_batch`, `marketing.attribution_touch`, `marketing.segment`, `queue.queue`, `queue.reading` |
+| Reads | `ai.capability_maturity`, `ai.forecast_point`, `ai.forecast_version`, `ai.history_observation`, `ai.insight`, `ai.operational_requirement`, `ai.policy`, `ai.provider`, `ai.rec_decline`, `ai.release`, `ai.suggestion`, `ai.venue_settings`, `cache:idempotency`, `cache:rec-candidates`, `fnb.production_plan`, `inventory.movement`, `inventory.stock_batch`, `marketing.attribution_touch`, `marketing.segment`, `queue.queue`, `queue.reading`, `venuemap.point`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
 | Writes | `ai.activity`, `ai.suggestion`, `cache:idempotency` |
-| Called by | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005, BO-115, BO-117, BO-138, BO-139, BO-772, BO-782, BO-925, EMP-031, GST-031, WEB-044 |
+| Called by | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005, BO-115, BO-117, BO-138, BO-139, BO-772, BO-782, BO-925, EMP-031, GST-031, GST-054, WEB-044 |
 
 **Parameters**
 
@@ -111,7 +209,7 @@
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| kind | object | yes | A guest caller may ask for prepPlan, upsell and waitTime only. |
+| kind | object | yes | A guest caller may ask for prepPlan, upsell, waitTime and itinerary only. |
 | subjectRef | string |  | (nullable) |
 | horizon | string |  | For a forecast — nextService, 7d, 28d, or an ISO period. (nullable) |
 | context | object |  | What the caller already knows. |
@@ -130,6 +228,19 @@
 | explanation | string |  | Plain words, always present, whatever the basis. |
 | inputs | object |  | What went in. |
 | producerRef | string |  | The rule name or the model id and version. |
+| maturity | AiMaturity | yes | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
+| maturity.stage | enum (starting, learning, established, learned) | yes | starting: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). |
+| maturity.basedOn | string | yes | The "Based on" line, in words, e.g. |
+| maturity.sources | array of object |  |  |
+| maturity.sources[].source | enum (venueSettings, startingPattern, calendar, weather, bookingsOnHand, ownHistory, importedHistory, configuration, …) | yes |  |
+| maturity.sources[].detail | string |  | e.g. (nullable) |
+| maturity.sources[].observations | integer |  | (nullable) |
+| maturity.ownDataShare | number |  | The weight own data carries, n / (k + n). (min 0; max 1) |
+| maturity.limitedHistory | boolean |  |  |
+| maturity.nextStage | object |  | What the next stage needs, e.g. (nullable) |
+| maturity.nextStage.stage | enum (learning, established, learned) |  |  |
+| maturity.nextStage.needs | string |  |  |
+| maturity.nextStage.expectedBy | string (date) |  | (nullable) |
 | producedAt | string (date-time) | yes |  |
 | expiresAt | string (date-time) |  | A demand forecast for Saturday is worthless on Sunday. (nullable) |
 
@@ -138,7 +249,7 @@
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The suggestion, with its basis and its reasoning |
-| 422 |  | Not enough data to answer. |
+| 422 |  | A setting the answer cannot do without is missing (29 September, AI functions review). |
 
 ### setAiCredential
 
@@ -154,7 +265,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.provider` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.byok_enablement`, `ai.provider`, `cache:idempotency` |
@@ -200,6 +311,12 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | isActive | boolean | yes |  |
 | managedBy | enum (ticvai, tenant) |  | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). (default ticvai) |
 | modelId | string (uuid) |  | The model in the catalogue (listAiModels) this provider serves. (nullable) |
+| taskKeys | array of string |  | Which agent tasks this provider serves (21 September minutes, M21-03: different agents may use different models chosen for the task). |
+| fitnessWarnings | array of object |  | The model-fitness check at the last write (21 September minutes, M21-09). (read-only) |
+| fitnessWarnings[].taskKey | string |  |  |
+| fitnessWarnings[].score | number |  | (nullable) |
+| fitnessWarnings[].floor | number |  |  |
+| fitnessWarnings[].direction | enum (underpowered, overpowered, unscored) |  |  |
 
 **Responses**
 
@@ -224,7 +341,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.policy` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -283,12 +400,12 @@ Scoped to a module and a role, because the same question means different things 
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.conversation`, `cache:idempotency` |
 | Writes | `ai.conversation`, `cache:idempotency` |
-| Called by | BO-928, BO-932, EMP-019, EMP-020, GST-031, WEB-044 |
+| Called by | BO-928, BO-932, CMS-104, EMP-019, EMP-020, GST-031, GST-054, WEB-044 |
 
 **Parameters**
 
@@ -384,12 +501,12 @@ Every response carries a trace id, the model and provider that produced it, toke
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
 | Reads | `ai.assistant_profile`, `ai.capability`, `ai.chunk_embedding`, `ai.chunk_ref`, `ai.conversation`, `ai.knowledge_document`, `ai.message`, `ai.policy`, `ai.proposed_action`, `ai.provider`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
 | Writes | `ai.activity`, `ai.decision_record`, `ai.knowledge_gap`, `ai.message`, `ai.proposed_action`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
-| Called by | ADM-533, BO-928, BO-929, BO-932, EMP-019, EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
+| Called by | ADM-533, BO-928, BO-929, BO-932, CMS-104, EMP-019, EMP-020, GST-031, GST-032, GST-033, GST-054, KSK-015, WEB-044 |
 
 **Parameters**
 
@@ -462,6 +579,87 @@ Every response carries a trace id, the model and provider that produced it, toke
 
 Providers, models and policy
 
+### getAiPolicy
+
+**`GET /policy`**: What the assistant may do here
+
+8.3.72–8.3.80. Which capabilities are enabled, which roles may use them, what is masked before it reaches a provider, and the usage ceiling.
+**Returns the policy in force at `scopePath`** — the venue's own row where the venue has narrowed the tenant's, the tenant's row otherwise (nearest ancestor wins, ADR-0018). The response's `scopeLevel` and `scopePath` say which row that is. Without `scopePath`, the tenant row is returned; a `scopePath` outside the caller's grants is refused.
+**Since 29 September** (AI design 2.3) `enabledCapabilities` covers the fourteen capabilities, `ceilingBehaviourByCapability` sets the ceiling behaviour per capability, and `autonomyOverrides` tightens the autonomy level per capability. The resolved result of this row together with the governance policies is `getEffectiveAiPolicy`.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.policy` |
+| Writes | - |
+| Called by | BO-091 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| scopePath | query |  | string | The tenant or venue node to read the policy for. |
+
+**Response**: `AiPolicy`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | Added 20 August. (read-only) |
+| scopeLevel | enum (tenant, venue) | yes | Tenant sets the default; a venue may narrow it and never widen it. |
+| scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
+| enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain, gatewayAndModels, governance, …) | yes | Extended on 29 September to the fourteen capabilities of the AI design (section 1.1, AiCapabilityFamily). |
+| allowedRoleIds | array of string (uuid) |  |  |
+| maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
+| requiresApprovalFor | array of enum (pricing, promotion, operational, financial, configuration) |  | 8.3.61–8.3.64. |
+| monthlyTokenCeiling | integer |  | (nullable) |
+| ceilingBehaviour | enum (warn, warnThenDisable, block) |  | Decided 17 August: warn, and let the venue manager choose. (default warn) |
+| ceilingBehaviourByCapability | array of object |  | Ceiling behaviour per capability (AI design 5.9, AIC-227), so a budget never silently disables fraud scoring, which spends no tokens, or a critical capability. |
+| ceilingBehaviourByCapability[].capability | string | yes | An AiCapabilityFamily value, or a registered capability key. |
+| ceilingBehaviourByCapability[].behaviour | enum (warn, warnThenDisable, block, neverRestrict) | yes |  |
+| autonomyOverrides | array of object |  | Tighten only (AI design 3.8, AIC-151). |
+| autonomyOverrides[].capabilityKey | string | yes |  |
+| autonomyOverrides[].autonomyLevel | integer | yes | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). (min 0; max 4) |
+| ceilingWarningPercent | integer |  | Warn before the ceiling, not at it. (default 80) |
+| guestCapabilityScope | array of enum (ticketSelection, promotions, faq, recommendations, checkout, waitTimes, wayfinding, visitPlanning) |  | What a guest-facing assistant may help with, and nothing else (2.1.28). |
+| retrieveTopK | integer |  | How many chunks retrieval returns before reranking. (default 30) |
+| rerankTopK | integer |  | How many survive the rerank and reach the model. (default 5; nullable) |
+| cacheAnswers | boolean |  | The largest cost lever available at a kiosk. (default True) |
+| cacheTtlMinutes | integer |  | An upper bound on top of event invalidation, not instead of it. (default 60) |
+| retainInteractionsDays | integer |  | How long prompts and responses are kept. |
+| semanticCacheThreshold | number |  | Similarity above which a cached answer serves a new question. (min 0; max 1; default 0.95) |
+| negativeCacheTtlSeconds | integer |  | How long *no answer found* is remembered. (default 300) |
+| cascade | object |  | A small model answers and escalates only below a confidence threshold. (nullable) |
+| cascade.smallModel | string |  |  |
+| cascade.largeModel | string |  |  |
+| cascade.escalateBelow | number |  | (default 0.7) |
+| chunking | object |  | The single biggest lever on retrieval quality, and currently nowhere. |
+| chunking.sizeTokens | integer |  | (default 512) |
+| chunking.overlapTokens | integer |  | (default 64) |
+| chunking.strategy | enum (fixed, sentence, semantic) |  | (default sentence) |
+| quantisation | enum (none, scalar, binary) |  | A decision, never a default. (default none) |
+| hnsw | object |  | Defaults are tuned for neither our recall nor our latency. (nullable) |
+| hnsw.m | integer |  | (default 16) |
+| hnsw.efConstruct | integer |  | (default 128) |
+| hnsw.efSearch | integer |  | (default 64) |
+| perRequestTokenCeiling | integer |  | One runaway conversation can spend a tenant's month. (nullable) |
+| streamsByCapability | array of string |  | Time to first token and total latency are separate targets. |
+| fallbackProviderId | string (uuid) |  | BL-151: a provider outage with no fallback is every AI surface going dark at once. (nullable) |
+| guardrailShortCircuit | boolean |  | A refusal a rule can decide never reaches a model. (default True) |
+| suggestionProviders | object |  | Which producer answers each SuggestionKind, and what requestSuggestion routes by. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Policy |
+
 ### setAiByokEnablement
 
 **`PUT /tenants/{tenantId}/byok`**: Enable or disable bring-your-own-key for a tenant (platform)
@@ -473,7 +671,7 @@ Providers, models and policy
 | Permission | `PLATFORM_AI_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.byok_enablement` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -541,7 +739,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | Permission | `AI_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `ai.policy` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -575,7 +773,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | autonomyOverrides[].capabilityKey | string | yes |  |
 | autonomyOverrides[].autonomyLevel | integer | yes | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). (min 0; max 4) |
 | ceilingWarningPercent | integer |  | Warn before the ceiling, not at it. (default 80) |
-| guestCapabilityScope | array of enum (ticketSelection, promotions, faq, recommendations, checkout, waitTimes, wayfinding) |  | What a guest-facing assistant may help with, and nothing else (2.1.28). |
+| guestCapabilityScope | array of enum (ticketSelection, promotions, faq, recommendations, checkout, waitTimes, wayfinding, visitPlanning) |  | What a guest-facing assistant may help with, and nothing else (2.1.28). |
 | retrieveTopK | integer |  | How many chunks retrieval returns before reranking. (default 30) |
 | rerankTopK | integer |  | How many survive the rerank and reach the model. (default 5; nullable) |
 | cacheAnswers | boolean |  | The largest cost lever available at a kiosk. (default True) |
@@ -622,7 +820,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 | autonomyOverrides[].capabilityKey | string | yes |  |
 | autonomyOverrides[].autonomyLevel | integer | yes | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). (min 0; max 4) |
 | ceilingWarningPercent | integer |  | Warn before the ceiling, not at it. (default 80) |
-| guestCapabilityScope | array of enum (ticketSelection, promotions, faq, recommendations, checkout, waitTimes, wayfinding) |  | What a guest-facing assistant may help with, and nothing else (2.1.28). |
+| guestCapabilityScope | array of enum (ticketSelection, promotions, faq, recommendations, checkout, waitTimes, wayfinding, visitPlanning) |  | What a guest-facing assistant may help with, and nothing else (2.1.28). |
 | retrieveTopK | integer |  | How many chunks retrieval returns before reranking. (default 30) |
 | rerankTopK | integer |  | How many survive the rerank and reach the model. (default 5; nullable) |
 | cacheAnswers | boolean |  | The largest cost lever available at a kiosk. (default True) |
@@ -665,13 +863,14 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 Credentials are a key-vault reference, never the key.
 **What the PUT does.** The body is one whole provider configuration, matched on `id`. With an `id`, it replaces that provider's configuration in full — a field left out takes its default or null, not its old value — and returns 200; an `id` that names no provider at the caller's scope is a 404. Without an `id`, it creates a provider and returns 201 with the new id. The other providers are never touched: this is not a replace-the-list call.
 **Who pays, and bring-your-own-key** (AI design 5.9, decided 29 September). `managedBy: ticvai` is the default: TICVAI-managed Azure OpenAI in UAE North, metered per tenant and re-billed per token. `managedBy: tenant` is bring-your-own-key, which **TICVAI enables per tenant** with `setAiByokEnablement` (`PLATFORM_AI_MANAGE`); until it is enabled, a tenant-managed provider is refused with 409 `byok-not-enabled`, and a task outside `AiByokEnablement.allowedTasks` likewise. `modelId` names the model in the catalogue (`listAiModels`) the provider serves.
+**Per agent task, and checked for fitness** (21 September minutes, M21-03 and M21-09). `taskKeys` binds the provider to named agent tasks; the response carries `fitnessWarnings` where the model scores outside a task's band in `AiModel.taskFitness` (underpowered, overpowered or never scored). A warning is shown and kept; it never refuses the write.
 
 |  |  |
 |---|---|
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.provider` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -709,6 +908,12 @@ Credentials are a key-vault reference, never the key.
 | isActive | boolean | yes |  |
 | managedBy | enum (ticvai, tenant) |  | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). (default ticvai) |
 | modelId | string (uuid) |  | The model in the catalogue (listAiModels) this provider serves. (nullable) |
+| taskKeys | array of string |  | Which agent tasks this provider serves (21 September minutes, M21-03: different agents may use different models chosen for the task). |
+| fitnessWarnings | array of object |  | The model-fitness check at the last write (21 September minutes, M21-09). (read-only) |
+| fitnessWarnings[].taskKey | string |  |  |
+| fitnessWarnings[].score | number |  | (nullable) |
+| fitnessWarnings[].floor | number |  |  |
+| fitnessWarnings[].direction | enum (underpowered, overpowered, unscored) |  |  |
 
 **Response**: `AiProvider`
 
@@ -734,6 +939,12 @@ Credentials are a key-vault reference, never the key.
 | isActive | boolean | yes |  |
 | managedBy | enum (ticvai, tenant) |  | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). (default ticvai) |
 | modelId | string (uuid) |  | The model in the catalogue (listAiModels) this provider serves. (nullable) |
+| taskKeys | array of string |  | Which agent tasks this provider serves (21 September minutes, M21-03: different agents may use different models chosen for the task). |
+| fitnessWarnings | array of object |  | The model-fitness check at the last write (21 September minutes, M21-09). (read-only) |
+| fitnessWarnings[].taskKey | string |  |  |
+| fitnessWarnings[].score | number |  | (nullable) |
+| fitnessWarnings[].floor | number |  |  |
+| fitnessWarnings[].direction | enum (underpowered, overpowered, unscored) |  |  |
 
 **Responses**
 
@@ -814,6 +1025,8 @@ The configuration assistant and Help me choose suggestions (design C7)
 
 **The Help me choose job** (design 3.11, decided 29 September; C7 at autonomy "suggest"). Runs automatically when a venue's products are uploaded (`catalogue.productPublished`), when a mapped product is withdrawn, or when new products are left out by every answer; this is the same job on request. **Rules first:** it reads the products through the catalogue API with the venue's permissions, picks the one or two attributes that split them most evenly (dropping any where an answer would leave nothing bookable), maps each answer to a product, category or flow, and only then asks a language model to word the questions in the tenant's languages from the attributes alone, never guest data. With no model, the attribute names are used as they are. The draft lands through `white-label.proposeGuidedChoice` with `source: aiSuggested` and this suggestion's id as `suggestionRef`, and a decision record keeps the inputs, splits and versions. **Nothing is published**: publishing is `white-label.publishGuidedChoice`, by a person.
 
+**Filter questions, not a quiz** (decided 29 September, W4; applied 30 September). It proposes up to four questions, each with a `kind` (`choice`, `yesNo`, `age`, `level`, `certification`) and, for each answer, an `answer.filter` built from what the catalogue already states: age and height limits from `ProductEligibilityRule` (`minAgeYears`/`maxAgeYears`), segment tags (`segmentTags`), certifications (`certificationCode` against `ProductEligibilityRule.requiredCertificationCode`), swim consent questions (`requiresSwimmer`, with `consentPrefill` so the REV3-26 consent is pre-filled and still confirmed), and products or categories (`productIds`, `productCategoryIds`). The default behaviour it proposes is `filter` with *Show everything* on; an answer that would leave nothing bookable is dropped.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
@@ -890,7 +1103,7 @@ Forecasting and operational requirements (design C8)
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | setup, makes `ai.forecast_point` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.forecast_point`, `ai.forecast_scenario`, `ai.forecast_version`, `cache:idempotency` |
@@ -954,7 +1167,7 @@ Forecasting and operational requirements (design C8)
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | setup, makes `ai.operational_requirement` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.operational_requirement`, `cache:idempotency` |
@@ -1007,6 +1220,258 @@ Forecasting and operational requirements (design C8)
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The requirement is no longer issued (requirement-not-open). |
 
+### getAiVenueSettings
+
+**`GET /venues/{venueId}/ai-settings`**: The venue AI profile the baselines stand on
+
+**What every data-driven answer stands on before the venue has history** (29 September, AI functions review): venue type, capacity, opening hours, typical weekday and weekend attendance, peak months, average spend, F&B attach rate and staff productivity per role. Entered at onboarding (ADM-489, or by the configuration assistant in conversation) and corrected by the venue at any time. A venue with none still gets answers from the starting pattern for its type, with the widest range; `requestSuggestion` names this setting when a kind cannot answer without it.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.venue_settings` |
+| Writes | - |
+| Called by | ADM-489, ANL-071 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+
+**Response**: `AiVenueSettings`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| venueType | enum (waterPark, themePark, familyEntertainmentCentre, museum, arena, zooAquarium, other) | yes |  |
+| isOutdoor | boolean |  | Outdoor venues take the summer-heat and weather effects. (default True) |
+| capacity | integer |  | (min 1; nullable) |
+| openingHours | array of object |  | The usual week. |
+| openingHours[].dayOfWeek | integer |  | (min 1; max 7) |
+| openingHours[].opensAt | string |  |  |
+| openingHours[].closesAt | string |  |  |
+| typicalWeekdayAttendance | integer |  | (min 0; nullable) |
+| typicalWeekendAttendance | integer |  | (min 0; nullable) |
+| peakMonths | array of integer |  |  |
+| averageSpend | object |  | (nullable) |
+| averageSpend.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| averageSpend.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| averageSpend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnbAttachRate | number |  | (min 0; max 1; nullable) |
+| staffProductivity | object |  | Per role, units per staff hour, e.g. |
+| startingPatternKey | string |  | The pattern and version in use, e.g. (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The venue AI settings. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### getVenueHistoryImport
+
+**`GET /history-imports/{importId}`**: One history import, with its findings
+
+The job's status, rows read, loaded and rejected, and each finding (a bad date, a negative quantity, a duplicate day) with the row it came from.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `ai.history_import` |
+| Writes | - |
+| Called by | ANL-071 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| importId | path | yes | string (uuid) |  |
+
+**Response**: `AiHistoryImport`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| venueId | string (uuid) | yes |  |
+| dataKind | enum (attendance, admissions, ticketSales, fnbSales, retailSales, queueReadings, staffShifts) | yes |  |
+| assetId | string (uuid) |  |  |
+| sourceSystem | string |  | (nullable) |
+| columnMapping | object |  |  |
+| dryRun | boolean |  | (default False) |
+| status | enum (queued, validating, loading, completed, completedWithRejections, failed) | yes | (read-only) |
+| periodFrom | string (date) |  | (read-only; nullable) |
+| periodTo | string (date) |  | (read-only; nullable) |
+| monthsCovered | integer |  | (read-only) |
+| rowsRead | integer |  | (read-only) |
+| rowsLoaded | integer |  | (read-only) |
+| rowsRejected | integer |  | (read-only) |
+| findings | array of object |  | (read-only) |
+| findings[].row | integer |  |  |
+| findings[].code | enum (badDate, badNumber, negativeValue, duplicateDay, unmappedColumn, outOfRange) |  |  |
+| findings[].detail | string |  |  |
+| requestedByPrincipalId | string (uuid) |  | (read-only) |
+| createdAt | string (date-time) |  | (read-only) |
+| completedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The import |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### importVenueHistory
+
+**`POST /venues/{venueId}/history-imports`**: Import the venue's own historical exports for the AI baselines
+
+**The venue's own history, from before TICVAI** (29 September, AI functions review): CSV or spreadsheet exports from its previous POS and ticketing systems, 12 to 36 months where it has them. The file is an asset already uploaded (`assetId`); the column mapping says which column is the date, the measure and each dimension. The job validates every row, loads the good ones into `ai.history_observation` tagged `imported`, and reports the rest with a reason.
+**Loaded into the AI data only, never into the ledger** (ADR-0020): an imported sale is an observation the forecast learns from, not an order, and no report of revenue ever counts it. **12 months or more moves the venue's answers straight to `established`** for the measures it covers. A second import of the same kind and period replaces the first rather than doubling it.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.history_import`, `assets.media_asset`, `cache:idempotency` |
+| Writes | `ai.history_import`, `ai.history_observation`, `cache:idempotency` |
+| Called by | ANL-071 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| dataKind | enum (attendance, admissions, ticketSales, fnbSales, retailSales, queueReadings, staffShifts) | yes |  |
+| assetId | string (uuid) | yes | The uploaded export, in the asset library. |
+| sourceSystem | string |  | What produced the file, e.g. (nullable) |
+| columnMapping | object | yes | Target field to source column, e.g. |
+| dryRun | boolean |  | Validate and report without loading. (default False) |
+
+**Response**: `AiHistoryImport`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| venueId | string (uuid) | yes |  |
+| dataKind | enum (attendance, admissions, ticketSales, fnbSales, retailSales, queueReadings, staffShifts) | yes |  |
+| assetId | string (uuid) |  |  |
+| sourceSystem | string |  | (nullable) |
+| columnMapping | object |  |  |
+| dryRun | boolean |  | (default False) |
+| status | enum (queued, validating, loading, completed, completedWithRejections, failed) | yes | (read-only) |
+| periodFrom | string (date) |  | (read-only; nullable) |
+| periodTo | string (date) |  | (read-only; nullable) |
+| monthsCovered | integer |  | (read-only) |
+| rowsRead | integer |  | (read-only) |
+| rowsLoaded | integer |  | (read-only) |
+| rowsRejected | integer |  | (read-only) |
+| findings | array of object |  | (read-only) |
+| findings[].row | integer |  |  |
+| findings[].code | enum (badDate, badNumber, negativeValue, duplicateDay, unmappedColumn, outOfRange) |  |  |
+| findings[].detail | string |  |  |
+| requestedByPrincipalId | string (uuid) |  | (read-only) |
+| createdAt | string (date-time) |  | (read-only) |
+| completedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Accepted: the import job, queued |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | An import of this venue and kind is already running (history-import-in-progress). |
+| 422 |  | The mapping names no date or no measure column, or the asset is not a CSV or spreadsheet (history-mapping-invalid). |
+
+### listVenueHistoryImports
+
+**`GET /venues/{venueId}/history-imports`**: The venue's history imports
+
+Imports of the venue's own history, newest first, with the months each covered and its result.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `ai.history_import` |
+| Writes | - |
+| Called by | ANL-071 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AiHistoryImport | yes |  |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].venueId | string (uuid) | yes |  |
+| items[].dataKind | enum (attendance, admissions, ticketSales, fnbSales, retailSales, queueReadings, staffShifts) | yes |  |
+| items[].assetId | string (uuid) |  |  |
+| items[].sourceSystem | string |  | (nullable) |
+| items[].columnMapping | object |  |  |
+| items[].dryRun | boolean |  | (default False) |
+| items[].status | enum (queued, validating, loading, completed, completedWithRejections, failed) | yes | (read-only) |
+| items[].periodFrom | string (date) |  | (read-only; nullable) |
+| items[].periodTo | string (date) |  | (read-only; nullable) |
+| items[].monthsCovered | integer |  | (read-only) |
+| items[].rowsRead | integer |  | (read-only) |
+| items[].rowsLoaded | integer |  | (read-only) |
+| items[].rowsRejected | integer |  | (read-only) |
+| items[].findings | array of object |  | (read-only) |
+| items[].findings[].row | integer |  |  |
+| items[].findings[].code | enum (badDate, badNumber, negativeValue, duplicateDay, unmappedColumn, outOfRange) |  |  |
+| items[].findings[].detail | string |  |  |
+| items[].requestedByPrincipalId | string (uuid) |  | (read-only) |
+| items[].createdAt | string (date-time) |  | (read-only) |
+| items[].completedAt | string (date-time) |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Imports |
+
 ### publishForecastVersion
 
 **`POST /forecast-versions/{versionId}/publish`**: Publish a forecast version
@@ -1018,7 +1483,7 @@ Forecasting and operational requirements (design C8)
 | Permission | `AI_APPROVE` |
 | Scope level | venue |
 | Part of slice | setup, makes `ai.forecast_version`, `ai.operational_requirement` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.forecast_definition`, `ai.forecast_version`, `cache:idempotency` |
@@ -1048,6 +1513,19 @@ Forecasting and operational requirements (design C8)
 | versionNumber | integer | yes | (min 1) |
 | status | enum (running, draft, awaitingApproval, published, superseded, rejected, failed) | yes | (read-only) |
 | basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
+| maturity | AiMaturity |  | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
+| maturity.stage | enum (starting, learning, established, learned) | yes | starting: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). |
+| maturity.basedOn | string | yes | The "Based on" line, in words, e.g. |
+| maturity.sources | array of object |  |  |
+| maturity.sources[].source | enum (venueSettings, startingPattern, calendar, weather, bookingsOnHand, ownHistory, importedHistory, configuration, …) | yes |  |
+| maturity.sources[].detail | string |  | e.g. (nullable) |
+| maturity.sources[].observations | integer |  | (nullable) |
+| maturity.ownDataShare | number |  | The weight own data carries, n / (k + n). (min 0; max 1) |
+| maturity.limitedHistory | boolean |  |  |
+| maturity.nextStage | object |  | What the next stage needs, e.g. (nullable) |
+| maturity.nextStage.stage | enum (learning, established, learned) |  |  |
+| maturity.nextStage.needs | string |  |  |
+| maturity.nextStage.expectedBy | string (date) |  | (nullable) |
 | producerRef | string |  |  |
 | modelVersion | string |  | (nullable) |
 | dataCutoffAt | string (date-time) |  | The analytical replica watermark the snapshot was taken at. |
@@ -1078,12 +1556,12 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 |---|---|
 | Permission | `AI_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `ai.forecast_point`, `ai.forecast_version`, `ai.insight` non-empty |
-| Wave | 2 |
+| Part of slice | setup, makes `ai.forecast_point`, `ai.forecast_version` non-empty |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.forecast_definition`, `ai.forecast_version`, `ai.release`, `ai.signal_observation`, `cache:idempotency`, `marketing.guest_profile`, `marketing.segment`, `orders.order_line` |
-| Writes | `ai.forecast_accuracy`, `ai.forecast_point`, `ai.forecast_version`, `ai.insight`, `cache:idempotency` |
+| Reads | `ai.forecast_definition`, `ai.forecast_version`, `ai.history_observation`, `ai.venue_settings`, `cache:idempotency` |
+| Writes | `ai.forecast_point`, `ai.forecast_version`, `cache:idempotency` |
 | Called by | ADM-500, ADM-508 |
 
 **Parameters**
@@ -1102,6 +1580,19 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 | versionNumber | integer | yes | (min 1) |
 | status | enum (running, draft, awaitingApproval, published, superseded, rejected, failed) | yes | (read-only) |
 | basis | SuggestionBasis: enum (heuristic, statistical, model, hybrid, manual) | yes | How the answer was reached, and this is the field the whole design exists for. |
+| maturity | AiMaturity |  | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
+| maturity.stage | enum (starting, learning, established, learned) | yes | starting: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). |
+| maturity.basedOn | string | yes | The "Based on" line, in words, e.g. |
+| maturity.sources | array of object |  |  |
+| maturity.sources[].source | enum (venueSettings, startingPattern, calendar, weather, bookingsOnHand, ownHistory, importedHistory, configuration, …) | yes |  |
+| maturity.sources[].detail | string |  | e.g. (nullable) |
+| maturity.sources[].observations | integer |  | (nullable) |
+| maturity.ownDataShare | number |  | The weight own data carries, n / (k + n). (min 0; max 1) |
+| maturity.limitedHistory | boolean |  |  |
+| maturity.nextStage | object |  | What the next stage needs, e.g. (nullable) |
+| maturity.nextStage.stage | enum (learning, established, learned) |  |  |
+| maturity.nextStage.needs | string |  |  |
+| maturity.nextStage.expectedBy | string (date) |  | (nullable) |
 | producerRef | string |  |  |
 | modelVersion | string |  | (nullable) |
 | dataCutoffAt | string (date-time) |  | The analytical replica watermark the snapshot was taken at. |
@@ -1121,6 +1612,91 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 | 202 |  | Accepted: run a forecast now |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A run of this definition is in progress. |
+
+### setAiVenueSettings
+
+**`PUT /venues/{venueId}/ai-settings`**: Set the venue AI profile
+
+**The onboarding figures the baselines use** (29 September, AI functions review). Replaces the venue's settings in full; a field left out takes the starting pattern's default for the venue type. A change is recorded and the next nightly re-estimate uses it; answers already given are not rewritten. **Configuration, not history**: nothing here is a sale or an admission, and nothing is written to the ledger.
+
+|  |  |
+|---|---|
+| Permission | `AI_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `ai.venue_settings`, `cache:idempotency` |
+| Writes | `ai.venue_settings`, `cache:idempotency` |
+| Called by | ADM-489, ANL-071 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `AiVenueSettings`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| venueType | enum (waterPark, themePark, familyEntertainmentCentre, museum, arena, zooAquarium, other) | yes |  |
+| isOutdoor | boolean |  | Outdoor venues take the summer-heat and weather effects. (default True) |
+| capacity | integer |  | (min 1; nullable) |
+| openingHours | array of object |  | The usual week. |
+| openingHours[].dayOfWeek | integer |  | (min 1; max 7) |
+| openingHours[].opensAt | string |  |  |
+| openingHours[].closesAt | string |  |  |
+| typicalWeekdayAttendance | integer |  | (min 0; nullable) |
+| typicalWeekendAttendance | integer |  | (min 0; nullable) |
+| peakMonths | array of integer |  |  |
+| averageSpend | object |  | (nullable) |
+| averageSpend.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| averageSpend.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| averageSpend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnbAttachRate | number |  | (min 0; max 1; nullable) |
+| staffProductivity | object |  | Per role, units per staff hour, e.g. |
+| startingPatternKey | string |  | The pattern and version in use, e.g. (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `AiVenueSettings`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) | yes |  |
+| venueType | enum (waterPark, themePark, familyEntertainmentCentre, museum, arena, zooAquarium, other) | yes |  |
+| isOutdoor | boolean |  | Outdoor venues take the summer-heat and weather effects. (default True) |
+| capacity | integer |  | (min 1; nullable) |
+| openingHours | array of object |  | The usual week. |
+| openingHours[].dayOfWeek | integer |  | (min 1; max 7) |
+| openingHours[].opensAt | string |  |  |
+| openingHours[].closesAt | string |  |  |
+| typicalWeekdayAttendance | integer |  | (min 0; nullable) |
+| typicalWeekendAttendance | integer |  | (min 0; nullable) |
+| peakMonths | array of integer |  |  |
+| averageSpend | object |  | (nullable) |
+| averageSpend.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| averageSpend.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| averageSpend.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| fnbAttachRate | number |  | (min 0; max 1; nullable) |
+| staffProductivity | object |  | Per role, units per staff hour, e.g. |
+| startingPatternKey | string |  | The pattern and version in use, e.g. (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 
 ## Group: generate
@@ -1216,7 +1792,7 @@ Logging, approval, explainability and cost
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.capability` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -1339,7 +1915,7 @@ Logging, approval, explainability and cost
 | rules[].maxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | rules[].roleIds | array of string (uuid) |  | Roles the rule applies to; empty means every role. |
-| rules[].environments | array of enum (development, staging, production) |  | ADM-525. |
+| rules[].environments | array of enum (development, sandbox, staging, production) |  | ADM-525. |
 | rules[].conditions | object |  | Conditions attached to an allowWithConditions effect, for example maskFields or requireCitation. (nullable) |
 | changeNote | string |  | (nullable) |
 
@@ -1362,7 +1938,7 @@ Logging, approval, explainability and cost
 | rules[].maxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | rules[].roleIds | array of string (uuid) |  | Roles the rule applies to; empty means every role. |
-| rules[].environments | array of enum (development, staging, production) |  | ADM-525. |
+| rules[].environments | array of enum (development, sandbox, staging, production) |  | ADM-525. |
 | rules[].conditions | object |  | Conditions attached to an allowWithConditions effect, for example maskFields or requireCitation. (nullable) |
 | changeNote | string |  | (nullable) |
 | simulationSummary | object |  | The last simulateAiGovernancePolicy result: decisions that would change, by outcome. (read-only; nullable) |
@@ -1377,6 +1953,74 @@ Logging, approval, explainability and cost
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Draft a governance policy, or a new version of one |
+
+### createAiPolicyException
+
+**`POST /governance/policy-exceptions`**: Grant a temporary exception to a governance policy
+
+**A legitimate exception, recorded, never a silent bypass** (AIC-162, ADM-526): an expiry, compensating controls and the approver, who is the caller. The effective policy shows it for as long as it is active.
+
+|  |  |
+|---|---|
+| Permission | `AI_APPROVE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `ai.policy_exception` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `ai.governance_policy`, `ai.policy_exception`, `cache:idempotency` |
+| Writes | `ai.decision_record`, `ai.policy_exception`, `cache:idempotency` |
+| Called by | ADM-526 |
+| State model | AI policy exception ([states/ai-policy-exception.yaml](../../../states/ai-policy-exception.yaml)): created as `active` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `AiPolicyException`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| policyId | string (uuid) | yes |  |
+| capabilityKey | string |  | (nullable) |
+| reason | string | yes | (max length 2000) |
+| compensatingControls | array of string |  |  |
+| startsAt | string (date-time) |  | (nullable) |
+| expiresAt | string (date-time) | yes | Required. |
+| status | enum (active, expired, revoked) |  | (read-only) |
+| approvedByPrincipalId | string (uuid) |  | (read-only) |
+| revokedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| revokedAt | string (date-time) |  | (read-only; nullable) |
+| revokeReason | string |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `AiPolicyException`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| policyId | string (uuid) | yes |  |
+| capabilityKey | string |  | (nullable) |
+| reason | string | yes | (max length 2000) |
+| compensatingControls | array of string |  |  |
+| startsAt | string (date-time) |  | (nullable) |
+| expiresAt | string (date-time) | yes | Required. |
+| status | enum (active, expired, revoked) |  | (read-only) |
+| approvedByPrincipalId | string (uuid) |  | (read-only) |
+| revokedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| revokedAt | string (date-time) |  | (read-only; nullable) |
+| revokeReason | string |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Grant a temporary exception to a governance policy |
 
 ### decideProposedAction
 
@@ -1448,6 +2092,126 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | 403 |  | The caller may not decide this proposal (audit R213 (3)): a level 2 proposal and the caller lacks AI_APPROVE (approval-level-requires-manager), a level 2 proposal the caller prompted themselves (appr… |
 | 409 |  | The action is no longer proposed — already decided, or expired (7 days after it was proposed, audit R213). |
 
+### evaluateAiGovernance
+
+**`POST /governance/evaluate`**: Ask the governance decision point (service callers)
+
+**The decision point as a service, for the .NET owners** (design 3.8). Inside `ticvai-ai` the decision point is an in-process library with cached policy (95th percentile 5 ms); this endpoint is for an owning service that must ask before acting on an AI output, such as Promotions before publishing an AI-assisted strategy. Given capability, action, scope, principal, data categories and amount, it returns allow, allow with conditions, prepare only, approval required, escalate or block, with the policy version and an explanation (AIC-166). **If policy cannot load, low-risk advisory continues and anything at L3 or above is refused** (AIC-168). A block writes a decision record.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `ai.capability`, `ai.governance_policy_version`, `ai.policy`, `ai.policy_exception`, `cache:governance-policy`, `cache:idempotency` |
+| Writes | `ai.decision_record`, `cache:idempotency` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| capabilityKey | string | yes |  |
+| action | enum (read, analyze, recommend, generate, prepare, create, modify, publish, …) | yes |  |
+| scopePath | string |  | (nullable) |
+| principalId | string (uuid) |  | (nullable) |
+| dataCategories | array of string |  |  |
+| amount | object |  | (nullable) |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| toolKey | string |  | (nullable) |
+
+**Response**: `AiGovernanceDecision`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| outcome | AiGovernanceOutcome: enum (allow, allowWithConditions, prepareOnly, approvalRequired, escalate, block) | yes | What the governance decision point returns (design 3.8, AIC-166). |
+| policyVersion | string | yes |  |
+| autonomyLevel | integer |  | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). (min 0; max 4) |
+| conditions | object |  | (nullable) |
+| requiredApprovalTier | integer |  | (min 1; max 2; nullable) |
+| explanation | string |  |  |
+| decisionRecordId | string (uuid) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Ask the governance decision point (service callers) |
+
+### getAiUsage
+
+**`GET /usage`**: Usage, cost and performance
+
+8.1.7, 8.3.81–8.3.83. Tokens, cost and latency by tenant, venue, principal, provider and capability.
+**Cost attribution is the reason every response carries a token count.** An AI feature with no cost signal is a bill nobody predicted, and the first month is when it matters.
+**Grouped by agent, model and task too, with a month-end projection** (AI design 2.3, 4.5). The projection is returned in `forecast`, labelled a forecast, beside the actual spend and never mixed into it. Tokens on TICVAI-managed providers are re-billed per token through `subscription.settleAiUsage` (decision 2); on a tenant's own key they are metered for visibility.
+
+|  |  |
+|---|---|
+| Permission | `AI_AUDIT_VIEW` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | analytical |
+| Reads | `ai.activity`, `ai.model` |
+| Writes | - |
+| Called by | ADM-549, BO-091 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| from | query |  | string (date) |  |
+| groupBy | query |  | enum (tenant, venue, principal, provider, capability, day, agent, model, …) |  |
+
+**Response**: `AiUsageReport`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| from | string (date) |  |  |
+| to | string (date) |  |  |
+| groupBy | string |  |  |
+| rows | array of object |  |  |
+| rows[].key | string |  |  |
+| rows[].interactions | integer |  |  |
+| rows[].promptTokens | integer |  |  |
+| rows[].completionTokens | integer |  |  |
+| rows[].cost | Money |  | On the wire this is three fields; in the database it is one column. |
+| rows[].cost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| rows[].cost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| rows[].cost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| rows[].p95LatencyMs | integer |  |  |
+| rows[].refusalRate | number |  |  |
+| rows[].rejectionRate | number |  | Proposals a person refused. |
+| forecast | object |  | A month-end projection, labelled a forecast (AI design 2.3, 4.5). (nullable) |
+| forecast.label | enum (forecast) |  |  |
+| forecast.periodEnd | string (date) |  |  |
+| forecast.projectedTokens | integer |  |  |
+| forecast.projectedCost | Money |  | On the wire this is three fields; in the database it is one column. |
+| forecast.projectedCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| forecast.projectedCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| forecast.projectedCost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| forecast.basis | string |  | How it was projected, e.g. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Usage |
+
 ### publishAiGovernancePolicy
 
 **`POST /governance/policy-versions/{versionId}/publish`**: Publish a simulated policy version
@@ -1494,7 +2258,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | rules[].maxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | rules[].roleIds | array of string (uuid) |  | Roles the rule applies to; empty means every role. |
-| rules[].environments | array of enum (development, staging, production) |  | ADM-525. |
+| rules[].environments | array of enum (development, sandbox, staging, production) |  | ADM-525. |
 | rules[].conditions | object |  | Conditions attached to an allowWithConditions effect, for example maskFields or requireCitation. (nullable) |
 | changeNote | string |  | (nullable) |
 | simulationSummary | object |  | The last simulateAiGovernancePolicy result: decisions that would change, by outcome. (read-only; nullable) |
@@ -1523,7 +2287,7 @@ Resuming needs more authority than pausing (`AI_APPROVE`): stopping is always sa
 | Permission | `AI_APPROVE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.capability` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.capability`, `cache:idempotency` |
@@ -1649,7 +2413,7 @@ Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | setup, makes `ai.insight` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.insight`, `cache:idempotency` |
@@ -1724,7 +2488,7 @@ Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | setup, makes `ai.insight` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | analytical |
@@ -1789,12 +2553,14 @@ Knowledge gaps, answer feedback and assistant profiles (design C4, C5)
 
 **`setAssistantProfile` in the design, renamed so the configuration-scope rules reach it.** One runtime, many profiles (design 5.10): the profile decides audience, roles, sources, tools, model task and guest scope. A guest profile's scope cannot be wider than `AiPolicy.guestCapabilityScope`. Matched on `profileKey`: replaces (200) or creates (201).
 
+**The app publishing guide** (24 September minutes M24-08, applied 30 September) is a profile of this runtime: `profileKey: guide.appPublishing`, audience `staff`, module `core`, task `assistant.staff.answer`, grounded only on the platform-owned *store publishing* knowledge collection (Apple and Google account set-up, D-U-N-S, listing assets, review rules, the build checklist) and on the tenant's own `StorePublishingChecklist` read through white-label `getStoreAccounts`. **No tenant data leaves the tenant and no other tenant's data is read**; it answers on CMS-104 (App Build & Store Publishing) beside the checklist and proposes nothing.
+
 |  |  |
 |---|---|
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.assistant_profile` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -2173,7 +2939,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | Permission | `PLATFORM_AI_MANAGE` |
 | Scope level | platform |
 | Part of slice | setup, makes `ai.model` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.model`, `cache:idempotency` |
@@ -2215,6 +2981,13 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
 | lifecycle.production | enum (draft, pilot, active, retired) |  |  |
 | isDefaultForTasks | array of string |  | Tasks this model is the default for (AIC-010), e.g. |
+| taskFitness | array of object |  | Evaluated fitness per task (21 September minutes, M21-09, our proposal): a score from the task's golden set (runAiEvaluation) and the band the task needs. (read-only) |
+| taskFitness[].taskKey | string | yes |  |
+| taskFitness[].score | number | yes | (min 0; max 1) |
+| taskFitness[].floor | number |  | (min 0; max 1) |
+| taskFitness[].ceiling | number |  | (min 0; max 1; nullable) |
+| taskFitness[].evaluationRunId | string (uuid) |  | (nullable) |
+| taskFitness[].evaluatedAt | string (date-time) |  |  |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Response**: `AiModel`
@@ -2245,6 +3018,13 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | lifecycle.staging | enum (draft, pilot, active, retired) |  |  |
 | lifecycle.production | enum (draft, pilot, active, retired) |  |  |
 | isDefaultForTasks | array of string |  | Tasks this model is the default for (AIC-010), e.g. |
+| taskFitness | array of object |  | Evaluated fitness per task (21 September minutes, M21-09, our proposal): a score from the task's golden set (runAiEvaluation) and the band the task needs. (read-only) |
+| taskFitness[].taskKey | string | yes |  |
+| taskFitness[].score | number | yes | (min 0; max 1) |
+| taskFitness[].floor | number |  | (min 0; max 1) |
+| taskFitness[].ceiling | number |  | (min 0; max 1; nullable) |
+| taskFitness[].evaluationRunId | string (uuid) |  | (nullable) |
+| taskFitness[].evaluatedAt | string (date-time) |  |  |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Responses**
@@ -2270,7 +3050,7 @@ Records containment and performs it: pause a capability, roll back a release, re
 |---|---|
 | Permission | `AI_APPROVE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `ai.capability`, `ai.release` non-empty |
+| Part of slice | setup, makes `ai.capability`, `ai.policy_exception`, `ai.release` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -2533,7 +3313,7 @@ Sending both, or naming a document in another collection or in a state the trans
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.chunk_embedding`, `ai.knowledge_document` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.chunk_ref`, `ai.knowledge_collection`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
@@ -2600,7 +3380,7 @@ Needed for three reasons and worth naming them: the embedding model changed, the
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.chunk_embedding` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.index_job`, `ai.index_source`, `assets.media_asset`, `cache:embedding`, `cache:idempotency`, `catalogue.entitlement_template`, `catalogue.product`, `fnb.menu_item`, `maintenance.inspection_template`, `marketing.case`, `reporting.report_definition`, `retail.merchandise`, `whitelabel.content_page`, `whitelabel.faq_entry`, `whitelabel.policy` |
@@ -2703,7 +3483,7 @@ Names the table, the fields that carry retrievable text, the collection it lands
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.index_source` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -2911,6 +3691,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 | updated_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `ai.capability_maturity`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| capability_key | text | yes |  |
+| suggestion_kind | text | no |  |
+| forecast_definition_key | text | no |  |
+| stage | text | yes |  |
+| maturity | jsonb | no |  |
+| producer_ref | text | no | The producer and version answering now. |
+| since | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `ai.chunk_embedding`
 
 | Column | Type | Required | Notes |
@@ -3010,24 +3804,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | blob_ref | text | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
-### `ai.forecast_accuracy`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | no |  |
-| definition_id | uuid | yes |  |
-| version_id | uuid | no |  |
-| producer_ref | text | no |  |
-| horizon_days | integer | yes |  |
-| period_start | timestamptz | yes |  |
-| period_end | timestamptz | no |  |
-| wape | numeric | no |  |
-| bias | numeric | no |  |
-| interval_coverage | numeric | no | Share of actuals inside the 10th-90th percentile band. |
-| baseline_wape | numeric | no |  |
-| measured_at | timestamptz | no |  |
-| scope_path | text | no | The partition key (ADR-0005). |
-
 ### `ai.forecast_definition`
 
 | Column | Type | Required | Notes |
@@ -3042,6 +3818,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | horizon_days | integer | yes |  |
 | refresh_cadence | text | no |  |
 | producer | text | yes | Which producer is live (design 3.10). |
+| history_window_months | integer | no | How much of the venue's own history the statistical producer reads (18 September minutes, M18-16: "36 months of history"). |
+| cold_start | jsonb | no | What the forecast stands on before the venue has history (29 September, AI functions review; forecasting book p.27 "New Venue / New Product Problem"). |
 | producer_ref | text | no |  |
 | shadow_producer_ref | text | no | Runs alongside and is recorded, never shown (design 3.5). |
 | is_auto_publish | boolean | no | Publish without approval when the quality gates pass (autonomy L4, design 3.8). |
@@ -3089,6 +3867,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | version_number | integer | yes |  |
 | status | text | yes |  |
 | basis | text | yes |  |
+| maturity | jsonb | no |  |
 | producer_ref | text | no |  |
 | model_version | text | no |  |
 | data_cutoff_at | timestamptz | no | The analytical replica watermark the snapshot was taken at. |
@@ -3166,6 +3945,44 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guided_choice_id | uuid | no | The white-label draft GuidedChoice it produced. |
 | decision_record_id | uuid | no |  |
 | created_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.history_import`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| venue_id | uuid | yes |  |
+| data_kind | text | yes |  |
+| asset_id | uuid | no |  |
+| source_system | text | no |  |
+| column_mapping | jsonb | no |  |
+| dry_run | boolean | no |  |
+| status | text | yes |  |
+| period_from | date | no |  |
+| period_to | date | no |  |
+| months_covered | integer | no |  |
+| rows_read | integer | no |  |
+| rows_loaded | integer | no |  |
+| rows_rejected | integer | no |  |
+| requested_by_principal_id | uuid | no |  |
+| created_at | timestamptz | no |  |
+| completed_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `ai.history_observation`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| import_id | uuid | yes |  |
+| venue_id | uuid | yes |  |
+| data_kind | text | yes |  |
+| observed_on | date | yes |  |
+| hour | integer | no |  |
+| dimension_key | text | no | The product, channel or outlet the value is for, as named in the export. |
+| value | numeric | yes |  |
+| unit | text | no | count, amount or minutes. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
 ### `ai.incident`
@@ -3508,6 +4325,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_active | boolean | yes |  |
 | managed_by | text | no | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). |
 | model_id | uuid | no | The model in the catalogue (listAiModels) this provider serves. |
+| task_keys | text[] | no | Which agent tasks this provider serves (21 September minutes, M21-03: different agents may use different models chosen for the task). |
 | region_id | uuid | yes | Points at platform.org_unit. |
 
 ### `ai.rec_decision`
@@ -3587,18 +4405,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | rolled_back_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
-### `ai.signal_observation`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | no |  |
-| source_id | uuid | yes |  |
-| observed_for | timestamptz | yes |  |
-| value | jsonb | no |  |
-| availability | text | yes |  |
-| received_at | timestamptz | no |  |
-| scope_path | text | no | The partition key (ADR-0005). |
-
 ### `ai.suggestion`
 
 | Column | Type | Required | Notes |
@@ -3613,27 +4419,47 @@ Every table this service owns that the slice reads or writes, with its columns a
 | explanation | text | no | Plain words, always present, whatever the basis. |
 | inputs | jsonb | no | What went in. |
 | producer_ref | text | no | The rule name or the model id and version. |
+| maturity | jsonb | yes |  |
 | produced_at | timestamptz | yes |  |
 | expires_at | timestamptz | no | A demand forecast for Saturday is worthless on Sunday. |
 
+### `ai.venue_settings`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| venue_id | uuid | yes |  |
+| venue_type | text | yes |  |
+| is_outdoor | boolean | no | Outdoor venues take the summer-heat and weather effects. |
+| capacity | integer | no |  |
+| typical_weekday_attendance | integer | no |  |
+| typical_weekend_attendance | integer | no |  |
+| peak_months | text[] | no |  |
+| average_spend | numeric(18,4) | no |  |
+| fnb_attach_rate | numeric | no |  |
+| staff_productivity | jsonb | no | Per role, units per staff hour, e.g. |
+| starting_pattern_key | text | no | The pattern and version in use, e.g. |
+| updated_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ## Not in the first release
 
-94 operations, added to this service in later releases without changing any of the above.
+91 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | actions | `cancelActionPlan`, `getActionPlan`, `listAiTools`, `overrideAiDecision`, `pauseActionPlan`, `resumeActionPlan`, `retryActionStep`, `rollbackActionPlan`, `setAiTool`, `simulateActionPlan` |
-| ai | `proposeTranslations`, `proposeVenueLabels`, `proposeWalkways`, `recordSuggestionOutcome`, `testAiProvider` |
+| ai | `proposeWalkways`, `recordSuggestionOutcome`, `testAiProvider` |
 | audit | `exportAiEvidencePackage`, `getAiDecisionTrace`, `replayAiDecision`, `searchAiDecisions` |
-| config | `getAiByokEnablement`, `getAiPolicy`, `listAiProviders` |
+| config | `getAiByokEnablement`, `listAiProviders` |
 | configure | `answerConfigurationQuestion`, `attachConfigurationSource`, `buildConfigurationPlan`, `decideBlueprintRecommendation`, `getConfigurationBlueprint`, `listConfigurationSessions`, `listConfigurationSources`, `proposeSeatMapChanges`, `startConfigurationSession` |
 | forecast | `compareForecastScenarios`, `configureForecastSignalSource`, `exportForecastVersion`, `getForecast`, `getForecastAccuracy`, `listForecastDefinitions`, `listForecastSignals`, `listForecastVersions`, `listOperationalRequirements`, `setForecastDefinition` |
 | generate | `generateConfiguration`, `generateVenueLayout`, `proposeLookalikeSegment` |
-| governance | `createAiPolicyException`, `evaluateAiGovernance`, `getAiUsage`, `getEffectiveAiPolicy`, `listAiCapabilities`, `listAiGovernancePolicyVersions`, `listAiInteractions`, `listProposedActions`, `pauseAiCapability`, `revokeAiPolicyException` |
+| governance | `getEffectiveAiPolicy`, `listAiCapabilities`, `listAiGovernancePolicyVersions`, `listAiInteractions`, `listProposedActions`, `pauseAiCapability`, `revokeAiPolicyException` |
 | insights | `configureAnomalyDetector`, `listAiInsights`, `listAnomalyDetectors`, `listMarketingRecommendations` |
 | knowledge | `listAssistantProfiles`, `listKnowledgeGaps` |
-| models | `listAiEvaluations`, `listAiModels`, `listPromptTemplates` |
-| monitoring | `closeAiIncident`, `decideAiGovernanceAlert`, `listAiControls`, `listAiGovernanceAlerts`, `listAiIncidents`, `listAiRiskRegister`, `openAiIncident`, `runAiControlTest`, `setAiRiskRegisterEntry` |
+| models | `listAiEvaluations`, `listAiModels`, `listAiTrainingRuns`, `listPromptTemplates` |
+| monitoring | `closeAiIncident`, `decideAiGovernanceAlert`, `listAiCapabilityHealth`, `listAiCapabilityMaturity`, `listAiControls`, `listAiGovernanceAlerts`, `listAiIncidents`, `listAiRiskRegister`, `openAiIncident`, `runAiControlTest`, `setAiRiskRegisterEntry` |
 | recommend | `explainRecommendationDecision`, `getCustomerRecommendationProfile`, `simulateRecommendationDecision` |
 | retrieval | `listIndexFailures`, `listIndexJobs`, `listIndexSources`, `listKnowledgeCollections`, `removeIndexEntry` |
 | risk | `addRiskCaseEvidence`, `backtestRiskStrategy`, `closeRiskCase`, `configureRiskStrategy`, `createRiskCase`, `decideRiskAlert`, `expandRiskNetwork`, `getApprovalRequestScore`, `getEntityRisk`, `getRiskCase`, `listRiskAlerts`, `proposeRiskAction`, `scoreApprovalRequest`, `scoreTransactionRisk` |

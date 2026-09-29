@@ -7,21 +7,20 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
-  "operations": 211,
+  "operations": 217,
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
   "operationsWithNoScreen": 19
  },
  "waves": {
-  "wave1": 20,
+  "wave1": 25,
   "wave2": 35,
-  "wave3": 17,
-  "wave4": 5
+  "wave3": 17
  },
  "modules": [
   {
@@ -37,9 +36,9 @@
    "module": "Engagement & Support",
    "screens": 12,
    "waves": [
+    1,
     2,
-    3,
-    4
+    3
    ]
   },
   {
@@ -183,23 +182,27 @@
    "operations": 11
   },
   {
-   "contract": "wallet",
+   "contract": "venue-map",
    "operations": 8
   },
   {
    "contract": "white-label",
-   "operations": 7
+   "operations": 8
+  },
+  {
+   "contract": "wallet",
+   "operations": 8
   },
   {
    "contract": "ai",
    "operations": 7
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 6
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 6
   },
   {
@@ -207,15 +210,11 @@
    "operations": 5
   },
   {
-   "contract": "promotions",
-   "operations": 4
-  },
-  {
    "contract": "retail",
    "operations": 4
   },
   {
-   "contract": "payments",
+   "contract": "promotions",
    "operations": 4
   },
   {
@@ -223,8 +222,8 @@
    "operations": 4
   },
   {
-   "contract": "venue-map",
-   "operations": 3
+   "contract": "payments",
+   "operations": 4
   },
   {
    "contract": "games",
@@ -234,38 +233,38 @@
  "screens": [
   {
    "id": "GST-001",
-   "name": "Home \u2013 Default",
+   "name": "Home",
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/home-default",
-   "operations": 11,
+   "operations": 13,
    "drawn": true
   },
   {
    "id": "GST-002",
-   "name": "Explore Categories",
+   "name": "Explore",
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/explore-categories",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "GST-003",
-   "name": "Event & Attraction Listing",
+   "name": "Buy Tickets",
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/attractions-list",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
    "id": "GST-004",
-   "name": "Attraction Details",
+   "name": "Item Detail",
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/attraction-details",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -279,7 +278,7 @@
   },
   {
    "id": "GST-006",
-   "name": "Event / Exhibition Details",
+   "name": "Item Detail \u2013 Event / Exhibition",
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/event-exhibition-details",
@@ -292,7 +291,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/select-date-and-time",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -301,7 +300,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/tickets-and-add-ons",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -310,7 +309,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/review-and-payment",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -567,7 +566,7 @@
   },
   {
    "id": "GST-038",
-   "name": "Digital Companion Mode",
+   "name": "At the Venue",
    "module": "In-venue Services",
    "wave": 3,
    "route": "/general/digital-companion-mode",
@@ -598,7 +597,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/checkout-entry",
-   "operations": 11,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -684,38 +683,38 @@
   },
   {
    "id": "GST-051",
-   "name": "Plan Your Adventure \u2013 Start",
+   "name": "Plan",
    "module": "Engagement & Support",
-   "wave": 4,
+   "wave": 1,
    "route": "/general/plan-your-adventure-start",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "GST-052",
    "name": "Suggested Itineraries",
    "module": "Engagement & Support",
-   "wave": 4,
+   "wave": 1,
    "route": "/general/suggested-itineraries",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "GST-053",
-   "name": "Build Your Own Itinerary",
+   "name": "Your Plan",
    "module": "Engagement & Support",
-   "wave": 4,
+   "wave": 1,
    "route": "/general/build-your-own-itinerary",
-   "operations": 4,
+   "operations": 7,
    "drawn": true
   },
   {
    "id": "GST-054",
-   "name": "AI Optimized Itinerary",
+   "name": "AI Planner",
    "module": "Engagement & Support",
-   "wave": 4,
+   "wave": 1,
    "route": "/general/ai-optimized-itinerary",
-   "operations": 3,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -756,11 +755,11 @@
   },
   {
    "id": "GST-059",
-   "name": "Plan My Day \u2013 In Progress",
+   "name": "Plan in Progress",
    "module": "Engagement & Support",
-   "wave": 4,
+   "wave": 1,
    "route": "/general/plan-my-day-in-progress",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -783,7 +782,7 @@
   },
   {
    "id": "GST-063",
-   "name": "Search",
+   "name": "Explore \u2013 Search Results",
    "module": "Discovery",
    "wave": 1,
    "route": "/search",
@@ -1070,9 +1069,9 @@
    {
     "module": "Engagement & Support",
     "waves": [
+     1,
      2,
-     3,
-     4
+     3
     ]
    },
    {

@@ -52,11 +52,11 @@ servicesCalled:
   operationCalls: 40
 - service: AccessService
   operationCalls: 23
+- service: InventoryService
+  operationCalls: 21
 - service: MarketingService
   operationCalls: 20
 - service: IdentityService
-  operationCalls: 18
-- service: InventoryService
   operationCalls: 18
 - service: CatalogueService
   operationCalls: 17
@@ -517,12 +517,15 @@ screens:
   - cancelWorkOrder
   - closeWorkOrder
   - completeWorkOrder
+  - createStockReservation
   - getWorkOrder
+  - listStockReservations
   - listWorkOrders
   - pauseWorkOrder
   - recordWorkOrderParts
   - recordWorkOrderTime
   - rejectWorkOrder
+  - releaseStockReservation
   - resumeWorkOrder
   - startWorkOrder
   - updateWorkOrder
@@ -537,6 +540,7 @@ screens:
   offlineState: true
   entryParams:
   - workOrderId<-deepLink
+  - stockReservationId<-navigation
   goesTo:
   - EMP-001
   - EMP-002

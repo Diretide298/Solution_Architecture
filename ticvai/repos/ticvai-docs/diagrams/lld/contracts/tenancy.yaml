@@ -1,5 +1,5 @@
 id: LLD-tenancy
-title: tenancy — 53 operations
+title: tenancy — 55 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -470,6 +470,17 @@ operations:
   writes:
   - cache:idempotency
   - platform.device
+- operation: resolveTenantHost
+  verb: GET
+  path: /tenant-domains/{hostname}
+  scope: region
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - control.tenant_domain
+  writes: []
 - operation: revokeDeviceCredential
   verb: DELETE
   path: /devices/{deviceId}/credentials
@@ -607,6 +618,19 @@ operations:
   - cache:resolution
   - identity.role_permission
   - platform.audit_record
+- operation: setTenantDomainMapping
+  verb: PUT
+  path: /tenant-domains/{hostname}
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - control.tenant
+  - control.tenant_domain
+  writes:
+  - control.tenant_domain
 - operation: setVenueSettings
   verb: PUT
   path: /venues/{venueId}/settings

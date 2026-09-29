@@ -1,0 +1,42 @@
+# fnb.kitchenTicketCreated v1 — published by fnb
+# Added 29 September (system-design review SD-033, SD-046).
+
+name: fnb.kitchenTicketCreated
+version: 1
+publisher: fnb
+description: A kitchen ticket exists for a preparation station, from a till sale or a guest order.
+aggregate: kitchenTicket
+emittedWhen: createFnbOrder (a till at the outlet), createGuestFnbOrder or acceptFnbOrder creates a ticket
+emittedBy:
+- fnb.createFnbOrder
+- fnb.createGuestFnbOrder
+- fnb.acceptFnbOrder
+payload:
+- field: kitchenTicketId
+  type: string
+- field: fnbOrderId
+  type: string
+- field: outletId
+  type: uuid
+- field: stationId
+  type: uuid
+- field: lines
+  type: array
+  notes: menuItemId, quantity, modifiers, course
+- field: createdAt
+  type: timestamp
+consumers:
+- context: fnb
+  purpose: Push the ticket to the station's KDS screens (the KDS also reads listKitchenTickets)
+  idempotencyKey: kitchenTicketId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: reporting
+  purpose: Ticket times against the kitchen SLA
+  idempotencyKey: kitchenTicketId
+  onFailure: retry
+  isCritical: false
+retention: 7 days after publication
+notes: '**Critical because a ticket that never reaches the pass is a meal nobody cooks.** Offline, the till
+  delivers the ticket to the KDS over the venue LAN and this event is written when the order replays (open ADR,
+  P29 group S). No state model emits this: a ticket is created already open.'

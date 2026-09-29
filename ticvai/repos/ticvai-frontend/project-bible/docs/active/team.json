@@ -1,5 +1,5 @@
 {
- "note": "Who owns which area of the first release. Read by tools/build-service-docs.py to assign tasks. Decided with Chinmay on 23 September; see developer-assignment-plan-23-september.md. Edit this file, not the task sheet.",
+ "note": "Who owns which area of the first release. Read by tools/build-service-docs.py to assign tasks. Decided with Chinmay on 23 September; see developer-assignment-plan-23-september.md. Edit this file, not the task sheet. Updated 30 September: Surendra on Venue Management at 60% pace, Deep's proportional share, Kalpita and the second AI engineer on the AI engine.",
  "areas": {
   "POS": [
    "Pradnya Yeram"
@@ -38,10 +38,10 @@
   "Hrushikant Patkar": "backend",
   "Pranay Shinde": "backend",
   "Tanmay Dukhande": "backend",
-  "Deep Khanvilkar": "backend"
- },
- "notAssigned": {
-  "Kalpita Mejari": "AI. No AI work is in the first release."
+  "Deep Khanvilkar": "backend",
+  "Surendra": "full stack",
+  "Kalpita Mejari": "AI",
+  "Second AI engineer": "AI"
  },
  "helpers": {
   "Chinmay Patkar": "Guest App - Web, White Labelling, smaller Guest App - Mobile screens, and backend tasks up to 2 points.",
@@ -57,7 +57,7 @@
  },
  "capsNote": "Largest task (points) a person takes in an area. Chinmay Patkar is rated 2 in React Native, so 5 and 8 point mobile screens stay with Chitrangi and Pradnya (rule: 5-8 points only to someone rated 3-4 in the stack).",
  "backendHelpers": {
-  "Deep Khanvilkar": 2,
+  "Deep Khanvilkar": 5,
   "Chinmay Patkar": 2,
   "Sanket Keluskar": 3
  },
@@ -65,7 +65,8 @@
  "venueManagement": {
   "who": [
    "Pallavi Sawant",
-   "Sanket Keluskar"
+   "Sanket Keluskar",
+   "Surendra"
   ],
   "screens": "P08",
   "waves": [
@@ -80,5 +81,20 @@
    "BO-040"
   ]
  },
- "venueManagementNote": "Pallavi is full stack (23 September), so she builds the Venue Management screens and the backend they need beyond the first release. Only screens whose every operation is agreed and specified; wave 3 and provisional screens wait. The backend is additive to services owned by others, and each service's owner reviews it, as for backendHelpers. 23 September: Sanket Keluskar joins Pallavi on the Venue Management screens; his Guest App web and White Labelling screens move to Chinmay Patkar and Chitrangi Mestry. Pallavi leads the epic."
+ "venueManagementNote": "Pallavi is full stack (23 September), so she builds the Venue Management screens and the backend they need beyond the first release. Only screens whose every operation is agreed and specified; wave 3 and provisional screens wait. The backend is additive to services owned by others, and each service's owner reviews it, as for backendHelpers. 23 September: Sanket Keluskar joins Pallavi on the Venue Management screens; his Guest App web and White Labelling screens move to Chinmay Patkar and Chitrangi Mestry. Pallavi leads the epic.",
+ "ai": {
+  "who": [
+   "Kalpita Mejari",
+   "Second AI engineer"
+  ],
+  "note": "Both from Monday 5 October 2026 (Chinmay, 30 September); no third AI engineer. They carry the AI engine tasks in docs/active/block-a-extra-tasks.json; the AI endpoints and screens are developers' tickets like any other module. Every AI function is built inside the six months, baseline first."
+ },
+ "pace": {
+  "Surendra": 0.6
+ },
+ "paceNote": "Share of a full developer's pace, used when screens are shared out. Surendra is full stack and junior (29 September): about 60%, on Venue Management from week 1.",
+ "helperShare": {
+  "Deep Khanvilkar": 0.55
+ },
+ "helperShareNote": "A helper with a share keeps taking backend tasks until their load reaches this fraction of the owner's. Deep (.NET 2, PostgreSQL 2) against owners rated 3-4: about 55%, tasks up to 5 points (the owners' backend tasks are cut at 5 and 8 points, so a cap of 3 left him three tasks; 8-point tasks stay with the owners, and the owner reviews every one) (Chinmay, 29 September: 'we can increase Deep's tasks but have to stay proportional'). Loads otherwise follow skill and experience and are uneven on purpose."
 }

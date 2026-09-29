@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 15 of 206 |
+| Operations in the slice | 18 of 212 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -30,7 +30,10 @@ Splitting them would give three services writing one schema, which is the arrang
 | licensing | [`addLicenceAddOn`](#addlicenceaddon) | POST | `/tenants/{tenantId}/licences/add-ons` | setup | 2 | ADM-005, ADM-007, ADM-011, ADM-422 |
 | plan | [`createPlan`](#createplan) | POST | `/plans` | setup | 2 | ADM-008, ADM-019, ADM-392 |
 | plan | [`createPlanVersion`](#createplanversion) | POST | `/plans/{planId}` | setup | 2 | ADM-008, ADM-019, ADM-398 |
+| publicApi | [`certifyIntegration`](#certifyintegration) | POST | `/listings/{listingId}/certify` | setup | 1 | BO-483, DEV-008 |
 | publicApi | [`createApiClient`](#createapiclient) | POST | `/api-clients` | setup | 1 | BO-067, BO-1073, BO-1173, BO-1177, DEV-003, PTR-019 |
+| publicApi | [`decideProductionAccess`](#decideproductionaccess) | POST | `/production-access-requests/{requestId}/decide` | setup | 1 | ADM-015, DEV-008 |
+| publicApi | [`deprecateApiVersion`](#deprecateapiversion) | POST | `/api-versions/{version}/deprecate` | setup | 1 | ADM-026, DEV-008 |
 | publicApi | [`registerDeveloper`](#registerdeveloper) | POST | `/developers` | setup | 1 | DEV-002 |
 | publicApi | [`rotateApiCredential`](#rotateapicredential) | POST | `/api-clients/{clientId}/credentials` | setup | 1 | DEV-003, PTR-019 |
 | publicApi | [`setApiLicensing`](#setapilicensing) | PUT | `/api-licensing` | setup | 1 | DEV-008 |
@@ -306,12 +309,72 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 
 ## Group: publicApi
 
+### certifyIntegration
+
+**`POST /listings/{listingId}/certify`**: Approve, reject or revoke a certification
+
+13.1.49. **Certification expires**, because an integration certified against v1 and still listed after v3 is TICVAI vouching for something it has not looked at in two years.
+**It is also what production access rests on** (17 September minutes, M17-06). Revoking a certification, or letting it lapse, suspends the production clients issued against it (`setApiClientStatus` `suspended`, reason `certificationLapsed`); sandbox clients are untouched.
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_ADMIN` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.integration_listing` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.api_version`, `control.integration_listing` |
+| Writes | `cache:idempotency`, `control.integration_listing` |
+| Called by | BO-483, DEV-008 |
+| State model | Integration listing ([states/integration-listing.yaml](../../../states/integration-listing.yaml)): moves `submitted` -> `inReview`, `inReview` -> `certified`, `inReview` -> `rejected`, `certified` -> `revoked`, `revoked` -> `delisted` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| listingId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| decision | enum (certify, reject, revoke) | yes |  |
+| certifiedUntil | string (date) |  | (nullable) |
+| notes | string |  | (nullable) |
+
+**Response**: `IntegrationListing`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| developerId | string (uuid) | yes |  |
+| name | string | yes |  |
+| category | enum (crm, marketing, accounting, hotel, transport, analytics, accessibility, other) | yes |  |
+| description | string |  |  |
+| integrationUrl | string |  |  |
+| requiredScopes | array of string |  |  |
+| status | enum (draft, submitted, inReview, certified, rejected, revoked, delisted) | yes | (read-only) |
+| certifiedUntil | string (date) |  | Certification expires. (read-only; nullable) |
+| certifiedAgainstVersion | string |  | (read-only; nullable) |
+| listingFeeModel | enum (none, flat, revenueShare) |  | (nullable) |
+| visibility | enum (public, private) |  | private: certified for production access and never shown in the marketplace (17 September minutes, M17-06). (default public) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Decided |
+
 ### createApiClient
 
 **`POST /api-clients`**: Create a client with scopes and an environment
 
 13.1.11 to 13.1.13, and **CF-135a: the credential model was owned by nobody.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things. **This is the one that exists.**
 **A client is bound to one environment.** A sandbox client cannot reach production, which is stated on the object rather than enforced by a naming convention — **a key that works in both is a key somebody will use in the wrong one.**
+**Production keys only after certification** (17 September minutes, M17-06; decided again 29 September). A developer creates `sandbox` clients here freely. A `production` client is refused 409 `certification-required` unless it names a certified integration (`certificationListingId`, an `IntegrationListing` in `certified` within `certifiedUntil`) and the caller is TICVAI staff (`issuedBy: ticvai`). The developer's route is `requestProductionAccess`, which TICVAI decides with `decideProductionAccess`; approving it creates the production client. **A production client needs an IP allow-list** (M17-07): an empty `ipAllowList` on a production client is refused 422 `ip-allow-list-required`.
+**Scopes are module scopes** (M17-05): each is `{module}.read` or `{module}.write` from `listApiScopes`, so a CRM integration partner is granted CRM scopes and nothing else. An unknown scope is refused 422 `unknown-scope`. **No scope grants a catalogue write** (M17-04): partners read assigned products and partner prices; the product, price and capacity writes are open only through a platform-staff `ApiLicence.catalogueWriteException`. Keys expire: `credentialTtlDays` (default 365 for production, 90 for sandbox) sets `expiresAt`, and rotation renews it.
 
 |  |  |
 |---|---|
@@ -321,7 +384,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.api_client`, `control.api_licence`, `control.developer_account` |
+| Reads | `cache:idempotency`, `control.api_client`, `control.api_licence`, `control.developer_account`, `control.integration_listing` |
 | Writes | `cache:idempotency`, `control.api_client` |
 | Called by | BO-067, BO-1073, BO-1173, BO-1177, DEV-003, PTR-019 |
 
@@ -341,6 +404,10 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | clientId | string |  | (read-only) |
 | environment | enum (sandbox, production) | yes | Bound to one, stated on the object rather than by naming convention. |
 | scopes | array of string | yes | Resolved against the tenant's licence at token issue (13.3.24). |
+| issuedBy | enum (partner, ticvai) |  | Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved requestProductionAccess. (read-only) |
+| certificationListingId | string (uuid) |  | For a production client, the certified integration it was issued against. (nullable) |
+| credentialTtlDays | integer |  | Key lifetime. (min 1; max 730; nullable) |
+| expiresAt | string (date-time) |  | When the key stops working unless rotated. (read-only; nullable) |
 | allowedTenantIds | array of string (uuid) |  | 13.1.46. |
 | ipAllowList | array of string |  | 13.1.38. |
 | status | enum (active, suspended, revoked) | yes | (read-only) |
@@ -357,6 +424,10 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | client.clientId | string |  | (read-only) |
 | client.environment | enum (sandbox, production) | yes | Bound to one, stated on the object rather than by naming convention. |
 | client.scopes | array of string | yes | Resolved against the tenant's licence at token issue (13.3.24). |
+| client.issuedBy | enum (partner, ticvai) |  | Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved requestProductionAccess. (read-only) |
+| client.certificationListingId | string (uuid) |  | For a production client, the certified integration it was issued against. (nullable) |
+| client.credentialTtlDays | integer |  | Key lifetime. (min 1; max 730; nullable) |
+| client.expiresAt | string (date-time) |  | When the key stops working unless rotated. (read-only; nullable) |
 | client.allowedTenantIds | array of string (uuid) |  | 13.1.46. |
 | client.ipAllowList | array of string |  | 13.1.38. |
 | client.status | enum (active, suspended, revoked) | yes | (read-only) |
@@ -368,6 +439,129 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created. |
+| 409 |  | A production client without a current certification, or asked for by a developer rather than issued by TICVAI (certification-required, M17-06). |
+| 422 |  | A production client with an empty ipAllowList (ip-allow-list-required, M17-07), or a scope that is not in the scope catalogue (unknown-scope, M17-05). |
+
+### decideProductionAccess
+
+**`POST /production-access-requests/{requestId}/decide`**: Approve or reject production access
+
+**TICVAI issues production keys** (M17-06). Approving creates the production `ApiClient` (`environment: production`, `issuedBy: ticvai`, the certified listing, the scopes, tenants and allow-list as approved or narrowed, `credentialTtlDays` as set) with no secret yet; the developer takes the secret once with `rotateApiCredential`. Rejecting needs a reason the developer can act on. A request whose certification lapsed since it was made is refused 409 `certification-required`.
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_ADMIN` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.api_client` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.integration_listing`, `control.production_access_request` |
+| Writes | `cache:idempotency`, `control.api_client`, `control.production_access_request` |
+| Called by | ADM-015, DEV-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| requestId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| decision | enum (approve, reject) | yes |  |
+| reason | string |  | (max length 1000; nullable) |
+| scopes | array of string |  | Narrow the requested scopes. |
+| credentialTtlDays | integer |  | (min 1; max 730; default 365) |
+
+**Response**: `ProductionAccessRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| developerId | string (uuid) | yes | (read-only) |
+| sandboxClientId | string (uuid) | yes | (read-only) |
+| listingId | string (uuid) | yes |  |
+| scopes | array of string |  |  |
+| allowedTenantIds | array of string (uuid) |  |  |
+| ipAllowList | array of string |  |  |
+| note | string |  | (nullable) |
+| status | enum (pending, approved, rejected, withdrawn) | yes | (read-only) |
+| decidedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+| decidedAt | string (date-time) |  | (read-only; nullable) |
+| reason | string |  | (read-only; nullable) |
+| productionClientId | string (uuid) |  | (read-only; nullable) |
+| requestedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Decided. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Already decided (already-decided), or the listing's certification lapsed since the request (certification-required). |
+| 422 |  | reject without a reason. |
+
+### deprecateApiVersion
+
+**`POST /api-versions/{version}/deprecate`**: Announce a sunset date and notify subscribers
+
+13.1.32 and 13.1.34. **Deprecation is an announcement with a date, not a switch.**
+Notifies every client using the version, and **the notification names which operations they actually call** — a generic *"v1 is retiring"* to somebody using three of two hundred endpoints is a message they will ignore.
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_ADMIN` |
+| Scope level | tenant |
+| Part of slice | setup, makes `control.api_version` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.api_client`, `control.api_version` |
+| Writes | `cache:idempotency`, `control.api_version`, `marketing.message_dispatch` |
+| Called by | ADM-026, DEV-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| version | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| sunsetAt | string (date-time) | yes |  |
+| reason | string | yes |  |
+| migrationGuideUrl | string |  | (nullable) |
+
+**Response**: `ApiVersion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| version | string | yes |  |
+| status | enum (preview, current, deprecated, sunset) | yes |  |
+| releasedAt | string (date-time) |  |  |
+| deprecatedAt | string (date-time) |  | (nullable) |
+| sunsetAt | string (date-time) |  | (nullable) |
+| minimumNoticeMonths | integer |  | The commitment, not the intention. (default 12) |
+| migrationGuideUrl | string |  | (nullable) |
+| activeClientCount | integer |  | (read-only) |
+| changes | array of object |  | The developer changelog for this version (17 September minutes, M17-14): every operation added, changed, deprecated or removed, and whether the change is breaking under ADR-0026. |
+| changes[].operationId | string | yes |  |
+| changes[].contract | string |  |  |
+| changes[].kind | enum (added, changed, deprecated, removed) | yes |  |
+| changes[].breaking | boolean |  | (default False) |
+| changes[].summary | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Deprecated |
 
 ### registerDeveloper
 
@@ -479,6 +673,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 13.3.24, decision D5. **Configuration, not code** — rates and terms change without a release, which is the whole point of the decision.
 **The example in the requirement is the shape**: a venue licensing the ticketing API and not the F&B one. A scope the tenant has not licensed produces no token, and the refusal happens at issue rather than at call time.
 **The rates themselves are CF-135c and remain open.** This is the surface they will be set through.
+**Catalogue writes are not grantable to partner or developer clients** (17 September minutes M17-04, decided 29 September): partners never create products, prices or performances through the API. The product, price list, channel capacity, lifecycle and alternative-code writes (`createProduct`, `updateProduct`, `setProductAttributes`, `createPriceList`, `updatePriceList`, `copyPriceList`, `setPrices`, `createChannelCapacity`, `updateChannelCapacity`, `setChannelAllocations`, `transitionProductLifecycle`, `setAlternativeCodes`) are in no scope a client can be granted, whatever modules are licensed. **The only exception is `catalogueWriteException`**, which TICVAI platform staff alone may set here (a tenant principal sending it is refused 403 `platform-staff-only`), for a named client and named operations, with a reason and an end date; it is audited and lapses on its own.
 
 |  |  |
 |---|---|
@@ -505,8 +700,14 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | tenantId | string (uuid) | yes |  |
-| licensedModules | array of string | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
+| licensedModules | array of ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
 | callAllowancePerMonth | integer |  | (nullable) |
+| catalogueWriteException | object |  | M17-04: the one way a client reaches a catalogue write, set by TICVAI platform staff only (setApiLicensing refuses anyone else 403 platform-staff-only). (nullable) |
+| catalogueWriteException.clientId | string (uuid) | yes |  |
+| catalogueWriteException.operationIds | array of enum (createProduct, updateProduct, setProductAttributes, createPriceList, updatePriceList, copyPriceList, setPrices, createChannelCapacity, …) | yes | (min items 1) |
+| catalogueWriteException.reason | string | yes | (max length 500) |
+| catalogueWriteException.grantedByPrincipalId | string (uuid) |  | (read-only) |
+| catalogueWriteException.grantedUntil | string (date) | yes |  |
 | overageRatePerThousand | number |  | (nullable) |
 | revenueSharePercent | number |  | (nullable) |
 | effectiveFrom | string (date) |  |  |
@@ -518,8 +719,14 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | tenantId | string (uuid) | yes |  |
-| licensedModules | array of string | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
+| licensedModules | array of ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
 | callAllowancePerMonth | integer |  | (nullable) |
+| catalogueWriteException | object |  | M17-04: the one way a client reaches a catalogue write, set by TICVAI platform staff only (setApiLicensing refuses anyone else 403 platform-staff-only). (nullable) |
+| catalogueWriteException.clientId | string (uuid) | yes |  |
+| catalogueWriteException.operationIds | array of enum (createProduct, updateProduct, setProductAttributes, createPriceList, updatePriceList, copyPriceList, setPrices, createChannelCapacity, …) | yes | (min items 1) |
+| catalogueWriteException.reason | string | yes | (max length 500) |
+| catalogueWriteException.grantedByPrincipalId | string (uuid) |  | (read-only) |
+| catalogueWriteException.grantedUntil | string (date) | yes |  |
 | overageRatePerThousand | number |  | (nullable) |
 | revenueSharePercent | number |  | (nullable) |
 | effectiveFrom | string (date) |  |  |
@@ -530,6 +737,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Set |
+| 403 |  | catalogueWriteException was sent by a principal that is not TICVAI platform staff (platform-staff-only, M17-04). |
 
 ### setDeveloperMembers
 
@@ -921,8 +1129,8 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `subscription.contract`, `control.tenant` |
-| Writes | `cache:idempotency`, `subscription.contract`, `control.tenant` |
+| Reads | `cache:idempotency`, `control.tenant`, `subscription.contract` |
+| Writes | `cache:idempotency`, `control.tenant`, `subscription.contract` |
 | Called by | ADM-005 |
 | State model | Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): moves `active` -> `terminating`, `suspended` -> `terminating` |
 
@@ -1043,6 +1251,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | client_id | text | no |  |
 | environment | text | yes | Bound to one, stated on the object rather than by naming convention. |
 | scopes | text[] | yes | Resolved against the tenant's licence at token issue (13.3.24). |
+| issued_by | text | no | Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved requestProductionAccess. |
+| certification_listing_id | uuid | no | For a production client, the certified integration it was issued against. |
+| credential_ttl_days | integer | no | Key lifetime. |
+| expires_at | timestamptz | no | When the key stops working unless rotated. |
 | allowed_tenant_ids | text[] | no | 13.1.46. |
 | ip_allow_list | text[] | no | 13.1.38. |
 | status | text | yes |  |
@@ -1056,10 +1268,25 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tenant_id | uuid | yes |  |
 | licensed_modules | text[] | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
 | call_allowance_per_month | integer | no |  |
+| catalogue_write_exception | jsonb | no | M17-04: the one way a client reaches a catalogue write, set by TICVAI platform staff only (setApiLicensing refuses anyone else 403 platform-staff-only). |
 | overage_rate_per_thousand | numeric | no |  |
 | revenue_share_percent | numeric | no |  |
 | effective_from | date | no |  |
 | effective_to | date | no |  |
+
+### `control.api_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| version | text | yes |  |
+| status | text | yes |  |
+| released_at | timestamptz | no |  |
+| deprecated_at | timestamptz | no |  |
+| sunset_at | timestamptz | no |  |
+| minimum_notice_months | integer | no | The commitment, not the intention. |
+| migration_guide_url | text | no |  |
+| active_client_count | integer | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `control.developer_account`
 
@@ -1073,6 +1300,23 @@ Every table this service owns that the slice reads or writes, with its columns a
 | partner_id | uuid | no | Where this developer is also a commercial partner. |
 | status | text | yes |  |
 | verified_at | timestamptz | no |  |
+
+### `control.integration_listing`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| developer_id | uuid | yes |  |
+| name | text | yes |  |
+| category | text | yes |  |
+| description | text | no |  |
+| integration_url | text | no |  |
+| required_scopes | text[] | no |  |
+| status | text | yes |  |
+| certified_until | date | no | Certification expires. |
+| certified_against_version | text | no |  |
+| listing_fee_model | text | no |  |
+| visibility | text | no | private: certified for production access and never shown in the marketplace (17 September minutes, M17-06). |
 
 ### `control.licence_add_on`
 
@@ -1096,6 +1340,25 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_overage_allowed | boolean | no |  |
 | overage_unit_price | numeric(18,4) | no |  |
 | id | uuid | yes | Synthesised key. |
+
+### `control.production_access_request`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| developer_id | uuid | yes |  |
+| sandbox_client_id | uuid | yes |  |
+| listing_id | uuid | yes |  |
+| scopes | text[] | no |  |
+| allowed_tenant_ids | text[] | no |  |
+| ip_allow_list | text[] | no |  |
+| note | text | no |  |
+| status | text | yes |  |
+| decided_by_principal_id | uuid | no |  |
+| decided_at | timestamptz | no |  |
+| reason | text | no |  |
+| production_client_id | uuid | no |  |
+| requested_at | timestamptz | no |  |
 
 ### `control.tenant`
 
@@ -1183,7 +1446,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-191 operations, added to this service in later releases without changing any of the above.
+194 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -1199,7 +1462,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | plan | `getPlan`, `listPlans` |
 | platform | `getScalingPolicy`, `listArchivalJobs`, `listBackupRuns`, `listWafRules`, `setScalingPolicy`, `setWafPolicy` |
 | platform-ops | `listDeadLetters`, `replayDeadLetter`, `skipRolloutCell` |
-| publicApi | `certifyIntegration`, `createSandbox`, `createWebhookSubscription`, `deprecateApiVersion`, `getApiUsage`, `issueApiToken`, `listApiClients`, `listApiVersions`, `listIntegrationListings`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `resetSandbox`, `revokeApiCredential`, `setApiClientStatus`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
+| publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listIntegrationListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiClientStatus`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
 | release | `createRelease`, `getRelease`, `getReleaseReadiness`, `listReleases`, `promoteRelease`, `rejectRelease`, `withdrawRelease` |
 | rollout | `getRollout`, `listRollouts`, `pauseRollout`, `rollbackRollout`, `startRollout` |
 | subscription | `actOnPartnerApplicationReview`, `actOnPartnerCase`, `actOnPartnerCommissionLine`, `actOnPartnerReconciliationException`, `actOnPartnerSettlementBatch`, `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerCase`, `createPartnerChangeRequest`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanRecommendations`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listModuleCatalogue`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setMembershipCommercialConfig`, `setMembershipUsagePolicy`, `setModuleListing`, `setPartnerAllocations`, `setPartnerCapabilityGrants`, `setPartnerCommissionRules`, `setPartnerContact`, `setPartnerCreditProfile`, `setPartnerDistributionRights`, `setPartnerSecurity`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |

@@ -1372,7 +1372,7 @@ CREATE TABLE IF NOT EXISTS access.operating_calendar_entry (
 -- A guest bought parking. Carries the plate where the mode is plateWhitelist — personal data,
 -- since a plate identifies a person Hangs off: reaches access.entitlement through its keys;
 -- references access.parking_facility, orders.sales_order, pii.subject. Reached by: 2 operations
--- read it and 2 write it.
+-- read it and 3 write it.
 CREATE TABLE IF NOT EXISTS access.parking_entitlement (
     id                                uuid PRIMARY KEY,
     facility_id                       uuid NOT NULL,

@@ -87,6 +87,7 @@ paths:
         - "P08 BO-034 Scan Activity"
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-latency-budget-ms: 300
       x-ticvai-audience:
       - staff
       summary: Validate media at an access point and admit or deny
@@ -141,6 +142,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ValidateRequest'
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
           headers:
             X-Consistency-Token:
@@ -169,6 +172,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       summary: Every entitlement this guest holds, including expired
       description: '**Raised in review 24 August** against `WEB-018`. `listMyEntitlements` returns what
         is currently usable; the web account page shows a history — used, expired, transferred away.
@@ -189,6 +195,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       - name: includeExpired
         in: query
         required: false
@@ -221,10 +228,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-018 My Tickets"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
         - "P02 GST-012 My Tickets"
         - "P02 GST-055 Dynamic QR Ticket"
         - "P04 POS-002 Sell — Ticket Catalogue"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Every ticket, pass and membership this guest holds
       description: '**Raised in review by Pranay and Deep, independently, on four screens.** `GST-012
         My Tickets`, `GST-013 Ticket Details`, `GST-019 Order History` and `WEB-018` each declared one
@@ -251,6 +261,7 @@ paths:
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       - name: state
         in: query
         schema:
@@ -302,6 +313,9 @@ paths:
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-055 Dynamic QR Ticket"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: One entitlement, with what remains on it
       description: '**Entries used against entries allowed, and the validity after any freeze.** A guest
         looking at a ten-entry pass wants the number left, and until `access.entitlement` existed nothing
@@ -353,6 +367,9 @@ paths:
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
         - "P02 GST-055 Dynamic QR Ticket"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: The thing that gets scanned
       description: 'The QR payload, wallet pass reference or wristband serial. **Separated from `getEntitlement`
         because it is the sensitive half** — a list of a guest''s tickets is a convenience, and the credential
@@ -462,6 +479,9 @@ paths:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-012 My Tickets"
         - "P02 GST-013 Ticket Details"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Every scan, freeze, share and reissue against it
       description: '**The screen a support agent opens when a guest says it did not work.** Scans with
         their outcome and deny reason, freezes with their dates, shares, reissues and the chain back through
@@ -762,6 +782,9 @@ paths:
       operationId: enrolFacePass
       x-ticvai-consumed-by:
         - "P02 GST-069 Face Pass"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -940,6 +963,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-069 Face Pass"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -978,6 +1004,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-069 Face Pass"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1014,6 +1043,9 @@ paths:
         - "P02 GST-027 Parking – Reserve & Pay"
         - "P02 GST-028 Parking – Reservation Confirmed"
         - "P08 BO-006 Parking Configuration"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -1139,9 +1171,103 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+  /internal/orders/{orderId}/entitlements:
+    parameters:
+    - name: orderId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    post:
+      operationId: issueOrderEntitlements
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '29 September: system-design review SD-026 (close the order, payment, ticket saga)'
+      summary: Issue the tickets for a paid order
+      description: '**The `order.paid` consumer, modelled as an operation so it has lineage and a ticket**
+        (system-design review SD-026, 29 September). AccessService owns `access.entitlement`, so it and nothing
+        else issues entitlements: never the order service, never catalogue. For each paid line it creates the
+        line''s entitlements from the product''s entitlement template (a parking line through the same path as
+        `createParkingEntitlement`), writes their ids back to the order line through the order service''s
+        `order.completed` step, and writes `entitlement.issued` to the outbox in the same transaction.
+
+
+        **Idempotent on order id + line id**: a redelivered `order.paid` finds the line''s entitlements already
+        issued and returns them unchanged. Invoked by the event relay with the event''s payload, never by a
+        screen. **A failure is retried, then dead-lettered, and a dead-lettered issuance pages** (the guest paid
+        and holds nothing); it is replayed, not compensated.
+
+        '
+      tags:
+      - validation
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-consumes:
+      - order.paid
+      x-ticvai-emits:
+      - entitlement.issued
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - lines
+              properties:
+                eventId:
+                  type: string
+                  description: The `order.paid` event id, for the consumer's inbox record.
+                lines:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                    - lineId
+                    - variantId
+                    - quantity
+                    properties:
+                      lineId:
+                        type: string
+                      variantId:
+                        type: string
+                        format: uuid
+                      quantity:
+                        type: integer
+                        minimum: 1
+                      performanceId:
+                        type: string
+                        format: uuid
+                        nullable: true
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The order's entitlements, issued now or already issued.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entitlement'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /parking-entitlements:
     post:
       operationId: createParkingEntitlement
+      security:
+      - serviceAuth: []
       x-ticvai-audience:
       - service
       x-ticvai-audience-note: '28 September: `guest` removed (decided 28 September, audit R166). The 24
@@ -1209,6 +1335,12 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-041 Parking – Reserve & Pay"
         - "P02 GST-027 Parking – Reserve & Pay"
+      x-ticvai-note: >-
+        **Self-scoped** (system-design review SD-055/SD-056, 29 September): a guest may change only a parking
+        entitlement whose `subjectId` is their own; another guest's id is refused.
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       summary: Change the plate, or revoke
@@ -1562,6 +1694,11 @@ paths:
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-060 Attendance & Footfall"
         - "P08 BO-207 Edge Package & Data Distribution"
+      x-ticvai-note: >-
+        **Entitlements and dynamic policy travel in the package** (system-design review SD-052, 29 September).
+        Built from `access.entitlement` and `access.dynamic_policy`. **A package may not miss a ticket sold seconds
+        earlier**: the caller passes the consistency token of the last `entitlement.issued` it heard of, and a
+        replica behind it is not used (the read goes to the primary). Delta by `sinceVersion`.
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1591,6 +1728,12 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: sinceVersion
+        in: query
+        description: The `entitlementsVersion` of the package the device holds; omitted, the whole package (SD-052).
+        schema:
+          type: integer
+      - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       - name: validFrom
         in: query
         required: true
@@ -11649,6 +11792,7 @@ paths:
       operationId: setEntryRulePoints
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
+      x-ticvai-conflict-policy: serverWins
       summary: Set the access points an admission rule covers
       description: >
         Set whole: a rule's coverage is decided as a set, and applying it point by point leaves
@@ -13718,6 +13862,9 @@ paths:
       x-ticvai-consumed-by:
         - "P02 GST-013 Ticket Details"
         - "P02 GST-055 Dynamic QR Ticket"
+      security:
+      - guestAuth: []
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - guest
       x-ticvai-agreed: '29 September: writers pass; writes the table listDeviceBindingSession and listDigitalCredentialSecurity
@@ -24443,8 +24590,21 @@ components:
         accessPointId:
           type: string
           format: uuid
+        entitlementsVersion:
+          type: integer
+          description: The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it
+            as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent
+            whole.
+        dynamicPolicies:
+          type: array
+          description: The active guest-admission dynamic policies for this access point's zones (SD-052), so
+            an offline gate applies the same rules as an online one.
+          items:
+            $ref: '#/components/schemas/AccessDynamicPolicy'
         entitlements:
           type: array
+          description: Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed
+            after it, including ones now void or used, so a device removes them.
           items:
             type: object
             required:
@@ -35950,6 +36110,21 @@ components:
           description: Advisory text only; any operational change goes through the normal permission and approval
             controls
   securitySchemes:
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
     bearerAuth:
       type: http
       scheme: bearer

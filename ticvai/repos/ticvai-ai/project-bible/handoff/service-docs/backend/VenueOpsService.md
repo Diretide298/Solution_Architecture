@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 63 of 274 |
+| Operations in the slice | 74 of 285 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -20,8 +20,9 @@
 | Service | Tables it reads |
 |---|---|
 | [AccessService](AccessService.md) | `access.access_point` |
-| [CatalogueService](CatalogueService.md) | `catalogue.product`, `promotions.promotion` |
+| [CatalogueService](CatalogueService.md) | `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.product`, `catalogue.product_eligibility_rule`, `catalogue.variant`, `promotions.bundle`, `promotions.promotion` |
 | [MarketingService](MarketingService.md) | `marketing.loyalty_position` |
+| [OrderService](OrderService.md) | `orders.cart`, `orders.cart_line` |
 | [TenancyService](TenancyService.md) | `platform.outlet`, `platform.scope` |
 
 ## Operations in the first release
@@ -31,7 +32,7 @@
 | asset | [`deleteMediaAsset`](#deletemediaasset) | DELETE | `/media/{mediaId}` | core | 2 | CMS-010, CMS-075 |
 | asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | BO-027, CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
 | asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 2 | BO-027, CMS-010, CMS-076, CMS-095 |
-| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 2 | BO-008, BO-838, CMS-010, CMS-061, CMS-062, CMS-067 … |
+| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 2 | BO-008, BO-094, BO-838, CMS-010, CMS-061, CMS-062 … |
 | asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 2 | CMS-010, CMS-075, CMS-082 |
 | card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 2 | BO-396, BO-454, BO-455, BO-457, BO-462, BO-486 … |
 | card | [`issueGameCard`](#issuegamecard) | POST | `/game-cards` | core | 1 | POS-002 |
@@ -52,26 +53,29 @@
 | favourite | [`saveFavouriteRoute`](#savefavouriteroute) | POST | `/transport/favourite-routes` | core | 3 | GST-077, WEB-049 |
 | feed | [`configureQueueFeed`](#configurequeuefeed) | PUT | `/queue-feeds` | setup | 1 | BO-001, BO-003 |
 | feed | [`getQueueFeedHealth`](#getqueuefeedhealth) | GET | `/queue-feeds/{feedId}/health` | core | 1 | BO-001, BO-003, POS-029 |
-| inspection | [`createInspectionTemplate`](#createinspectiontemplate) | POST | `/inspection-templates` | setup | 2 | EMP-048 |
+| inspection | [`createInspectionTemplate`](#createinspectiontemplate) | POST | `/inspection-templates` | setup | 1 | EMP-048 |
+| networkImport | [`applyTransportNetworkImport`](#applytransportnetworkimport) | POST | `/transport/network-imports/{importId}/apply` | setup | 3 | BO-1189 |
+| networkImport | [`importTransportNetwork`](#importtransportnetwork) | POST | `/transport/network-imports` | setup | 3 | BO-1189 |
+| pass | [`createTransportPassType`](#createtransportpasstype) | POST | `/transport/pass-types` | setup | 3 | BO-1188 |
 | pass | [`listTransportPassOffers`](#listtransportpassoffers) | GET | `/transport/pass-offers` | core | 3 | GST-078, WEB-049 |
 | queue | [`createQueue`](#createqueue) | POST | `/queues` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038 |
 | queue | [`getQueue`](#getqueue) | GET | `/queues/{queueId}` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
 | queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 2 | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 … |
 | queue | [`updateQueue`](#updatequeue) | PATCH | `/queues/{queueId}` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 |
 | resources | [`createResource`](#createresource) | POST | `/resources` | setup | 2 | BO-095, BO-857, BO-863 |
-| resources | [`createResourceBlock`](#createresourceblock) | POST | `/resource-blocks` | setup | 3 | BO-864, BO-870, BO-880, BO-910 |
+| resources | [`createResourceBlock`](#createresourceblock) | POST | `/resource-blocks` | setup | 2 | BO-864, BO-870, BO-880, BO-910 |
 | resources | [`createResourceHold`](#createresourcehold) | POST | `/resource-holds` | core | 3 | GST-074, WEB-047 |
 | resources | [`createResourcePackage`](#createresourcepackage) | POST | `/resource-packages` | setup | 3 | BO-861, BO-895, BO-918 |
 | resources | [`extendResourceHold`](#extendresourcehold) | POST | `/resource-holds/{holdId}/extend` | core | 3 | GST-074, WEB-047 |
 | resources | [`getMapResourceAvailability`](#getmapresourceavailability) | GET | `/resource-availability` | core | 3 | GST-074, WEB-047 |
-| resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 2 | BO-096, WEB-031 |
+| resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 2 | BO-096, BO-857, BO-866, WEB-031 |
 | resources | [`getResourceHold`](#getresourcehold) | GET | `/resource-holds/{holdId}` | core | 1 | GST-041, GST-074, WEB-010, WEB-047 |
 | resources | [`listProductStartTimes`](#listproductstarttimes) | GET | `/resource-start-times` | core | 3 | GST-075, WEB-048 |
-| resources | [`releaseResourceBlock`](#releaseresourceblock) | DELETE | `/resource-blocks/{blockId}` | setup | 3 | BO-870 |
+| resources | [`releaseResourceBlock`](#releaseresourceblock) | DELETE | `/resource-blocks/{blockId}` | setup | 2 | BO-870 |
 | resources | [`relinquishResourceHold`](#relinquishresourcehold) | DELETE | `/resource-holds/{holdId}` | core | 3 | GST-074, WEB-047 |
 | resources | [`setExperienceResourceRequirements`](#setexperienceresourcerequirements) | PUT | `/experiences/{experienceId}/resource-requirements` | setup | 3 | BO-877, BO-893 |
 | resources | [`setResourceSchedule`](#setresourceschedule) | PUT | `/resources/{resourceId}/schedule` | setup | 3 | BO-866, BO-867, BO-878 |
-| resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 2 | BO-857, BO-863 |
+| resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 2 | BO-857, BO-863, BO-866 |
 | resources | [`updateResourcePackage`](#updateresourcepackage) | PUT | `/resource-packages/{packageId}` | setup | 3 | BO-861 |
 | rights | [`getExpiringRights`](#getexpiringrights) | GET | `/media/rights-expiring` | core | 2 | CMS-010, CMS-081, CMS-088, CMS-090 |
 | route | [`createTransportRoute`](#createtransportroute) | POST | `/transport/routes` | setup | 3 | BO-1184 |
@@ -79,17 +83,25 @@
 | route | [`getTransportRouteMap`](#gettransportroutemap) | GET | `/transport/routes/{routeId}/map` | core | 3 | GST-077, WEB-049 |
 | route | [`listTransportRoutes`](#listtransportroutes) | GET | `/transport/routes` | core | 3 | BO-1184, BO-1185, BO-1186, BO-1187, BO-1188, GST-076 … |
 | route | [`updateTransportRoute`](#updatetransportroute) | PATCH | `/transport/routes/{routeId}` | setup | 3 | BO-1184 |
+| station | [`createTransportStation`](#createtransportstation) | POST | `/transport/stations` | setup | 3 | BO-1183 |
 | station | [`listTransportStations`](#listtransportstations) | GET | `/transport/stations` | core | 3 | BO-1183, BO-1184, GST-076, GST-078, WEB-049 |
+| timetable | [`createTransportTimetable`](#createtransporttimetable) | POST | `/transport/routes/{routeId}/timetables` | setup | 3 | BO-1186 |
+| timetable | [`publishTransportTimetable`](#publishtransporttimetable) | POST | `/transport/timetables/{timetableId}/publish` | setup | 3 | BO-1186 |
 | upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
 | upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
 | venueMap | [`createVenueMap`](#createvenuemap) | POST | `/venue-maps` | setup | 1 | BO-092 |
-| venueMap | [`getVenueMap`](#getvenuemap) | GET | `/venue-maps/{mapId}` | core | 2 | BO-094, EMP-030, GST-021, GST-074, WEB-039, WEB-047 |
+| venueMap | [`getVenueMap`](#getvenuemap) | GET | `/venue-maps/{mapId}` | core | 1 | BO-094, EMP-030, GST-004, GST-021, GST-074, WEB-039 … |
 | venueMap | [`getVenueMapGraph`](#getvenuemapgraph) | GET | `/venue-maps/{mapId}/graph` | core | 2 | BO-094, GST-021, WEB-039 |
 | venueMap | [`importVenueGeometry`](#importvenuegeometry) | POST | `/venue-maps/{mapId}/import` | setup | 1 | BO-093 |
 | venueMap | [`listBookableVenueMaps`](#listbookablevenuemaps) | GET | `/bookable-venue-maps` | core | 3 | GST-074, WEB-047 |
 | venueMap | [`publishVenueMap`](#publishvenuemap) | POST | `/venue-maps/{mapId}/publish` | setup | 1 | BO-094 |
-| venueMap | [`setPlacedResource`](#setplacedresource) | POST | `/venue-maps/{mapId}/resources` | setup | 2 | BO-094 |
+| venueMap | [`setPlacedResource`](#setplacedresource) | POST | `/venue-maps/{mapId}/resources` | setup | 1 | BO-094 |
 | venueMap | [`setVenuePoint`](#setvenuepoint) | POST | `/venue-maps/{mapId}/points` | setup | 1 | BO-094 |
+| visitPlan | [`bookVisitPlan`](#bookvisitplan) | POST | `/visit-plans/{planId}/booking` | core | 1 | GST-053, WEB-050 |
+| visitPlan | [`generateVisitPlan`](#generatevisitplan) | POST | `/visit-plans` | core | 1 | GST-051, GST-052, WEB-050 |
+| visitPlan | [`getVisitPlan`](#getvisitplan) | GET | `/visit-plans/{planId}` | core | 1 | GST-053, GST-054, GST-059, WEB-050 |
+| visitPlan | [`listVisitPlanAlternatives`](#listvisitplanalternatives) | GET | `/visit-plans/{planId}/items/{itemId}/alternatives` | core | 1 | GST-053, GST-059, WEB-050 |
+| visitPlan | [`updateVisitPlan`](#updatevisitplan) | PUT | `/visit-plans/{planId}` | core | 1 | GST-053, GST-054, GST-059, WEB-050 |
 | waitTime | [`getWaitTimes`](#getwaittimes) | GET | `/queues/wait-times` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
 
 ## Group: asset
@@ -326,7 +338,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | Read routing | replica |
 | Reads | `assets.media_asset` |
 | Writes | - |
-| Called by | BO-008, BO-838, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
+| Called by | BO-008, BO-094, BO-838, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
 
 **Parameters**
 
@@ -685,7 +697,7 @@ A damaged or lost card. The source moves to status `transferred`, with `transfer
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_collection`, `cache:idempotency` |
-| Writes | `assets.media_collection`, `cache:idempotency`, `assets.media_collection_member` |
+| Writes | `assets.media_collection`, `assets.media_collection_member`, `cache:idempotency` |
 | Called by | CMS-010, CMS-064 |
 
 **Parameters**
@@ -782,9 +794,9 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| departureId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| departureId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | performanceId | string (uuid) | yes |  |
-| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | routeCode | string |  | The price card's label, e.g. |
 | departsAt | string (date-time) | yes | At the boarding stop. |
 | arrivesAt | string (date-time) | yes | At the alighting stop. |
@@ -805,6 +817,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | The next departure |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
@@ -847,9 +860,9 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of DepartureOffer | yes |  |
-| items[].departureId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].departureId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].performanceId | string (uuid) | yes |  |
-| items[].routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].routeCode | string |  | The price card's label, e.g. |
 | items[].departsAt | string (date-time) | yes | At the boarding stop. |
 | items[].arrivesAt | string (date-time) | yes | At the alighting stop. |
@@ -881,6 +894,7 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Departures by departure time at the boarding stop |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
 
@@ -1160,8 +1174,8 @@ The passenger picker reads its types from here (adult, child, student, person of
 | perStopFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | perStopFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | matrix | array of object |  | matrix only. |
-| matrix[].fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| matrix[].toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | matrix[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
 | matrix[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | matrix[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1177,13 +1191,14 @@ The passenger picker reads its types from here (adult, child, student, person of
 | passengerTypes[].isDefault | boolean |  | The type a new search starts with, one of it. (default False) |
 | passengerTypes[].catalogueVariantId | string (uuid) |  | The variant of the route's trip product this type is sold as. (read-only) |
 | effectiveFrom | string (date-time) | yes |  |
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Fare table |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
@@ -1211,20 +1226,20 @@ Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| routeId | string |  | Omitted, the active route serving the two stations in this order. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string |  | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | passengers | array of object |  | Omitted, one of the default type. (max items 10) |
 | passengers[].code | string | yes |  |
 | passengers[].count | integer | yes | (min 0; max 99) |
-| passTypeId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| passTypeId | string |  | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | at | string (date-time) |  | The sale instant the fare table is read at. |
 
 **Response**: `FareQuote`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stopsTravelled | integer | yes | (min 1) |
 | adultFare | Money | yes | On the wire this is three fields; in the database it is one column. |
 | adultFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1242,7 +1257,7 @@ Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| passTypeId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| passTypeId | string |  | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | saving | Money |  | On the wire this is three fields; in the database it is one column. |
 | saving.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | saving.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1256,6 +1271,7 @@ Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Quote |
 | 422 |  | Stations not on the route or in the wrong order, an unknown passenger type, no passengers, or a pass type not offered on this route. |
 
@@ -1271,12 +1287,12 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 |---|---|
 | Permission | `TRANSPORT_PRICE` |
 | Scope level | venue |
-| Part of slice | setup, makes `transport.fare_passenger_type` non-empty |
+| Part of slice | setup, makes `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table` non-empty |
 | Wave | 3 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table` |
-| Writes | `transport.fare_passenger_type` |
+| Reads | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route` |
+| Writes | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table` |
 | Called by | BO-1185 |
 
 **Parameters**
@@ -1300,8 +1316,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | perStopFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | perStopFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | matrix | array of object |  | matrix only. |
-| matrix[].fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| matrix[].toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | matrix[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
 | matrix[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | matrix[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1332,8 +1348,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | perStopFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | perStopFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | matrix | array of object |  | matrix only. |
-| matrix[].fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| matrix[].toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | matrix[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
 | matrix[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | matrix[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1349,8 +1365,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | passengerTypes[].isDefault | boolean |  | The type a new search starts with, one of it. (default False) |
 | passengerTypes[].catalogueVariantId | string (uuid) |  | The variant of the route's trip product this type is sold as. (read-only) |
 | effectiveFrom | string (date-time) | yes |  |
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 
 **Responses**
 
@@ -1390,6 +1406,7 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 204 |  | Removed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
@@ -1425,10 +1442,10 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of FavouriteRoute | yes |  |
-| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].venueId | string (uuid) | yes |  |
-| items[].fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| items[].toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].fromStationName | string |  | (read-only) |
 | items[].toStationName | string |  | (read-only) |
 | items[].label | string |  | (nullable) |
@@ -1444,6 +1461,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Saved routes |
 | 401 | Unauthorized | Missing, expired or superseded session |
 
@@ -1461,8 +1479,8 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | Wave | 3 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `transport.favourite_route` |
-| Writes | - |
+| Reads | `transport.favourite_route`, `transport.station` |
+| Writes | `transport.favourite_route` |
 | Called by | GST-077, WEB-049 |
 
 **Parameters**
@@ -1484,10 +1502,10 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | venueId | string (uuid) | yes |  |
-| fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | fromStationName | string |  | (read-only) |
 | toStationName | string |  | (read-only) |
 | label | string |  | (nullable) |
@@ -1501,6 +1519,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Already saved; the existing favourite |
 | 201 |  | Saved |
 | 409 |  | The guest already has the maximum number of saved routes. |
@@ -1646,7 +1665,7 @@ Items may be marked safety-critical. **A failed safety-critical item blocks the 
 | Permission | `INSPECTION_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `maintenance.inspection_template` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -1715,7 +1734,214 @@ Items may be marked safety-critical. **A failed safety-critical item blocks the 
 | 201 |  | Created |
 
 
+## Group: networkImport
+
+### applyTransportNetworkImport
+
+**`POST /transport/network-imports/{importId}/apply`**: Apply a previewed import to the network
+
+**A person applies; the import never applies itself** (rev 3 REV3-21, the venue-map pattern). Writes the preview in one transaction: stations created or updated, routes created as `draft` with their stops, a `draft` route's stops replaced, and timetables created as `draft`. **Nothing goes on sale**: a route is still activated with `setTransportRouteStatus`, it still needs a fare table, and a timetable is still published with `publishTransportTimetable`.
+**An `active` route's stops are never changed by an import** — a sold ticket names its stops. The preview reports `routeActiveStopsChanged` and the apply skips that route's stops, as `updateTransportRoute` would refuse them.
+Refused `409` while the import has any `error` finding, is not `previewReady`, or the network changed after validation (the preview no longer describes what would happen; import the file again).
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.network_import` |
+| Writes | `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable`, `transport.timetable_run` |
+| Called by | BO-1189 |
+| State model | Transport network import ([states/transport-network-import.yaml](../../../states/transport-network-import.yaml)): moves `previewReady` -> `applied` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| importId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Response**: `TransportNetworkImport`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| venueId | string (uuid) | yes | (read-only) |
+| format | enum (csvBundle, gtfs) | yes |  |
+| sourceRef | string (uuid) | yes |  |
+| status | TransportNetworkImportStatus: enum (validating, previewReady, failed, applied, expired) | yes | validating → previewReady or failed; previewReady → applied, or expired after 7 days unapplied (proposed, client to correct). |
+| preview | object |  | What applying would write. (read-only; nullable) |
+| preview.stationsToCreate | integer |  | (min 0) |
+| preview.stationsToUpdate | integer |  | (min 0) |
+| preview.routesToCreate | integer |  | (min 0) |
+| preview.routesToUpdate | integer |  | (min 0) |
+| preview.stopsToWrite | integer |  | (min 0) |
+| preview.timetablesToCreate | integer |  | (min 0) |
+| findings | array of TransportNetworkImportFinding |  | (max items 1000; read-only) |
+| findings[].code | enum (nothingFound, fileMissing, headerMismatch, stationCodeDuplicate, stationCoordinatesMissing, routeCodeDuplicate, routeStopUnknownStation, routeOffsetsNotIncreasing, …) | yes | stationCoordinatesMissing is a warning (the station is listed and left off the map); routeActiveStopsChanged is a warning (those stops are skipped); every other code is an error and blocks the apply. |
+| findings[].severity | enum (error, warning) | yes |  |
+| findings[].file | string |  | e.g. (nullable) |
+| findings[].row | integer |  | (min 1; nullable) |
+| findings[].reference | string |  | The station (nullable) |
+| findings[].message | string | yes | (max length 500) |
+| createdBy | string (uuid) |  | (read-only) |
+| createdAt | string (date-time) |  | (read-only) |
+| appliedBy | string (uuid) |  | (read-only; nullable) |
+| appliedAt | string (date-time) |  | (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Applied, with what was written |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Not previewReady, has error findings, or the network changed since validation. |
+
+### importTransportNetwork
+
+**`POST /transport/network-imports`**: Read a network file into a preview
+
+**Bulk entry of a venue's network** — stations, routes with their ordered stops, and timetables — for an operator with more than a handful to type (decided 29 September, rev 3 REV3-21: the network is operator configuration entered in Venue Management, not an open value from the client). The same import-then-publish pattern as the venue map (`venue-map.importVenueGeometry`): **nothing is written to the network until a person applies the preview**, and applying never puts anything on sale.
+**Two formats.** `csvBundle`: a zip of four CSV files, header on row 1, UTF-8 — `stations.csv` (code, name, nameAr, latitude, longitude), `routes.csv` (code, lineCode, name, pairedRouteCode), `route_stops.csv` (routeCode, sequence, stationCode, offsetMinutes) and `timetables.csv` (routeCode, validFrom, validTo, daysOfWeek, departureTimes, seatCapacity). `gtfs`: a GTFS static feed (`stops.txt`, `routes.txt`, `trips.txt`, `stop_times.txt`, `calendar.txt`); stops become stations, each route and direction a route (the two directions paired), a representative trip's stop times the stop offsets, and the trips' first departure times by service calendar the timetable runs. **Fares are not imported** — they are set with `setTransportFareTable` by a holder of `TRANSPORT_PRICE`, the same separation as the permissions.
+**The file is uploaded first, through `assets`** (`createUpload`, the signed URL, `completeUpload`), and its `MediaAsset.id` is `sourceRef`, as for the venue map. Uploading needs `ASSET_LIBRARY_MANAGE` as well.
+**Returns `202` with the import, which is `validating`.** Poll `getTransportNetworkImport` until it is `previewReady` or `failed`. Stations match existing ones by `code` and routes by `code`: a match is an update, anything else is new. A file that yields no station, route or timetable is `failed` with `nothingFound`, never an empty success.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.network_import` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.network_import` |
+| Writes | `transport.network_import` |
+| Called by | BO-1189 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ImportTransportNetworkRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| format | enum (csvBundle, gtfs) | yes | A zip of the four CSV files described on importTransportNetwork, or a GTFS static feed. |
+| sourceRef | string (uuid) | yes | The uploaded file, as the MediaAsset.id from assets.completeUpload. |
+| include | array of enum (stations, routes, timetables) |  | Which parts of the file to read. |
+
+**Response**: `TransportNetworkImport`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| venueId | string (uuid) | yes | (read-only) |
+| format | enum (csvBundle, gtfs) | yes |  |
+| sourceRef | string (uuid) | yes |  |
+| status | TransportNetworkImportStatus: enum (validating, previewReady, failed, applied, expired) | yes | validating → previewReady or failed; previewReady → applied, or expired after 7 days unapplied (proposed, client to correct). |
+| preview | object |  | What applying would write. (read-only; nullable) |
+| preview.stationsToCreate | integer |  | (min 0) |
+| preview.stationsToUpdate | integer |  | (min 0) |
+| preview.routesToCreate | integer |  | (min 0) |
+| preview.routesToUpdate | integer |  | (min 0) |
+| preview.stopsToWrite | integer |  | (min 0) |
+| preview.timetablesToCreate | integer |  | (min 0) |
+| findings | array of TransportNetworkImportFinding |  | (max items 1000; read-only) |
+| findings[].code | enum (nothingFound, fileMissing, headerMismatch, stationCodeDuplicate, stationCoordinatesMissing, routeCodeDuplicate, routeStopUnknownStation, routeOffsetsNotIncreasing, …) | yes | stationCoordinatesMissing is a warning (the station is listed and left off the map); routeActiveStopsChanged is a warning (those stops are skipped); every other code is an error and blocks the apply. |
+| findings[].severity | enum (error, warning) | yes |  |
+| findings[].file | string |  | e.g. (nullable) |
+| findings[].row | integer |  | (min 1; nullable) |
+| findings[].reference | string |  | The station (nullable) |
+| findings[].message | string | yes | (max length 500) |
+| createdBy | string (uuid) |  | (read-only) |
+| createdAt | string (date-time) |  | (read-only) |
+| appliedBy | string (uuid) |  | (read-only; nullable) |
+| appliedAt | string (date-time) |  | (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Accepted; the file is being validated |
+| 400 | BadRequest | Validation failed |
+| 422 |  | The asset is not ready, not in this venue, or not a zip. |
+
+
 ## Group: pass
+
+### createTransportPassType
+
+**`POST /transport/pass-types`**: Define a multi-trip or unlimited pass
+
+**Creates the catalogue product** (kind `openDated`) whose entitlement carries `entriesAllowed` = `trips` (null for unlimited) and a validity of `validityDays` from first use or purchase. Each boarding with the pass consumes one entry at the driver's scan (`access`).
+**Pass types are the venue's own configuration** (decided 29 September, rev 3 REV3-21: the network is operator configuration). The prototype's four are seed data for the demo tenant, not a default: 5-trip, valid 30 days, ×4.5 the single fare; 10-trip, valid 60 days, ×8.5; weekly unlimited, 7 days, ×11 (compared with 14 trips); monthly unlimited, 30 days, ×38 (compared with 60 trips). A pass is valid between the two stations it was bought for, either direction.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_PRICE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.pass_type` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `transport.pass_type` |
+| Writes | `transport.pass_type` |
+| Called by | BO-1188 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreatePassTypeRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | (max length 32) |
+| name | LocalisedText | yes |  |
+| description | LocalisedText |  |  |
+| kind | enum (multiTrip, unlimited) | yes |  |
+| trips | integer |  | Journeys included. (min 2; max 100; nullable) |
+| fareMultiplier | number | yes | The pass price as a multiple of the single adult fare between its two stations. (min 0; max 1000) |
+| referenceTrips | integer | yes | The single trips the saving is measured against — trips for a multi-trip card, an number the venue sets for unlimited (14 a week, 60 a month in the demo seed data). (min 1; max 1000) |
+| validityDays | integer | yes | (min 1; max 366) |
+| routeIds | array of string |  | Routes it is sold on. |
+| sortOrder | integer |  | (min 0; default 0) |
+
+**Response**: `PassType`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | (max length 32) |
+| name | LocalisedText | yes |  |
+| description | LocalisedText |  |  |
+| kind | enum (multiTrip, unlimited) | yes |  |
+| trips | integer |  | Journeys included. (min 2; max 100; nullable) |
+| fareMultiplier | number | yes | The pass price as a multiple of the single adult fare between its two stations. (min 0; max 1000) |
+| referenceTrips | integer | yes | The single trips the saving is measured against — trips for a multi-trip card, an number the venue sets for unlimited (14 a week, 60 a month in the demo seed data). (min 1; max 1000) |
+| validityDays | integer | yes | (min 1; max 366) |
+| routeIds | array of string |  | Routes it is sold on. |
+| sortOrder | integer |  | (min 0; default 0) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| active | boolean | yes | (default True) |
+| catalogueProductId | string (uuid) |  | The catalogue openDated product this pass is sold as. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+| 400 | BadRequest | Validation failed |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 
 ### listTransportPassOffers
 
@@ -1750,9 +1976,9 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of PassOffer | yes |  |
-| items[].passTypeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].passTypeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].catalogueProductId | string (uuid) | yes |  |
-| items[].routeId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].routeId | string |  | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].name | string | yes |  |
 | items[].description | string |  |  |
 | items[].kind | enum (multiTrip, unlimited) |  |  |
@@ -1773,6 +1999,7 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Pass offers, by sortOrder |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
 
@@ -2181,7 +2408,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `platform.scope`, `resources.resource` |
+| Reads | `cache:idempotency`, `resources.resource` |
 | Writes | `cache:idempotency`, `resources.resource` |
 | Called by | BO-095, BO-857, BO-863 |
 | State model | Resource ([states/resource.yaml](../../../states/resource.yaml)): created as `available`; moves `available` -> `maintenance`, `maintenance` -> `retired`, `available` -> `retired` **(not settled: see the Gaps sheet)** |
@@ -2206,7 +2433,13 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | principalId | string (uuid) |  | For a resource of kind instructor or staff. (nullable) |
 | attributes | object |  | Configurable per kind — capacity, size, shade, power, poolside. |
 | setupMinutes | integer |  | Before the booking, not inside it. (default 0) |
-| teardownMinutes | integer |  | (default 0) |
+| teardownMinutes | integer |  | After the booking. (default 0) |
+| cleaningPolicy | object |  | How the resource is cleaned between uses (decided 29 September, W10). (nullable) |
+| cleaningPolicy.mode | enum (afterEveryBooking, timesPerDay) | yes |  |
+| cleaningPolicy.bufferMinutes | integer | yes | Minutes one cleaning takes. (min 5; max 240) |
+| cleaningPolicy.cleaningsPerDay | integer |  | Required for timesPerDay; ignored for afterEveryBooking. (min 1; max 24; nullable) |
+| cleaningPolicy.windowStart | string |  | Venue-local time the cleaning window opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| cleaningPolicy.windowEnd | string |  | Venue-local time the cleaning window closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
 | requiresQualification | array of string |  | Qualification codes a person must hold to be assigned to this. |
 | depositAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | depositAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -2229,7 +2462,13 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | principalId | string (uuid) |  | For a resource of kind instructor or staff. (nullable) |
 | attributes | object |  | Configurable per kind — capacity, size, shade, power, poolside. |
 | setupMinutes | integer |  | Before the booking, not inside it. (default 0) |
-| teardownMinutes | integer |  | (default 0) |
+| teardownMinutes | integer |  | After the booking. (default 0) |
+| cleaningPolicy | object |  | How the resource is cleaned between uses (decided 29 September, W10). (nullable) |
+| cleaningPolicy.mode | enum (afterEveryBooking, timesPerDay) | yes |  |
+| cleaningPolicy.bufferMinutes | integer | yes | Minutes one cleaning takes. (min 5; max 240) |
+| cleaningPolicy.cleaningsPerDay | integer |  | Required for timesPerDay; ignored for afterEveryBooking. (min 1; max 24; nullable) |
+| cleaningPolicy.windowStart | string |  | Venue-local time the cleaning window opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| cleaningPolicy.windowEnd | string |  | Venue-local time the cleaning window closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
 | requiresQualification | array of string |  | Qualification codes a person must hold to be assigned to this. |
 | depositAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | depositAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -2243,6 +2482,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 422 |  | A cleaningPolicy with timesPerDay and no cleaningsPerDay, or whose window ends before it starts (W10, 29 September). |
 
 ### createResourceBlock
 
@@ -2255,7 +2495,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Permission | `RESOURCE_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `resources.resource_block` non-empty |
-| Wave | 3 |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `resources.resource_block` |
@@ -2601,6 +2841,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 **Returns free windows, not a list of bookings for the caller to subtract.** A client computing availability from bookings will forget setup time, and a cabana booked 14:00–16:00 with a 30-minute turnaround is not free at 16:00.
 Includes maintenance windows and blackouts. **A resource under repair is unavailable for a different reason from one that is booked**, and the response says which — an operator looking for something free needs to know whether to wait or to look elsewhere.
 **Per resource.** A guest booking a meeting room never names one, so the start times they choose from come from `listProductStartTimes` (product, length variant, date), not from here (decided 29 September, rev 3 REV3-13).
+**Cleanings are subtracted** (decided 29 September, W10): each cleaning the resource's `cleaningPolicy` places in the window comes back as a blocked window with reason `cleaning`, placed as `ResourceCleaningPolicy` describes.
 
 |  |  |
 |---|---|
@@ -2612,9 +2853,9 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `maintenance.work_order`, `resources.booking`, `resources.resource` |
+| Reads | `maintenance.work_order`, `resources.booking`, `resources.resource`, `resources.resource_block`, `resources.resource_hold` |
 | Writes | - |
-| Called by | BO-096, WEB-031 |
+| Called by | BO-096, BO-857, BO-866, WEB-031 |
 
 **Parameters**
 
@@ -2635,7 +2876,7 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | blockedWindows | array of object |  | With a reason, because they are not the same. |
 | blockedWindows[].from | string (date-time) |  |  |
 | blockedWindows[].to | string (date-time) |  |  |
-| blockedWindows[].reason | enum (booked, held, setup, teardown, maintenance, blackout, closed) |  | held is a live ResourceHold (rev 3 REV3-15): taken now, free again if it expires. |
+| blockedWindows[].reason | enum (booked, held, setup, teardown, maintenance, blackout, closed, cleaning) |  | held is a live ResourceHold (rev 3 REV3-15): taken now, free again if it expires. |
 
 **Responses**
 
@@ -2705,6 +2946,7 @@ The countdown's source of truth, as `seating.getSeatHold`.
 
 **The guest's start-time step for a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). A guest never names a room, so `getResourceAvailability`, which is per resource, cannot answer them. Given the product (a room type such as *boardroom*, `catalogue.Product.requiresTimeWindow` true), the chosen length variant and a date, this returns every start time at which **at least one resource satisfying the product's resource requirements** (`setExperienceResourceRequirements`, the experience being the product) is free for the variant's `durationMinutes`, setup and teardown included, with live bookings, resource holds and cart windows already counted as taken. `freeCount` says how many.
 Start times fall on `stepMinutes` from the venue's opening on that date, and a window must end by its close. The chosen start becomes the cart line's `bookedWindow`; `allocateResources` picks the room at checkout. **Display only**, like any availability read: the cart line is what holds.
+**Date, start and duration are checked together** (decided 29 September, W9 and W10). A start is offered only when a room is free for the whole of `startsAt` to `startsAt + durationMinutes`, plus its setup, teardown and `cleaningPolicy`: an `afterEveryBooking` buffer must fit after the window, and with `timesPerDay` every cleaning of the date must still be placeable once the window is taken. `freeCount` counts only rooms that pass all three.
 
 |  |  |
 |---|---|
@@ -2759,7 +3001,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | Permission | `RESOURCE_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `resources.resource_block` non-empty |
-| Wave | 3 |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `resources.resource_block` |
@@ -2955,7 +3197,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Conflict policy | serverWins |
 | Reads | `resources.resource` |
 | Writes | `resources.resource` |
-| Called by | BO-857, BO-863 |
+| Called by | BO-857, BO-863, BO-866 |
 
 **Parameters**
 
@@ -2978,7 +3220,13 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | principalId | string (uuid) |  | For a resource of kind instructor or staff. (nullable) |
 | attributes | object |  | Configurable per kind — capacity, size, shade, power, poolside. |
 | setupMinutes | integer |  | Before the booking, not inside it. (default 0) |
-| teardownMinutes | integer |  | (default 0) |
+| teardownMinutes | integer |  | After the booking. (default 0) |
+| cleaningPolicy | object |  | How the resource is cleaned between uses (decided 29 September, W10). (nullable) |
+| cleaningPolicy.mode | enum (afterEveryBooking, timesPerDay) | yes |  |
+| cleaningPolicy.bufferMinutes | integer | yes | Minutes one cleaning takes. (min 5; max 240) |
+| cleaningPolicy.cleaningsPerDay | integer |  | Required for timesPerDay; ignored for afterEveryBooking. (min 1; max 24; nullable) |
+| cleaningPolicy.windowStart | string |  | Venue-local time the cleaning window opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| cleaningPolicy.windowEnd | string |  | Venue-local time the cleaning window closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
 | requiresQualification | array of string |  | Qualification codes a person must hold to be assigned to this. |
 | depositAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | depositAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -3001,7 +3249,13 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | principalId | string (uuid) |  | For a resource of kind instructor or staff. (nullable) |
 | attributes | object |  | Configurable per kind — capacity, size, shade, power, poolside. |
 | setupMinutes | integer |  | Before the booking, not inside it. (default 0) |
-| teardownMinutes | integer |  | (default 0) |
+| teardownMinutes | integer |  | After the booking. (default 0) |
+| cleaningPolicy | object |  | How the resource is cleaned between uses (decided 29 September, W10). (nullable) |
+| cleaningPolicy.mode | enum (afterEveryBooking, timesPerDay) | yes |  |
+| cleaningPolicy.bufferMinutes | integer | yes | Minutes one cleaning takes. (min 5; max 240) |
+| cleaningPolicy.cleaningsPerDay | integer |  | Required for timesPerDay; ignored for afterEveryBooking. (min 1; max 24; nullable) |
+| cleaningPolicy.windowStart | string |  | Venue-local time the cleaning window opens. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| cleaningPolicy.windowEnd | string |  | Venue-local time the cleaning window closes. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
 | requiresQualification | array of string |  | Qualification codes a person must hold to be assigned to this. |
 | depositAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | depositAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -3015,6 +3269,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 422 |  | A cleaningPolicy with timesPerDay and no cleaningsPerDay, or whose window ends before it starts (W10, 29 September). |
 
 ### updateResourcePackage
 
@@ -3158,12 +3413,12 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 |---|---|
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `transport.route_stop` non-empty |
+| Part of slice | setup, makes `transport.route`, `transport.route_stop` non-empty |
 | Wave | 3 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.route`, `transport.route_stop`, `transport.station` |
-| Writes | `transport.route_stop` |
+| Writes | `transport.route`, `transport.route_stop` |
 | Called by | BO-1184 |
 | State model | Transport route ([states/transport-route.yaml](../../../states/transport-route.yaml)): created as `draft` |
 
@@ -3185,7 +3440,7 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 | pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | stops | array of RouteStopInput | yes | (min items 2; max items 100) |
-| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
@@ -3202,11 +3457,11 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 | pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | stops | array of RouteStop | yes |  |
-| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
-| stops[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].sequence | integer | yes | 1 for the origin. (min 1) |
 | stops[].station | Station |  |  |
 | stops[].station.venueId | string (uuid) | yes |  |
@@ -3215,9 +3470,9 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 | stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
 | stops[].station.latitude | number |  | (min -90; max 90; nullable) |
 | stops[].station.longitude | number |  | (min -180; max 180; nullable) |
-| stops[].station.id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].station.id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].station.active | boolean | yes | (default True) |
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
 | totalMinutes | integer |  | The last stop's offset. (read-only) |
 | catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
@@ -3269,11 +3524,11 @@ The stop list from origin to end. A guest or public caller gets 404 for a route 
 | pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | stops | array of RouteStop | yes |  |
-| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
-| stops[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].sequence | integer | yes | 1 for the origin. (min 1) |
 | stops[].station | Station |  |  |
 | stops[].station.venueId | string (uuid) | yes |  |
@@ -3282,9 +3537,9 @@ The stop list from origin to end. A guest or public caller gets 404 for a route 
 | stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
 | stops[].station.latitude | number |  | (min -90; max 90; nullable) |
 | stops[].station.longitude | number |  | (min -180; max 180; nullable) |
-| stops[].station.id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].station.id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].station.active | boolean | yes | (default True) |
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
 | totalMinutes | integer |  | The last stop's offset. (read-only) |
 | catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
@@ -3294,6 +3549,7 @@ The stop list from origin to end. A guest or public caller gets 404 for a route 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Route |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
@@ -3329,11 +3585,11 @@ The stop list from departure to arrival and the street map beside it (decided 29
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lineCode | string |  |  |
 | colour | string |  |  |
 | stops | array of object | yes | Every stop in route order. |
-| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].sequence | integer | yes |  |
 | stops[].name | string | yes | Localised to the caller. |
 | stops[].shortName | string |  |  |
@@ -3354,6 +3610,7 @@ The stop list from departure to arrival and the street map beside it (decided 29
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Route map |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | A station is not on this route, or the alighting stop comes before the boarding stop. |
@@ -3402,14 +3659,14 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | items[].pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | items[].bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | items[].stops | array of RouteStop | yes |  |
-| items[].stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | items[].stops[].boardingAllowed | boolean |  | (default True) |
 | items[].stops[].alightingAllowed | boolean |  | (default True) |
-| items[].stops[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].stops[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].stops[].sequence | integer | yes | 1 for the origin. (min 1) |
 | items[].stops[].station | Station |  |  |
-| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
 | items[].totalMinutes | integer |  | The last stop's offset. (read-only) |
 | items[].catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
@@ -3421,6 +3678,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Routes |
 
 ### updateTransportRoute
@@ -3433,12 +3691,12 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 |---|---|
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `transport.route_stop` non-empty |
+| Part of slice | setup, makes `transport.route`, `transport.route_stop` non-empty |
 | Wave | 3 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.route`, `transport.route_stop`, `transport.station` |
-| Writes | `transport.route_stop` |
+| Writes | `transport.route`, `transport.route_stop` |
 | Called by | BO-1184 |
 
 **Parameters**
@@ -3457,7 +3715,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | pairedRouteId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | bookingCutoffMinutes | integer |  | (min 0; max 1440) |
 | stops | array of RouteStopInput |  | (min items 2) |
-| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
@@ -3474,11 +3732,11 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | stops | array of RouteStop | yes |  |
-| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
-| stops[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].sequence | integer | yes | 1 for the origin. (min 1) |
 | stops[].station | Station |  |  |
 | stops[].station.venueId | string (uuid) | yes |  |
@@ -3487,9 +3745,9 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
 | stops[].station.latitude | number |  | (min -90; max 90; nullable) |
 | stops[].station.longitude | number |  | (min -180; max 180; nullable) |
-| stops[].station.id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].station.id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | stops[].station.active | boolean | yes | (default True) |
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
 | totalMinutes | integer |  | The last stop's offset. (read-only) |
 | catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
@@ -3506,6 +3764,62 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 
 
 ## Group: station
+
+### createTransportStation
+
+**`POST /transport/stations`**: Add a station
+
+Venue Management transport setup (decided 29 September, rev 3 REV3-21). **A station carries coordinates** because the route map places it; a station without them is shown in the stop list and left off the map.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.station` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.station` |
+| Writes | `transport.station` |
+| Called by | BO-1183 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateStationRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | Short operator code, e.g. (max length 32) |
+| name | LocalisedText | yes |  |
+| shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
+| latitude | number |  | (min -90; max 90; nullable) |
+| longitude | number |  | (min -180; max 180; nullable) |
+
+**Response**: `Station`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | Short operator code, e.g. (max length 32) |
+| name | LocalisedText | yes |  |
+| shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
+| latitude | number |  | (min -90; max 90; nullable) |
+| longitude | number |  | (min -180; max 180; nullable) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| active | boolean | yes | (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+| 400 | BadRequest | Validation failed |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 
 ### listTransportStations
 
@@ -3547,7 +3861,7 @@ The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or 
 | items[].shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
 | items[].latitude | number |  | (min -90; max 90; nullable) |
 | items[].longitude | number |  | (min -180; max 180; nullable) |
-| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].active | boolean | yes | (default True) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
@@ -3556,7 +3870,136 @@ The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Stations |
+
+
+## Group: timetable
+
+### createTransportTimetable
+
+**`POST /transport/routes/{routeId}/timetables`**: Draft a timetable for a route
+
+Departure times from the route's origin by day of week, valid over a date range. Created as `draft`; nothing is on sale until it is published.
+**The timetable is the venue's own configuration**, drafted here or with `importTransportNetwork` (decided 29 September, rev 3 REV3-21: the network is operator configuration). The prototype's 23 daily departures from 05:30 to 00:15 are seed data for the demo tenant, not a default.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.timetable` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.route`, `transport.timetable`, `transport.timetable_run` |
+| Writes | `transport.timetable`, `transport.timetable_run` |
+| Called by | BO-1186 |
+| State model | Transport timetable ([states/transport-timetable.yaml](../../../states/transport-timetable.yaml)): created as `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| routeId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateTimetableRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 120) |
+| validFrom | string (date) | yes |  |
+| validTo | string (date) |  | (nullable) |
+| releaseHorizonDays | integer |  | How many days ahead departures go on sale. (min 1; max 365; default 30) |
+| seatCapacity | integer | yes | Seats per departure, unless a departure overrides it. (min 1; max 200) |
+| seatMapId | string (uuid) |  | The coach seat map for Seat Selection (seating). (nullable) |
+| runs | array of TimetableRun | yes | (min items 1; max items 500) |
+| runs[].departsAt | string | yes | Venue local time, 24-hour HH:MM, at the route's first stop. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| runs[].days | array of enum (mon, tue, wed, thu, fri, sat, sun) | yes | (min items 1) |
+
+**Response**: `Timetable`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 120) |
+| validFrom | string (date) | yes |  |
+| validTo | string (date) |  | (nullable) |
+| releaseHorizonDays | integer |  | How many days ahead departures go on sale. (min 1; max 365; default 30) |
+| seatCapacity | integer | yes | Seats per departure, unless a departure overrides it. (min 1; max 200) |
+| seatMapId | string (uuid) |  | The coach seat map for Seat Selection (seating). (nullable) |
+| runs | array of TimetableRun | yes | (min items 1; max items 500) |
+| runs[].departsAt | string | yes | Venue local time, 24-hour HH:MM, at the route's first stop. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| runs[].days | array of enum (mon, tue, wed, thu, fri, sat, sun) | yes | (min items 1) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| status | TransportTimetableStatus: enum (draft, published, superseded, withdrawn) | yes |  |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| releasedThrough | string (date) |  | The last date whose departures have been generated. (read-only; nullable) |
+| supersededById | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created as draft |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### publishTransportTimetable
+
+**`POST /transport/timetables/{timetableId}/publish`**: Publish a timetable and release its departures
+
+**Generates the departures** for every date from `validFrom` to today plus `releaseHorizonDays` (proposed default 30, the prototype's "Timetables are released 30 days ahead", client to correct (rev 3 REV3-21)), and a nightly job releases one more day after that. Each departure is created as a catalogue performance under the route's event with `seatCapacity` as its channel capacity (`createPerformances`, `createChannelCapacity`), and goes on sale.
+**A published timetable whose dates overlap this one is superseded from this one's `validFrom`**; its departures before that date are untouched, and its unsold departures on or after it are removed. **A departure with sold seats is never removed** — the publish is refused with a 409 listing them, and they are cancelled (`cancelPerformance`) or the new `validFrom` moved.
+The route must be `active` and have a fare table.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.departure`, `transport.timetable` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.timetable`, `transport.timetable_run` |
+| Writes | `transport.departure`, `transport.timetable` |
+| Called by | BO-1186 |
+| State model | Transport timetable ([states/transport-timetable.yaml](../../../states/transport-timetable.yaml)): moves `draft` -> `published`, `published` -> `superseded` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| timetableId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Response**: `Timetable`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 120) |
+| validFrom | string (date) | yes |  |
+| validTo | string (date) |  | (nullable) |
+| releaseHorizonDays | integer |  | How many days ahead departures go on sale. (min 1; max 365; default 30) |
+| seatCapacity | integer | yes | Seats per departure, unless a departure overrides it. (min 1; max 200) |
+| seatMapId | string (uuid) |  | The coach seat map for Seat Selection (seating). (nullable) |
+| runs | array of TimetableRun | yes | (min items 1; max items 500) |
+| runs[].departsAt | string | yes | Venue local time, 24-hour HH:MM, at the route's first stop. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| runs[].days | array of enum (mon, tue, wed, thu, fri, sat, sun) | yes | (min items 1) |
+| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| status | TransportTimetableStatus: enum (draft, published, superseded, withdrawn) | yes |  |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| releasedThrough | string (date) |  | The last date whose departures have been generated. (read-only; nullable) |
+| supersededById | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Published, with the number of departures released |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Not a draft, the route is not active or has no fare table, or a superseded timetable has departures with sold seats on or after this validFrom. |
 
 
 ## Group: upload
@@ -3822,14 +4265,14 @@ A venue may have several — **a park map and a floor plan per building are diff
 | Permission | `VENUE_MAP_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
 | Reads | `assets.media_asset`, `venuemap.map`, `venuemap.path`, `venuemap.placed_resource`, `venuemap.point` |
 | Writes | - |
-| Called by | BO-094, EMP-030, GST-021, GST-074, WEB-039, WEB-047 |
+| Called by | BO-094, EMP-030, GST-004, GST-021, GST-074, WEB-039, WEB-047 |
 
 **Parameters**
 
@@ -3881,6 +4324,19 @@ A venue may have several — **a park map and a floor plan per building are diff
 | points[].isActive | boolean |  | (default True) |
 | points[].isNavigable | boolean |  | Whether a route may pass through it. (default True) |
 | points[].isDestination | boolean |  | Whether a guest may be routed *to* it, and whether it appears in a list of places. (default True) |
+| points[].description | object |  | What the guest reads on Item Detail (29 September, MOB-4). (nullable) |
+| points[].media | array of object |  | The gallery on Item Detail (29 September, MOB-4): images and short clips from the asset library, first isPrimary shown on the map card. (max items 12) |
+| points[].media[].assetId | string (uuid) | yes |  |
+| points[].media[].kind | enum (image, video) | yes |  |
+| points[].media[].isPrimary | boolean |  | (default False) |
+| points[].media[].altText | string |  | (max length 200; nullable) |
+| points[].featuredOffer | object |  | The product card on Item Detail, for every kind of point (29 September, MOB-4). (nullable) |
+| points[].featuredOffer.kind | enum (product, bundle) | yes |  |
+| points[].featuredOffer.id | string (uuid) | yes | The catalogue.product id or the promotions.bundle id, by kind. |
+| points[].featuredOffer.label | string |  | The button text, e.g. (max length 40; nullable) |
+| points[].typicalDurationMinutes | integer |  | How long a visit to this point usually takes, ride time and queue excluded (29 September, MOB-6). (min 1; max 600; nullable) |
+| points[].interestTags | array of enum (thrill, family, kids, water, animals, shows, culture, shopping, …) |  | What a guest who says they like this would like here (29 September, MOB-6): the planner matches the guest's interests against these. (max items 12) |
+| points[].cuisineTags | array of string |  | For dining points (restaurant, cafe, kiosk; 29 September, MOB-6). (max items 8) |
 | paths | array of VenuePath |  |  |
 | paths[].id | string (uuid) | yes | (read-only) |
 | paths[].mapId | string (uuid) | yes | From the path of the operation that writes the path. (read-only) |
@@ -3990,7 +4446,7 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 |---|---|
 | Permission | `VENUE_MAP_MANAGE` |
 | Scope level | venue |
-| Part of slice | setup, makes `venuemap.path`, `venuemap.point` non-empty |
+| Part of slice | setup, makes `venuemap.import_job`, `venuemap.path`, `venuemap.point` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -4205,7 +4661,7 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 | Permission | `VENUE_MAP_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `venuemap.placed_resource` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `venuemap.placed_resource` |
@@ -4289,7 +4745,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `access.access_point`, `cache:idempotency`, `catalogue.product`, `platform.outlet`, `venuemap.map`, `venuemap.point` |
+| Reads | `access.access_point`, `assets.media_asset`, `cache:idempotency`, `catalogue.product`, `platform.outlet`, `promotions.bundle`, `venuemap.map`, `venuemap.point` |
 | Writes | `cache:idempotency`, `venuemap.point` |
 | Called by | BO-094 |
 
@@ -4321,6 +4777,19 @@ Unlinked points are fine and expected — a toilet is a toilet.
 | isActive | boolean |  | (default True) |
 | isNavigable | boolean |  | Whether a route may pass through it. (default True) |
 | isDestination | boolean |  | Whether a guest may be routed *to* it, and whether it appears in a list of places. (default True) |
+| description | object |  | What the guest reads on Item Detail (29 September, MOB-4). (nullable) |
+| media | array of object |  | The gallery on Item Detail (29 September, MOB-4): images and short clips from the asset library, first isPrimary shown on the map card. (max items 12) |
+| media[].assetId | string (uuid) | yes |  |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean |  | (default False) |
+| media[].altText | string |  | (max length 200; nullable) |
+| featuredOffer | object |  | The product card on Item Detail, for every kind of point (29 September, MOB-4). (nullable) |
+| featuredOffer.kind | enum (product, bundle) | yes |  |
+| featuredOffer.id | string (uuid) | yes | The catalogue.product id or the promotions.bundle id, by kind. |
+| featuredOffer.label | string |  | The button text, e.g. (max length 40; nullable) |
+| typicalDurationMinutes | integer |  | How long a visit to this point usually takes, ride time and queue excluded (29 September, MOB-6). (min 1; max 600; nullable) |
+| interestTags | array of enum (thrill, family, kids, water, animals, shows, culture, shopping, …) |  | What a guest who says they like this would like here (29 September, MOB-6): the planner matches the guest's interests against these. (max items 12) |
+| cuisineTags | array of string |  | For dining points (restaurant, cafe, kiosk; 29 September, MOB-6). (max items 8) |
 | pointId | string (uuid) |  | The point to amend. (nullable) |
 
 **Response**: `VenuePoint`
@@ -4344,6 +4813,19 @@ Unlinked points are fine and expected — a toilet is a toilet.
 | isActive | boolean |  | (default True) |
 | isNavigable | boolean |  | Whether a route may pass through it. (default True) |
 | isDestination | boolean |  | Whether a guest may be routed *to* it, and whether it appears in a list of places. (default True) |
+| description | object |  | What the guest reads on Item Detail (29 September, MOB-4). (nullable) |
+| media | array of object |  | The gallery on Item Detail (29 September, MOB-4): images and short clips from the asset library, first isPrimary shown on the map card. (max items 12) |
+| media[].assetId | string (uuid) | yes |  |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean |  | (default False) |
+| media[].altText | string |  | (max length 200; nullable) |
+| featuredOffer | object |  | The product card on Item Detail, for every kind of point (29 September, MOB-4). (nullable) |
+| featuredOffer.kind | enum (product, bundle) | yes |  |
+| featuredOffer.id | string (uuid) | yes | The catalogue.product id or the promotions.bundle id, by kind. |
+| featuredOffer.label | string |  | The button text, e.g. (max length 40; nullable) |
+| typicalDurationMinutes | integer |  | How long a visit to this point usually takes, ride time and queue excluded (29 September, MOB-6). (min 1; max 600; nullable) |
+| interestTags | array of enum (thrill, family, kids, water, animals, shows, culture, shopping, …) |  | What a guest who says they like this would like here (29 September, MOB-6): the planner matches the guest's interests against these. (max items 12) |
+| cuisineTags | array of string |  | For dining points (restaurant, cafe, kiosk; 29 September, MOB-6). (max items 8) |
 
 **Responses**
 
@@ -4351,6 +4833,439 @@ Unlinked points are fine and expected — a toilet is a toilet.
 |---|---|---|
 | 200 |  | Placed |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+
+
+## Group: visitPlan
+
+### bookVisitPlan
+
+**`POST /visit-plans/{planId}/booking`**: Book this plan — turn it into cart lines
+
+**"Book this plan"** (29 September, MOB-6). For each item that is bought (an admission per day, a timed attraction, a show performance, a meal combo, an accepted Fast Track add-on) the server adds a line to the guest's cart **by the orders service's `addCartLine`, with its rules unchanged**: the 15-minute lease, the capacity refusal, the seat limit, the info-only refusal. Free items (a walk-up ride, a toilet, a photo spot) add nothing. Quantities come from the party: one admission per person by their age band's variant.
+**The cart handoff.** With `cartId`, lines are added to that cart; without it a cart is created for the venue and the guest channel (`orders.createCart`), exactly as the Buy tickets button would. The response is the cart id, the lines added and each item that could not be added with the `addCartLine` refusal it met (`soldOutForSession`, `productInfoOnly`, ...). **A partly booked plan is still a success**: the guest goes to GST-041 with what was added and the plan marks the rest, rather than losing the whole plan to one sold-out show. Nothing is paid here; checkout is `orders.checkoutCart`.
+The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets shows what was bought. `baseVersion` must be current (409 as `updateVisitPlan`).
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `orders.cart`, `orders.cart_line`, `promotions.bundle`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
+| Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart`, `orders.cart_line`, `venuemap.visit_plan` |
+| Called by | GST-053, WEB-050 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| planId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| baseVersion | integer | yes | The version the guest is looking at. (min 1) |
+| cartId | string (uuid) |  | The guest's open cart. (nullable) |
+| itemIds | array of string (uuid) |  | Only these items. |
+| includeAddOns | boolean |  | Also add the add-ons the guest accepted on the plan (VisitPlanItem.addOnAccepted). (default True) |
+
+**Response**: `VisitPlanBooking`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| planId | string (uuid) | yes |  |
+| cartId | string (uuid) | yes |  |
+| added | array of object | yes |  |
+| added[].itemId | string (uuid) |  |  |
+| added[].cartLineId | string (uuid) |  |  |
+| added[].leaseExpiresAt | string (date-time) |  | (nullable) |
+| notAdded | array of object | yes | Items that could not be added, with the addCartLine refusal each met. |
+| notAdded[].itemId | string (uuid) |  |  |
+| notAdded[].reason | string |  | The orders CartProblem code, e.g. |
+| freeItems | integer |  | Stops that need nothing bought. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Lines added, and what could not be |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | baseVersion is not current (plan-version-conflict), or the cart is not the caller's or is no longer open (cart-not-open). |
+| 422 |  | Nothing on the plan could be added (nothing-bookable); the problem lists each item's refusal, so the guest is told why rather than taken to an empty cart. |
+
+### generateVisitPlan
+
+**`POST /visit-plans`**: Build a visit plan from the party, the dates and what they like
+
+**The Plan tab's first answer, and it needs no AI** (29 September, MOB-6). The guest gives party size, each person's height or age, the dates, the pace (packed or relaxed), interests and cuisines; the planner returns one itinerary per day with timed items and add-ons such as Fast Track.
+**Rules, in order.** (1) Candidates: the venue's published map points that are destinations and have a `typicalDurationMinutes`, and the dated performances on each day. (2) Eligibility: a ride whose product's `catalogue.ProductEligibilityRule` excludes anyone in the party by height or age is dropped, and the reason is kept on the plan (`excluded`). (3) Scoring: interest tags matched, then the venue's featured order. (4) Layout: from opening time, the next item is the best-scoring one reachable by walking time over the published graph (`venuemap.path`), with the typical wait for that hour and its duration; a meal is placed at a cuisine-matched dining point around 12:30 and 19:00; `relaxed` leaves a 30-minute gap after every two items and stops by 18:00, `packed` fills to closing. (5) Add-ons: where the expected wait on a planned ride exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that item, never added.
+**The same inputs give the same plan**, so the guest can trust that a regenerate changes only what they changed. `presetKey` (or the older `preset`) gives the ready-made day plans of GST-052 (the same rules with preset interests and pace). **The AI planner agent refines a plan; it does not make the first one** (ai `requestSuggestion` kind `itinerary`): when AI is off or fails, this answer is the plan.
+**Owned by the guest session**, as a cart is: a signed-in guest's plan is theirs, an anonymous one is bound to the device session and claimed on sign-in. Nothing is held or sold here; `bookVisitPlan` turns the plan into cart lines.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `cache:idempotency`, `catalogue.performance`, `catalogue.product`, `catalogue.product_eligibility_rule`, `catalogue.variant`, `queue.reading`, `venuemap.map`, `venuemap.path`, `venuemap.point`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
+| Writes | `cache:idempotency`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
+| Called by | GST-051, GST-052, WEB-050 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `VisitPlanRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| dates | array of string (date) | yes | (min items 1; max items 7) |
+| party | array of object | yes | One entry per person. (min items 1; max items 20) |
+| party[].heightCm | integer |  | (min 40; max 230; nullable) |
+| party[].ageYears | integer |  | (min 0; max 120; nullable) |
+| pace | enum (packed, relaxed) |  | (default relaxed) |
+| interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
+| cuisineTags | array of string |  | (max items 8) |
+| mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
+| presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
+| startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| locale | string |  | (nullable) |
+
+**Response**: `VisitPlan`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| venueId | string (uuid) | yes |  |
+| scopePath | string |  | Derived from venueId. (read-only) |
+| subjectId | string (uuid) |  | The signed-in guest. (read-only; nullable) |
+| sessionRef | string |  | The anonymous device session that owns the plan until sign-in. (read-only; nullable) |
+| status | enum (draft, booked, archived) | yes | booked after bookVisitPlan; a booked plan is read-only. (read-only) |
+| version | integer | yes | The current version. (min 1; read-only) |
+| source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
+| inputs | VisitPlanRequest |  | What generateVisitPlan takes (29 September, MOB-6): the Plan tab's form on GST-051 and WEB-050. |
+| inputs.venueId | string (uuid) | yes |  |
+| inputs.dates | array of string (date) | yes | (min items 1; max items 7) |
+| inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
+| inputs.party[].heightCm | integer |  | (min 40; max 230; nullable) |
+| inputs.party[].ageYears | integer |  | (min 0; max 120; nullable) |
+| inputs.pace | enum (packed, relaxed) |  | (default relaxed) |
+| inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
+| inputs.cuisineTags | array of string |  | (max items 8) |
+| inputs.mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| inputs.preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
+| inputs.presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
+| inputs.startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| inputs.locale | string |  | (nullable) |
+| mapVersion | integer |  | The published map version the plan was laid out on. (read-only) |
+| cartId | string (uuid) |  | The cart bookVisitPlan filled. (read-only; nullable) |
+| excluded | array of object |  | What was left out and why, e.g. (read-only) |
+| excluded[].pointId | string (uuid) |  |  |
+| excluded[].productId | string (uuid) |  | (nullable) |
+| excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime) |  |  |
+| days | array of object | yes | One per date, in order. (read-only) |
+| days[].date | string (date) | yes |  |
+| days[].opensAt | string |  | (nullable) |
+| days[].closesAt | string |  | (nullable) |
+| days[].items | array of VisitPlanItem | yes |  |
+| days[].items[].id | string (uuid) | yes | (read-only) |
+| days[].items[].planId | string (uuid) | yes | (read-only) |
+| days[].items[].planVersion | integer | yes | (min 1; read-only) |
+| days[].items[].date | string (date) | yes |  |
+| days[].items[].sequence | integer | yes | (min 1) |
+| days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes |  |
+| days[].items[].pointId | string (uuid) |  | (nullable) |
+| days[].items[].productId | string (uuid) |  | What is bought for this stop, where it is bought. (nullable) |
+| days[].items[].bundleId | string (uuid) |  | A meal combo or package, from the point's featuredOffer. (nullable) |
+| days[].items[].performanceId | string (uuid) |  | (nullable) |
+| days[].items[].startsAt | string (date-time) | yes |  |
+| days[].items[].endsAt | string (date-time) | yes |  |
+| days[].items[].walkMinutesBefore | integer |  | (min 0; nullable) |
+| days[].items[].expectedWaitMinutes | integer |  | The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one. (min 0; nullable) |
+| days[].items[].addOnSuggestion | object |  | A suggested add-on for this stop, e.g. (nullable) |
+| days[].items[].addOnAccepted | boolean |  | (default False) |
+| days[].items[].pinned | boolean |  | The guest fixed this stop; a re-lay moves other stops around it. (default False) |
+| days[].items[].note | string |  | (max length 200; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | The plan, version 1, one day per date asked for. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | The venue has no published map, or none of its points carries a planning duration (venue-not-plannable), so there is nothing to lay out; or a date is outside the venue's opening calendar (venue-close… |
+
+### getVisitPlan
+
+**`GET /visit-plans/{planId}`**: A visit plan, at its current version or an earlier one
+
+The plan with its days and items (29 September, MOB-6). **`version` reads an earlier version**, which is what lets GST-053 show what undo would restore before the guest commits to it. Only the guest session that owns the plan may read it (404 otherwise, never 403, so a plan id reveals nothing).
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Guest callable | True |
+| Reads | `venuemap.visit_plan`, `venuemap.visit_plan_item` |
+| Writes | - |
+| Called by | GST-053, GST-054, GST-059, WEB-050 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| planId | path | yes | string (uuid) |  |
+| version | query |  | integer | Absent means the current version. |
+
+**Response**: `VisitPlan`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| venueId | string (uuid) | yes |  |
+| scopePath | string |  | Derived from venueId. (read-only) |
+| subjectId | string (uuid) |  | The signed-in guest. (read-only; nullable) |
+| sessionRef | string |  | The anonymous device session that owns the plan until sign-in. (read-only; nullable) |
+| status | enum (draft, booked, archived) | yes | booked after bookVisitPlan; a booked plan is read-only. (read-only) |
+| version | integer | yes | The current version. (min 1; read-only) |
+| source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
+| inputs | VisitPlanRequest |  | What generateVisitPlan takes (29 September, MOB-6): the Plan tab's form on GST-051 and WEB-050. |
+| inputs.venueId | string (uuid) | yes |  |
+| inputs.dates | array of string (date) | yes | (min items 1; max items 7) |
+| inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
+| inputs.party[].heightCm | integer |  | (min 40; max 230; nullable) |
+| inputs.party[].ageYears | integer |  | (min 0; max 120; nullable) |
+| inputs.pace | enum (packed, relaxed) |  | (default relaxed) |
+| inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
+| inputs.cuisineTags | array of string |  | (max items 8) |
+| inputs.mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| inputs.preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
+| inputs.presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
+| inputs.startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| inputs.locale | string |  | (nullable) |
+| mapVersion | integer |  | The published map version the plan was laid out on. (read-only) |
+| cartId | string (uuid) |  | The cart bookVisitPlan filled. (read-only; nullable) |
+| excluded | array of object |  | What was left out and why, e.g. (read-only) |
+| excluded[].pointId | string (uuid) |  |  |
+| excluded[].productId | string (uuid) |  | (nullable) |
+| excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime) |  |  |
+| days | array of object | yes | One per date, in order. (read-only) |
+| days[].date | string (date) | yes |  |
+| days[].opensAt | string |  | (nullable) |
+| days[].closesAt | string |  | (nullable) |
+| days[].items | array of VisitPlanItem | yes |  |
+| days[].items[].id | string (uuid) | yes | (read-only) |
+| days[].items[].planId | string (uuid) | yes | (read-only) |
+| days[].items[].planVersion | integer | yes | (min 1; read-only) |
+| days[].items[].date | string (date) | yes |  |
+| days[].items[].sequence | integer | yes | (min 1) |
+| days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes |  |
+| days[].items[].pointId | string (uuid) |  | (nullable) |
+| days[].items[].productId | string (uuid) |  | What is bought for this stop, where it is bought. (nullable) |
+| days[].items[].bundleId | string (uuid) |  | A meal combo or package, from the point's featuredOffer. (nullable) |
+| days[].items[].performanceId | string (uuid) |  | (nullable) |
+| days[].items[].startsAt | string (date-time) | yes |  |
+| days[].items[].endsAt | string (date-time) | yes |  |
+| days[].items[].walkMinutesBefore | integer |  | (min 0; nullable) |
+| days[].items[].expectedWaitMinutes | integer |  | The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one. (min 0; nullable) |
+| days[].items[].addOnSuggestion | object |  | A suggested add-on for this stop, e.g. (nullable) |
+| days[].items[].addOnAccepted | boolean |  | (default False) |
+| days[].items[].pinned | boolean |  | The guest fixed this stop; a re-lay moves other stops around it. (default False) |
+| days[].items[].note | string |  | (max length 200; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The plan |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### listVisitPlanAlternatives
+
+**`GET /visit-plans/{planId}/items/{itemId}/alternatives`**: What could take this item's place
+
+**The swap sheet** (29 September, MOB-6): points and performances the whole party is eligible for that fit the item's slot, best first by interest match, then by the time lost to walking and the expected wait. Each carries why it was offered, so the sheet can say *"Same thrill level, 4 minutes closer"*. Computed on read, never stored; choosing one is an `updateVisitPlan` `swap`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | `catalogue.performance`, `catalogue.product`, `catalogue.product_eligibility_rule`, `queue.reading`, `venuemap.path`, `venuemap.point`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
+| Writes | - |
+| Called by | GST-053, GST-059, WEB-050 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| planId | path | yes | string (uuid) |  |
+| itemId | path | yes | string (uuid) |  |
+| kind | query |  | enum (attraction, show, meal, shop, rest) | Only alternatives of this kind. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of VisitPlanAlternative | yes |  |
+| items[].kind | enum (attraction, show, meal, shop, rest) | yes |  |
+| items[].pointId | string (uuid) |  | (nullable) |
+| items[].productId | string (uuid) |  | (nullable) |
+| items[].performanceId | string (uuid) |  | (nullable) |
+| items[].name | string |  |  |
+| items[].startsAt | string (date-time) | yes |  |
+| items[].durationMinutes | integer |  |  |
+| items[].walkMinutes | integer |  | (nullable) |
+| items[].expectedWaitMinutes | integer |  | (nullable) |
+| items[].matchedInterests | array of string |  |  |
+| items[].reason | string | yes | Why it is offered, in words the sheet shows, e.g. |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Alternatives, best first |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### updateVisitPlan
+
+**`PUT /visit-plans/{planId}`**: Swap, remove, add, move or undo, as a new version
+
+**Every change is a new version, so undo is a change too** (29 September, MOB-6). The body names the version it was made against (`baseVersion`) and a list of changes: `swap` an item for an alternative from `listVisitPlanAlternatives`, `remove`, `add` a point or a performance, `move` an item to another time, or `revertTo` an earlier version. The server re-lays the affected day with the same rules as `generateVisitPlan`, so the times after a change still add up, and returns the new current version.
+**A stale `baseVersion` is refused 409 `plan-version-conflict`** rather than merged: the AI planner agent and the guest can both change a plan, and a change made against a plan the guest no longer sees is a change they did not choose.
+**The AI planner agent calls this as the guest** (ai `setAiTool`, toolKey `venue-map.updateVisitPlan`): the agent's proposal becomes a version the guest can undo. AI never writes the plan tables itself (ADR-0020).
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `cache:idempotency`, `catalogue.performance`, `catalogue.product_eligibility_rule`, `queue.reading`, `venuemap.path`, `venuemap.point`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
+| Writes | `cache:idempotency`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
+| Called by | GST-053, GST-054, GST-059, WEB-050 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| planId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `VisitPlanUpdate`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| baseVersion | integer | yes | (min 1) |
+| changes | array of object | yes | (min items 1; max items 20) |
+| changes[].op | enum (swap, remove, add, move, pin, acceptAddOn, declineAddOn, revertTo) | yes |  |
+| changes[].itemId | string (uuid) |  | (nullable) |
+| changes[].date | string (date) |  | (nullable) |
+| changes[].pointId | string (uuid) |  | (nullable) |
+| changes[].performanceId | string (uuid) |  | (nullable) |
+| changes[].startsAt | string (date-time) |  | (nullable) |
+| changes[].version | integer |  | For revertTo, the earlier version to restore (undo). (nullable) |
+
+**Response**: `VisitPlan`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| venueId | string (uuid) | yes |  |
+| scopePath | string |  | Derived from venueId. (read-only) |
+| subjectId | string (uuid) |  | The signed-in guest. (read-only; nullable) |
+| sessionRef | string |  | The anonymous device session that owns the plan until sign-in. (read-only; nullable) |
+| status | enum (draft, booked, archived) | yes | booked after bookVisitPlan; a booked plan is read-only. (read-only) |
+| version | integer | yes | The current version. (min 1; read-only) |
+| source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
+| inputs | VisitPlanRequest |  | What generateVisitPlan takes (29 September, MOB-6): the Plan tab's form on GST-051 and WEB-050. |
+| inputs.venueId | string (uuid) | yes |  |
+| inputs.dates | array of string (date) | yes | (min items 1; max items 7) |
+| inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
+| inputs.party[].heightCm | integer |  | (min 40; max 230; nullable) |
+| inputs.party[].ageYears | integer |  | (min 0; max 120; nullable) |
+| inputs.pace | enum (packed, relaxed) |  | (default relaxed) |
+| inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
+| inputs.cuisineTags | array of string |  | (max items 8) |
+| inputs.mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| inputs.preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
+| inputs.presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
+| inputs.startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| inputs.locale | string |  | (nullable) |
+| mapVersion | integer |  | The published map version the plan was laid out on. (read-only) |
+| cartId | string (uuid) |  | The cart bookVisitPlan filled. (read-only; nullable) |
+| excluded | array of object |  | What was left out and why, e.g. (read-only) |
+| excluded[].pointId | string (uuid) |  |  |
+| excluded[].productId | string (uuid) |  | (nullable) |
+| excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime) |  |  |
+| days | array of object | yes | One per date, in order. (read-only) |
+| days[].date | string (date) | yes |  |
+| days[].opensAt | string |  | (nullable) |
+| days[].closesAt | string |  | (nullable) |
+| days[].items | array of VisitPlanItem | yes |  |
+| days[].items[].id | string (uuid) | yes | (read-only) |
+| days[].items[].planId | string (uuid) | yes | (read-only) |
+| days[].items[].planVersion | integer | yes | (min 1; read-only) |
+| days[].items[].date | string (date) | yes |  |
+| days[].items[].sequence | integer | yes | (min 1) |
+| days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes |  |
+| days[].items[].pointId | string (uuid) |  | (nullable) |
+| days[].items[].productId | string (uuid) |  | What is bought for this stop, where it is bought. (nullable) |
+| days[].items[].bundleId | string (uuid) |  | A meal combo or package, from the point's featuredOffer. (nullable) |
+| days[].items[].performanceId | string (uuid) |  | (nullable) |
+| days[].items[].startsAt | string (date-time) | yes |  |
+| days[].items[].endsAt | string (date-time) | yes |  |
+| days[].items[].walkMinutesBefore | integer |  | (min 0; nullable) |
+| days[].items[].expectedWaitMinutes | integer |  | The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one. (min 0; nullable) |
+| days[].items[].addOnSuggestion | object |  | A suggested add-on for this stop, e.g. (nullable) |
+| days[].items[].addOnAccepted | boolean |  | (default False) |
+| days[].items[].pinned | boolean |  | The guest fixed this stop; a re-lay moves other stops around it. (default False) |
+| days[].items[].note | string |  | (max length 200; nullable) |
+| createdAt | string (date-time) |  | (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The new current version |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | baseVersion is not the current version (plan-version-conflict), or the plan is already booked (plan-booked; a booked plan is read-only, generate a new one). |
+| 422 |  | A change names an item not on the plan, a revertTo version that does not exist, or a point the party is not eligible for (item-not-eligible, with the rule that excludes). |
 
 
 ## Group: waitTime
@@ -4373,7 +5288,7 @@ A guest who waits forty minutes for a fifteen-minute estimate deserves a system 
 | Read routing | replica |
 | Reads | `queue.entry`, `queue.queue`, `queue.reading` |
 | Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-046, WEB-002, WEB-004, WEB-015, WEB-039, WEB-040 |
+| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-046, GST-051, GST-053, GST-054, GST-059, WEB-002, WEB-004, WEB-015, WEB-039, WEB-040 |
 
 **Parameters**
 
@@ -4573,6 +5488,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | asset_name | text | no | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised. |
 | status | text | yes |  |
 | priority | text | yes |  |
+| priority_score | integer | no | The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01). |
+| priority_source | text | no | Where priority came from (M17-01). |
+| fault_assessment | jsonb | no |  |
+| required_qualification_codes | text[] | no | Skills the job needs (M17-13). |
 | kind | text | yes |  |
 | assigned_to_principal_id | uuid | no |  |
 | raised_by_principal_id | uuid | no |  |
@@ -4756,7 +5675,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | principal_id | uuid | no | For a resource of kind instructor or staff. |
 | attributes | jsonb | no | Configurable per kind — capacity, size, shade, power, poolside. |
 | setup_minutes | integer | no | Before the booking, not inside it. |
-| teardown_minutes | integer | no |  |
+| teardown_minutes | integer | no | After the booking. |
+| cleaning_policy | jsonb | no | How the resource is cleaned between uses (decided 29 September, W10). |
 | requires_qualification | text[] | no | Qualification codes a person must hold to be assigned to this. |
 | deposit_amount | numeric(18,4) | no |  |
 | status | text | no |  |
@@ -4845,9 +5765,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | jsonb | yes |  |
-| route_id | jsonb | yes |  |
-| timetable_id | jsonb | yes |  |
+| id | text | yes |  |
+| route_id | text | yes |  |
+| timetable_id | text | yes |  |
 | performance_id | uuid | yes | The catalogue performance this departure is sold as. |
 | service_date | date | yes |  |
 | departs_at | timestamptz | yes | At the route's first stop. |
@@ -4860,9 +5780,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| fare_table_id | jsonb | yes | The parent row. |
-| from_station_id | jsonb | yes |  |
-| to_station_id | jsonb | yes |  |
+| fare_table_id | text | yes | The parent row. |
+| from_station_id | text | yes |  |
+| to_station_id | text | yes |  |
 | fare | numeric(18,4) | yes |  |
 | id | uuid | yes | Synthesised key. |
 
@@ -4870,7 +5790,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| fare_table_id | jsonb | yes | The parent row. |
+| fare_table_id | text | yes | The parent row. |
 | code | text | yes | adult, child, student, determination. |
 | name | jsonb | yes |  |
 | description | jsonb | no | What the picker shows under the name ("Age 5–11 · half fare"). |
@@ -4890,21 +5810,36 @@ Every table this service owns that the slice reads or writes, with its columns a
 | base_fare | numeric(18,4) | no | stopCount only. |
 | per_stop_fare | numeric(18,4) | no | stopCount only. |
 | effective_from | timestamptz | yes |  |
-| id | jsonb | yes |  |
-| route_id | jsonb | yes |  |
+| id | text | yes |  |
+| route_id | text | yes |  |
 
 ### `transport.favourite_route`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | jsonb | yes |  |
+| id | text | yes |  |
 | venue_id | uuid | yes |  |
-| from_station_id | jsonb | yes |  |
-| to_station_id | jsonb | yes |  |
+| from_station_id | text | yes |  |
+| to_station_id | text | yes |  |
 | from_station_name | text | no |  |
 | to_station_name | text | no |  |
 | label | text | no |  |
 | created_at | timestamptz | yes |  |
+
+### `transport.network_import`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | text | yes |  |
+| venue_id | uuid | yes |  |
+| format | text | yes |  |
+| source_ref | uuid | yes |  |
+| status | text | yes |  |
+| preview | jsonb | no | What applying would write. |
+| created_by | uuid | no |  |
+| created_at | timestamptz | no |  |
+| applied_by | uuid | no |  |
+| applied_at | timestamptz | no |  |
 
 ### `transport.pass_type`
 
@@ -4921,7 +5856,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | validity_days | integer | yes |  |
 | route_ids | text[] | no | Routes it is sold on. |
 | sort_order | integer | no |  |
-| id | jsonb | yes |  |
+| id | text | yes |  |
 | is_active | boolean | yes |  |
 | catalogue_product_id | uuid | no | The catalogue openDated product this pass is sold as. |
 
@@ -4936,7 +5871,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | colour | text | no |  |
 | paired_route_id | text | no | The same line run the other way. |
 | booking_cutoff_minutes | integer | no | How long before a departure leaves the boarding stop that online sale stops. |
-| id | jsonb | yes |  |
+| id | text | yes |  |
 | status | text | yes |  |
 | total_minutes | integer | no | The last stop's offset. |
 | catalogue_event_id | uuid | no | The catalogue event its departures are performances of. |
@@ -4946,12 +5881,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| route_id | jsonb | yes | The parent row. |
-| station_id | jsonb | yes |  |
+| route_id | text | yes | The parent row. |
+| station_id | text | yes |  |
 | offset_minutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. |
 | is_boarding_allowed | boolean | no |  |
 | is_alighting_allowed | boolean | no |  |
-| id | jsonb | yes |  |
+| id | text | yes |  |
 | sequence | integer | yes | 1 for the origin. |
 
 ### `transport.station`
@@ -4964,7 +5899,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | short_name | jsonb | no | The label on the route diagram and the map pin (Union Sq, MoE). |
 | latitude | numeric | no |  |
 | longitude | numeric | no |  |
-| id | jsonb | yes |  |
+| id | text | yes |  |
 | is_active | boolean | yes |  |
 
 ### `transport.timetable`
@@ -4977,12 +5912,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 | release_horizon_days | integer | no | How many days ahead departures go on sale. |
 | seat_capacity | integer | yes | Seats per departure, unless a departure overrides it. |
 | seat_map_id | uuid | no | The coach seat map for Seat Selection (seating). |
-| id | jsonb | yes |  |
-| route_id | jsonb | yes |  |
+| id | text | yes |  |
+| route_id | text | yes |  |
 | status | text | yes |  |
 | published_at | timestamptz | no |  |
 | released_through | date | no | The last date whose departures have been generated. |
 | superseded_by_id | text | no |  |
+
+### `transport.timetable_run`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| timetable_id | text | yes | The parent row. |
+| departs_at | text | yes | Venue local time, 24-hour HH:MM, at the route's first stop. |
+| days | text[] | yes |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `venuemap.import_job`
 
@@ -5082,6 +6026,52 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_active | boolean | no |  |
 | is_navigable | boolean | no | Whether a route may pass through it. |
 | is_destination | boolean | no | Whether a guest may be routed *to* it, and whether it appears in a list of places. |
+| description | jsonb | no | What the guest reads on Item Detail (29 September, MOB-4). |
+| featured_offer | jsonb | no | The product card on Item Detail, for every kind of point (29 September, MOB-4). |
+| typical_duration_minutes | integer | no | How long a visit to this point usually takes, ride time and queue excluded (29 September, MOB-6). |
+| interest_tags | text[] | no | What a guest who says they like this would like here (29 September, MOB-6): the planner matches the guest's interests against these. |
+| cuisine_tags | text[] | no | For dining points (restaurant, cafe, kiosk; 29 September, MOB-6). |
+
+### `venuemap.visit_plan`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| venue_id | uuid | yes |  |
+| scope_path | text | no | Derived from venueId. |
+| subject_id | uuid | no | The signed-in guest. |
+| session_ref | text | no | The anonymous device session that owns the plan until sign-in. |
+| status | text | yes | booked after bookVisitPlan; a booked plan is read-only. |
+| version | integer | yes | The current version. |
+| source | text | no | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. |
+| inputs | jsonb | no |  |
+| map_version | integer | no | The published map version the plan was laid out on. |
+| cart_id | uuid | no | The cart bookVisitPlan filled. |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+
+### `venuemap.visit_plan_item`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| plan_id | uuid | yes |  |
+| plan_version | integer | yes |  |
+| date | date | yes |  |
+| sequence | integer | yes |  |
+| kind | text | yes |  |
+| point_id | uuid | no |  |
+| product_id | uuid | no | What is bought for this stop, where it is bought. |
+| bundle_id | uuid | no | A meal combo or package, from the point's featuredOffer. |
+| performance_id | uuid | no |  |
+| starts_at | timestamptz | yes |  |
+| ends_at | timestamptz | yes |  |
+| walk_minutes_before | integer | no |  |
+| expected_wait_minutes | integer | no | The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one. |
+| add_on_suggestion | jsonb | no | A suggested add-on for this stop, e.g. |
+| is_add_on_accepted | boolean | no |  |
+| is_pinned | boolean | no | The guest fixed this stop; a re-lay moves other stops around it. |
+| note | text | no |  |
 
 ## Not in the first release
 
@@ -5099,8 +6089,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | incident | `getIncident`, `listIncidents`, `recordAuthorityNotification`, `reportIncident`, `updateIncident` |
 | inspection | `listInspectionTemplates`, `listInspections`, `submitInspection` |
 | maintenance | `acceptWorkOrder`, `attachWorkOrderEvidence`, `closeWorkOrder`, `pauseWorkOrder`, `rejectWorkOrder`, `resumeWorkOrder`, `startWorkOrder` |
-| networkImport | `applyTransportNetworkImport`, `getTransportNetworkImport`, `importTransportNetwork` |
-| pass | `createTransportPassType`, `listTransportPassTypes`, `updateTransportPassType` |
+| networkImport | `getTransportNetworkImport` |
+| pass | `listTransportPassTypes`, `updateTransportPassType` |
 | planned | `createMaintenancePlan`, `getDueMaintenance`, `listMaintenancePlans`, `updateMaintenancePlan` |
 | play | `recordGamePlay`, `syncGamePlays` |
 | prize | `createPrize`, `listPrizes`, `lookupPrize`, `redeemPrize` |
@@ -5109,9 +6099,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `cloneResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceLifecycleState`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
 | route | `setTransportRouteStatus` |
 | signage | `getSignageQueueBoard`, `getSignageQueueCalls` |
-| station | `createTransportStation`, `updateTransportStation` |
-| timetable | `createTransportTimetable`, `listTransportTimetables`, `publishTransportTimetable`, `updateTransportTimetable`, `withdrawTransportTimetable` |
+| station | `updateTransportStation` |
+| timetable | `listTransportTimetables`, `updateTransportTimetable`, `withdrawTransportTimetable` |
 | venueMap | `acceptVenueLabelProposals`, `acceptWalkwayProposals`, `getVenueMapImportJob`, `getVenueMapLive`, `listVenueMaps`, `setPathClosure`, `validateVenueMapGraph` |
 | waitTime | `setWaitTime` |
 | work | `cancelWorkOrder` |
-| workOrder | `completeWorkOrder`, `createWorkOrder`, `getWorkOrder`, `listWorkOrders`, `recordWorkOrderParts`, `recordWorkOrderTime`, `updateWorkOrder`, `verifyWorkOrder` |
+| workOrder | `completeWorkOrder`, `createVendorServiceRequest`, `createWorkOrder`, `getWorkOrder`, `getWorkOrderPriorityPolicy`, `listVendorServiceRequests`, `listWorkOrders`, `recordWorkOrderParts`, `recordWorkOrderTime`, `setWorkOrderPriorityPolicy`, `suggestWorkOrderAssignee`, `updateVendorServiceRequest`, `updateWorkOrder`, `verifyWorkOrder` |

@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
-  "operations": 221,
+  "operations": 224,
   "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 135
+  "operationsWithNoScreen": 134
  },
  "waves": {
   "wave1": 25,
@@ -68,15 +68,15 @@
    "operations": 23
   },
   {
+   "contract": "inventory",
+   "operations": 18
+  },
+  {
    "contract": "catalogue",
    "operations": 17
   },
   {
    "contract": "workforce",
-   "operations": 15
-  },
-  {
-   "contract": "inventory",
    "operations": 15
   },
   {
@@ -96,11 +96,11 @@
    "operations": 12
   },
   {
-   "contract": "access",
+   "contract": "queue",
    "operations": 7
   },
   {
-   "contract": "queue",
+   "contract": "access",
    "operations": 7
   },
   {
@@ -112,6 +112,10 @@
    "operations": 4
   },
   {
+   "contract": "tenancy",
+   "operations": 2
+  },
+  {
    "contract": "venue-map",
    "operations": 2
   },
@@ -120,15 +124,11 @@
    "operations": 2
   },
   {
-   "contract": "tenancy",
-   "operations": 2
-  },
-  {
-   "contract": "accreditation",
+   "contract": "assets",
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "accreditation",
    "operations": 1
   }
  ],
@@ -175,7 +175,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/task-detail",
-   "operations": 15,
+   "operations": 18,
    "drawn": true
   },
   {
@@ -1269,12 +1269,6 @@
     "contract": "identity",
     "verb": "PUT",
     "summary": "Tick what they may do"
-   },
-   {
-    "operation": "listStockReservations",
-    "contract": "inventory",
-    "verb": "GET",
-    "summary": "Soft holds on stock"
    },
    {
     "operation": "actOnWaiverRequirements",

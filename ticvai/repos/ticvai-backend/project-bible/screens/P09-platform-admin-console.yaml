@@ -78,6 +78,10 @@ screens:
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-001 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
+    - to: ADM-004
+      trigger: Platform Audit Log
+      provenance: derived — ADM-004 declares entryState.params decisionRecordId and ADM-001 holds none
+        of them, so the edge carries nothing and ADM-004 opens cold
     - to: PTR-001
       trigger: A partner user signs in through the same door
       provenance: flow F104 step 3→4
@@ -85,10 +89,6 @@ screens:
       back: false
       carries:
       - challengeId
-    - to: ADM-004
-      trigger: Platform Audit Log
-      provenance: derived — ADM-004 declares entryState.params decisionRecordId and ADM-001 holds none
-        of them, so the edge carries nothing and ADM-004 opens cold
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -737,8 +737,8 @@ screens:
       trigger: API Rate Limit & Quota Management
       carries:
       - tenantId
-      provenance: derived — ADM-015 declares entryState.params tenantId and ADM-002 holds tenantId, so
-        an edge into it carries them
+      provenance: derived — ADM-015 declares entryState.params requestId, tenantId and ADM-002 holds tenantId,
+        so an edge into it carries them
     - to: ADM-016
       trigger: White-Label Branding Management
       provenance: derived — ADM-016 declares entryState.params bannerId, pageId, policyKind, version and
@@ -759,12 +759,12 @@ screens:
         edge into it carries them
     - to: ADM-022
       trigger: Release & Version Management
-      provenance: derived — ADM-022 declares entryState.params reinventoryHoldId and ADM-002 holds none
-        of them, so the edge carries nothing and ADM-022 opens cold
+      provenance: derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them,
+        so the edge carries nothing and ADM-022 opens cold
     - to: ADM-023
       trigger: Staging Promotion & Approval
-      provenance: derived — ADM-023 declares entryState.params reinventoryHoldId and ADM-002 holds none
-        of them, so the edge carries nothing and ADM-023 opens cold
+      provenance: derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them,
+        so the edge carries nothing and ADM-023 opens cold
     - to: ADM-026
       trigger: End-of-Support Notice Management
       provenance: derived — ADM-026 declares entryState.params version and ADM-002 holds none of them,
@@ -1156,6 +1156,10 @@ screens:
       trigger: Platform Dashboard
       provenance: derived — ADM-002 declares entryState.params  and ADM-003 holds none of them, so the
         edge carries nothing and ADM-002 opens cold
+    - to: ADM-004
+      trigger: Platform Audit Log
+      provenance: derived — ADM-004 declares entryState.params decisionRecordId and ADM-003 holds none
+        of them, so the edge carries nothing and ADM-004 opens cold
     - to: SCN-003
       trigger: Guest scans at the other venue
       provenance: flow F19 step 2→3
@@ -1163,10 +1167,6 @@ screens:
       back: false
       carries:
       - rightId
-    - to: ADM-004
-      trigger: Platform Audit Log
-      provenance: derived — ADM-004 declares entryState.params decisionRecordId and ADM-003 holds none
-        of them, so the edge carries nothing and ADM-004 opens cold
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office
     and a guest app does not navigate to either** — those are device handovers, and a flow declares them
@@ -5177,6 +5177,38 @@ screens:
         - ApiClient.lastUsedAt
         operation: listApiClients
         provenance: contract public-api.yaml GET /api-clients
+      - kind: dataTable
+        label: Production access requests, pending first
+        bindsTo: ProductionAccessRequest
+        columns:
+        - ProductionAccessRequest.developerId
+        - ProductionAccessRequest.listingId
+        - ProductionAccessRequest.scopes
+        - ProductionAccessRequest.allowedTenantIds
+        - ProductionAccessRequest.ipAllowList
+        - ProductionAccessRequest.status
+        - ProductionAccessRequest.requestedAt
+        operation: listProductionAccessRequests
+        notes: '**Production keys only after certification** (17 September minutes, M17-06). The queue
+          a TICVAI administrator works: each request names the certified integration, the tenants, the
+          module scopes and the IP allow-list. Approving issues a new production client; the sandbox key
+          is never promoted.'
+        provenance: 29 September pass (P29 group A)
+      - kind: dataTable
+        label: Flagged API traffic
+        bindsTo: ApiAnomaly
+        columns:
+        - ApiAnomaly.clientId
+        - ApiAnomaly.ruleKey
+        - ApiAnomaly.measure
+        - ApiAnomaly.observed
+        - ApiAnomaly.baseline
+        - ApiAnomaly.actionTaken
+        - ApiAnomaly.detectedAt
+        operation: listApiAnomalies
+        notes: '**Abnormal volume is flagged, not only throttled** (M17-07): calls above the client''s
+          own baseline, refusals from outside the allow-list, calls to operations it never uses.'
+        provenance: 29 September pass (P29 group A)
     - name: contextPanel
       slot: selection
       components:
@@ -5280,6 +5312,14 @@ screens:
         label: Save API quota
         operation: setApiQuota
         provenance: contract public-api.yaml PUT /api-quotas
+      - kind: primaryButton
+        label: Decide production access
+        operation: decideProductionAccess
+        provenance: 29 September pass (P29 group A)
+      - kind: secondaryButton
+        label: Save anomaly rule
+        operation: setApiAnomalyRule
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The api rate limit list.
     error: Could not load. Names which read failed and leaves the api rate limit untouched.
@@ -5329,10 +5369,37 @@ screens:
     contract: public-api
     purpose: Registered clients for this developer
     trigger: onLoad
+  - operationId: listProductionAccessRequests
+    contract: public-api
+    purpose: The production key approval queue
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: decideProductionAccess
+    contract: public-api
+    purpose: Approve or reject production keys for a certified integration
+    trigger: onAction
+    invalidates:
+    - listProductionAccessRequests
+    - listApiClients
+    provenance: 29 September pass (P29 group A)
+  - operationId: listApiAnomalies
+    contract: public-api
+    purpose: Flagged abnormal API traffic
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: setApiAnomalyRule
+    contract: public-api
+    purpose: When traffic is flagged, throttled or suspended
+    trigger: onAction
+    invalidates:
+    - listApiAnomalies
+    provenance: 29 September pass (P29 group A)
   entryState:
     params:
     - name: tenantId
       from: ADM-002
+    - name: requestId
+      from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - Cell.id
@@ -5369,6 +5436,45 @@ screens:
       - perOperationOverrides
       - onBreach
     provenance: contract public-api.yaml PUT /api-quotas
+  - id: formDecideProductionAccess
+    component: modal
+    trigger: Decide production access
+    body: '**Collects what `decideProductionAccess` sends before it is called.** Required: `decision`.
+      Optional: `reason` (required to reject, in words the developer can act on), `scopes` (narrow only),
+      `credentialTtlDays`. Dismissing sends nothing.'
+    confirm:
+      label: Decide production access
+      operation: decideProductionAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - decision
+      - reason
+      - scopes
+      - credentialTtlDays
+    provenance: 29 September pass (P29 group A)
+  - id: formSetApiAnomalyRule
+    component: modal
+    trigger: Save anomaly rule
+    body: '**Collects what `setApiAnomalyRule` sends before it is called.** Required: `ruleKey`, `measure`,
+      `comparison`, `threshold`, `action`. Optional: `clientId`, `windowMinutes`, `isActive`. A `suspend`
+      action is named in the form: it stops the client until someone reactivates it.'
+    bindsTo: ApiAnomalyRule
+    confirm:
+      label: Save anomaly rule
+      operation: setApiAnomalyRule
+    dismiss:
+      label: Cancel
+      discards:
+      - ruleKey
+      - clientId
+      - measure
+      - comparison
+      - threshold
+      - windowMinutes
+      - action
+      - isActive
+    provenance: 29 September pass (P29 group A)
 - id: ADM-016
   name: White-Label Branding Management
   module: Branding & Localisation
@@ -7034,12 +7140,12 @@ screens:
         label: The release readiness
         bindsTo: ReleaseReadiness
         columns:
-        - ReleaseReadiness.reinventoryHoldId
+        - ReleaseReadiness.releaseId
         - ReleaseReadiness.canPromote
         - ReleaseReadiness.targetEnvironment
         - ReleaseReadiness.gates
         operation: getReleaseReadiness
-        provenance: contract platform-ops.yaml GET /releases/{reinventoryHoldId}/readiness
+        provenance: contract platform-ops.yaml GET /releases/{releaseId}/readiness
       - kind: detailPanel
         label: The release
         bindsTo: ReleaseDetail
@@ -7048,7 +7154,7 @@ screens:
         - ReleaseDetail.cellsOnThisVersion
         - ReleaseDetail.cellsTotal
         operation: getRelease
-        provenance: contract platform-ops.yaml GET /releases/{reinventoryHoldId}
+        provenance: contract platform-ops.yaml GET /releases/{releaseId}
     - name: actionBar
       slot: rowActions
       components:
@@ -7059,15 +7165,15 @@ screens:
       - kind: secondaryButton
         label: Promote release
         operation: promoteRelease
-        provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/promote
+        provenance: contract platform-ops.yaml POST /releases/{releaseId}/promote
       - kind: destructiveButton
         label: Reject release
         operation: rejectRelease
-        provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/reject
+        provenance: contract platform-ops.yaml POST /releases/{releaseId}/reject
       - kind: destructiveButton
         label: Withdraw release
         operation: withdrawRelease
-        provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/withdraw
+        provenance: contract platform-ops.yaml POST /releases/{releaseId}/withdraw
       - kind: publishGate
         label: What publishing changes
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
@@ -7080,14 +7186,14 @@ screens:
     body: '**Names what `rejectRelease` changes and what it leaves alone**, in the consequence rather
       than the verb. A release version this affects should be identified in the dialog, not just counted.
       **Collects what `rejectRelease` sends before it is called.** Required: `reason`.'
-    provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/reject
+    provenance: contract platform-ops.yaml POST /releases/{releaseId}/reject
   - id: confirmWithdrawRelease
     component: confirmDialog
     trigger: Withdraw release
     body: '**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather
       than the verb. A release version this affects should be identified in the dialog, not just counted.
       **Collects what `withdrawRelease` sends before it is called.** Required: `reason`.'
-    provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/withdraw
+    provenance: contract platform-ops.yaml POST /releases/{releaseId}/withdraw
   - id: formCreateRelease
     component: modal
     trigger: Create release
@@ -7125,7 +7231,7 @@ screens:
       - note
       - approverPrincipalId
       - stepUpToken
-    provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/promote
+    provenance: contract platform-ops.yaml POST /releases/{releaseId}/promote
   states:
     loading: The release version list.
     error: Could not load. Names which read failed and leaves the release version untouched.
@@ -7175,12 +7281,12 @@ screens:
     - listReleases
   entryState:
     params:
-    - name: reinventoryHoldId
+    - name: releaseId
       from: deepLink
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
-      than one that shows nothing.** Arrives with `reinventoryHoldId`.'
+      than one that shows nothing.** Arrives with `releaseId`.'
     preloaded:
     - Release.components
     - Release.requiredMigrations
@@ -7302,24 +7408,24 @@ screens:
         - ReleaseDetail.cellsOnThisVersion
         - ReleaseDetail.cellsTotal
         operation: getRelease
-        provenance: contract platform-ops.yaml GET /releases/{reinventoryHoldId}
+        provenance: contract platform-ops.yaml GET /releases/{releaseId}
       - kind: detailPanel
         label: The release readiness
         bindsTo: ReleaseReadiness
         columns:
-        - ReleaseReadiness.reinventoryHoldId
+        - ReleaseReadiness.releaseId
         - ReleaseReadiness.canPromote
         - ReleaseReadiness.targetEnvironment
         - ReleaseReadiness.gates
         operation: getReleaseReadiness
-        provenance: contract platform-ops.yaml GET /releases/{reinventoryHoldId}/readiness
+        provenance: contract platform-ops.yaml GET /releases/{releaseId}/readiness
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
         label: Promote release
         operation: promoteRelease
-        provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/promote
+        provenance: contract platform-ops.yaml POST /releases/{releaseId}/promote
       - kind: secondaryButton
         label: Create release
         operation: createRelease
@@ -7327,11 +7433,11 @@ screens:
       - kind: destructiveButton
         label: Reject release
         operation: rejectRelease
-        provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/reject
+        provenance: contract platform-ops.yaml POST /releases/{releaseId}/reject
       - kind: destructiveButton
         label: Withdraw release
         operation: withdrawRelease
-        provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/withdraw
+        provenance: contract platform-ops.yaml POST /releases/{releaseId}/withdraw
       - kind: publishGate
         label: What publishing changes
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
@@ -7344,14 +7450,14 @@ screens:
     body: '**Names what `rejectRelease` changes and what it leaves alone**, in the consequence rather
       than the verb. A staging promotion approval this affects should be identified in the dialog, not
       just counted. **Collects what `rejectRelease` sends before it is called.** Required: `reason`.'
-    provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/reject
+    provenance: contract platform-ops.yaml POST /releases/{releaseId}/reject
   - id: confirmWithdrawRelease
     component: confirmDialog
     trigger: Withdraw release
     body: '**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather
       than the verb. A staging promotion approval this affects should be identified in the dialog, not
       just counted. **Collects what `withdrawRelease` sends before it is called.** Required: `reason`.'
-    provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/withdraw
+    provenance: contract platform-ops.yaml POST /releases/{releaseId}/withdraw
   - id: formPromoteRelease
     component: modal
     trigger: Promote release
@@ -7368,7 +7474,7 @@ screens:
       - note
       - approverPrincipalId
       - stepUpToken
-    provenance: contract platform-ops.yaml POST /releases/{reinventoryHoldId}/promote
+    provenance: contract platform-ops.yaml POST /releases/{releaseId}/promote
   - id: formCreateRelease
     component: modal
     trigger: Create release
@@ -7434,12 +7540,12 @@ screens:
     - listReleases
   entryState:
     params:
-    - name: reinventoryHoldId
+    - name: releaseId
       from: deepLink
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
-      than one that shows nothing.** Arrives with `reinventoryHoldId`.'
+      than one that shows nothing.** Arrives with `releaseId`.'
     preloaded:
     - Release.components
     - Release.requiredMigrations
@@ -8383,7 +8489,7 @@ screens:
         bindsTo: Rollout
         columns:
         - Rollout.id
-        - Rollout.reinventoryHoldId
+        - Rollout.releaseId
         - Rollout.environment
         - Rollout.status
         - Rollout.cellsTotal
@@ -8466,7 +8572,7 @@ screens:
         bindsTo: RolloutDetail
         columns:
         - RolloutDetail.id
-        - RolloutDetail.reinventoryHoldId
+        - RolloutDetail.releaseId
         - RolloutDetail.environment
         - RolloutDetail.status
         - RolloutDetail.cellsTotal
@@ -10550,6 +10656,26 @@ screens:
         - AiProvider.maxTokens
         operation: listAiProviders
         provenance: contract ai.yaml GET /providers
+      - kind: detailPanel
+        label: Tasks and model fit
+        bindsTo: AiProvider
+        columns:
+        - AiProvider.taskKeys
+        - AiProvider.fitnessWarnings
+        - AiProvider.managedBy
+        - AiProvider.modelId
+        operation: listAiProviders
+        notes: '**One managed provider by default (AI-D02)**, with a small and a stronger model per agent
+          task; a second provider or a tenant key only where TICVAI enabled it (AI-D14). `taskKeys` binds
+          a provider to named agent tasks (M21-03). **Fitness warnings are shown, never blocking** (M21-09):
+          a model below a task''s floor is underpowered, one far above its ceiling is overpowered.'
+        provenance: 29 September pass (P29 group A)
+      - kind: banner
+        label: Model fit warning
+        operation: setAiProvider
+        notes: 'Shown after `setAiProvider` returns `fitnessWarnings`: names the task, the score and the
+          band.'
+        provenance: 29 September pass (P29 group A)
     - name: actionBar
       slot: rowActions
       components:
@@ -17854,7 +17980,7 @@ screens:
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
+    rather than passed off as a decision Rendered on the calendar template (M17-03, 29 September).'
   purpose: Configure dynamic pricing behavior according to temporal commercial patterns.
   gaps:
   - operation: null
@@ -17868,7 +17994,7 @@ screens:
       a default rather than a reading. It needs a person before it is built.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 81
   layout:
-    template: split
+    template: calendar
     regions:
     - name: contentBody
       components:
@@ -17886,6 +18012,24 @@ screens:
         permission: PRICE_CONFIGURE
         notes: '**The person''s half of `catalogue.demand_signal`** (29 September, writers pass).'
         provenance: contract catalogue.yaml PUT /demand-signals/{signalId}
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: selectField
+        label: 'View: day, week or month'
+        notes: '**Every calendar has day, week and month views, and the day view is broken into hours
+          from the venue''s day start hour** (17 September minutes, M17-03). Built on the shared calendar
+          view (`calendarView`, to be added to the component library); until then a timeline per view.'
+        provenance: 29 September pass (P29 group A)
+      - kind: multiSelect
+        label: Category
+        notes: '**Filtered by category, so a team sees only what is theirs** (M17-03).'
+        provenance: 29 September pass (P29 group A)
+      - kind: calendarView
+        label: Calendar
+        operation: listSeasonalCalendarDay
+        notes: Entries of the view in force, placed by date and hour.
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The seasonal calendar day list.
     error: Could not load. Names which read failed and leaves the seasonal calendar day untouched.
@@ -24622,10 +24766,11 @@ screens:
         so an edge into it carries them
   density: compact
   pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Identify) and no metric row
+  patternReason: the pack gives this screen a display directory (§Identify) and no metric row Rendered
+    on the calendar template (M17-03, 29 September).
   purpose: Provide a calendar-based operational view of promotions.
   layout:
-    template: split
+    template: calendar
     regions:
     - name: contentBody
       slot: collection
@@ -24673,6 +24818,21 @@ screens:
         - CommercialCampaign.budgets
         operation: listCommercialCampaigns
         provenance: contract promotions.yaml GET /commercial-campaigns
+      - kind: selectField
+        label: 'View: day, week or month'
+        notes: '**Every calendar has day, week and month views, and the day view is broken into hours
+          from the venue''s day start hour** (17 September minutes, M17-03). Built on the shared calendar
+          view (`calendarView`, to be added to the component library); until then a timeline per view.'
+        provenance: 29 September pass (P29 group A)
+      - kind: multiSelect
+        label: Category
+        notes: '**Filtered by category, so a team sees only what is theirs** (M17-03).'
+        provenance: 29 September pass (P29 group A)
+      - kind: calendarView
+        label: Calendar
+        operation: listCampaignCalendarTimeline
+        notes: Entries of the view in force, placed by date and hour.
+        provenance: 29 September pass (P29 group A)
     - name: contextPanel
       slot: selection
       components:
@@ -60641,6 +60801,32 @@ screens:
       - kind: metricTile
         label: Production Impact
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs
+    - name: contentBody
+      slot: fields
+      components:
+      - kind: detailPanel
+        label: Venue AI profile
+        bindsTo: AiVenueSettings
+        columns:
+        - AiVenueSettings.venueType
+        - AiVenueSettings.capacity
+        - AiVenueSettings.openingHours
+        - AiVenueSettings.typicalWeekdayAttendance
+        - AiVenueSettings.typicalWeekendAttendance
+        - AiVenueSettings.peakMonths
+        - AiVenueSettings.averageSpend
+        - AiVenueSettings.fnbAttachRate
+        operation: getAiVenueSettings
+        notes: '**What every AI answer stands on before the venue has history** (29 September, AI functions
+          review). Collected at onboarding, here or by the configuration assistant in conversation.'
+        provenance: 29 September pass (P29 group A)
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Save venue AI profile
+        operation: setAiVenueSettings
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The readiness list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the readiness untouched.
@@ -60660,6 +60846,18 @@ screens:
     purpose: A plan with its steps
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: getAiVenueSettings
+    contract: ai
+    purpose: The venue AI profile the baselines use
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: setAiVenueSettings
+    contract: ai
+    purpose: Set it at onboarding
+    trigger: onAction
+    invalidates:
+    - getAiVenueSettings
+    provenance: 29 September pass (P29 group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-489
@@ -60672,6 +60870,33 @@ screens:
     params:
     - name: planId
       from: navigation
+    - name: venueId
+      from: session
+  overlays:
+  - id: formSetAiVenueSettings
+    component: modal
+    trigger: Save venue AI profile
+    body: '**Collects what `setAiVenueSettings` sends before it is called.** Required: `venueId`, `venueType`.
+      Every other figure is optional and defaults to the starting pattern for the venue type, so a venue
+      that knows only its type still gets answers.'
+    bindsTo: AiVenueSettings
+    confirm:
+      label: Save venue AI profile
+      operation: setAiVenueSettings
+    dismiss:
+      label: Cancel
+      discards:
+      - venueType
+      - isOutdoor
+      - capacity
+      - openingHours
+      - typicalWeekdayAttendance
+      - typicalWeekendAttendance
+      - peakMonths
+      - averageSpend
+      - fnbAttachRate
+      - staffProductivity
+    provenance: 29 September pass (P29 group A)
 - id: ADM-490
   name: Configuration Validation Results
   module: Platform
@@ -62071,6 +62296,26 @@ screens:
       - kind: selectField
         label: 90 Days
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields
+      - kind: selectField
+        label: Producer
+        bindsTo: AiForecastDefinition.producer
+        operation: setForecastDefinition
+        notes: '`rule`, `statistical` or `ensemble` (M18-16). A model only arrives by promotion.'
+        provenance: 29 September pass (P29 group A)
+      - kind: numberField
+        label: History window (months)
+        bindsTo: AiForecastDefinition.historyWindowMonths
+        operation: setForecastDefinition
+        notes: Default 36 (M18-16).
+        provenance: 29 September pass (P29 group A)
+      - kind: selectField
+        label: Cold start
+        bindsTo: AiForecastDefinition.coldStart
+        operation: setForecastDefinition
+        notes: '**What the forecast stands on before there is history** (AI functions review): the venue
+          AI profile with the venue-type pattern, a sister venue, a category, or imported history; the
+          starting range and how many observations the prior is worth.'
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The forecast forecasting strategy configuration as saved.
     error: Could not load. Names which read failed and leaves the forecast forecasting strategy untouched.
@@ -64184,6 +64429,19 @@ screens:
       - kind: metricTile
         label: Governance Warnings
         provenance: pack AI_Governance_Reference.pdf, page 4 §Header KPIs
+      - kind: dataTable
+        label: AI maturity by question
+        bindsTo: AiCapabilityMaturity
+        columns:
+        - AiCapabilityMaturity.capabilityKey
+        - AiCapabilityMaturity.stage
+        - AiCapabilityMaturity.maturity
+        - AiCapabilityMaturity.since
+        operation: listAiCapabilityMaturity
+        notes: '**Starting, learning, established, learned** (AI functions review): where each answer
+          stands, what it is based on and what the next stage needs. A `promotionReady` alert links from
+          the row.'
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The governance list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the governance untouched.
@@ -64213,6 +64471,11 @@ screens:
     purpose: Governance alerts
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: listAiCapabilityMaturity
+    contract: ai
+    purpose: Where each AI answer stands on the way to learned
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-519
@@ -64910,11 +65173,13 @@ screens:
         impliedBy: listAiGovernancePolicyVersions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: getEffectiveAiPolicy
       - kind: primaryButton
         derived: true
         impliedBy: createAiPolicyException
         label: Create AI policy exception
         notes: The act the screen exists for.
+        operation: createAiPolicyException
       - kind: destructiveButton
         derived: true
         impliedBy: revokeAiPolicyException
@@ -64922,11 +65187,20 @@ screens:
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — which
           AI policy exception is affected and what goes with it, in the screen''s own words; *are you
           sure* is not a confirmation.'
+        operation: revokeAiPolicyException
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createAiPolicyException
+      - kind: dataTable
+        label: Policy conflicts
+        bindsTo: AiEffectivePolicy.conflicts
+        operation: getEffectiveAiPolicy
+        notes: '**Each conflict and the more restrictive result it resolved to** (18 September minutes,
+          M18-01; AIC-161). A plan step that fails the owning module''s limit (a price above the configured
+          maximum) is shown as governance-blocked and is never applied.'
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The policy conflict exception list.
     error: Could not load. Names which read failed and leaves the policy conflict exception untouched.
@@ -64968,6 +65242,13 @@ screens:
     params:
     - name: exceptionId
       from: navigation
+  overlays:
+  - id: confirmRevokeAiPolicyException
+    component: confirmDialog
+    trigger: Revoke AI policy exception
+    body: '**Names the exception and what the capability falls back to** once it is revoked: the stricter
+      policy applies at once to every scope the exception covered.'
+    provenance: 29 September pass (P29 group A)
 - id: ADM-527
   name: AI Policy Testing & Governance Simulation
   module: Platform
@@ -65423,8 +65704,25 @@ screens:
       - kind: secondaryButton
         label: → Commercial Director + General Manager
         provenance: pack AI_Governance_Reference.pdf, page 31 §Support
+      - kind: primaryButton
+        label: Save approval matrix
+        operation: setApprovalMatrix
+        provenance: 29 September pass (P29 group A)
+      - kind: secondaryButton
+        label: Test a routing
+        operation: evaluateApprovalRequirement
+        notes: Evaluates a sample AI action (kind `aiRecommendation`, amount, scope) against the matrix
+          and shows who would approve it.
+        provenance: 29 September pass (P29 group A)
     - name: contentBody
-      components: []
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Approval matrix for AI actions
+        operation: listApprovalMatrices
+        notes: '**AI actions route through the shared approval matrix** (18 September minutes, M18-02),
+          kind `aiRecommendation`: an approver is authorised up to a limit and anything above it escalates.'
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The approval requirement routing list.
     error: Could not load. Names which read failed and leaves the approval requirement routing untouched.
@@ -65450,6 +65748,23 @@ screens:
     purpose: The tool registry
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: listApprovalMatrices
+    contract: approvals
+    purpose: The matrices AI actions route through
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: setApprovalMatrix
+    contract: approvals
+    purpose: Thresholds and levels for AI actions
+    trigger: onAction
+    invalidates:
+    - listApprovalMatrices
+    provenance: 29 September pass (P29 group A)
+  - operationId: evaluateApprovalRequirement
+    contract: approvals
+    purpose: Who would approve this AI action
+    trigger: onAction
+    provenance: 29 September pass (P29 group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-530
@@ -65457,6 +65772,21 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 31. 0 of 0 labels bound
     to a contract property; 11 of 60 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  overlays:
+  - id: formSetApprovalMatrix
+    component: modal
+    trigger: Save approval matrix
+    body: '**Collects the matrix for kind `aiRecommendation`** before `setApprovalMatrix` is called: levels,
+      the value range each approver may approve, and the escalation above it. Dismissing sends nothing.'
+    confirm:
+      label: Save approval matrix
+      operation: setApprovalMatrix
+    dismiss:
+      label: Cancel
+      discards:
+      - levels
+      - thresholds
+    provenance: 29 September pass (P29 group A)
 - id: ADM-531
   name: AI Approval Review Workspace
   module: Platform
@@ -65594,6 +65924,7 @@ screens:
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
+        operation: getActionPlan
       - kind: primaryButton
         derived: true
         impliedBy: decideProposedAction
@@ -65603,6 +65934,19 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: decideProposedAction
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: Approval condition for this action
+        operation: evaluateApprovalRequirement
+        notes: '**Conditional authority** (M18-02): the approver''s limit for this kind and amount, and
+          whether the action is within it or must escalate.'
+        provenance: 29 September pass (P29 group A)
+      - kind: dataTable
+        label: Threshold ranges
+        operation: listApprovalMatrices
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The conditional approval approval list.
     error: Could not load. Names which read failed and leaves the conditional approval approval untouched.
@@ -65623,6 +65967,16 @@ screens:
     purpose: Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: evaluateApprovalRequirement
+    contract: approvals
+    purpose: Whether this action is within the approver's limit
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: listApprovalMatrices
+    contract: approvals
+    purpose: The threshold ranges
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-532
@@ -65811,11 +66165,36 @@ screens:
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
+        operation: getActionPlan
       - kind: dataTable
         derived: true
         impliedBy: listProposedActions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listProposedActions
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Delegations in force
+        operation: listApprovalDelegations
+        provenance: 29 September pass (P29 group A)
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: secondaryButton
+        label: Escalate
+        operation: escalateApprovalRequest
+        provenance: 29 September pass (P29 group A)
+      - kind: secondaryButton
+        label: Delegate
+        operation: createApprovalDelegation
+        provenance: 29 September pass (P29 group A)
+      - kind: secondaryButton
+        label: Save approval SLA
+        operation: setApprovalSlaPolicy
+        notes: Escalation, delegation and SLA apply to AI actions as to any approval (M18-02).
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The escalation delegation approval list.
     error: Could not load. Names which read failed and leaves the escalation delegation approval untouched.
@@ -65836,6 +66215,28 @@ screens:
     purpose: What the assistant has proposed and nobody has decided
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: listApprovalDelegations
+    contract: approvals
+    purpose: Who is acting for whom
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: escalateApprovalRequest
+    contract: approvals
+    purpose: Send an AI action to the next level
+    trigger: onAction
+    provenance: 29 September pass (P29 group A)
+  - operationId: createApprovalDelegation
+    contract: approvals
+    purpose: Delegate approval authority
+    trigger: onAction
+    invalidates:
+    - listApprovalDelegations
+    provenance: 29 September pass (P29 group A)
+  - operationId: setApprovalSlaPolicy
+    contract: approvals
+    purpose: The SLA and its escalation
+    trigger: onAction
+    provenance: 29 September pass (P29 group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-534
@@ -65847,6 +66248,9 @@ screens:
     params:
     - name: planId
       from: navigation
+    - name: requestId
+      from: navigation
+      optional: true
 - id: ADM-535
   name: Live AI Execution Oversight & Human Intervention
   module: Platform
@@ -65906,7 +66310,7 @@ screens:
         - Confirmation
         - Audit Record
         bindsTo: null
-        operation: null
+        operation: getActionPlan
         provenance: pack AI_Governance_Reference.pdf, page 39 §High-impact intervention should show
     - name: contextPanel
       slot: selection
@@ -65928,6 +66332,28 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Approval answers”, “Step
           Action Module Status”, “Administrator notices”.'
         provenance: pack AI_Governance_Reference.pdf, page 39 §High-impact intervention should show
+        operation: getActionPlan
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: secondaryButton
+        label: Pause
+        operation: pauseActionPlan
+        provenance: 29 September pass (P29 group A)
+      - kind: secondaryButton
+        label: Resume
+        operation: resumeActionPlan
+        provenance: 29 September pass (P29 group A)
+      - kind: destructiveButton
+        label: Cancel plan
+        operation: cancelActionPlan
+        provenance: 29 September pass (P29 group A)
+      - kind: destructiveButton
+        label: Roll back
+        operation: rollbackActionPlan
+        notes: '**Rollback on partial failure** (21 September minutes, M21-12): plans the compensating
+          steps in reverse dependency order, for approval like any plan.'
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The live execution oversight list.
     error: Could not load. Names which read failed and leaves the live execution oversight untouched.
@@ -65958,6 +66384,11 @@ screens:
     purpose: Cancel a plan
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: rollbackActionPlan
+    contract: ai
+    purpose: Plan the rollback of a partly executed plan
+    trigger: onAction
+    provenance: 29 September pass (P29 group A)
   entryState:
     preloaded:
     - Impact of Pausing
@@ -65976,6 +66407,19 @@ screens:
   apisNote: Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 39. 0 of 10 labels bound
     to a contract property; 10 of 54 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  overlays:
+  - id: confirmCancelActionPlan
+    component: confirmDialog
+    trigger: Cancel plan
+    body: '**Names the plan, the steps already executed and what stays applied**: cancelling stops the
+      remaining steps; it does not undo the executed ones (that is Roll back).'
+    provenance: 29 September pass (P29 group A)
+  - id: confirmRollbackActionPlan
+    component: confirmDialog
+    trigger: Roll back
+    body: '**Names each executed step and its compensation**, and that the rollback plan goes for approval
+      before it runs.'
+    provenance: 29 September pass (P29 group A)
 - id: ADM-536
   name: Human Override & Manual Control Center
   module: Platform
@@ -66493,6 +66937,19 @@ screens:
         derived: true
         impliedBy: getAiDecisionTrace
         notes: One record, read-only.
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: selectField
+        label: Venue
+        operation: searchAiDecisions
+        notes: 'Sent as `venueId` (18 September minutes, M18-03: searchable by venue).'
+        provenance: 29 September pass (P29 group A)
+      - kind: searchField
+        label: Customer
+        operation: searchAiDecisions
+        notes: 'Sent as `subjectRef`, the guest profile id (M18-03: searchable by customer).'
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The decision search list.
     error: Could not load. Names which read failed and leaves the decision search untouched.
@@ -67408,6 +67865,27 @@ screens:
         notes: The pack filters this screen by tenant, venue, capability, module, environment, risk and
           4 more — which are present is a decision the pack already made.
         provenance: pack AI_Governance_Reference.pdf, page 82 §Filters
+      - kind: dataTable
+        label: Capability health
+        bindsTo: AiCapabilityHealth
+        columns:
+        - AiCapabilityHealth.capabilityKey
+        - AiCapabilityHealth.availability
+        - AiCapabilityHealth.p95LatencyMs
+        - AiCapabilityHealth.errorRate
+        - AiCapabilityHealth.breakerState
+        - AiCapabilityHealth.degraded
+        - AiCapabilityHealth.dataFreshness
+        operation: listAiCapabilityHealth
+        notes: '**Overall AI health in production** (21 September minutes, M21-13).'
+        provenance: 29 September pass (P29 group A)
+      - kind: chart
+        label: Spend by agent
+        bindsTo: AiUsageReport
+        operation: getAiUsage
+        notes: '`getAiUsage` grouped by `agent`, with the month-end projection labelled a forecast: which
+          agents consume the most, and for what (M21-13).'
+        provenance: 29 September pass (P29 group A)
     - name: contentBody
       slot: headline
       components:
@@ -67471,6 +67949,16 @@ screens:
     purpose: AI incidents
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: listAiCapabilityHealth
+    contract: ai
+    purpose: Health per capability
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
+  - operationId: getAiUsage
+    contract: ai
+    purpose: Consumption by agent
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-549
@@ -68029,6 +68517,21 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: runAiEvaluation
+      - kind: dataTable
+        label: Training and backtest runs
+        bindsTo: AiTrainingRun
+        columns:
+        - AiTrainingRun.capabilityKey
+        - AiTrainingRun.trainingWindowFrom
+        - AiTrainingRun.trainingWindowTo
+        - AiTrainingRun.includesImportedHistory
+        - AiTrainingRun.status
+        - AiTrainingRun.metrics
+        - AiTrainingRun.releaseId
+        operation: listAiTrainingRuns
+        notes: '**Per tenant, own data only** (AIP-149). A run that passes its shadow gate raises `promotionReady`;
+          the admin promotes it here with `promoteAiRelease`. Nothing switches by itself (AI-D16).'
+        provenance: 29 September pass (P29 group A)
   states:
     loading: The quality behavior governance list.
     error: Could not load. Names which read failed and leaves the quality behavior governance untouched.
@@ -68064,6 +68567,11 @@ screens:
     purpose: Governance alerts
     trigger: onLoad
     provenance: build, 29 September 2026
+  - operationId: listAiTrainingRuns
+    contract: ai
+    purpose: The per-tenant training and backtest runs
+    trigger: onLoad
+    provenance: 29 September pass (P29 group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-554
@@ -75924,7 +76432,8 @@ screens:
       back: true
   density: compact
   pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Display) and no metric row
+  patternReason: the pack gives this screen a display directory (§Display) and no metric row Rendered
+    on the calendar template (M17-03, 29 September).
   purpose: Manage operational settlement expectations across providers, merchant accounts and legal entities.
   gaps:
   - operation: null
@@ -75939,7 +76448,7 @@ screens:
       builds.'
     source: contract — the screen's declared operations
   layout:
-    template: split
+    template: calendar
     regions:
     - name: contentBody
       slot: collection
@@ -75954,6 +76463,21 @@ screens:
         bindsTo: null
         operation: null
         provenance: pack Payment_Payment_Orchestration.pdf, page 145 §Display
+      - kind: selectField
+        label: 'View: day, week or month'
+        notes: '**Every calendar has day, week and month views, and the day view is broken into hours
+          from the venue''s day start hour** (17 September minutes, M17-03). Built on the shared calendar
+          view (`calendarView`, to be added to the component library); until then a timeline per view.'
+        provenance: 29 September pass (P29 group A)
+      - kind: multiSelect
+        label: Category
+        notes: '**Filtered by category, so a team sees only what is theirs** (M17-03).'
+        provenance: 29 September pass (P29 group A)
+      - kind: calendarView
+        label: Calendar
+        operation: listMerchantAccounts
+        notes: Entries of the view in force, placed by date and hour.
+        provenance: 29 September pass (P29 group A)
     - name: contextPanel
       slot: selection
       components:

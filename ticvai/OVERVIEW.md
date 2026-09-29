@@ -4,7 +4,7 @@ A multi-tenant platform for ticketing, access control, point of sale and venue o
 **This package is the design of it** — the contracts, the data model, the screens, the
 journeys through them, and the reasoning behind every decision that was not obvious.
 
-**2608 operations · 33 contracts · 1076 tables · 2440 screens · 206 state models · 96 flows · 48 ADRs**
+**2660 operations · 33 contracts · 1091 tables · 2445 screens · 206 state models · 97 flows · 48 ADRs**
 
 **Design 96% · Build 33%.**
 
@@ -33,12 +33,12 @@ package has been bitten by that three times.
 | | | |
 |---|---:|---|
 | Requirements contracted | **3,153** of 3,184 | **100% of what is in scope** |
-| Operations reaching a screen | 2386 of 2608 | 91% |
-| Screens reachable from an entry point | 2439 of 2440 | 100% |
-| Screens drawn on a board | 2440 of 2440 | 100% |
-| Screens in a journey | 2122 of 2440 | 87% |
+| Operations reaching a screen | 2430 of 2660 | 91% |
+| Screens reachable from an entry point | 2444 of 2445 | 100% |
+| Screens drawn on a board | 2445 of 2445 | 100% |
+| Screens in a journey | 2123 of 2445 | 87% |
 | Conflicts | 157 closed | 9 open, none blocking |
-| **Tables written** | **0** of 1076 | **build has not started** |
+| **Tables written** | **0** of 1091 | **build has not started** |
 
 ---
 
@@ -65,7 +65,7 @@ cd viewer && npm start        →  http://localhost:4173
 
 | | | | |
 |---|---|---|---:|
-| `P01` | Guest Web — Storefront | guest | 49 |
+| `P01` | Guest Web — Storefront | guest | 50 |
 | `P02` | Guest App — Mobile | guest | 77 |
 | `P04` | Venue POS — Terminal and Tablet | staff | 30 |
 | `P05` | Guest Kiosk — Self-Service | guest | 17 |
@@ -76,10 +76,10 @@ cd viewer && npm start        →  http://localhost:4173
 | `P10` | Partner Web — Reseller Portal | partner | 51 |
 | `P11` | Accreditation Web — Applications | public | 8 |
 | `P12` | Venue Support — Agent Console | staff | 28 |
-| `P13` | Venue CMS — White Label | staff | 100 |
+| `P13` | Venue CMS — White Label | staff | 103 |
 | `P14` | Developer Portal | partner | 8 |
 | `P15` | Kitchen Display — Pass and Stations | staff | 10 |
-| `P16` | Venue Analytics — Cross-Domain Reporting | staff | 69 |
+| `P16` | Venue Analytics — Cross-Domain Reporting | staff | 70 |
 | `P17` | TICVAI Sign-up — Onboarding & Purchase | public | 24 |
 
 ---
@@ -105,15 +105,15 @@ cd viewer && npm start        →  http://localhost:4173
 
 **Put last on purpose.** A landing page that only lists what exists is a landing page that misleads.
 
-**Build is 0%.** 1076 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 100% of in-scope requirements and the gap to build is the entire remaining risk.**
+**Build is 0%.** 1091 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 100% of in-scope requirements and the gap to build is the entire remaining risk.**
 
-**96 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 2608 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
+**97 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 2660 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
 
-**2440 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
+**2445 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
 
 **9 conflicts are open.** None blocks build; four need an email and one needs a workshop.
 
-- **CF-171** — Chinmay + Qossai **Re-measured 20 September: 577 of 2608 operations, 28%** — the figures above are 577 of 1,626 and 35%. **The absolute number has not moved by one, and all 577 still have a `summary` that is verbatim the title of a screen in their own `x-ticvai-consumed-by`.** It reads better only because the denominator grew by 2608 operations that were specified properly. **A measurement that drifts in our own favour is the one nobody re-runs**, which is the whole argument of this row restated against itself. Concentrated in `access` (146), `catalogue` (108), `promotions` (96), `orders` (89), `marketing-crm` (68), `subscription` (50) and `approvals` (20).
+- **CF-171** — Chinmay + Qossai **Re-measured 20 September: 577 of 2660 operations, 28%** — the figures above are 577 of 1,626 and 35%. **The absolute number has not moved by one, and all 577 still have a `summary` that is verbatim the title of a screen in their own `x-ticvai-consumed-by`.** It reads better only because the denominator grew by 2660 operations that were specified properly. **A measurement that drifts in our own favour is the one nobody re-runs**, which is the whole argument of this row restated against itself. Concentrated in `access` (146), `catalogue` (108), `promotions` (96), `orders` (89), `marketing-crm` (68), `subscription` (50) and `approvals` (20).
 - **CF-170** — Chinmay + Dinesh
 - **CF-169** — Chinmay + Dinesh
 - **CF-162** — Dinesh

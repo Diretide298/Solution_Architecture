@@ -355,6 +355,7 @@ retire-answered-questions                                          # never run: 
 retest-gap-rows                                                    # reports review candidates; a verdict is a judgement, not a rebuild
 build-provisional-review                                           # its sheets carry people's decisions; a rebuild would erase them
 bench derive-services export-design-batch render-screens           # deliberate, not a rebuild
+build-plan-deck                                                    # the presentation plan, run by hand after a refresh
 build-mom-digest build-review-responses scan-domain-drift find-capability
 "
 _missing=""

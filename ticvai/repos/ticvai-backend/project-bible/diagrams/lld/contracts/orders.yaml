@@ -30,23 +30,17 @@ operations:
   - partner
   offline: false
   reads:
-  - cache:idempotency
   - catalogue.channel_capacity
   - catalogue.performance
   - catalogue.variant
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - marketing.consent_question
   - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
   writes:
-  - cache:idempotency
-  - catalogue.inventory_hold
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.cart
   - orders.cart_line
+  - platform.idempotency_record
 - operation: addTip
   verb: POST
   path: /payments/{paymentId}/tip
@@ -73,9 +67,8 @@ operations:
   reads:
   - access.entitlement
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
@@ -95,13 +88,15 @@ operations:
   - partner
   offline: false
   reads:
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - marketing.consent_question
   - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
-  writes: []
+  - promotions.coupon_campaign
+  - promotions.coupon_code
+  writes:
+  - orders.cart
+  - orders.cart_line
 - operation: applyManualDiscount
   verb: POST
   path: /orders/{orderId}/discounts
@@ -113,9 +108,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
@@ -250,15 +244,19 @@ operations:
   - partner
   offline: false
   reads:
-  - cache:idempotency
   - ledger.fx_rate
   - orders.payment
   - payments.provider_connection
   writes:
   - cache:idempotency
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - ledger.journal_entry
+  - ledger.journal_line
   - orders.order_event
   - orders.payment
   - payments.payment_attempt
+  - platform.idempotency_record
   - platform.outbox
 - operation: captureStoredValue
   verb: POST
@@ -285,22 +283,25 @@ operations:
   - partner
   offline: false
   reads:
-  - cache:idempotency
   - catalogue.inventory_hold
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - marketing.consent_question
   - orders.cart
   - orders.cart_line
   - orders.fraud_rule
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
-  - cache:idempotency
+  - marketing.consent_record
   - orders.cart
   - orders.order_line
+  - orders.order_line_discount
+  - orders.order_line_eligibility
   - orders.sales_order
+  - platform.idempotency_record
+  - platform.outbox
 - operation: claimCart
   verb: POST
   path: /carts/{cartId}/claim
@@ -311,8 +312,6 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - marketing.consent_question
   - marketing.consent_question_version
   - orders.cart
@@ -372,9 +371,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
@@ -396,9 +394,8 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
@@ -431,8 +428,6 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - marketing.consent_question
   - marketing.consent_question_version
   - orders.cart
@@ -515,16 +510,13 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_event
   - orders.order_line
   - orders.payment
@@ -555,18 +547,22 @@ operations:
   - partner
   offline: true
   reads:
-  - cache:idempotency
+  - catalogue.inventory_hold
   - ledger.fx_rate
+  - orders.order_line
   - orders.payment
   - orders.sales_order
   - payments.provider_connection
   writes:
   - cache:idempotency
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
   - ledger.journal_entry
-  - ledger.posting
+  - ledger.journal_line
   - orders.order_event
   - orders.payment
   - payments.payment_attempt
+  - platform.idempotency_record
   - platform.outbox
 - operation: createPaymentLink
   verb: POST
@@ -652,14 +648,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.reservation
   - orders.reservation_line
   writes:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_event
   - orders.reservation
   - orders.reservation_line
@@ -713,8 +705,6 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_event
   - orders.sales_order
   - platform.outbox
@@ -729,8 +719,6 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.inventory_hold
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - marketing.consent_question
   - marketing.consent_question_version
   - orders.cart
@@ -749,8 +737,6 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.reservation
   - orders.reservation_line
   writes:
@@ -797,8 +783,6 @@ operations:
   reads:
   - catalogue.channel_capacity
   - catalogue.inventory_hold
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - marketing.consent_question
   - marketing.consent_question_version
   - orders.cart
@@ -831,7 +815,6 @@ operations:
   offline: false
   reads:
   - orders.deposit_policy
-  - orders.deposit_policy (dining_* columns)
   writes: []
 - operation: getGroupBooking
   verb: GET
@@ -873,9 +856,8 @@ operations:
   - partner
   offline: true
   reads:
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
@@ -919,9 +901,8 @@ operations:
   - anonymous
   offline: false
   reads:
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment_link
   - orders.reservation
@@ -974,8 +955,6 @@ operations:
   - guest
   offline: false
   reads:
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.reservation
   - orders.reservation_line
   writes: []
@@ -1001,9 +980,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
@@ -1604,9 +1582,8 @@ operations:
   - guest
   offline: false
   reads:
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
@@ -2144,8 +2121,6 @@ operations:
   - guest
   offline: false
   reads:
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.reservation
   - orders.reservation_line
   writes: []
@@ -2360,6 +2335,7 @@ operations:
   offline: false
   reads:
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
@@ -2394,16 +2370,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_event
   - orders.order_line
   - orders.payment
@@ -2634,8 +2607,6 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - marketing.consent_question
   - marketing.consent_question_version
   - orders.cart
@@ -2777,9 +2748,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
@@ -2900,10 +2870,8 @@ operations:
   offline: false
   reads:
   - orders.deposit_policy
-  - orders.deposit_policy (dining_* columns)
   writes:
   - orders.deposit_policy
-  - orders.deposit_policy (dining_* columns)
 - operation: setFraudRules
   verb: PUT
   path: /fraud-rules
@@ -3349,11 +3317,21 @@ operations:
   - staff
   offline: false
   reads:
+  - catalogue.inventory_hold
+  - catalogue.price_list
+  - catalogue.variant
   - orders.sales_order
   writes:
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
+  - ledger.price_variance
+  - orders.order_line
+  - orders.order_line_discount
+  - orders.payment
   - orders.sales_order
+  - platform.idempotency_record
+  - platform.outbox
+  - sync.rejection
 - operation: transferOrderTickets
   verb: POST
   path: /orders/{orderId}/transfer
@@ -3382,8 +3360,6 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.channel_capacity
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - marketing.consent_question
   - marketing.consent_question_version
   - orders.cart
@@ -3444,9 +3420,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
-  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
+  - orders.order_line_discount
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order

@@ -7,6 +7,8 @@ publisher: accreditation
 description: An accreditation application was approved, rejected, returned for information or escalated.
 aggregate: accreditationApplication
 emittedWhen: decideAccreditationApplication succeeds (submitted or underReview to approved, rejected, informationRequested, or escalated), or renewAccreditation approves a renewal at once where no reverification is required
+emittedBy:
+- decideAccreditationApplication
 payload:
 - field: applicationId
   type: uuid

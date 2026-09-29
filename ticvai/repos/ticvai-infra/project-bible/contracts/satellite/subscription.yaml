@@ -151,6 +151,7 @@ paths:
         format: uuid
     get:
       operationId: listPartnerUsers
+      x-ticvai-api-scope: partner.read
       summary: Users beneath a partner, by branch
       tags:
       - subscription
@@ -175,6 +176,7 @@ paths:
       operationId: createPartnerUser
       x-ticvai-consumed-by:
         - "P10 PTR-025 Partner Contacts & User Administration"
+      x-ticvai-api-scope: partner.write
       summary: Add a user to a partner branch
       description: '2.7.51. **Quota and credit resolve nearest-ancestor-wins**, like configuration — a
         branch with no limit inherits the agency''s.
@@ -540,6 +542,7 @@ paths:
         - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-011 Quote Management"
         - "P10 PTR-017 Commission Statement"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
       - partner
@@ -663,6 +666,8 @@ paths:
   /partner-registrations:
     post:
       operationId: registerPartner
+      security: []
+      x-ticvai-agreed: '29 September: system-design review SD-056 (an anonymous write needs a challenge and a rate limit)'
       x-ticvai-audience:
       - anonymous
       summary: A business applies to become a partner
@@ -680,6 +685,14 @@ paths:
         no agreement is created here, the first one is drafted after approval (`setAgreementContractTerm`).
         **The 202 body is therefore the application** (status `submitted`, with `partnerId` and `approvalRequestId`),
         no longer a pending PartnerAgreement.
+
+
+        **Anonymous, so challenged and rate-limited** (system-design review SD-056, 29 September). It
+        stays unauthenticated (`security: []`: an applicant has no account yet), and every request
+        carries `challengeToken`, the answer to the sign-up page''s bot challenge, verified server-side
+        before anything is written; a missing, expired or failed token is refused 422 `challenge-failed`.
+        Requests are limited per source address and per `contactEmail` domain, refused 429 with
+        `Retry-After`, so a script cannot fill the partner review queue.
 
         '
       tags:
@@ -700,6 +713,7 @@ paths:
               - companyName
               - contactEmail
               - country
+              - challengeToken
               properties:
                 companyName:
                   type: string
@@ -715,6 +729,11 @@ paths:
                   type: string
                 expectedVolume:
                   type: string
+                challengeToken:
+                  type: string
+                  maxLength: 4096
+                  writeOnly: true
+                  description: The bot-challenge answer from the sign-up page (SD-056), verified before anything is written; never stored.
       responses:
         '202':
           headers:
@@ -725,6 +744,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PartnerApplication'
+        '422':
+          description: The bot challenge is missing, expired or failed (`challenge-failed`, SD-056); nothing was written.
+          x-ticvai-problem-types:
+          - challenge-failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /partner-agreements/{agreementId}/commission-statement:
     parameters:
     - name: agreementId
@@ -738,6 +767,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-011 Quote Management"
         - "P10 PTR-017 Commission Statement"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
       - partner
@@ -3068,6 +3098,7 @@ paths:
       operationId: listPartnerQuotes
       x-ticvai-consumed-by:
         - "P10 PTR-011 Quote Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       summary: Quotes offered to this partner
@@ -3102,6 +3133,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-408 Final Package Approval & Handoff"
         - "P10 PTR-011 Quote Management"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
       summary: Raise a quote
@@ -4655,6 +4687,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-022 Partner Management Command Center"
         - "P10 PTR-042 Partner Operations Command Center"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.5-6 (Executive
@@ -4811,6 +4844,7 @@ paths:
       operationId: setPartnerProfileOrganization
       x-ticvai-consumed-by:
         - "P10 PTR-023 Partner Profile & Organization Setup"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.7-8 (Partner
@@ -4858,6 +4892,7 @@ paths:
       operationId: listPartnerOnboardingApplication
       x-ticvai-consumed-by:
         - "P10 PTR-024 Partner Onboarding & Application Workflow"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.8-10
@@ -4949,6 +4984,7 @@ paths:
       operationId: listPartnerContactUser
       x-ticvai-consumed-by:
         - "P10 PTR-025 Partner Contacts & User Administration"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.10-12
@@ -5044,6 +5080,7 @@ paths:
       operationId: listTerritoryMarketDistribution
       x-ticvai-consumed-by:
         - "P10 PTR-026 Territory, Market & Distribution Rights"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.12-14
@@ -5136,6 +5173,7 @@ paths:
       operationId: setPartnerBrandVenue
       x-ticvai-consumed-by:
         - "P10 PTR-027 Partner Brand, Venue & Business Scope Assignment"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.14-15
@@ -5183,6 +5221,7 @@ paths:
       operationId: listPartnerDocumentationCompliance
       x-ticvai-consumed-by:
         - "P10 PTR-028 Partner Documentation & Compliance Repository"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.15-16
@@ -5262,6 +5301,7 @@ paths:
       operationId: listPartnerAccessRole
       x-ticvai-consumed-by:
         - "P10 PTR-029 Partner Access, Roles & Permission Profile"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.16-18
@@ -5357,6 +5397,7 @@ paths:
       operationId: approvePartnerStatuLifecycle
       x-ticvai-consumed-by:
         - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.18-19
@@ -5406,6 +5447,7 @@ paths:
       operationId: listPartnerProfileReadiness
       x-ticvai-consumed-by:
         - "P10 PTR-031 Partner 360° Profile, Readiness & AI Review"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.19-21
@@ -5484,6 +5526,7 @@ paths:
       operationId: listCommercialAgreement
       x-ticvai-consumed-by:
         - "P10 PTR-032 Commercial Agreement Command Center"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.23-25
@@ -5614,6 +5657,7 @@ paths:
         - "P09 ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance"
         - "P10 PTR-033 Agreement & Contract Terms Builder"
         - "P17 SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.25-27
@@ -5663,6 +5707,7 @@ paths:
       operationId: setPartnerRateNet
       x-ticvai-consumed-by:
         - "P10 PTR-034 Partner Rate & Net Pricing Configuration"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.27-29
@@ -5712,6 +5757,7 @@ paths:
       operationId: listCommissionMarginIncentive
       x-ticvai-consumed-by:
         - "P10 PTR-035 Commission, Margin & Incentive Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.29-30
@@ -5786,6 +5832,7 @@ paths:
       operationId: listCreditLimitExposure
       x-ticvai-consumed-by:
         - "P10 PTR-036 Credit Limit & Exposure Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.30-32
@@ -5865,6 +5912,7 @@ paths:
       operationId: listDepositGuaranteeFinancial
       x-ticvai-consumed-by:
         - "P10 PTR-037 Deposit, Guarantee & Financial Security Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.32-33
@@ -5948,6 +5996,7 @@ paths:
       operationId: setPaymentTermBilling
       x-ticvai-consumed-by:
         - "P10 PTR-038 Payment Terms, Billing & Account Configuration"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.33-35
@@ -6005,6 +6054,7 @@ paths:
       operationId: listCommercialAllocationQuota
       x-ticvai-consumed-by:
         - "P10 PTR-039 Commercial Allocation, Quota & Commitment Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.35-36
@@ -6079,6 +6129,7 @@ paths:
       operationId: approveBookingLimitCommercial
       x-ticvai-consumed-by:
         - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.37-38
@@ -6131,6 +6182,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-032 Commercial Agreement Command Center"
         - "P10 PTR-041 Commercial Agreement 360°, Health & AI Review"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.38-41
@@ -6211,6 +6263,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-022 Partner Management Command Center"
         - "P10 PTR-042 Partner Operations Command Center"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.44-46
@@ -6337,6 +6390,7 @@ paths:
       operationId: listPartnerOrderBooking
       x-ticvai-consumed-by:
         - "P10 PTR-043 Partner Orders & Booking Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.46-48
@@ -6461,6 +6515,7 @@ paths:
       operationId: listReservationHoldRelease
       x-ticvai-consumed-by:
         - "P10 PTR-044 Reservations, Holds & Release Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.48-49
@@ -6542,6 +6597,7 @@ paths:
       operationId: listPartnerCancellationRefund
       x-ticvai-consumed-by:
         - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.49-51
@@ -6637,6 +6693,7 @@ paths:
       operationId: listPartnerStatementAccount
       x-ticvai-consumed-by:
         - "P10 PTR-046 Partner Statement & Account Activity"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.51-52
@@ -6732,6 +6789,7 @@ paths:
       operationId: listPartnerReconciliationException
       x-ticvai-consumed-by:
         - "P10 PTR-047 Partner Reconciliation & Exception Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.52-54
@@ -6819,6 +6877,7 @@ paths:
       operationId: listCommissionCalculationSettlement
       x-ticvai-consumed-by:
         - "P10 PTR-048 Commission Calculation & Settlement Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.54-55
@@ -6902,6 +6961,7 @@ paths:
       operationId: listPartnerDisputeCase
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.56-57
@@ -7010,6 +7070,7 @@ paths:
       operationId: listPartnerPerformanceScorecard
       x-ticvai-consumed-by:
         - "P10 PTR-050 Partner Performance Scorecard & Risk Monitoring"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.57-59
@@ -7100,6 +7161,7 @@ paths:
       operationId: listPartnerRelationship
       x-ticvai-consumed-by:
         - "P10 PTR-051 Partner AI Intelligence & Relationship Optimization"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.59-61
@@ -7995,6 +8057,7 @@ paths:
       operationId: actOnPartnerApplicationReview
       x-ticvai-consumed-by:
         - "P10 PTR-024 Partner Onboarding & Application Workflow"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
       - partner
@@ -8067,6 +8130,7 @@ paths:
       operationId: setPartnerContact
       x-ticvai-consumed-by:
         - "P10 PTR-025 Partner Contacts & User Administration"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
       - partner
@@ -8583,6 +8647,7 @@ paths:
       operationId: createPartnerChangeRequest
       x-ticvai-consumed-by:
         - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
       - staff
@@ -8951,6 +9016,7 @@ paths:
       operationId: createPartnerCase
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
       - partner
@@ -9008,6 +9074,7 @@ paths:
       operationId: actOnPartnerCase
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
       - partner
@@ -24270,6 +24337,11 @@ components:
           format: date-time
           description: Generated at
   securitySchemes:
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
     bearerAuth:
       type: http
       scheme: bearer

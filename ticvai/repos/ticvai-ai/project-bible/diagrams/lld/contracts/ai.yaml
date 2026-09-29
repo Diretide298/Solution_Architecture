@@ -1,5 +1,5 @@
 id: LLD-ai
-title: ai — 133 operations
+title: ai — 141 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -684,6 +684,17 @@ operations:
   - ai.activity
   - ai.model
   writes: []
+- operation: getAiVenueSettings
+  verb: GET
+  path: /venues/{venueId}/ai-settings
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.venue_settings
+  writes: []
 - operation: getApprovalRequestScore
   verb: GET
   path: /approval-requests/{approvalRequestId}/score
@@ -798,6 +809,33 @@ operations:
   - ai.risk_alert
   - ai.risk_case
   writes: []
+- operation: getVenueHistoryImport
+  verb: GET
+  path: /history-imports/{importId}
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.history_import
+  writes: []
+- operation: importVenueHistory
+  verb: POST
+  path: /venues/{venueId}/history-imports
+  scope: venue
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.history_import
+  - assets.media_asset
+  - cache:idempotency
+  writes:
+  - ai.history_import
+  - ai.history_observation
+  - cache:idempotency
 - operation: ingestKnowledgeDocument
   verb: POST
   path: /collections/{collectionId}/documents
@@ -829,6 +867,32 @@ operations:
   offline: false
   reads:
   - ai.capability
+  writes: []
+- operation: listAiCapabilityHealth
+  verb: GET
+  path: /governance/capability-health
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.activity
+  - ai.capability
+  - ai.provider
+  - cache:ai-breaker
+  writes: []
+- operation: listAiCapabilityMaturity
+  verb: GET
+  path: /capability-maturity
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.capability
+  - ai.capability_maturity
   writes: []
 - operation: listAiControls
   verb: GET
@@ -965,6 +1029,19 @@ operations:
   offline: false
   reads:
   - ai.tool
+  writes: []
+- operation: listAiTrainingRuns
+  verb: GET
+  path: /training-runs
+  scope: tenant
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.eval_run
+  - ai.release
+  - ai.training_run
   writes: []
 - operation: listAnomalyDetectors
   verb: GET
@@ -1157,6 +1234,17 @@ operations:
   offline: false
   reads:
   - ai.risk_alert
+  writes: []
+- operation: listVenueHistoryImports
+  verb: GET
+  path: /venues/{venueId}/history-imports
+  scope: venue
+  permission: AI_USE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.history_import
   writes: []
 - operation: openAiIncident
   verb: POST
@@ -1569,8 +1657,10 @@ operations:
   - guest
   offline: false
   reads:
+  - ai.capability_maturity
   - ai.forecast_point
   - ai.forecast_version
+  - ai.history_observation
   - ai.insight
   - ai.operational_requirement
   - ai.policy
@@ -1578,6 +1668,7 @@ operations:
   - ai.rec_decline
   - ai.release
   - ai.suggestion
+  - ai.venue_settings
   - cache:idempotency
   - cache:rec-candidates
   - fnb.production_plan
@@ -1587,6 +1678,9 @@ operations:
   - marketing.segment
   - queue.queue
   - queue.reading
+  - venuemap.point
+  - venuemap.visit_plan
+  - venuemap.visit_plan_item
   writes:
   - ai.activity
   - ai.suggestion
@@ -1739,17 +1833,12 @@ operations:
   reads:
   - ai.forecast_definition
   - ai.forecast_version
-  - ai.release
-  - ai.signal_observation
+  - ai.history_observation
+  - ai.venue_settings
   - cache:idempotency
-  - marketing.guest_profile
-  - marketing.segment
-  - orders.order_line
   writes:
-  - ai.forecast_accuracy
   - ai.forecast_point
   - ai.forecast_version
-  - ai.insight
   - cache:idempotency
 - operation: scoreApprovalRequest
   verb: POST
@@ -1954,6 +2043,20 @@ operations:
   writes:
   - ai.tool
   - cache:idempotency
+- operation: setAiVenueSettings
+  verb: PUT
+  path: /venues/{venueId}/ai-settings
+  scope: venue
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.venue_settings
+  - cache:idempotency
+  writes:
+  - ai.venue_settings
+  - cache:idempotency
 - operation: setForecastDefinition
   verb: PUT
   path: /forecast-definitions/{definitionKey}
@@ -1964,7 +2067,6 @@ operations:
   offline: false
   reads:
   - ai.forecast_definition
-  - ai.signal_source
   - cache:idempotency
   writes:
   - ai.forecast_definition

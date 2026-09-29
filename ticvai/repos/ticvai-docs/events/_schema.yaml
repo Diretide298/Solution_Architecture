@@ -29,6 +29,18 @@ description: >
   **Ordering is per aggregate, never global.** Two orders may be processed in any order. Two
   events about the *same* order may not, and the sequence is what makes that enforceable.
 
+  ## The envelope (system-design review SD-030, 29 September)
+
+  **Every event travels in one envelope, so no payload repeats it.** `eventId` (ULID, the consumer inbox
+  key), `name`, `version`, `tenantId`, `aggregateType`, `aggregateId` (text: order ids are ULIDs),
+  `sequence` (per aggregate, allocated in the writing transaction, so a consumer can order and
+  de-duplicate), `occurredAt` and `traceId`. The outbox row carries the same fields; a payload field
+  named `sequence` is the envelope's, repeated only where it was written before this rule.
+
+  **`emittedBy` names the operations that write the event to the outbox**, and an operation names what it
+  emits with `x-ticvai-emits` (SD-033). A consumer with an `operation` is modelled as that internal
+  operation, so its writes appear in lineage and it gets a ticket (SD-026).
+
   ## What is deliberately not here
 
   Commands. This catalogue is facts that have already happened — `order.paid`, not
@@ -53,6 +65,11 @@ properties:
   emittedWhen:
     type: string
     description: The state transition that causes it. Cross-checked against states/.
+  emittedBy:
+    type: array
+    items: { type: string }
+    description: '`<contract>.<operationId>` or `<operationId>` of each operation that writes this event to
+      the outbox (SD-033).'
   payload:
     type: array
     items:
@@ -74,6 +91,10 @@ properties:
       properties:
         context: { type: string }
         purpose: { type: string }
+        operation:
+          type: string
+          description: The internal operation that handles it (`<contract>.<operationId>`), where one is
+            modelled (SD-026).
         idempotencyKey:
           type: string
           description: >

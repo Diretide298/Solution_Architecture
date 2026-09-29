@@ -3,12 +3,12 @@
 **10 September 2026. Fifteen of seventeen checks pass; the two that do not are named below.**
 
 ```
-2608 operations · 33 contracts · 1076 tables · 2966 relationships
-206 state models · 69 events · 96 flows · 48 ADRs
-2440 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
+2660 operations · 33 contracts · 1091 tables · 3034 relationships
+206 state models · 77 events · 97 flows · 48 ADRs
+2445 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
 ```
 
-**`96 flows` counts authored journeys.** 106 more are derived from the client boards and carry
+**`97 flows` counts authored journeys.** 106 more are derived from the client boards and carry
 `provenance: derived-from-board` — they route screens the client specified and do not yet say
 why anyone walks them. `check-board-flows` reports the two apart, because a number a generator can
 move is not a measure of progress.
@@ -76,7 +76,7 @@ decision somebody has to make, and the register says which.
 
 ```
 contracts/      28 OpenAPI files — the source of truth. Everything else derives from here.
-screens/        2440 screens across 16 platforms
+screens/        2445 screens across 16 platforms
 flows/          203 journey files · 106 derived from the client boards, one per board but B2B board 1
 states/         206 state models
 events/         29 declared events
@@ -84,7 +84,7 @@ docs/adr/       44 architecture decisions
 docs/active/    the working documents — audits, briefs, handoffs
 docs/registers/ conflicts (CF-*), backlog, decisions
 
-backend/        DDL, generated — 1076 tables, 763 foreign keys, 2775 indexes
+backend/        DDL, generated — 1091 tables, 783 foreign keys, 2826 indexes
 services/       16 FastAPI skeletons for topology benchmarking
 deploy/         four deployment configurations plus three burst variants
 tools/          the generators and the checks
@@ -102,7 +102,7 @@ sources/        every client file — MoMs, RFP, board PDFs, requirements
 
 ## Where the screen design stands
 
-**46 of 2440 screens are drawn.** 13 batches of P01 Guest Web came back on 10 September,
+**46 of 2445 screens are drawn.** 13 batches of P01 Guest Web came back on 10 September,
 passed the import with nothing refused, and 45 of the 46 carry seeded values rather than
 blank rows. Those frames are now the house style: a later batch that re-derives the look
 instead of matching them produces a second product, not more of this one.
@@ -156,7 +156,7 @@ selected gate mode" and nothing else. **These are placeholders to be replaced, a
 sets them in type has published a generator's shrug.** The 83% that remain were written by a
 person and should be kept.
 
-**719 of the 2440 screens cannot be drawn faithfully from what they declare.** They carry fewer
+**719 of the 2445 screens cannot be drawn faithfully from what they declare.** They carry fewer
 than four components, 224 carry none, and `purpose` runs to a median of 84 characters (measured
 11 September). The bundle says
 so where a designer will see it. Drawing over that gap invents requirements; the gap is a
@@ -169,7 +169,7 @@ specification problem and belongs in the log, not in a picture.
 **`handoff/api-data-lineage.json`** — every operation with its verb, path, scope, permission,
 audience, service, reads and writes. **The join everything else resolves through.**
 
-**`handoff/schema-reference.json`** — 1076 tables, every column, every reference, and a description
+**`handoff/schema-reference.json`** — 1091 tables, every column, every reference, and a description
 for all of them.
 
 **`handoff/burst-scope.json`** — what a flash-sale environment runs, and what it does not. **Thirteen

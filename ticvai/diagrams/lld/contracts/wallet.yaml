@@ -1,5 +1,5 @@
 id: LLD-wallet
-title: wallet — 63 operations
+title: wallet — 66 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -64,6 +64,24 @@ operations:
   writes:
   - cache:idempotency
   - wallet.gift_card
+- operation: captureWalletHold
+  verb: POST
+  path: /wallet-holds/{walletHoldId}/capture
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - service
+  - staff
+  offline: false
+  reads:
+  - wallet.balance
+  - wallet.hold
+  writes:
+  - platform.idempotency_record
+  - platform.outbox
+  - wallet.balance
+  - wallet.hold
+  - wallet.wallet_transaction
 - operation: closeWallet
   verb: POST
   path: /wallets/{walletId}/close
@@ -287,6 +305,25 @@ operations:
   - wallet.reconciliation_source
   - wallet.wallet_transaction
   writes: []
+- operation: holdWalletFunds
+  verb: POST
+  path: /wallets/{walletId}/holds
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - service
+  - staff
+  offline: false
+  reads:
+  - wallet.balance
+  - wallet.hold
+  - wallet.wallet
+  writes:
+  - platform.idempotency_record
+  - platform.outbox
+  - wallet.balance
+  - wallet.hold
+  - wallet.wallet_transaction
 - operation: issueGiftCard
   verb: POST
   path: /gift-cards
@@ -499,6 +536,24 @@ operations:
   writes:
   - cache:idempotency
   - wallet.wallet
+- operation: releaseWalletHold
+  verb: POST
+  path: /wallet-holds/{walletHoldId}/release
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - service
+  - staff
+  offline: false
+  reads:
+  - wallet.balance
+  - wallet.hold
+  writes:
+  - platform.idempotency_record
+  - platform.outbox
+  - wallet.balance
+  - wallet.hold
+  - wallet.wallet_transaction
 - operation: resolveWalletDispute
   verb: POST
   path: /wallet-disputes/{disputeId}/resolve

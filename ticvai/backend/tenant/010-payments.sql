@@ -1,4 +1,4 @@
--- payments — 32 tables
+-- payments — 33 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS payments.instalment (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.instalment_plan (
     id                                uuid PRIMARY KEY NOT NULL,
     order_id                          text NOT NULL,
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS payments.instalment_plan (
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 3 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.instalment_policy (
     is_enabled                        boolean DEFAULT false,
     eligible_product_kinds            text[],
@@ -305,6 +305,9 @@ CREATE TABLE IF NOT EXISTS payments.payment_attempt (
     decline_class                     text,
     decline_code                      text,
     decline_reason                    text,
+    provider_reference                text,
+    provider_idempotency_key          text,
+    attempt_kind                      text CONSTRAINT payment_attempt_attempt_kind_chk CHECK (attempt_kind IN ('authorise', 'capture', 'refund', 'void', 'inquire', 'terminal')),
     latency_ms                        integer,
     authentication_outcome            text CONSTRAINT payment_attempt_authentication_outcome_chk CHECK (authentication_outcome IN ('notAttempted', 'exempted', 'frictionless', 'challengePassed', 'challengeFailed')),
     amount                            numeric(18,4),
@@ -374,6 +377,22 @@ CREATE TABLE IF NOT EXISTS payments.provider_cost (
     amount                            numeric(18,4) NOT NULL,
     settlement_id                     uuid,
     incurred_at                       timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS payments.provider_event (
+    id                                uuid PRIMARY KEY NOT NULL,
+    provider                          text NOT NULL CONSTRAINT provider_event_provider_chk CHECK (provider IN ('stripe', 'networkInternational')),
+    provider_event_id                 text NOT NULL CONSTRAINT provider_event_provider_event_id_chk CHECK (char_length(provider_event_id) <= 255),
+    event_type                        text NOT NULL CONSTRAINT provider_event_event_type_chk CHECK (char_length(event_type) <= 120),
+    provider_reference                text,
+    payment_id                        text,
+    payload                           jsonb,
+    status                            text NOT NULL CONSTRAINT provider_event_status_chk CHECK (status IN ('received', 'processed', 'duplicate', 'unmatched', 'failed')),
+    received_at                       timestamptz NOT NULL,
+    processed_at                      timestamptz,
     scope_path                        ltree NOT NULL
 );
 
@@ -448,7 +467,7 @@ CREATE TABLE IF NOT EXISTS payments.terminal (
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 3 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS payments.terminal_certification (
     id                                uuid PRIMARY KEY,
     model_code                        text NOT NULL CONSTRAINT terminal_certification_model_code_chk CHECK (char_length(model_code) <= 100),

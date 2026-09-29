@@ -7,6 +7,8 @@ publisher: fnb
 description: Food is ready to hand over.
 aggregate: fnbOrder
 emittedWhen: FnbOrderStatus inPreparation to ready
+emittedBy:
+- setKitchenTicketStatus
 payload:
 - field: orderId
   type: string

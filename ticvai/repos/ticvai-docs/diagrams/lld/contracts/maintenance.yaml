@@ -1,5 +1,5 @@
 id: LLD-maintenance
-title: maintenance — 36 operations
+title: maintenance — 42 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -124,6 +124,22 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.preventive_plan
+- operation: createVendorServiceRequest
+  verb: POST
+  path: /vendor-service-requests
+  scope: venue
+  permission: WORK_ORDER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.supplier
+  - maintenance.vendor_service_request
+  - maintenance.work_order
+  writes:
+  - cache:idempotency
+  - maintenance.vendor_service_request
 - operation: createWorkOrder
   verb: POST
   path: /work-orders
@@ -134,6 +150,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - maintenance.asset
+  - maintenance.priority_scoring_model
   - maintenance.work_order
   writes:
   - cache:idempotency
@@ -201,6 +219,17 @@ operations:
   reads:
   - maintenance.work_order
   writes: []
+- operation: getWorkOrderPriorityPolicy
+  verb: GET
+  path: /work-order-priority-policy
+  scope: venue
+  permission: WORK_ORDER_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - maintenance.priority_scoring_model
+  writes: []
 - operation: listAssets
   verb: GET
   path: /assets
@@ -256,6 +285,17 @@ operations:
   offline: false
   reads:
   - maintenance.preventive_plan
+  writes: []
+- operation: listVendorServiceRequests
+  verb: GET
+  path: /vendor-service-requests
+  scope: venue
+  permission: WORK_ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - maintenance.vendor_service_request
   writes: []
 - operation: listWorkOrders
   verb: GET
@@ -321,9 +361,12 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - inventory.stock_reservation
   - maintenance.work_order
   writes:
   - cache:idempotency
+  - inventory.movement
+  - inventory.stock_reservation
   - maintenance.work_order
 - operation: recordWorkOrderTime
   verb: POST
@@ -396,6 +439,20 @@ operations:
   - cache:idempotency
   - maintenance.asset
   - maintenance.asset_status_change
+- operation: setWorkOrderPriorityPolicy
+  verb: PUT
+  path: /work-order-priority-policy
+  scope: venue
+  permission: WORK_ORDER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.priority_scoring_model
+  writes:
+  - cache:idempotency
+  - maintenance.priority_scoring_model
 - operation: startWorkOrder
   verb: POST
   path: /work-orders/{workOrderId}/start
@@ -426,6 +483,20 @@ operations:
   - cache:idempotency
   - maintenance.inspection
   - maintenance.inspection_item
+- operation: suggestWorkOrderAssignee
+  verb: GET
+  path: /work-orders/{workOrderId}/assignee-suggestions
+  scope: venue
+  permission: WORK_ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - maintenance.work_order
+  - resources.qualification
+  - resources.resource
+  - workforce.shift
+  writes: []
 - operation: updateAsset
   verb: PATCH
   path: /assets/{assetId}
@@ -469,6 +540,20 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.preventive_plan
+- operation: updateVendorServiceRequest
+  verb: PATCH
+  path: /vendor-service-requests/{vendorServiceRequestId}
+  scope: venue
+  permission: WORK_ORDER_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - maintenance.vendor_service_request
+  writes:
+  - cache:idempotency
+  - maintenance.vendor_service_request
 - operation: updateWorkOrder
   verb: PATCH
   path: /work-orders/{workOrderId}

@@ -7,6 +7,8 @@ publisher: seating
 description: A seat was blocked out of general sale (house seats, kills, production holds).
 aggregate: seat
 emittedWhen: SeatStatus available to blocked (createSeatBlock)
+emittedBy:
+- createSeatBlock
 payload:
 - field: seatId
   type: string

@@ -7,6 +7,8 @@ publisher: approvals
 description: An approval request was escalated, by a person or because its SLA was breached.
 aggregate: approvalRequest
 emittedWhen: ApprovalStatus pending to escalated (escalateApprovalRequest, or the SLA timer)
+emittedBy:
+- escalateApprovalRequest
 payload:
 - field: requestId
   type: string

@@ -1,0 +1,40 @@
+# wallet.debited v1 — published by wallet
+# Added 29 September (system-design review SD-033, SD-027).
+
+name: wallet.debited
+version: 1
+publisher: wallet
+description: Money left a wallet's available balance, held for a spend or captured.
+aggregate: wallet
+emittedWhen: holdWalletFunds or captureWalletHold moves the balance
+emittedBy:
+- wallet.holdWalletFunds
+- wallet.captureWalletHold
+payload:
+- field: walletId
+  type: uuid
+- field: walletTransactionId
+  type: string
+- field: walletHoldId
+  type: uuid
+  required: false
+- field: amount
+  type: Money
+- field: availableAfter
+  type: Money
+- field: orderId
+  type: string
+  required: false
+consumers:
+- context: ledger
+  purpose: Reduce the stored-value liability on capture
+  idempotencyKey: walletTransactionId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: marketing
+  purpose: Low-balance and auto-reload journeys
+  idempotencyKey: walletTransactionId
+  onFailure: retry
+  isCritical: false
+retention: 30 days after publication
+notes: No state model emits this. Ordering per wallet is what lets a consumer rebuild the balance.

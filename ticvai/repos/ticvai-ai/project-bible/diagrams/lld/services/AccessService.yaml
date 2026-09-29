@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 245 operations, 77 tables
+title: AccessService — 246 operations, 77 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,9 +9,9 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 245
+  operations: 246
   inAFlow: 161
-  percent: 66%
+  percent: 65%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -22,7 +22,7 @@ schemas:
   largestTable: access.media_type
 operationsByContract:
 - contract: access
-  count: 245
+  count: 246
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -238,8 +238,16 @@ operationsByContract:
     scope: workstation
     permission: ACCESS_VALIDATE
     offline: false
-    reads: 10
-    writes: 1
+    reads: 6
+    writes: 0
+  - operation: issueOrderEntitlements
+    verb: POST
+    path: /internal/orders/{orderId}/entitlements
+    scope: venue
+    permission: null
+    offline: false
+    reads: 5
+    writes: 4
   - operation: listAccess
     verb: GET
     path: /access
@@ -2228,24 +2236,6 @@ tables:
   - validateAccess
   - validateGroupAccess
   - verifyIdentity
-- store: cache:resolution
-  kind: cache
-  columns: 4
-  backing: redis
-  owned: false
-  why: '**Not a table and not owned by a service.** Derived from something already read, losable without
-    consequence — no migration, no backup, no owner.'
-  key: scope_path + what is being resolved — permissions, configuration, a price list
-  eviction:
-  - 'version: Bumped by the write that evicts it. **A config change nobody evicts is a stale permission**'
-  writtenBy:
-  - getOfflinePackage
-  readBy:
-  - getOfflinePackage
-  gap: '**The lineage names this store, not the key.** Which resolution entry each writer below evicts
-    or bumps — permissions, configuration, a price list, and whether child scopes under its `scope_path`
-    are affected — is not recorded for any operation, so a writer here cannot yet be implemented from
-    the package alone.'
 - table: access.access_area
   columns: 27
   store: postgres
@@ -2787,14 +2777,14 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: IdentityService
-  operations: 31
+  operations: 30
 - service: CatalogueService
   operations: 29
 - service: OrderService
-  operations: 8
-- service: VenueOpsService
-  operations: 4
+  operations: 9
 - service: CrossRegionService
+  operations: 3
+- service: VenueOpsService
   operations: 3
 - service: MarketingService
   operations: 1
@@ -2822,13 +2812,17 @@ writesOutside:
     tables:
     - pii.subject_biometric
 - service: TenancyService
-  operations: 2
+  operations: 3
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
     each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
+  - operation: issueOrderEntitlements
+    tables:
+    - platform.idempotency_record
+    - platform.outbox
   - operation: syncScans
     tables:
     - platform.outbox
@@ -2862,7 +2856,7 @@ screens:
 - P01:WEB-018 My Tickets
 - P01:WEB-024 Devices, Wishlist & Consent
 - P01:WEB-041 Parking – Reserve & Pay
-- P02:GST-001 Home – Default
+- P02:GST-001 Home
 - P02:GST-012 My Tickets
 - P02:GST-013 Ticket Details
 - P02:GST-027 Parking – Reserve & Pay

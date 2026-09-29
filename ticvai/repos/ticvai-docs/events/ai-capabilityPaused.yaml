@@ -7,6 +7,9 @@ publisher: ai
 description: An AI capability was paused and now answers from its degradation mode.
 aggregate: aiCapability
 emittedWhen: AiCapabilityRegistration active to paused (pauseAiCapability, or containAiIncident)
+emittedBy:
+- containAiIncident
+- pauseAiCapability
 payload:
 - field: tenantId
   type: uuid

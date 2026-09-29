@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `inventory` |
 | Schemas owned | `inventory` |
-| Operations in the slice | 7 of 56 |
+| Operations in the slice | 7 of 58 |
 | Scale | Mixed. Counting is bursty; procurement is not. |
 | If it is down | Down blocks receiving and counting; selling continues from the till's cache. |
 
@@ -47,7 +47,7 @@ Board 2C. **Retire a season, reprice a category, change a tax class across two h
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `catalogue.product`, `inventory.item` non-empty |
+| Part of slice | setup, makes `inventory.item` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
@@ -665,12 +665,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-49 operations, added to this service in later releases without changing any of the above.
+51 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | count | `cancelStockCount`, `getCountVariance`, `listStockCounts`, `postStockCount`, `recountStockCount`, `startStockCount`, `submitCountLines` |
-| inventory | `getStockTransfer`, `listExpiringBatches`, `listStockReservations`, `setDailyCount`, `updateRequisitionLines`, `updateSupplier` |
+| inventory | `createStockReservation`, `getStockTransfer`, `listExpiringBatches`, `listStockReservations`, `releaseStockReservation`, `setDailyCount`, `updateRequisitionLines`, `updateSupplier` |
 | item | `getInventoryItem`, `getInventoryKitDefinition`, `listInventoryItems`, `lookupInventoryItem` |
 | movement | `createStockMovement`, `listStockMovements` |
 | procurement | `acknowledgePurchaseOrder`, `cancelRequisition`, `closePurchaseOrderShort`, `rejectRequisition`, `returnRequisition`, `sendPurchaseOrder` |

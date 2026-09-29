@@ -556,7 +556,17 @@ paths:
         When the inter-cell link is down, the consuming cell draws against its bounded allocation instead
         — see `/wallet-allocations`.
 
+        **A reference to a wallet hold, never a second balance** (system-design review SD-027, 29
+        September; applied 30 September). The home cell''s wallet service owns the one balance writer:
+        this call is served in the home cell by wallet `holdWalletFunds` (guarded update on
+        `wallet.balance` under its row lock), and `platform.wallet_authorisation` records only the
+        cross-cell handshake: which consuming cell asked, for which guest link, and the `walletHoldId`
+        it was given. Capture is `captureWalletHold`, release is `releaseWalletHold`, and expiry is the
+        hold''s own. Nothing here debits, credits or caches a balance.
+
         '
+      x-ticvai-calls:
+      - wallet.holdWalletFunds
       tags:
       - wallet
       x-ticvai-permission: ORDER_CREATE
@@ -631,6 +641,8 @@ paths:
       description: 'Capture may be less than the hold — a partial capture releases the remainder.
 
         '
+      x-ticvai-calls:
+      - wallet.captureWalletHold
       tags:
       - wallet
       x-ticvai-permission: ORDER_CREATE
@@ -682,6 +694,13 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Release a hold without capturing
+      description: 'Releases the home cell''s wallet hold through wallet `releaseWalletHold` and marks the
+        authorisation `released` (SD-027): the authorisation is a reference to that hold, so releasing it
+        never adjusts a balance of its own.
+
+        '
+      x-ticvai-calls:
+      - wallet.releaseWalletHold
       tags:
       - wallet
       x-ticvai-permission: ORDER_CREATE
@@ -692,6 +711,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
           content:
             application/json:
@@ -1288,6 +1310,13 @@ components:
         orderId:
           type: string
           nullable: true
+        walletHoldId:
+          type: string
+          format: uuid
+          description: '**The wallet hold this authorisation refers to** (SD-027): the home cell''s
+            `wallet.hold` row made by `holdWalletFunds`. The balance lives there, once; this row holds no
+            amount of its own beyond the figures echoed for the consuming cell.'
+          x-ticvai-references: wallet.hold
         createdAt:
           type: string
           format: date-time
@@ -1455,6 +1484,11 @@ components:
                 type: string
                 nullable: true
   securitySchemes:
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
     bearerAuth:
       type: http
       scheme: bearer

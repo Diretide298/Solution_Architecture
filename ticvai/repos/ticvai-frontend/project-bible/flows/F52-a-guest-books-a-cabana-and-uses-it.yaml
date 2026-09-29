@@ -74,6 +74,13 @@ branches:
     — a cancelled cabana held until the system notices is an afternoon lost.'
   severity: high
   resolvedBy: cancelReservation
+- at: 2
+  condition: The venue's cabana flow is *by size* rather than *pick on the map*.
+  behaviour: 'Map booking is optional per flow (decided 29 September, W6): with the *Cabana: by size*
+    flow (CMS-103) the guest chooses a size on GST-050 and the unit is assigned; the resource selection
+    policy (`guestMayChoose`, REV3-15) decides whether the guest may choose the unit at all.'
+  severity: low
+  resolvedBy: Automatic
 exitStates:
 - state: used
   description: Booked, assigned, used.

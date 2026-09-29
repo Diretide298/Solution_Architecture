@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — AI
   version: 1.0.0
-  x-ticvai-screen-count: 120
+  x-ticvai-screen-count: 128
   x-ticvai-module: 8 — Unified Operations Dashboard (AI)
   x-ticvai-platforms:
   - P01 Guest Web
@@ -455,6 +455,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-054 AI Planner"
         - "P06 EMP-031 Queue monitor"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
@@ -504,6 +505,31 @@ paths:
         return-slot allocation by queue type and where to redirect guests, applied through `queue.updateQueue`.
         Rules and minimum history are on `SuggestionKind`. All three are staff-only.
 
+
+        **Answers from day one, then learns (29 September, AI functions review, decided by the product
+        owner).** Below a kind''s own-data threshold the answer is no longer a 422: it comes from the
+        baseline producer (the venue''s AI settings entered at onboarding, `setAiVenueSettings`; the
+        TICVAI starting pattern for the venue type; the UAE calendar; the weather) and says so. As the
+        venue trades, the statistical producer blends own data in, weighting the starting value by k
+        and own data by n observations, `(k x prior + n x own mean) / (k + n)`, re-estimated nightly
+        and recorded as a new producer version; imported history (`importVenueHistory`) counts as own
+        data. **Every answer carries `maturity`**: the stage (`starting`, `learning`, `established`,
+        `learned`), what it is based on, how much of it is own data, and what the next stage needs.
+        A trained model reaches `learned` only when an admin promotes it after a shadow run
+        (`promotionReady`, AI-D16). **422 is kept for one case only**: a setting the kind cannot answer
+        without (no current cost for `price`, no par level for `replenishment`, no ride capacity for
+        `waitTime`), and the problem names the setting and the screen that sets it.
+
+
+        **`itinerary` (added 29 September, MOB-6; supersedes the deferral in audits R187 and R209).**
+        The AI planner agent refines a guest''s visit plan: `subjectRef` is the `venue-map` plan id,
+        `context` carries the guest''s request in words (*"less walking after lunch"*), and `value` is
+        `{planId, baseVersion, changes: [VisitPlanUpdate changes], rationale}`. **It proposes; it does
+        not write the plan.** The app applies the changes with `updateVisitPlan` as the guest (or the
+        planner agent does, through its registered tools, as the guest), so the change is a version the
+        guest can undo and AI writes only `ai.suggestion` (ADR-0020). When AI is off or fails, the
+        answer is the rules plan unchanged, with `basis` `heuristic`, never an error.
+
         '
       tags:
       - ai
@@ -529,16 +555,17 @@ paths:
                 kind:
                   allOf:
                   - $ref: '#/components/schemas/SuggestionKind'
-                  description: '**A guest caller may ask for `prepPlan`, `upsell` and `waitTime` only.**
+                  description: '**A guest caller may ask for `prepPlan`, `upsell`, `waitTime` and `itinerary`
+                    only.**
                     Anything else is refused — a guest asking for `price` is a guest asking what the venue
                     is willing to charge, and `demandForecast` is a competitor question. The refusal is
                     on the operation rather than in a note, because **an audience widened without narrowing
                     its inputs is an audience given everything.**
 
-                    **No guest day plan in the first release (decided 28 September, audits R187 and
-                    R209).** The itinerary planner is deferred, so there is no guest itinerary kind and
-                    `scenario` stays staff-only; a guest request for it is refused like any other. When
-                    the planner ships it gets its own guest-allowed kind, not `scenario`.
+                    **A guest day plan is `itinerary`, not `scenario`** (29 September, MOB-6: the Plan
+                    tab is Block A, superseding the deferral of 28 September, audits R187 and R209).
+                    `scenario` stays staff-only; a guest may ask `itinerary` only about a plan their own
+                    session owns.
 
                     '
                 subjectRef:
@@ -570,21 +597,20 @@ paths:
               schema:
                 $ref: '#/components/schemas/Suggestion'
         '422':
-          description: '**Not enough data to answer.** A venue three weeks old has no seasonality, and
-            **refusing is better than a confident number built on nothing** — the response names what
-            is missing and when there will be enough.
-
-            **The threshold is that kind''s minimum history**, listed per value on `SuggestionKind`
-            (proposed, client to correct (audit R213)). `need` carries that minimum and `have` what the
-            scope holds, counted at the scope the question is asked at.
+          description: '**A setting the answer cannot do without is missing** (29 September, AI functions
+            review). Little or no history is **not** a refusal any more: the answer comes from the
+            baseline with `maturity.stage` `starting`. Only a missing setting refuses, for example no
+            current cost for `price`, no par level for `replenishment`, no configured ride capacity for
+            `waitTime`, or a venue with no published map for `itinerary`. The problem names each setting
+            and the screen that sets it.
 
             '
           x-ticvai-problem-types:
-          - insufficient-data
+          - missing-setting
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/InsufficientDataProblem'
+                $ref: '#/components/schemas/AiMissingSettingProblem'
   /ai/suggestions/{suggestionId}/outcome:
     parameters:
     - name: suggestionId
@@ -1205,10 +1231,12 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-054 AI Planner"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
         - "P08 BO-928 AI Conflict Resolution Assistant"
         - "P08 BO-932 Conversational AI Resource Copilot"
+        - "P13 CMS-104 App Build & Store Publishing"
       x-ticvai-audience:
       - staff
       - guest
@@ -1278,7 +1306,7 @@ paths:
         - "P02 GST-031 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-033 AI Concierge – Contextual Help"
-        - "P02 GST-054 AI Optimized Itinerary"
+        - "P02 GST-054 AI Planner"
         - "P05 KSK-015 Assistant"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
@@ -1286,6 +1314,7 @@ paths:
         - "P08 BO-929 Automatic Schedule Optimization"
         - "P08 BO-932 Conversational AI Resource Copilot"
         - "P09 ADM-533 Human Review, Challenge & AI Clarification Workspace"
+        - "P13 CMS-104 App Build & Store Publishing"
       x-ticvai-audience:
       - staff
       - guest
@@ -1964,6 +1993,7 @@ paths:
       operationId: getAiUsage
       x-ticvai-consumed-by:
         - "P08 BO-091 AI Policy & Spend"
+        - "P09 ADM-549 AI Governance Monitoring Command Center"
       x-ticvai-audience:
       - staff
       summary: Usage, cost and performance
@@ -2088,6 +2118,11 @@ paths:
         `setAiByokEnablement` (`PLATFORM_AI_MANAGE`); until it is enabled, a tenant-managed provider is
         refused with 409 `byok-not-enabled`, and a task outside `AiByokEnablement.allowedTasks` likewise.
         `modelId` names the model in the catalogue (`listAiModels`) the provider serves.
+
+        **Per agent task, and checked for fitness** (21 September minutes, M21-03 and M21-09). `taskKeys`
+        binds the provider to named agent tasks; the response carries `fitnessWarnings` where the model scores
+        outside a task''s band in `AiModel.taskFitness` (underpowered, overpowered or never scored). A warning
+        is shown and kept; it never refuses the write.
 
         '
       tags:
@@ -2718,6 +2753,7 @@ paths:
           type: string
           enum:
           - development
+          - sandbox
           - staging
           - production
       responses:
@@ -3681,6 +3717,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-495 Configuration Results & Object Mapping"
         - "P09 ADM-497 Configuration History, Versions & Rollback"
+        - "P09 ADM-535 Live AI Execution Oversight & Human Intervention"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions, 2.2 D step 8; our build plan, shape follows
         generateVenueLayout (202, draft for review)'
       summary: Plan a rollback
@@ -4611,6 +4648,15 @@ paths:
         and guest scope. A guest profile''s scope cannot be wider than `AiPolicy.guestCapabilityScope`. Matched
         on `profileKey`: replaces (200) or creates (201).
 
+
+        **The app publishing guide** (24 September minutes M24-08, applied 30 September) is a profile of
+        this runtime: `profileKey: guide.appPublishing`, audience `staff`, module `core`, task
+        `assistant.staff.answer`, grounded only on the platform-owned *store publishing* knowledge
+        collection (Apple and Google account set-up, D-U-N-S, listing assets, review rules, the build
+        checklist) and on the tenant''s own `StorePublishingChecklist` read through white-label
+        `getStoreAccounts`. **No tenant data leaves the tenant and no other tenant''s data is read**; it
+        answers on CMS-104 (App Build & Store Publishing) beside the checklist and proposes nothing.
+
         '
       tags:
       - knowledge
@@ -5182,8 +5228,12 @@ paths:
       x-ticvai-agreed: '29 September: AI system design 2.3 forecast; our build plan, shape follows setIndexSource'
       summary: Define a forecast
       description: '**What to forecast, at what grain, for what horizon, how often** (ADM-500, ADM-501). `producer`
-        can be set to `rule` or `statistical` here; a `model` producer arrives only through `promoteAiRelease` (design
-        3.12). Matched on `definitionKey`: replaces (200) or creates (201).
+        can be set to `rule`, `statistical` or `ensemble` here; a `model` producer arrives only through `promoteAiRelease`
+        (design 3.12). Matched on `definitionKey`: replaces (200) or creates (201).
+
+        **Cold start and history window** (18 September minutes M18-16; 29 September AI functions review):
+        `historyWindowMonths` (default 36) and `coldStart` decide what the forecast stands on before the venue has
+        history, so a new venue gets a forecast with a wide range on day one rather than nothing.
 
         '
       tags:
@@ -6930,7 +6980,7 @@ paths:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-008 Add-ons & Upsell"
         - "P01 WEB-043 Loyalty & Rewards"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
         - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-048 Upsell / Cross-Sell"
         - "P08 BO-102 Sell"
@@ -7070,7 +7120,7 @@ paths:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-008 Add-ons & Upsell"
         - "P01 WEB-043 Loyalty & Rewards"
-        - "P02 GST-001 Home – Default"
+        - "P02 GST-001 Home"
         - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-048 Upsell / Cross-Sell"
         - "P08 BO-102 Sell"
@@ -7856,6 +7906,17 @@ paths:
         in: query
         schema:
           type: string
+        description: 'What the decision was about. **For a decision about a customer, the guest profile id**
+          (18 September minutes, M18-03: searchable by customer), e.g. a recommendation, a risk assessment or a
+          concierge answer to a signed-in guest; otherwise the product, order, plan or entity the record names.'
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: 'Only decisions at this venue or below it (18 September minutes, M18-03: searchable by
+          venue). Matched on the record''s `scopePath`; a caller scoped to a venue sees only that venue whatever
+          it sends.'
       - name: traceId
         in: query
         schema:
@@ -8839,6 +8900,17 @@ paths:
         and this suggestion''s id as `suggestionRef`, and a decision record keeps the inputs, splits and versions.
         **Nothing is published**: publishing is `white-label.publishGuidedChoice`, by a person.
 
+
+        **Filter questions, not a quiz** (decided 29 September, W4; applied 30 September). It proposes up
+        to four questions, each with a `kind` (`choice`, `yesNo`, `age`, `level`, `certification`) and, for
+        each answer, an `answer.filter` built from what the catalogue already states: age and height limits
+        from `ProductEligibilityRule` (`minAgeYears`/`maxAgeYears`), segment tags (`segmentTags`),
+        certifications (`certificationCode` against `ProductEligibilityRule.requiredCertificationCode`),
+        swim consent questions (`requiresSwimmer`, with `consentPrefill` so the REV3-26 consent is pre-filled
+        and still confirmed), and products or categories (`productIds`, `productCategoryIds`). The default
+        behaviour it proposes is `filter` with *Show everything* on; an answer that would leave nothing
+        bookable is dropped.
+
         '
       tags:
       - configure
@@ -8924,6 +8996,426 @@ paths:
                 $ref: '#/components/schemas/AiGuidedChoiceSuggestion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+  /venues/{venueId}/ai-settings:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getAiVenueSettings
+      x-ticvai-consumed-by:
+        - "P09 ADM-489 AI Configuration Readiness Center"
+        - "P16 ANL-071 AI Maturity & Learning"
+      x-ticvai-agreed: '29 September: AI functions review (baseline then learn), packageFindings 7; shape follows getAiPolicy'
+      summary: The venue AI profile the baselines stand on
+      description: '**What every data-driven answer stands on before the venue has history** (29 September, AI functions
+        review): venue type, capacity, opening hours, typical weekday and weekend attendance, peak months, average
+        spend, F&B attach rate and staff productivity per role. Entered at onboarding (ADM-489, or by the configuration
+        assistant in conversation) and corrected by the venue at any time. A venue with none still gets answers from
+        the starting pattern for its type, with the widest range; `requestSuggestion` names this setting when a kind
+        cannot answer without it.
+
+        '
+      tags:
+      - forecast
+      x-ticvai-permission: AI_USE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The venue AI settings. Defaults from the starting pattern where the venue has entered none.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiVenueSettings'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    put:
+      operationId: setAiVenueSettings
+      x-ticvai-consumed-by:
+        - "P09 ADM-489 AI Configuration Readiness Center"
+        - "P16 ANL-071 AI Maturity & Learning"
+      x-ticvai-agreed: '29 September: AI functions review (baseline then learn), venue AI profile at onboarding; shape
+        follows setForecastDefinition'
+      summary: Set the venue AI profile
+      description: '**The onboarding figures the baselines use** (29 September, AI functions review). Replaces the
+        venue''s settings in full; a field left out takes the starting pattern''s default for the venue type. A change
+        is recorded and the next nightly re-estimate uses it; answers already given are not rewritten. **Configuration,
+        not history**: nothing here is a sale or an admission, and nothing is written to the ledger.
+
+        '
+      tags:
+      - forecast
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiVenueSettings'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiVenueSettings'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /venues/{venueId}/history-imports:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: importVenueHistory
+      x-ticvai-consumed-by:
+        - "P16 ANL-071 AI Maturity & Learning"
+      x-ticvai-agreed: '29 September: AI functions review, packageFindings 7 (no historical import existed); shape follows
+        importVenueGeometry (a job)'
+      summary: Import the venue's own historical exports for the AI baselines
+      description: '**The venue''s own history, from before TICVAI** (29 September, AI functions review): CSV or
+        spreadsheet exports from its previous POS and ticketing systems, 12 to 36 months where it has them. The file
+        is an asset already uploaded (`assetId`); the column mapping says which column is the date, the measure and
+        each dimension. The job validates every row, loads the good ones into `ai.history_observation` tagged
+        `imported`, and reports the rest with a reason.
+
+        **Loaded into the AI data only, never into the ledger** (ADR-0020): an imported sale is an observation the
+        forecast learns from, not an order, and no report of revenue ever counts it. **12 months or more moves the
+        venue''s answers straight to `established`** for the measures it covers. A second import of the same kind and
+        period replaces the first rather than doubling it.
+
+        '
+      tags:
+      - forecast
+      x-ticvai-permission: AI_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - dataKind
+              - assetId
+              - columnMapping
+              properties:
+                dataKind:
+                  type: string
+                  enum:
+                  - attendance
+                  - admissions
+                  - ticketSales
+                  - fnbSales
+                  - retailSales
+                  - queueReadings
+                  - staffShifts
+                assetId:
+                  type: string
+                  format: uuid
+                  description: The uploaded export, in the asset library.
+                sourceSystem:
+                  type: string
+                  nullable: true
+                  description: What produced the file, e.g. the previous POS's name. Recorded, not interpreted.
+                columnMapping:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: 'Target field to source column, e.g. `{"date": "Txn Date", "value": "Net Sales",
+                    "product": "Item"}`.'
+                dryRun:
+                  type: boolean
+                  default: false
+                  description: Validate and report without loading.
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: 'Accepted: the import job, `queued`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiHistoryImport'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: An import of this venue and kind is already running (`history-import-in-progress`).
+          x-ticvai-problem-types:
+          - history-import-in-progress
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: The mapping names no date or no measure column, or the asset is not a CSV or spreadsheet
+            (`history-mapping-invalid`).
+          x-ticvai-problem-types:
+          - history-mapping-invalid
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+    get:
+      operationId: listVenueHistoryImports
+      x-ticvai-consumed-by:
+        - "P16 ANL-071 AI Maturity & Learning"
+      x-ticvai-agreed: '29 September: AI functions review, historical import; shape follows listIndexJobs'
+      summary: The venue's history imports
+      description: 'Imports of the venue''s own history, newest first, with the months each covered and its result.
+
+        '
+      tags:
+      - forecast
+      x-ticvai-permission: AI_USE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Imports
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AiHistoryImport'
+  /history-imports/{importId}:
+    parameters:
+    - name: importId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getVenueHistoryImport
+      x-ticvai-consumed-by:
+        - "P16 ANL-071 AI Maturity & Learning"
+      x-ticvai-agreed: '29 September: AI functions review, historical import; shape follows getVenueMapImportJob'
+      summary: One history import, with its findings
+      description: 'The job''s status, rows read, loaded and rejected, and each finding (a bad date, a negative
+        quantity, a duplicate day) with the row it came from.
+
+        '
+      tags:
+      - forecast
+      x-ticvai-permission: AI_USE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      responses:
+        '200':
+          description: The import
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiHistoryImport'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /capability-maturity:
+    get:
+      operationId: listAiCapabilityMaturity
+      x-ticvai-consumed-by:
+        - "P09 ADM-519 AI Governance Command Center"
+        - "P16 ANL-071 AI Maturity & Learning"
+      x-ticvai-agreed: '29 September: AI functions review (maturity on every answer, an AI maturity page); shape follows
+        listAiCapabilities'
+      summary: Where each AI answer stands on the way from baseline to learned
+      description: '**The AI maturity page** (29 September, AI functions review). One row per question the venue''s AI
+        answers (a suggestion kind, a forecast definition, risk scoring, recommendations): its stage (`starting`,
+        `learning`, `established`, `learned`), what it is based on, how much of it is the venue''s own data, and what
+        the next stage needs. Stages move by themselves from `starting` to `established` as data arrives, each move
+        recorded; `learned` only when an admin promotes a trained model (AI-D16).
+
+        '
+      tags:
+      - monitoring
+      x-ticvai-permission: AI_USE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: stage
+        in: query
+        schema:
+          type: string
+          enum:
+          - starting
+          - learning
+          - established
+          - learned
+      - name: capabilityKey
+        in: query
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Maturity per question
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AiCapabilityMaturity'
+  /training-runs:
+    get:
+      operationId: listAiTrainingRuns
+      x-ticvai-consumed-by:
+        - "P09 ADM-554 AI Quality, Behavior & Governance Drift Monitoring"
+      x-ticvai-agreed: '29 September: AI functions review (per-tenant training and backtest job); shape follows listAiEvaluations'
+      summary: The per-tenant training and backtest runs
+      description: '**The registry of training runs** (29 September, AI functions review; design 3.5). Each trained
+        producer is retrained weekly on the tenant''s own data only (AIP-149), backtested against past actuals
+        (`ai.eval_run` kind `backtest`), and run in shadow beside the live answer. A run whose shadow period passes the
+        promotion gate raises a `promotionReady` governance alert to the admin; **nothing switches by itself** (AI-D16).
+        Runs are scheduled by the platform; this reads them.
+
+        '
+      tags:
+      - models
+      x-ticvai-permission: AI_USE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: capabilityKey
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - queued
+          - training
+          - backtesting
+          - shadow
+          - gatePassed
+          - gateFailed
+          - failed
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Training runs, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AiTrainingRun'
+  /governance/capability-health:
+    get:
+      operationId: listAiCapabilityHealth
+      x-ticvai-consumed-by:
+        - "P09 ADM-549 AI Governance Monitoring Command Center"
+      x-ticvai-agreed: '29 September: 21 September minutes M21-13 (AI operations and consumption monitoring); shape follows
+        listAiCapabilities'
+      summary: How each AI capability is running now
+      description: '**Health per capability** (21 September minutes, M21-13): availability, 95th-percentile latency
+        against the task budget, error rate, the provider circuit breaker''s state, whether it is answering from its
+        degradation mode, and the freshness of its data (index lag, last forecast published). Read beside
+        `getAiUsage` grouped by `agent`, which says which agents spend the most and on what. Computed from the gateway
+        telemetry and `ai.activity` over the last hour; nothing is stored here.
+
+        '
+      tags:
+      - monitoring
+      x-ticvai-permission: AI_USE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: analytical
+      parameters:
+      - name: breakerState
+        in: query
+        schema:
+          type: string
+          enum:
+          - closed
+          - halfOpen
+          - open
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Health per capability
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AiCapabilityHealth'
 
 components:
   securitySchemes:
@@ -8938,6 +9430,493 @@ components:
       description: Cell-to-cell, as `../shared/common.yaml` `serviceAuth`. Used by `evaluateAiGovernance`,
         `scoreTransactionRisk` and `simulateRecommendationDecision`.
   schemas:
+    AiMaturity:
+      type: object
+      x-ticvai-persistence: none — embedded as jsonb on ai.suggestion and ai.forecast_version
+      description: '**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn).
+        The customer sees a stage badge and a "Based on" chip, never a bare percentage (design 5.6), and "Limited
+        historical data" while the starting pattern carries more than half the weight.'
+      required:
+      - stage
+      - basedOn
+      properties:
+        stage:
+          type: string
+          enum:
+          - starting
+          - learning
+          - established
+          - learned
+          description: '`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE
+            calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own
+            level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once
+            with 12+ months imported). `learned`: a model trained on this tenant''s data, promoted by an admin (AI-D16).'
+        basedOn:
+          type: string
+          description: 'The "Based on" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days
+            of your sales*. Always present.'
+        sources:
+          type: array
+          items:
+            type: object
+            required:
+            - source
+            properties:
+              source:
+                type: string
+                enum:
+                - venueSettings
+                - startingPattern
+                - calendar
+                - weather
+                - bookingsOnHand
+                - ownHistory
+                - importedHistory
+                - configuration
+                - trainedModel
+              detail:
+                type: string
+                nullable: true
+                description: e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*.
+              observations:
+                type: integer
+                nullable: true
+        ownDataShare:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: 'The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked "Limited historical
+            data".'
+        limitedHistory:
+          type: boolean
+        nextStage:
+          type: object
+          nullable: true
+          description: What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.
+          properties:
+            stage:
+              type: string
+              enum:
+              - learning
+              - established
+              - learned
+            needs:
+              type: string
+            expectedBy:
+              type: string
+              format: date
+              nullable: true
+    AiVenueSettings:
+      type: object
+      x-ticvai-persistence: ai.venue_settings
+      description: '**The venue AI profile** (29 September, AI functions review): the figures a venue gives at onboarding
+        so every data-driven answer is useful before it has history. One row per venue; configuration, not history.
+        Defaults come from the starting pattern for `venueType`, which TICVAI writes from published sources and made-up
+        example curves, **never from another tenant''s data** (AI-D01, AIP-149).'
+      required:
+      - venueId
+      - venueType
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        venueType:
+          type: string
+          enum:
+          - waterPark
+          - themePark
+          - familyEntertainmentCentre
+          - museum
+          - arena
+          - zooAquarium
+          - other
+        isOutdoor:
+          type: boolean
+          default: true
+          description: Outdoor venues take the summer-heat and weather effects.
+        capacity:
+          type: integer
+          minimum: 1
+          nullable: true
+        openingHours:
+          type: array
+          description: The usual week. Exceptions come from the venue calendar.
+          items:
+            type: object
+            properties:
+              dayOfWeek:
+                type: integer
+                minimum: 1
+                maximum: 7
+              opensAt:
+                type: string
+              closesAt:
+                type: string
+        typicalWeekdayAttendance:
+          type: integer
+          minimum: 0
+          nullable: true
+        typicalWeekendAttendance:
+          type: integer
+          minimum: 0
+          nullable: true
+        peakMonths:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+            maximum: 12
+        averageSpend:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+        fnbAttachRate:
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+        staffProductivity:
+          type: object
+          additionalProperties:
+            type: number
+          description: 'Per role, units per staff hour, e.g. `{"cashier": 40, "gate": 300}`. Defaults from the pattern.'
+        startingPatternKey:
+          type: string
+          readOnly: true
+          description: The pattern and version in use, e.g. `waterPark@3`.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
+            (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
+    AiHistoryImport:
+      type: object
+      x-ticvai-persistence: ai.history_import
+      description: '**One import of a venue''s own history** (29 September, AI functions review). A job: validated, then
+        loaded into `ai.history_observation`, never into the ledger.'
+      required:
+      - id
+      - venueId
+      - dataKind
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        venueId:
+          type: string
+          format: uuid
+        dataKind:
+          type: string
+          enum:
+          - attendance
+          - admissions
+          - ticketSales
+          - fnbSales
+          - retailSales
+          - queueReadings
+          - staffShifts
+        assetId:
+          type: string
+          format: uuid
+          x-ticvai-references: assets.media_asset
+        sourceSystem:
+          type: string
+          nullable: true
+        columnMapping:
+          type: object
+          additionalProperties:
+            type: string
+        dryRun:
+          type: boolean
+          default: false
+        status:
+          type: string
+          enum:
+          - queued
+          - validating
+          - loading
+          - completed
+          - completedWithRejections
+          - failed
+          readOnly: true
+        periodFrom:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+        periodTo:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+        monthsCovered:
+          type: integer
+          readOnly: true
+        rowsRead:
+          type: integer
+          readOnly: true
+        rowsLoaded:
+          type: integer
+          readOnly: true
+        rowsRejected:
+          type: integer
+          readOnly: true
+        findings:
+          type: array
+          readOnly: true
+          items:
+            type: object
+            properties:
+              row:
+                type: integer
+              code:
+                type: string
+                enum:
+                - badDate
+                - badNumber
+                - negativeValue
+                - duplicateDay
+                - unmappedColumn
+                - outOfRange
+              detail:
+                type: string
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: identity.principal
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
+            (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
+    AiHistoryObservation:
+      type: object
+      x-ticvai-persistence: ai.history_observation
+      description: '**One imported observation** (29 September, AI functions review): a day''s (or an hour''s) value of
+        one measure at the venue, from the venue''s own exports. Read by the statistical producers beside the snapshot of
+        live trading; tagged `imported` on every answer that uses it. **Never a sale, never in a revenue report.** AI log
+        database, append-only; a re-import of the same kind and period supersedes by `importId`.'
+      required:
+      - importId
+      - venueId
+      - dataKind
+      - observedOn
+      - value
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        importId:
+          type: string
+          format: uuid
+          x-ticvai-references: ai.history_import
+        venueId:
+          type: string
+          format: uuid
+        dataKind:
+          type: string
+        observedOn:
+          type: string
+          format: date
+        hour:
+          type: integer
+          minimum: 0
+          maximum: 23
+          nullable: true
+        dimensionKey:
+          type: string
+          nullable: true
+          description: The product, channel or outlet the value is for, as named in the export. Null for a venue total.
+        value:
+          type: number
+        unit:
+          type: string
+          description: '`count`, `amount` or `minutes`.'
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
+            (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
+    AiCapabilityMaturity:
+      type: object
+      x-ticvai-persistence: ai.capability_maturity
+      description: '**The stage of each question the venue''s AI answers** (29 September, AI functions review). Written
+        by the nightly re-estimate; a stage change is a new row, so the page can show when each answer moved.'
+      required:
+      - capabilityKey
+      - stage
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        capabilityKey:
+          type: string
+        suggestionKind:
+          allOf:
+          - $ref: '#/components/schemas/SuggestionKind'
+          nullable: true
+        forecastDefinitionKey:
+          type: string
+          nullable: true
+        stage:
+          type: string
+          enum:
+          - starting
+          - learning
+          - established
+          - learned
+        maturity:
+          $ref: '#/components/schemas/AiMaturity'
+        producerRef:
+          type: string
+          description: The producer and version answering now.
+        since:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
+            (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
+    AiTrainingRun:
+      type: object
+      x-ticvai-persistence: ai.training_run
+      description: '**One per-tenant training run** (29 September, AI functions review; design 3.5): trained on the
+        tenant''s own data only, backtested, then run in shadow. When its shadow period passes the gate, the release
+        moves to `gatePassedAt` and a `promotionReady` alert goes to the admin (AI-D16).'
+      required:
+      - capabilityKey
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        capabilityKey:
+          type: string
+        suggestionKind:
+          allOf:
+          - $ref: '#/components/schemas/SuggestionKind'
+          nullable: true
+        forecastDefinitionKey:
+          type: string
+          nullable: true
+        trainingWindowFrom:
+          type: string
+          format: date
+        trainingWindowTo:
+          type: string
+          format: date
+        dataCutoffAt:
+          type: string
+          format: date-time
+        includesImportedHistory:
+          type: boolean
+          default: false
+        featureSetVersion:
+          type: string
+        artefactRef:
+          type: string
+          nullable: true
+          description: The model file in the tenant's Blob container.
+        backtestRunId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: ai.eval_run
+        releaseId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: ai.release
+        status:
+          type: string
+          enum:
+          - queued
+          - training
+          - backtesting
+          - shadow
+          - gatePassed
+          - gateFailed
+          - failed
+        metrics:
+          type: object
+          additionalProperties: true
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
+            (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
+    AiCapabilityHealth:
+      type: object
+      x-ticvai-persistence: none — computed from gateway telemetry, ai.activity and the breaker state in cache
+      description: 'How one capability is running over the last hour (21 September minutes, M21-13).'
+      required:
+      - capabilityKey
+      properties:
+        capabilityKey:
+          type: string
+        availability:
+          type: number
+          minimum: 0
+          maximum: 1
+        p95LatencyMs:
+          type: integer
+        latencyBudgetMs:
+          type: integer
+          nullable: true
+        errorRate:
+          type: number
+          minimum: 0
+          maximum: 1
+        breakerState:
+          type: string
+          enum:
+          - closed
+          - halfOpen
+          - open
+        degraded:
+          type: boolean
+          description: Answering from its degradation mode (rules only, search only, a person).
+        dataFreshness:
+          type: string
+          nullable: true
+          description: e.g. index lag, the last forecast published.
+        requests:
+          type: integer
+        measuredAt:
+          type: string
+          format: date-time
     AiCapabilityFamily:
       type: string
       enum:
@@ -9058,9 +10037,12 @@ components:
             type: string
             enum:
             - development
+            - sandbox
             - staging
             - production
-          description: ADM-525. Empty means every environment.
+          description: 'ADM-525. Empty means every environment. **`sandbox`** (18 September minutes, M18-01): the
+            developer sandbox and a tenant''s trial environment, governed apart from staging so a rule can allow in
+            sandbox what it blocks in production.'
         conditions:
           type: object
           additionalProperties: true
@@ -9494,6 +10476,42 @@ components:
           items:
             type: string
           description: Tasks this model is the default for (AIC-010), e.g. `assistant.guest.answer`, `config.extract`.
+        taskFitness:
+          type: array
+          readOnly: true
+          description: '**Evaluated fitness per task** (21 September minutes, M21-09, our proposal): a score from
+            the task''s golden set (`runAiEvaluation`) and the band the task needs. Below `floor` the model is
+            underpowered for the task; far above `ceiling` it is overpowered (it costs more than the task needs).
+            `setAiProvider` returns a warning (`AiProvider.fitnessWarnings`) when a choice falls outside the band,
+            and ADM-037 shows the band beside `setAiModel`; neither refuses on it.'
+          items:
+            type: object
+            required:
+            - taskKey
+            - score
+            properties:
+              taskKey:
+                type: string
+              score:
+                type: number
+                minimum: 0
+                maximum: 1
+              floor:
+                type: number
+                minimum: 0
+                maximum: 1
+              ceiling:
+                type: number
+                minimum: 0
+                maximum: 1
+                nullable: true
+              evaluationRunId:
+                type: string
+                format: uuid
+                nullable: true
+              evaluatedAt:
+                type: string
+                format: date-time
         scopePath:
           type: string
           readOnly: true
@@ -9680,6 +10698,78 @@ components:
         timeoutMs: 5000
         idempotent: true
         validateOnly: true
+      - toolKey: venue-map.generateVisitPlan
+        targetContract: venue-map
+        targetOperation: generateVisitPlan
+        effect: write
+        riskClass: low
+        permission: null
+        callerAudience: guest
+        reversible: true
+        compensationOperation: null
+        timeoutMs: 3000
+        idempotent: true
+        validateOnly: false
+        agent: planner.guest
+      - toolKey: venue-map.getVisitPlan
+        targetContract: venue-map
+        targetOperation: getVisitPlan
+        effect: read
+        riskClass: low
+        permission: null
+        callerAudience: guest
+        reversible: true
+        compensationOperation: null
+        timeoutMs: 2000
+        idempotent: true
+        validateOnly: false
+        agent: planner.guest
+      - toolKey: venue-map.listVisitPlanAlternatives
+        targetContract: venue-map
+        targetOperation: listVisitPlanAlternatives
+        effect: read
+        riskClass: low
+        permission: null
+        callerAudience: guest
+        reversible: true
+        compensationOperation: null
+        timeoutMs: 2000
+        idempotent: true
+        validateOnly: false
+        agent: planner.guest
+      - toolKey: venue-map.updateVisitPlan
+        targetContract: venue-map
+        targetOperation: updateVisitPlan
+        effect: write
+        riskClass: low
+        permission: null
+        callerAudience: guest
+        reversible: true
+        compensationOperation: updateVisitPlan
+        timeoutMs: 3000
+        idempotent: true
+        validateOnly: false
+        agent: planner.guest
+      - toolKey: venue-map.bookVisitPlan
+        targetContract: venue-map
+        targetOperation: bookVisitPlan
+        effect: write
+        riskClass: medium
+        permission: null
+        callerAudience: guest
+        reversible: true
+        compensationOperation: orders.removeCartLine
+        timeoutMs: 5000
+        idempotent: true
+        validateOnly: false
+        agent: planner.guest
+        requiresGuestConfirmation: true
+      x-ticvai-registered-tools-planner-note: '**The planner agent''s tools** (29 September, MOB-6; the assistant profile
+        `planner.guest`, audience guest, `guestCapabilityScope` `visitPlanning`). The agent refines a rules plan by chat
+        on GST-054 through these five `venue-map` operations, **always called as the guest whose plan it is** (permission
+        null, the guest session''s own plan), so every change is a plan version the guest can undo. `bookVisitPlan`
+        needs the guest to press Book in the app; the agent may prepare it and never checks out. AI writes nothing
+        outside `ai.*` (ADR-0020): the plan tables are written by the venue-map service these tools call.'
       required:
       - toolKey
       - targetContract
@@ -10638,7 +11728,10 @@ components:
             assistant, AIC-078).
         modelTask:
           type: string
-          description: The gateway task, e.g. `assistant.staff.answer`.
+          description: 'The gateway task, e.g. `assistant.staff.answer`. The visit planner agent (29 September, MOB-6)
+            is profile `planner.guest` with task `planner.guest.refine` and the five `venue-map` visit-plan tools.
+            The app publishing guide (M24-08) is profile `guide.appPublishing` with task `assistant.staff.answer`,
+            grounded on the platform''s store-publishing collection only.'
         guestCapabilityScope:
           type: array
           items:
@@ -10746,7 +11839,57 @@ components:
           - rule
           - statistical
           - model
-          description: Which producer is live (design 3.10). A model is promoted only through `promoteAiRelease`.
+          - ensemble
+          description: 'Which producer is live (design 3.10). A model is promoted only through `promoteAiRelease`.
+            **`ensemble`** (18 September minutes, M18-16): a weighted blend of the rule and statistical producers,
+            and of a promoted model where one exists; the weights are recorded on each version. Setting `ensemble`
+            never brings in an unpromoted model.'
+        historyWindowMonths:
+          type: integer
+          minimum: 1
+          maximum: 60
+          default: 36
+          description: 'How much of the venue''s own history the statistical producer reads (18 September minutes,
+            M18-16: "36 months of history"). Imported history (`importVenueHistory`) counts. Less than the window is
+            not an error: the cold-start setting fills the gap.'
+        coldStart:
+          type: object
+          description: '**What the forecast stands on before the venue has history** (29 September, AI functions
+            review; forecasting book p.27 "New Venue / New Product Problem"). Day one is never empty: the prior is
+            the venue AI settings (typical weekday and weekend attendance, capacity, opening hours) x the starting
+            pattern for the venue type x the UAE calendar x weather, with bookings on hand as a floor. The
+            statistical producer blends own data in as `(k x prior + n x own) / (k + n)`, with `k` =
+            `priorWeightObservations`. The version''s `maturity` says which stage it reached.'
+          properties:
+            strategy:
+              type: string
+              enum:
+              - venueSettings
+              - startingPattern
+              - sisterVenue
+              - categoryBaseline
+              - importedHistory
+              default: venueSettings
+              description: '`venueSettings` uses the onboarding figures with the venue-type pattern; `sisterVenue`
+                a venue of the same tenant; `categoryBaseline` a product category''s own history; `importedHistory`
+                means an import covers the window and the prior only fills unseen holidays.'
+            sisterVenueId:
+              type: string
+              format: uuid
+              nullable: true
+              description: For `sisterVenue`. Same tenant only (no data is pooled across tenants, AIP-149).
+            priorWeightObservations:
+              type: integer
+              minimum: 1
+              maximum: 52
+              default: 4
+              description: '`k`: how many own observations the prior is worth (4 same weekdays by default).'
+            startingBandPercent:
+              type: integer
+              minimum: 5
+              maximum: 80
+              default: 40
+              description: The width of the range while the prior carries most of the weight (about +/-40%).
         producerRef:
           type: string
           readOnly: true
@@ -10814,6 +11957,8 @@ components:
           readOnly: true
         basis:
           $ref: '#/components/schemas/SuggestionBasis'
+        maturity:
+          $ref: '#/components/schemas/AiMaturity'
         producerRef:
           type: string
         modelVersion:
@@ -14459,9 +15604,21 @@ components:
         **Building six endpoints means six places to change when a model changes**, and the model will
         change more often than the venue''s question does.
 
-        **What each kind is based on, and how much history is enough. Proposed, client to correct
-        (decided 28 September, audit R213).** With less than the minimum, `requestSuggestion` answers
-        422 with `InsufficientDataProblem` naming the input, what there is and this minimum.
+        **What each kind is based on, and when the venue''s own data takes over. Proposed, client to
+        correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The
+        figure after each rule is **the point where own data takes over from the baseline, not a
+        refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern
+        for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between
+        it and about three months it blends the two (`learning`). The day-one baseline per kind:
+        `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the
+        baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x
+        the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with
+        popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured
+        capacity; `upsell` the relationship map and business priority; `segmentation` known guest
+        attributes; `anomaly` the venue''s configured thresholds and actual against the forecast''s low
+        end; `sendTime` the channel''s typical hour; `wasteRisk` shelf life and par against the forecast;
+        `queueBalancing` configured capacity per queue. Only a missing setting refuses (422
+        `AiMissingSettingProblem`).
 
         - `price`: unit cost plus the category''s target margin, held inside the price band. Minimum:
         a current cost, no history.
@@ -14518,6 +15675,10 @@ components:
         is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum:
         14 days of queue readings.
 
+        - `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the
+        guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`,
+        applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.
+
         '
       enum:
       - price
@@ -14536,6 +15697,7 @@ components:
       - sendTime
       - wasteRisk
       - queueBalancing
+      - itinerary
     SuggestionBasis:
       type: string
       description: '**How the answer was reached, and this is the field the whole design exists for.**
@@ -14572,6 +15734,7 @@ components:
       - id
       - kind
       - basis
+      - maturity
       - producedAt
       properties:
         id:
@@ -14620,6 +15783,8 @@ components:
             *the model said so* is not an answer to *which model, when*.
 
             '
+        maturity:
+          $ref: '#/components/schemas/AiMaturity'
         producedAt:
           type: string
           format: date-time
@@ -14847,6 +16012,38 @@ components:
           x-ticvai-references: ai.model
           description: The model in the catalogue (`listAiModels`) this provider serves. Null for an older row
             that names its model only in `model`.
+        taskKeys:
+          type: array
+          items:
+            type: string
+          description: '**Which agent tasks this provider serves** (21 September minutes, M21-03: different agents
+            may use different models chosen for the task). Empty means every task of its `capability`. A task
+            listed on two providers goes to the lower `priority`. **AI-D02 stands:** one managed provider (Azure
+            OpenAI in UAE North) serves every task by default, with a small and a stronger model per task; a second
+            provider or a tenant''s own key is added only where TICVAI enables it for the tenant (AI-D14,
+            `setAiByokEnablement`).'
+        fitnessWarnings:
+          type: array
+          readOnly: true
+          description: '**The model-fitness check at the last write** (21 September minutes, M21-09). For each task
+            in `taskKeys` whose model scores outside the task''s band in `AiModel.taskFitness`, or has no score, one
+            warning. A warning never blocks the write; it is shown on ADM-037 and kept so the choice is auditable.'
+          items:
+            type: object
+            properties:
+              taskKey:
+                type: string
+              score:
+                type: number
+                nullable: true
+              floor:
+                type: number
+              direction:
+                type: string
+                enum:
+                - underpowered
+                - overpowered
+                - unscored
     AiPolicy:
       type: object
       x-ticvai-persistence: ai.policy
@@ -15031,6 +16228,7 @@ components:
             - checkout
             - waitTimes
             - wayfinding
+            - visitPlanning
         retrieveTopK:
           type: integer
           default: 30
@@ -16310,10 +17508,12 @@ components:
         reasoning:
           type: string
           nullable: true
-    InsufficientDataProblem:
+    AiMissingSettingProblem:
       x-ticvai-persistence: none — error shape
-      description: '`requestSuggestion` 422. **Names what is missing and when there will be enough**,
-        so a manager is told when to ask again rather than simply refused.
+      description: '`requestSuggestion` 422 (29 September, AI functions review; replaces the insufficient-data
+        refusal). **Names the setting the answer cannot do without, and where it is set**, so a manager is
+        sent to fix it rather than told to wait. Little history is never this problem: that answer comes from
+        the baseline with `maturity.stage` `starting`.
 
         '
       allOf:
@@ -16328,25 +17528,20 @@ components:
             items:
               type: object
               required:
-              - input
+              - setting
               properties:
-                input:
+                setting:
                   type: string
-                  description: What the answer needs and does not have — *sales history*, *seasonality*.
-                have:
-                  type: string
-                  nullable: true
-                  description: How much there is now — *21 days*.
-                need:
+                  description: What is not set, e.g. *current cost*, *par level*, *ride capacity*, *venue AI
+                    settings*.
+                owner:
                   type: string
                   nullable: true
-                  description: How much the producer needs — *one full year*. The minimum per kind is on
-                    `SuggestionKind` (proposed, audit R213).
-          enoughBy:
-            type: string
-            format: date-time
-            nullable: true
-            description: When there will be enough at the current rate. Null where no date can be stated.
+                  description: The operation that sets it, e.g. `inventory.setParLevel`, `setAiVenueSettings`.
+                screenId:
+                  type: string
+                  nullable: true
+                  description: The screen a manager sets it on.
     UsageLimitProblem:
       x-ticvai-persistence: none — error shape
       description: '`sendAiMessage` 429. **Says which limit was reached**, and whether waiting will clear

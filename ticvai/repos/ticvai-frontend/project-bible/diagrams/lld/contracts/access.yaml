@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 245 operations
+title: access — 246 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -407,14 +407,28 @@ operations:
   - access.accreditation_credential
   - access.admission_rules
   - access.blacklist
-  - cache:resolution
+  - access.dynamic_policy
+  - access.entitlement
+  writes: []
+- operation: issueOrderEntitlements
+  verb: POST
+  path: /internal/orders/{orderId}/entitlements
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - access.entitlement
   - catalogue.entitlement_template
-  - identity.principal
-  - venuemap.map
-  - venuemap.path
-  - venuemap.point
+  - catalogue.variant
+  - orders.order_line
+  - orders.sales_order
   writes:
-  - cache:resolution
+  - access.entitlement
+  - access.parking_entitlement
+  - platform.idempotency_record
+  - platform.outbox
 - operation: listAccess
   verb: GET
   path: /access

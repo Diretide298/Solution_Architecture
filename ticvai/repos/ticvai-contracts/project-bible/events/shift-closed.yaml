@@ -7,6 +7,8 @@ publisher: shift
 description: A till has been counted and closed.
 aggregate: shift
 emittedWhen: ShiftStatus pendingClosure or pendingVariance to closed
+emittedBy:
+- acceptShiftVariance
 payload:
 - field: shiftId
   type: string

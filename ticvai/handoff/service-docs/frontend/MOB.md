@@ -24,26 +24,31 @@
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [GST-001](#gst-001-home-default) | Home – Default | Discovery & Browse | 1 | 11 |
-| [GST-002](#gst-002-explore-categories) | Explore Categories | Discovery & Browse | 1 | 2 |
-| [GST-003](#gst-003-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 4 |
-| [GST-004](#gst-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
+| [GST-001](#gst-001-home) | Home | Discovery & Browse | 1 | 13 |
+| [GST-002](#gst-002-explore) | Explore | Discovery & Browse | 1 | 3 |
+| [GST-003](#gst-003-buy-tickets) | Buy Tickets | Discovery & Browse | 1 | 5 |
+| [GST-004](#gst-004-item-detail) | Item Detail | Discovery & Browse | 1 | 7 |
 | [GST-005](#gst-005-what-s-on) | What's On | Discovery & Browse | 1 | 2 |
-| [GST-006](#gst-006-event-exhibition-details) | Event / Exhibition Details | Discovery & Browse | 1 | 2 |
-| [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 8 |
-| [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 5 |
-| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 9 |
+| [GST-006](#gst-006-item-detail-event-exhibition) | Item Detail – Event / Exhibition | Discovery & Browse | 1 | 2 |
+| [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 9 |
+| [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 6 |
+| [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 10 |
 | [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 6 |
 | [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 5 |
 | [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 2 |
-| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 11 |
+| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 12 |
 | [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 13 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 0 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 3 |
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 1 |
+| [GST-051](#gst-051-plan) | Plan | Engagement & Support | 1 | 3 |
+| [GST-052](#gst-052-suggested-itineraries) | Suggested Itineraries | Engagement & Support | 1 | 3 |
+| [GST-053](#gst-053-your-plan) | Your Plan | Engagement & Support | 1 | 7 |
+| [GST-054](#gst-054-ai-planner) | AI Planner | Engagement & Support | 1 | 6 |
 | [GST-055](#gst-055-dynamic-qr-ticket) | Dynamic QR Ticket | Account & Self-Service | 1 | 5 |
-| [GST-063](#gst-063-search) | Search | Discovery | 1 | 1 |
+| [GST-059](#gst-059-plan-in-progress) | Plan in Progress | Engagement & Support | 1 | 4 |
+| [GST-063](#gst-063-explore-search-results) | Explore – Search Results | Discovery | 1 | 1 |
 | [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 2 | 6 |
 | [GST-014](#gst-014-ticket-transfer) | Ticket Transfer | Ticketing | 2 | 3 |
 | [GST-015](#gst-015-memberships) | Memberships | Membership, Loyalty & Value | 2 | 11 |
@@ -85,7 +90,7 @@
 | [GST-027](#gst-027-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 3 | 5 |
 | [GST-028](#gst-028-parking-reservation-confirmed) | Parking – Reservation Confirmed | In-venue Services | 3 | 2 |
 | [GST-035](#gst-035-feedback-ratings) | Feedback & Ratings | Engagement & Support | 3 | 2 |
-| [GST-038](#gst-038-digital-companion-mode) | Digital Companion Mode | In-venue Services | 3 | 3 |
+| [GST-038](#gst-038-at-the-venue) | At the Venue | In-venue Services | 3 | 3 |
 | [GST-050](#gst-050-resource-booking-cabana) | Resource Booking – Cabana | Booking & Selection | 3 | 3 |
 | [GST-058](#gst-058-resource-availability-cabana) | Resource Availability (Cabana) | Booking & Selection | 3 | 2 |
 | [GST-062](#gst-062-shop-drop-collection) | Shop & Drop Collection | In-Venue Experience | 3 | 1 |
@@ -97,9 +102,9 @@
 | [GST-078](#gst-078-intercity-trip-multi-trip-passes) | Intercity Trip — Multi-trip Passes | Transport | 3 | 3 |
 | [GST-079](#gst-079-intercity-trip-favourite-routes) | Intercity Trip — Favourite Routes | Transport | 3 | 2 |
 
-## GST-001 Home – Default
+## GST-001 Home
 
-**The screen this app sits on. Everything else is entered from here and returns to it.**
+**The Home tab: what this venue is, when it is open and what there is to do, with one or two highlights per type, from which everything else is entered.**
 
 |  |  |
 |---|---|
@@ -131,6 +136,8 @@
 | `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
 | `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
 | `recordStorefrontSessionEvents` | [WhiteLabelService](../backend/WhiteLabelService.md#recordstorefrontsessionevents) | onLoad | App-shell beacon of hashed browsing behaviour for fraud prevention | `None` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | One or two highlights per type (rides, dining, events, shops) for the Home sections (MOB-3) | `PRODUCT_VIEW` |
+| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The type tiles on Home (rides, dining, events, shops) | `PRODUCT_VIEW` |
 
 **States**
 
@@ -142,17 +149,18 @@
 | emptyNoResults | Nothing matches the filter on state, includeShared and the home default are still there. Names the active filter and offers to clear it. |
 | emptyNoAccess | Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| introVideo | First-launch state (MOB-5): the intro video overlay plays over Home while Home loads behind it; Skip introduction reveals Home. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-002 | Explore Categories |  |  |
-| GST-003 | Event & Attraction Listing |  |  |
+| GST-003 | Event & Attraction Listing | eventId |  |
 | GST-004 | Attraction Details | productId |  |
 | GST-005 | What's On |  |  |
 | GST-006 | Event / Exhibition Details | productId |  |
-| GST-007 | Select Date & Time |  |  |
+| GST-007 | Select Date & Time | eventId |  |
 | GST-008 | Tickets & Add-ons | productId |  |
 | GST-009 | Review & Payment | orderId |  |
 | GST-010 | Booking Confirmation | orderId |  |
@@ -184,11 +192,11 @@
 | GST-045 | Ticket Delivery & Sharing | orderId |  |
 | GST-046 | Branded Queue / Waiting Room |  |  |
 | GST-049 | Interactive Seat Selection |  |  |
-| GST-052 | Suggested Itineraries |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
-| GST-054 | AI Optimized Itinerary |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
+| GST-052 | Suggested Itineraries |  |  |
+| GST-054 | AI Optimized Itinerary |  |  |
 | GST-055 | Dynamic QR Ticket | entitlementId, orderId |  |
 | GST-056 | Bundle Package |  |  |
-| GST-059 | Plan My Day – In Progress |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
+| GST-059 | Plan My Day – In Progress |  |  |
 | GST-061 | Menu Item Detail |  |  |
 | GST-070 | Reserve a Table |  |  |
 | GST-022 | Attraction Wait Times |  |  |
@@ -203,18 +211,20 @@
 | GST-047 | Maintenance / Upgrade Page |  |  |
 | GST-048 | Upsell / Cross-Sell |  |  |
 | GST-050 | Resource Booking – Cabana |  |  |
-| GST-051 | Plan Your Adventure – Start |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
-| GST-053 | Build Your Own Itinerary |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
+| GST-051 | Plan Your Adventure – Start |  |  |
+| GST-053 | Build Your Own Itinerary |  |  |
 | GST-057 | Accessibility Information |  |  |
 | GST-058 | Resource Availability (Cabana) |  |  |
 | GST-062 | Shop & Drop Collection |  |  |
 | GST-063 | Search |  |  |
 | GST-068 | Help & My Cases |  |  |
 | GST-076 | Book a trip (a transport venue) |  |  |
+| GST-004 | Opens a highlight (Item Detail) | productId |  |
+| GST-051 | Plan tab |  |  |
 
-## GST-002 Explore Categories
+## GST-002 Explore
 
-**Find explore categories for this venue.**
+**The Explore tab: search the venue, browse its categories and preview items before opening one.**
 
 |  |  |
 |---|---|
@@ -231,6 +241,7 @@
 |---|---|---|---|---|
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The category tiles (a tree, with images and descriptions) | `PRODUCT_VIEW` |
+| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Search from the top of Explore; results are GST-063, a state of this screen | `None` |
 
 **States**
 
@@ -250,10 +261,11 @@
 | GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing |  |  |
 | GST-004 | Attraction Details | productId |  |
+| GST-063 | Searches (results in place) |  |  |
 
-## GST-003 Event & Attraction Listing
+## GST-003 Buy Tickets
 
-**Find the right one quickly, and act on it without opening it.**
+**Every bookable product and booking flow of the venue, one tap from any screen.**
 
 |  |  |
 |---|---|
@@ -269,6 +281,7 @@
 | Parameter | From |
 |---|---|
 | eventId | deepLink |
+| venueId | session |
 
 **Operations**
 
@@ -278,6 +291,7 @@
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | List performances of an event | `PRODUCT_VIEW` |
 | `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
+| `getPublishedGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedguidedchoice) | onLoad | Help me choose: the venue's questions whose answers filter this list (W4) | `None` |
 
 **States**
 
@@ -296,11 +310,16 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-004 | Attraction Details | eventId, productId |  |
+| GST-007 | Book (a dated product: date, then time, then tickets) | productId |  |
+| GST-008 | Book (an undated product, or a product-first flow such as a workshop) | productId |  |
+| GST-074 | Book (a spot on the venue map, where the flow picks on the map) | productId |  |
+| GST-075 | Book (a space by the hour) | productId |  |
+| GST-056 | Book a bundle (e.g. meal combo with admission) |  |  |
 | BO-005 | A supervisor sees the queue building | queueId |  |
 
-## GST-004 Attraction Details
+## GST-004 Item Detail
 
-**See attraction details for this venue.**
+**One detail screen for a ride, show, restaurant or shop: what it is, where it is on the map, and the product to buy for it.**
 
 |  |  |
 |---|---|
@@ -317,6 +336,8 @@
 |---|---|
 | productId | deepLink |
 | eventId | deepLink |
+| mapId | session |
+| bundleId | navigation |
 
 **Operations**
 
@@ -327,6 +348,8 @@
 | `getAvailability` | [CatalogueService](../backend/CatalogueService.md#getavailability) | onLoad | Live remaining capacity | `PRODUCT_VIEW` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | List performances of an event | `PRODUCT_VIEW` |
+| `getVenueMap` | [VenueOpsService](../backend/VenueOpsService.md#getvenuemap) | onLoad | The item's point on the 2D/3D venue map, with its description, media and featured offer (MOB-4) | `VENUE_MAP_VIEW` |
+| `getBundle` | [CatalogueService](../backend/CatalogueService.md#getbundle) | onLoad | The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4) | `PRODUCT_VIEW` |
 
 **States**
 
@@ -350,6 +373,8 @@
 | GST-049 | Book (a fixture with one on-sale performance opens straight on the seat map) | performanceId |  |
 | GST-074 | Book (a cabana, lounger or other spot on the venue map) | productId |  |
 | GST-075 | Book (a space sold by the hour) | productId |  |
+| GST-056 | Buy meal combo (a bundle that includes admission) | bundleId |  |
+| GST-038 | Show on the map (At the Venue, Map view) |  |  |
 
 ## GST-005 What's On
 
@@ -395,7 +420,7 @@
 | GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
 
-## GST-006 Event / Exhibition Details
+## GST-006 Item Detail – Event / Exhibition
 
 **See event / exhibition details for this venue.**
 
@@ -438,6 +463,7 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
+| GST-007 | Book (date, then time, then tickets) | productId |  |
 
 ## GST-007 Select Date & Time
 
@@ -458,6 +484,7 @@
 |---|---|
 | eventId | deepLink |
 | cartId | session |
+| venueId | session |
 
 **Operations**
 
@@ -471,6 +498,7 @@
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the chosen time to the cart (the lease is taken server-side) | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onAction | The cart's `consentQuestions` after the time is added | `None` |
 | `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions | `ORDER_CREATE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -491,6 +519,7 @@
 | GST-003 | Event & Attraction Listing | eventId |  |
 | GST-008 | Picks a time; the tickets for it appear | performanceId |  |
 | GST-049 | Picks a time on a seated event (inline step) | performanceId |  |
+| GST-008 | Picks a date and time after choosing the workshop (product-first flow) | performanceId |  |
 
 ## GST-008 Tickets & Add-ons
 
@@ -523,6 +552,7 @@
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | The add-ons, and the tickets of a category | `PRODUCT_VIEW` |
 | `getPublishedGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedguidedchoice) | onLoad | The venue's published Help me choose (404 = none) | `None` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the tickets and add-ons | `None` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -541,9 +571,10 @@
 |---|---|---|---|
 | GST-041 | Continue to the basket | cartId | a date and time (dated products) and at least one ticket chosen |
 | GST-042 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
-| GST-007 | Change date or time |  |  |
+| GST-007 | Change date or time | eventId |  |
 | GST-072 | Booking for a group or a party | productId, token |  |
 | GST-001 | Home – Default |  |  |
+| GST-007 | Workshop chosen, then date and time (product-first flow) | productId |  |
 
 ## GST-009 Review & Payment
 
@@ -566,6 +597,7 @@
 | orderId | deepLink |
 | paymentId | deepLink |
 | token | deepLink |
+| venueId | session |
 
 **Operations**
 
@@ -580,6 +612,7 @@
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Turn the checked-out cart into an order | `ORDER_CREATE` |
 | `getPaymentLink` | [OrderService](../backend/OrderService.md#getpaymentlink) | onLoad | Open a payment link sent to this guest | `ORDER_VIEW` |
 | `payByLink` | [OrderService](../backend/OrderService.md#paybylink) | onAction | Pay a booking somebody else made | `ORDER_CREATE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -806,6 +839,7 @@
 | productId | navigation |
 | performanceId | navigation |
 | holdId | navigation |
+| venueId | session |
 
 **Operations**
 
@@ -822,6 +856,7 @@
 | `updateCartLine` | [OrderService](../backend/OrderService.md#updatecartline) | onAction | Change a quantity before paying | `None` |
 | `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | The visit date of each line (`Performance.startsAt`) | `PRODUCT_VIEW` |
 | `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The countdown of a spot held on the venue map | `ORDER_VIEW` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
 
@@ -840,6 +875,7 @@
 |---|---|---|---|
 | GST-042 | Signs in, or proves the contact the tickets go to | cartId | no verified guest session. This screen is the checkout page, so the fork sits here rather than in front of the cart (matrix 2.6.1 §2.4) |
 | GST-001 | Home – Default |  |  |
+| GST-059 | They follow it through the day |  |  |
 
 ## GST-042 Simple Registration & OTP
 
@@ -1006,6 +1042,206 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 
+## GST-051 Plan
+
+**The Plan tab: tell the venue who is coming, when, at what pace and what you like, and get a day-by-day plan.**
+
+|  |  |
+|---|---|
+| Module | Engagement & Support |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/general/plan-your-adventure-start` |
+| Component | `apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx` |
+| Pattern | multiStepForm |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
+| `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine) | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The plan builds in place; the inputs stay on screen. |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
+| emptyFirstRun | No plan yet: the first question is shown. Nothing is saved until *Make my plan*. |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-053 | Make my plan | planId |  |
+| GST-052 | Take a ready-made plan |  |  |
+| GST-001 | Home tab |  |  |
+
+## GST-052 Suggested Itineraries
+
+**Ready-made day plans for this venue that a guest can take instead of answering questions.**
+
+|  |  |
+|---|---|
+| Module | Engagement & Support |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/general/suggested-itineraries` |
+| Component | `apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
+| `listCatalogueBundles` | [CatalogueService](../backend/CatalogueService.md#listcataloguebundles) | onLoad | List published bundles | `PRODUCT_VIEW` |
+| `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine) | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The plan builds in place; the inputs stay on screen. |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
+| emptyFirstRun | The venue has no ready-made plans: says so and offers *Make my own* (GST-051). |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-053 | Use this plan | planId |  |
+| GST-051 | Make my own |  |  |
+| GST-001 | Home tab |  |  |
+
+## GST-053 Your Plan
+
+**The plan, day by day: swap, remove or add items, undo, add Fast Track, then book the whole plan.**
+
+|  |  |
+|---|---|
+| Module | Engagement & Support |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/general/build-your-own-itinerary` |
+| Component | `apps/guest-app/src/routes/general/BuildYourOwnItineraryDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| planId | GST-051 |
+| venueId | session |
+| itemId | navigation |
+| cartId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now | `None` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
+| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
+| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version | `None` |
+| `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
+| `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
+| `bookVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#bookvisitplan) | onAction | Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The plan builds in place; the inputs stay on screen. |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
+| emptyFirstRun | No plan yet: offers the questions (GST-051) or a ready-made plan (GST-052). |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-041 | Book this plan | cartId |  |
+| GST-054 | Refine with the AI planner | planId |  |
+| GST-051 | Change answers |  |  |
+| GST-048 | More add-ons | cartId |  |
+| GST-059 | On the day: follow the plan | planId |  |
+| GST-001 | Home tab |  |  |
+
+## GST-054 AI Planner
+
+**Ask the planner in your own words to change the plan; it refines the rules plan, and the rules plan stays if AI is unavailable.**
+
+|  |  |
+|---|---|
+| Module | Engagement & Support |
+| Wave | 1 |
+| Licensed module | ai |
+| Route | `/general/ai-optimized-itinerary` |
+| Component | `apps/guest-app/src/routes/general/AiOptimizedItineraryDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| planId | GST-053 |
+| conversationId | deepLink |
+| venueId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
+| `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Chat with the planner agent; its tools are the plan operations, so a change it makes is a new plan version | `AI_USE` |
+| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version | `None` |
+| `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
+| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | onLoad | Open the planner conversation for this plan | `AI_USE` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan` | `AI_USE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The plan builds in place; the inputs stay on screen. |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
+| emptyFirstRun | No conversation yet: the plan is shown with example requests. |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| aiUnavailable | Falls back to the rules plan, never to an error (MOB-6): the plan from `getVisitPlan` stays on screen with a short note, and the guest carries on editing it on GST-053. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-053 | Back to your plan | planId |  |
+| GST-059 | They follow it through the day | planId |  |
+| GST-001 | Home tab |  |  |
+
 ## GST-055 Dynamic QR Ticket
 
 **Find dynamic qr ticket for this venue.**
@@ -1053,7 +1289,56 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 
-## GST-063 Search
+## GST-059 Plan in Progress
+
+**Today's plan while you are in the venue, re-ordered against live waits.**
+
+|  |  |
+|---|---|
+| Module | Engagement & Support |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/general/plan-my-day-in-progress` |
+| Component | `apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| planId | GST-053 |
+| venueId | session |
+| itemId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
+| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version | `None` |
+| `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
+| `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The plan builds in place; the inputs stay on screen. |
+| error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
+| emptyFirstRun | No plan for today: offers to make one (GST-051). |
+| emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
+| emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-053 | See the whole plan | planId |  |
+| GST-038 | Directions (At the Venue, Map) |  |  |
+| GST-001 | Home tab |  |  |
+
+## GST-063 Explore – Search Results
 
 **Find something when you do not know what it is called.**
 
@@ -1087,6 +1372,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
+| GST-002 | Clears the search |  |  |
+| GST-004 | Opens a result (Item Detail) | productId |  |
 
 ## GST-011 Wallet Overview
 
@@ -1460,7 +1747,7 @@
 | GST-003 | Picks something shorter from the attractions list |  |  |
 | GST-023 | They join a virtual queue rather than stand in it |  |  |
 | GST-001 | Home – Default |  |  |
-| GST-059 | Plan My Day – In Progress |  | a later release: the itinerary planner is deferred and this tile or link is not shown in the first release (decided 28 September, audit R187) |
+| GST-059 | Plan My Day – In Progress |  |  |
 
 ## GST-024 F&B – Browse & Order
 
@@ -1724,7 +2011,7 @@
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
 | `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | onAction | Open a conversation | `AI_USE` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | Pass an assistant conversation to a person | `None` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | A suggestion of kind prepPlan, upsell or waitTime only — the kinds a guest may ask for; no itinerary or scenario (decided 28 September, audit R209) | `AI_USE` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | A suggestion of kind prepPlan, upsell or waitTime from the concierge; an itinerary (guest-allowed since 29 September) is asked on the Plan tab (GST-054), not here | `AI_USE` |
 
 **States**
 
@@ -2227,6 +2514,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
+| GST-041 | Add the meal combo (admission included) to the basket | cartId |  |
 
 ## GST-057 Accessibility Information
 
@@ -2967,9 +3255,9 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 
-## GST-038 Digital Companion Mode
+## GST-038 At the Venue
 
-**The in-venue home: your tickets, the map, and what is near you.**
+**Everything live at the venue in one place: map, waits, food, shows, shop and services, with what is happening now.**
 
 |  |  |
 |---|---|
@@ -3004,6 +3292,12 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
+| GST-021 | Map view |  |  |
+| GST-022 | Waits view |  |  |
+| GST-024 | Food |  |  |
+| GST-026 | Shop |  |  |
+| GST-029 | Services |  |  |
+| GST-023 | Join a virtual queue |  |  |
 
 ## GST-050 Resource Booking – Cabana
 

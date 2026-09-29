@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `white-label` |
 | Schemas owned | `whitelabel` |
-| Operations in the slice | 61 of 64 |
+| Operations in the slice | 78 of 79 |
 | Scale | Read-heavy and heavily cached. Published, not queried. |
 | If it is down | Down freezes the current published config. Guests see the last good version. |
 
@@ -19,6 +19,7 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 
 | Service | Tables it reads |
 |---|---|
+| [CatalogueService](CatalogueService.md) | `catalogue.product`, `catalogue.product_category` |
 | [IdentityService](IdentityService.md) | `identity.principal` |
 | [MarketingService](MarketingService.md) | `marketing.segment` |
 | [PlatformService](PlatformService.md) | `control.content_block`, `control.licence_add_on`, `control.tenant`, `subscription.contract`, `subscription.plan` |
@@ -27,6 +28,19 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
+| appPublishing | [`getAppBuild`](#getappbuild) | GET | `/tenant-config/app-builds/{appBuildId}` | core | 1 | CMS-104 |
+| appPublishing | [`getStoreAccounts`](#getstoreaccounts) | GET | `/tenant-config/store-accounts` | core | 1 | CMS-104 |
+| appPublishing | [`listAppBuilds`](#listappbuilds) | GET | `/tenant-config/app-builds` | core | 1 | CMS-104 |
+| appPublishing | [`requestAppBuild`](#requestappbuild) | POST | `/tenant-config/app-builds` | core | 1 | CMS-104 |
+| appPublishing | [`setStoreAccounts`](#setstoreaccounts) | PUT | `/tenant-config/store-accounts` | core | 1 | CMS-104 |
+| bookingFlows | [`createBookingFlowDefinition`](#createbookingflowdefinition) | POST | `/venues/{venueId}/booking-flows` | core | 1 | CMS-102, CMS-103 |
+| bookingFlows | [`deleteBookingFlow`](#deletebookingflow) | DELETE | `/booking-flows/{bookingFlowId}` | core | 1 | CMS-103 |
+| bookingFlows | [`getBookingFlow`](#getbookingflow) | GET | `/booking-flows/{bookingFlowId}` | core | 1 | CMS-103 |
+| bookingFlows | [`getPublishedBookingFlow`](#getpublishedbookingflow) | GET | `/venues/{venueId}/booking-flow` | core | 1 | CMS-103, GST-007, GST-008, GST-009, GST-041, WEB-005 … |
+| bookingFlows | [`listBookingFlowTypes`](#listbookingflowtypes) | GET | `/booking-flow-types` | core | 1 | CMS-102, CMS-103 |
+| bookingFlows | [`listBookingFlows`](#listbookingflows) | GET | `/venues/{venueId}/booking-flows` | core | 1 | BO-007, BO-008, BO-115, CMS-014, CMS-101, CMS-102 … |
+| bookingFlows | [`updateBookingFlowDefinition`](#updatebookingflowdefinition) | PATCH | `/booking-flows/{bookingFlowId}` | core | 1 | CMS-103 |
+| bookingFlows | [`validateBookingFlow`](#validatebookingflow) | POST | `/booking-flows/{bookingFlowId}/validate` | core | 1 | CMS-103 |
 | brand | [`getAppIcons`](#getappicons) | GET | `/tenant-config/app-icons` | core | 2 | ADM-016, CMS-004 |
 | brand | [`getBrandIdentity`](#getbrandidentity) | GET | `/tenant-config/brand` | core | 2 | ADM-016, CMS-002, CMS-004 |
 | brand | [`setAppIcons`](#setappicons) | PUT | `/tenant-config/app-icons` | core | 2 | ADM-016, CMS-004 |
@@ -41,13 +55,14 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | content | [`deleteContentPage`](#deletecontentpage) | DELETE | `/tenant-config/pages/{pageId}` | core | 2 | CMS-007 |
 | content | [`deleteGuidedChoice`](#deleteguidedchoice) | DELETE | `/guided-choices/{guidedChoiceId}` | core | 2 | CMS-101 |
 | content | [`deletePromoBlock`](#deletepromoblock) | DELETE | `/tenant-config/promo-blocks/{promoBlockId}` | core | 2 | CMS-008 |
-| content | [`getPublishedGuidedChoice`](#getpublishedguidedchoice) | GET | `/venues/{venueId}/guided-choice` | core | 1 | GST-008, WEB-005 |
+| content | [`getPublishedGuidedChoice`](#getpublishedguidedchoice) | GET | `/venues/{venueId}/guided-choice` | core | 1 | GST-003, GST-008, WEB-002, WEB-005 |
 | content | [`listBanners`](#listbanners) | GET | `/tenant-config/banners` | core | 2 | CMS-008 |
 | content | [`listContentPages`](#listcontentpages) | GET | `/tenant-config/pages` | core | 2 | BO-837, CMS-007, GST-040, GST-057, WEB-045 |
 | content | [`listFaqs`](#listfaqs) | GET | `/tenant-config/faqs` | core | 2 | ADM-018, GST-040, SUP-006, WEB-045 |
 | content | [`listGuidedChoices`](#listguidedchoices) | GET | `/venues/{venueId}/guided-choices` | core | 2 | CMS-101 |
 | content | [`listPolicies`](#listpolicies) | GET | `/tenant-config/policies` | core | 2 | ADM-018, BO-243, CMS-018 |
 | content | [`listPromoBlocks`](#listpromoblocks) | GET | `/tenant-config/promo-blocks` | core | 2 | CMS-008 |
+| content | [`proposeGuidedChoice`](#proposeguidedchoice) | POST | `/venues/{venueId}/guided-choice-suggestions` | core | 1 |  |
 | content | [`publishGuidedChoice`](#publishguidedchoice) | POST | `/guided-choices/{guidedChoiceId}/publish` | core | 2 | CMS-101 |
 | content | [`setFaqs`](#setfaqs) | PUT | `/tenant-config/faqs` | core | 2 | ADM-018 |
 | content | [`setPolicy`](#setpolicy) | PUT | `/tenant-config/policies/{policyKind}` | core | 2 | ADM-018, CMS-018 |
@@ -63,9 +78,10 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | modules | [`setFeatureToggles`](#setfeaturetoggles) | PUT | `/tenant-config/features` | core | 2 | CMS-001 |
 | modules | [`setLanguages`](#setlanguages) | PUT | `/tenant-config/languages` | core | 2 | ADM-018, CMS-011 |
 | modules | [`setModuleEnablement`](#setmoduleenablement) | PUT | `/tenant-config/modules` | core | 2 | CMS-001 |
+| navigation | [`getNavigation`](#getnavigation) | GET | `/tenant-config/navigation` | core | 2 | CMS-009 |
 | navigation | [`setHeader`](#setheader) | PUT | `/tenant-config/header` | core | 2 | CMS-007 |
 | navigation | [`setNavigation`](#setnavigation) | PUT | `/tenant-config/navigation` | core | 2 | CMS-009 |
-| overview | [`getTenantAppStatus`](#gettenantappstatus) | GET | `/tenant-config/status` | core | 1 | CMS-001, CMS-014, GST-001, GST-029, GST-038, GST-040 … |
+| overview | [`getTenantAppStatus`](#gettenantappstatus) | GET | `/tenant-config/status` | core | 1 | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038 … |
 | overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 1 | BO-599, BO-834, CMS-001, CMS-012, CMS-016, GST-001 … |
 | overview | [`listAnalyticsProviders`](#listanalyticsproviders) | GET | `/tenant-config/analytics-providers` | core | 1 | CMS-016, GST-001, WEB-001 |
 | overview | [`recordStorefrontSessionEvents`](#recordstorefrontsessionevents) | POST | `/storefront/session-events` | core | 1 | GST-001, WEB-001 |
@@ -73,10 +89,12 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | overview | [`setMaintenanceMode`](#setmaintenancemode) | PUT | `/tenant-config/status` | core | 2 | CMS-001 |
 | publishing | [`createPreview`](#createpreview) | POST | `/tenant-config/preview` | core | 2 | ADM-016, CMS-006 |
 | publishing | [`diffConfigVersion`](#diffconfigversion) | GET | `/tenant-config/versions/{version}/diff` | core | 2 | ADM-016, CMS-006, CMS-015 |
+| publishing | [`getSiteSetupProgress`](#getsitesetupprogress) | GET | `/tenant-config/site-setup` | core | 1 | CMS-102 |
 | publishing | [`listConfigVersions`](#listconfigversions) | GET | `/tenant-config/versions` | core | 2 | ADM-016, CMS-006, CMS-015 |
-| publishing | [`publishTenantConfig`](#publishtenantconfig) | POST | `/tenant-config/publish` | core | 2 | ADM-016, BO-843, CMS-006, CMS-014 |
+| publishing | [`publishTenantConfig`](#publishtenantconfig) | POST | `/tenant-config/publish` | core | 1 | ADM-016, BO-843, CMS-006, CMS-014, CMS-103 |
 | publishing | [`restoreConfigVersion`](#restoreconfigversion) | POST | `/tenant-config/versions/{version}/restore` | core | 2 | ADM-016, CMS-006, CMS-015 |
-| publishing | [`validateTenantConfig`](#validatetenantconfig) | POST | `/tenant-config/validate` | core | 2 | CMS-012, CMS-014 |
+| publishing | [`setSiteSetupProgress`](#setsitesetupprogress) | PUT | `/tenant-config/site-setup` | core | 1 | CMS-102 |
+| publishing | [`validateTenantConfig`](#validatetenantconfig) | POST | `/tenant-config/validate` | core | 1 | CMS-012, CMS-014, CMS-102 |
 | theme | [`getFonts`](#getfonts) | GET | `/tenant-config/fonts` | core | 2 | CMS-003 |
 | theme | [`getTheme`](#gettheme) | GET | `/tenant-config/theme` | core | 2 | ADM-016, CMS-003, CMS-005 |
 | theme | [`setFonts`](#setfonts) | PUT | `/tenant-config/fonts` | core | 2 | CMS-003 |
@@ -88,6 +106,836 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | whiteLabel | [`createContentBlock`](#createcontentblock) | POST | `/content-blocks` | setup | 2 | BO-839 |
 | whiteLabel | [`publishContentBlock`](#publishcontentblock) | POST | `/content-blocks/{blockId}/publish` | setup | 2 |  |
 | whiteLabel | [`setFooter`](#setfooter) | PUT | `/footer` | core | 2 | CMS-007 |
+
+## Group: appPublishing
+
+### getAppBuild
+
+**`GET /tenant-config/app-builds/{appBuildId}`**: One app build, with its package and store status
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.app_build` |
+| Writes | - |
+| Called by | CMS-104 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| appBuildId | path | yes | string (uuid) |  |
+
+**Response**: `AppBuild`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| platform | enum (ios, android) | yes |  |
+| configVersion | string | yes | The ConfigVersion.version built. |
+| storeAccountId | string (uuid) |  | (read-only) |
+| versionName | string |  | The marketing version, e.g. (read-only) |
+| buildNumber | integer |  | (read-only) |
+| status | enum (queued, building, built, failed, submitted, inReview, approved, rejected, …) | yes | queued to built or failed is the build service's; from submitted on it is read from the store with the client's credential, or stays built when the client uploads by hand. (read-only) |
+| failureReason | string |  | (read-only; nullable) |
+| packageAssetRef | string (uuid) |  | The signed .ipa or .aab in the assets library, for the client to download and upload. (read-only; nullable) |
+| releaseNotes | LocalisedText |  | Keyed by ISO 639-1 code. |
+| submitToStore | boolean |  | (default False) |
+| requestedAt | string (date-time) | yes | (read-only) |
+| requestedByPrincipalId | string (uuid) |  | (read-only) |
+| finishedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The build |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### getStoreAccounts
+
+**`GET /tenant-config/store-accounts`**: The client's store accounts and the publishing checklist
+
+The Apple and Google accounts the client has recorded, and the checklist CMS-104 shows: Apple D-U-N-S number, Apple Developer account, Google Play developer account, store listing, app icons and a published configuration. Secrets are never returned: a stored credential shows as `hasApiCredential`.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.config_version`, `whitelabel.store_account`, `whitelabel.tenant_config` |
+| Writes | - |
+| Called by | CMS-104 |
+
+**Response**: `StorePublishingChecklist`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| accounts | array of StoreAccount | yes |  |
+| accounts[].id | string (uuid) |  | (read-only) |
+| accounts[].store | enum (appleAppStore, googlePlay) | yes |  |
+| accounts[].accountHolderName | string | yes | The client's legal entity as the store knows it. (max length 200) |
+| accounts[].dunsNumber | string |  | Required for appleAppStore; Apple enrols an organisation only with its D-U-N-S number. (pattern ^[0-9]{9}$; nullable) |
+| accounts[].developerAccountId | string | yes | Apple Team ID, or the Google Play developer account id. (max length 64) |
+| accounts[].appIdentifier | string | yes | The bundle id (Apple) or application id (Google) the app is signed with. (max length 155; pattern ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$) |
+| accounts[].apiCredentialSecretRef | string |  | App Store Connect API key or Play service-account key, sent once and kept in the secret store; this is its reference. (nullable) |
+| accounts[].hasApiCredential | boolean |  | (read-only) |
+| accounts[].listing | object |  | The store listing. |
+| accounts[].listing.appName | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.subtitle | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.description | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.keywords | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.category | string |  |  |
+| accounts[].listing.supportUrl | string (uri) |  |  |
+| accounts[].listing.privacyPolicyUrl | string (uri) |  |  |
+| accounts[].listing.screenshotAssetRefs | array of string (uuid) |  |  |
+| accounts[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| accounts[].updatedAt | string (date-time) |  | (read-only) |
+| items | array of object | yes |  |
+| items[].item | enum (appleDunsNumber, appleDeveloperAccount, googlePlayDeveloperAccount, storeListing, appIcons, publishedConfiguration) | yes |  |
+| items[].done | boolean | yes |  |
+| items[].clientOwned | boolean |  | True for the three accounts, which only the client can open. |
+| items[].guidance | string |  | What to do next, in the operator's language. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Accounts and checklist |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
+### listAppBuilds
+
+**`GET /tenant-config/app-builds`**: The tenant's app builds, newest first
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.app_build` |
+| Writes | - |
+| Called by | CMS-104 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| platform | query |  | enum (ios, android) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of AppBuild | yes |  |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].platform | enum (ios, android) | yes |  |
+| items[].configVersion | string | yes | The ConfigVersion.version built. |
+| items[].storeAccountId | string (uuid) |  | (read-only) |
+| items[].versionName | string |  | The marketing version, e.g. (read-only) |
+| items[].buildNumber | integer |  | (read-only) |
+| items[].status | enum (queued, building, built, failed, submitted, inReview, approved, rejected, …) | yes | queued to built or failed is the build service's; from submitted on it is read from the store with the client's credential, or stays built when the client uploads by hand. (read-only) |
+| items[].failureReason | string |  | (read-only; nullable) |
+| items[].packageAssetRef | string (uuid) |  | The signed .ipa or .aab in the assets library, for the client to download and upload. (read-only; nullable) |
+| items[].releaseNotes | LocalisedText |  | Keyed by ISO 639-1 code. |
+| items[].submitToStore | boolean |  | (default False) |
+| items[].requestedAt | string (date-time) | yes | (read-only) |
+| items[].requestedByPrincipalId | string (uuid) |  | (read-only) |
+| items[].finishedAt | string (date-time) |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Builds, newest first |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
+### requestAppBuild
+
+**`POST /tenant-config/app-builds`**: Build the branded app for a store
+
+**Builds the tenant's app from a published configuration (decided 24 September, M24-08).** The build-time parts (app icons, splash, custom fonts, wallet and payment integrations: `ChangeScope` `buildTime`) come from the version named, or the current one; the intro video is streamed and needs no build. Signed for the client's own account and bundle id, never TICVAI's. Accepted as `queued`; the package is downloaded from `getAppBuild` for the client to upload, or submitted with the client's API credential when one is recorded and `submitToStore` is true. **Refused with 409** when the store's account is not recorded (`setStoreAccounts`), when no version has been published, or while a build for the same platform is running.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_PUBLISH` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.app_build`, `whitelabel.config_version`, `whitelabel.store_account` |
+| Writes | `cache:idempotency`, `whitelabel.app_build` |
+| Called by | CMS-104 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| platform | enum (ios, android) | yes |  |
+| configVersion | string |  | A published ConfigVersion.version. |
+| releaseNotes | LocalisedText |  | Keyed by ISO 639-1 code. |
+| submitToStore | boolean |  | Submit with the client's recorded API credential once built. (default False) |
+
+**Response**: `AppBuild`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| platform | enum (ios, android) | yes |  |
+| configVersion | string | yes | The ConfigVersion.version built. |
+| storeAccountId | string (uuid) |  | (read-only) |
+| versionName | string |  | The marketing version, e.g. (read-only) |
+| buildNumber | integer |  | (read-only) |
+| status | enum (queued, building, built, failed, submitted, inReview, approved, rejected, …) | yes | queued to built or failed is the build service's; from submitted on it is read from the store with the client's credential, or stays built when the client uploads by hand. (read-only) |
+| failureReason | string |  | (read-only; nullable) |
+| packageAssetRef | string (uuid) |  | The signed .ipa or .aab in the assets library, for the client to download and upload. (read-only; nullable) |
+| releaseNotes | LocalisedText |  | Keyed by ISO 639-1 code. |
+| submitToStore | boolean |  | (default False) |
+| requestedAt | string (date-time) | yes | (read-only) |
+| requestedByPrincipalId | string (uuid) |  | (read-only) |
+| finishedAt | string (date-time) |  | (read-only; nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 202 |  | Queued |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 409 |  | No store account for the platform, nothing published yet, or a build for the platform already running; the problem says which |
+
+### setStoreAccounts
+
+**`PUT /tenant-config/store-accounts`**: Record the client's own Apple and Google store accounts and listings
+
+**The client's accounts, never TICVAI's (decided 24 September, M24-08).** One entry per store; the body replaces both. A fact about the client rather than configuration a guest resolves against, and not part of the published draft: it takes effect at once and carries no config scope. An Apple entry without a nine-digit `dunsNumber`, a store given twice, or a listing text missing a tenant language, is refused with 400. A credential is kept in the secret store and only its reference is stored here.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.store_account` |
+| Writes | `cache:idempotency`, `whitelabel.store_account` |
+| Called by | CMS-104 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| accounts | array of StoreAccount | yes | (max items 2) |
+| accounts[].id | string (uuid) |  | (read-only) |
+| accounts[].store | enum (appleAppStore, googlePlay) | yes |  |
+| accounts[].accountHolderName | string | yes | The client's legal entity as the store knows it. (max length 200) |
+| accounts[].dunsNumber | string |  | Required for appleAppStore; Apple enrols an organisation only with its D-U-N-S number. (pattern ^[0-9]{9}$; nullable) |
+| accounts[].developerAccountId | string | yes | Apple Team ID, or the Google Play developer account id. (max length 64) |
+| accounts[].appIdentifier | string | yes | The bundle id (Apple) or application id (Google) the app is signed with. (max length 155; pattern ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$) |
+| accounts[].apiCredentialSecretRef | string |  | App Store Connect API key or Play service-account key, sent once and kept in the secret store; this is its reference. (nullable) |
+| accounts[].hasApiCredential | boolean |  | (read-only) |
+| accounts[].listing | object |  | The store listing. |
+| accounts[].listing.appName | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.subtitle | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.description | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.keywords | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.category | string |  |  |
+| accounts[].listing.supportUrl | string (uri) |  |  |
+| accounts[].listing.privacyPolicyUrl | string (uri) |  |  |
+| accounts[].listing.screenshotAssetRefs | array of string (uuid) |  |  |
+| accounts[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| accounts[].updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `StorePublishingChecklist`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| accounts | array of StoreAccount | yes |  |
+| accounts[].id | string (uuid) |  | (read-only) |
+| accounts[].store | enum (appleAppStore, googlePlay) | yes |  |
+| accounts[].accountHolderName | string | yes | The client's legal entity as the store knows it. (max length 200) |
+| accounts[].dunsNumber | string |  | Required for appleAppStore; Apple enrols an organisation only with its D-U-N-S number. (pattern ^[0-9]{9}$; nullable) |
+| accounts[].developerAccountId | string | yes | Apple Team ID, or the Google Play developer account id. (max length 64) |
+| accounts[].appIdentifier | string | yes | The bundle id (Apple) or application id (Google) the app is signed with. (max length 155; pattern ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$) |
+| accounts[].apiCredentialSecretRef | string |  | App Store Connect API key or Play service-account key, sent once and kept in the secret store; this is its reference. (nullable) |
+| accounts[].hasApiCredential | boolean |  | (read-only) |
+| accounts[].listing | object |  | The store listing. |
+| accounts[].listing.appName | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.subtitle | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.description | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.keywords | LocalisedText |  | Keyed by ISO 639-1 code. |
+| accounts[].listing.category | string |  |  |
+| accounts[].listing.supportUrl | string (uri) |  |  |
+| accounts[].listing.privacyPolicyUrl | string (uri) |  |  |
+| accounts[].listing.screenshotAssetRefs | array of string (uuid) |  |  |
+| accounts[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| accounts[].updatedAt | string (date-time) |  | (read-only) |
+| items | array of object | yes |  |
+| items[].item | enum (appleDunsNumber, appleDeveloperAccount, googlePlayDeveloperAccount, storeListing, appIcons, publishedConfiguration) | yes |  |
+| items[].done | boolean | yes |  |
+| items[].clientOwned | boolean |  | True for the three accounts, which only the client can open. |
+| items[].guidance | string |  | What to do next, in the operator's language. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved; the checklist as it now stands |
+| 400 |  | An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing text missing a tenant language |
+
+
+## Group: bookingFlows
+
+### createBookingFlowDefinition
+
+**`POST /venues/{venueId}/booking-flows`**: Pick a booking flow for a venue
+
+**A venue picks a flow type and gets its steps (decided 29 September, W12).** Steps left out of the body are filled from the type: every step of the type, `enabled` at the type's default and in the type's default order. The body may reorder, turn off an optional step or set a step's own settings. **Saved even when it does not validate**, so an operator can work step by step; `isValid` says whether it does and `validateBookingFlow` says why. `publishTenantConfig` refuses a draft holding an invalid flow. **A step the type does not have**, or a step given twice, is refused with 400. `isDefaultForType` true makes this the venue's flow for every product of the type's kinds that names no flow (catalogue `Product.bookingFlowId`); the venue's previous default for the type loses the flag in the same transaction.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step` |
+| Writes | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step` |
+| Called by | CMS-102, CMS-103 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `BookingFlow`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) |  | From the path of createBookingFlowDefinition. (read-only) |
+| flowTypeKey | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
+| name | string | yes | Staff-facing, e.g. (max length 80) |
+| isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
+| isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
+| steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].id | string (uuid) |  | (read-only) |
+| steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| steps[].sortOrder | integer | yes | (min 0) |
+| steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+| settings | BookingFlowLevelSettings |  | The settings that belong to one flow, not to the venue (decided 29 September, W12). |
+| settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (rev 3 REV3-2). (default dateTimeTicket) |
+| settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3). (default afterAddOns) |
+| settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (rev 3 REV3-4). (default inlineStep) |
+| settings.extrasStep | enum (auto, always, never) |  | auto shows the extras step only when the cart's products have add-ons; never is the same as turning the optional extras step off. (default auto) |
+| settings.quickTour | boolean |  | Quick tour (rev 3 REV3-20). (default False) |
+| settings.consentQuestionIds | array of string (uuid) |  | The flow's own consent questions (rev 3 REV3-26). (max items 10; default []) |
+| isValid | boolean |  | Whether the flow passes validateBookingFlow; worked out in the same transaction as each write. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `BookingFlow`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) |  | From the path of createBookingFlowDefinition. (read-only) |
+| flowTypeKey | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
+| name | string | yes | Staff-facing, e.g. (max length 80) |
+| isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
+| isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
+| steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].id | string (uuid) |  | (read-only) |
+| steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| steps[].sortOrder | integer | yes | (min 0) |
+| steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+| settings | BookingFlowLevelSettings |  | The settings that belong to one flow, not to the venue (decided 29 September, W12). |
+| settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (rev 3 REV3-2). (default dateTimeTicket) |
+| settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3). (default afterAddOns) |
+| settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (rev 3 REV3-4). (default inlineStep) |
+| settings.extrasStep | enum (auto, always, never) |  | auto shows the extras step only when the cart's products have add-ons; never is the same as turning the optional extras step off. (default auto) |
+| settings.quickTour | boolean |  | Quick tour (rev 3 REV3-20). (default False) |
+| settings.consentQuestionIds | array of string (uuid) |  | The flow's own consent questions (rev 3 REV3-26). (max items 10; default []) |
+| isValid | boolean |  | Whether the flow passes validateBookingFlow; worked out in the same transaction as each write. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created in the working draft |
+| 400 |  | An unknown flow type, a step the type does not have, or a step given twice |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
+### deleteBookingFlow
+
+**`DELETE /booking-flows/{bookingFlowId}`**: Remove a booking flow from a venue
+
+Removed from the working draft; guests keep the published copy until the next publish. **Refused with 409 while a product or category names it** (catalogue `bookingFlowId`) or while it is the venue's default for its type and products of that kind are on sale: reassign them first, so no product is left without a way to book.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `catalogue.product`, `catalogue.product_category`, `whitelabel.booking_flow` |
+| Writes | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step` |
+| Called by | CMS-103 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| bookingFlowId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Removed from the draft |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | A product or category still names this flow, or it is the default for products on sale; the problem names them |
+
+### getBookingFlow
+
+**`GET /booking-flows/{bookingFlowId}`**: Read one of a venue's booking flows, every step included
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step` |
+| Writes | - |
+| Called by | CMS-103 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| bookingFlowId | path | yes | string (uuid) |  |
+
+**Response**: `BookingFlow`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) |  | From the path of createBookingFlowDefinition. (read-only) |
+| flowTypeKey | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
+| name | string | yes | Staff-facing, e.g. (max length 80) |
+| isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
+| isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
+| steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].id | string (uuid) |  | (read-only) |
+| steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| steps[].sortOrder | integer | yes | (min 0) |
+| steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+| settings | BookingFlowLevelSettings |  | The settings that belong to one flow, not to the venue (decided 29 September, W12). |
+| settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (rev 3 REV3-2). (default dateTimeTicket) |
+| settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3). (default afterAddOns) |
+| settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (rev 3 REV3-4). (default inlineStep) |
+| settings.extrasStep | enum (auto, always, never) |  | auto shows the extras step only when the cart's products have add-ons; never is the same as turning the optional extras step off. (default auto) |
+| settings.quickTour | boolean |  | Quick tour (rev 3 REV3-20). (default False) |
+| settings.consentQuestionIds | array of string (uuid) |  | The flow's own consent questions (rev 3 REV3-26). (max items 10; default []) |
+| isValid | boolean |  | Whether the flow passes validateBookingFlow; worked out in the same transaction as each write. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The flow, disabled steps included |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### getPublishedBookingFlow
+
+**`GET /venues/{venueId}/booking-flow`**: The published booking flow a product or category books through
+
+**What the guest booking screens read to order their steps (decided 29 September, W12).** Public and cacheable, like the rest of the published app; reads the current `ConfigVersion`, never the draft. Resolved in this order: the product's own `bookingFlowId` (catalogue), then its category's, then the venue's default flow for the type serving the product's kind. With `flowTypeKey` alone, the venue's default for that type. Returns only the enabled steps, in order, with their settings and the flow-level settings; `name` is left out of this view. 404 when nothing resolves, and the guest screens use the type's default order.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `catalogue.product`, `catalogue.product_category`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.config_version` |
+| Writes | - |
+| Called by | CMS-103, GST-007, GST-008, GST-009, GST-041, WEB-005, WEB-006, WEB-007, WEB-008, WEB-010, WEB-011, WEB-012 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| productId | query |  | string (uuid) |  |
+| productCategoryId | query |  | string (uuid) |  |
+| flowTypeKey | query |  | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) |  |
+
+**Response**: `BookingFlow`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) |  | From the path of createBookingFlowDefinition. (read-only) |
+| flowTypeKey | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
+| name | string | yes | Staff-facing, e.g. (max length 80) |
+| isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
+| isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
+| steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].id | string (uuid) |  | (read-only) |
+| steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| steps[].sortOrder | integer | yes | (min 0) |
+| steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+| settings | BookingFlowLevelSettings |  | The settings that belong to one flow, not to the venue (decided 29 September, W12). |
+| settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (rev 3 REV3-2). (default dateTimeTicket) |
+| settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3). (default afterAddOns) |
+| settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (rev 3 REV3-4). (default inlineStep) |
+| settings.extrasStep | enum (auto, always, never) |  | auto shows the extras step only when the cart's products have add-ons; never is the same as turning the optional extras step off. (default auto) |
+| settings.quickTour | boolean |  | Quick tour (rev 3 REV3-20). (default False) |
+| settings.consentQuestionIds | array of string (uuid) |  | The flow's own consent questions (rev 3 REV3-26). (max items 10; default []) |
+| isValid | boolean |  | Whether the flow passes validateBookingFlow; worked out in the same transaction as each write. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The published flow, enabled steps only |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### listBookingFlowTypes
+
+**`GET /booking-flow-types`**: The booking flow types a venue can pick from, with their steps
+
+**The system catalogue of booking flows (decided 29 September, W12).** Shipped with the service and the same for every tenant; a venue never edits it, it picks from it (`createBookingFlowDefinition`). Each type lists its steps, each `required`, `optional` or `conditional` (with the condition), the order constraints the venue's own order must respect (for example payment is last, and the seat map comes after date and time), and the settings each step owns. The full catalogue is `x-ticvai-system-catalogue` on `BookingFlowType`.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | CMS-102, CMS-103 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| productKind | query |  | string | Only the types that serve this catalogue product kind. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of BookingFlowType | yes |  |
+| items[].key | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
+| items[].name | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| items[].description | LocalisedText |  | Keyed by ISO 639-1 code. |
+| items[].productKinds | array of string | yes | The catalogue ProductKind values this type books. |
+| items[].steps | array of object | yes | In the type's default order. |
+| items[].steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| items[].steps[].requirement | enum (required, optional, conditional) | yes |  |
+| items[].steps[].condition | object |  | For conditional, when a guest meets the step. (nullable) |
+| items[].steps[].defaultEnabled | boolean |  | (default True) |
+| items[].steps[].defaultSortOrder | integer | yes | (min 0) |
+| items[].steps[].settingsOwned | array of string |  | Names of BookingFlowSettings (venue-wide) or BookingFlowLevelSettings (this flow) fields shown beside the step. |
+| items[].steps[].stepSettings | array of object |  | The step's own settings, kept in BookingFlowStep.settings. |
+| items[].orderConstraints | array of object | yes | first and last pin a step; before puts stepKey somewhere ahead of otherStepKey. |
+| items[].orderConstraints[].kind | enum (first, last, before) | yes |  |
+| items[].orderConstraints[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| items[].orderConstraints[].otherStepKey | object |  | Required when kind is before. (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The flow types, in catalogue order |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
+### listBookingFlows
+
+**`GET /venues/{venueId}/booking-flows`**: A venue's booking flows, in the working draft
+
+The flows this venue has picked, each with its steps in the venue's order. Draft rows: guests read the published copy through `getPublishedBookingFlow` (decided 29 September, W12).
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step` |
+| Writes | - |
+| Called by | BO-007, BO-008, BO-115, CMS-014, CMS-101, CMS-102, CMS-103 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| flowTypeKey | query |  | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of BookingFlow | yes |  |
+| items[].id | string (uuid) |  | (read-only) |
+| items[].venueId | string (uuid) |  | From the path of createBookingFlowDefinition. (read-only) |
+| items[].flowTypeKey | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
+| items[].name | string | yes | Staff-facing, e.g. (max length 80) |
+| items[].isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
+| items[].isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
+| items[].steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| items[].steps[].id | string (uuid) |  | (read-only) |
+| items[].steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| items[].steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| items[].steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| items[].steps[].sortOrder | integer | yes | (min 0) |
+| items[].steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| items[].steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+| items[].settings | BookingFlowLevelSettings |  | The settings that belong to one flow, not to the venue (decided 29 September, W12). |
+| items[].settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (rev 3 REV3-2). (default dateTimeTicket) |
+| items[].settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3). (default afterAddOns) |
+| items[].settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (rev 3 REV3-4). (default inlineStep) |
+| items[].settings.extrasStep | enum (auto, always, never) |  | auto shows the extras step only when the cart's products have add-ons; never is the same as turning the optional extras step off. (default auto) |
+| items[].settings.quickTour | boolean |  | Quick tour (rev 3 REV3-20). (default False) |
+| items[].settings.consentQuestionIds | array of string (uuid) |  | The flow's own consent questions (rev 3 REV3-26). (max items 10; default []) |
+| items[].isValid | boolean |  | Whether the flow passes validateBookingFlow; worked out in the same transaction as each write. (read-only) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| items[].updatedAt | string (date-time) |  | (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The venue's flows, defaults first |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
+### updateBookingFlowDefinition
+
+**`PATCH /booking-flows/{bookingFlowId}`**: Reorder a flow's steps, switch optional steps, change its settings
+
+A partial update of the working draft; guests see it after `publishTenantConfig`. `steps` replaces the whole step list (same rules as on create: a step the type does not have, or given twice, is 400). Saved even when the order breaks a constraint; `isValid` turns false and the publish refuses it until it is fixed.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step` |
+| Writes | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step` |
+| Called by | CMS-103 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| bookingFlowId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string |  | (max length 80) |
+| isDefaultForType | boolean |  |  |
+| isEnabled | boolean |  |  |
+| steps | array of BookingFlowStep |  | (min items 1; max items 30) |
+| steps[].id | string (uuid) |  | (read-only) |
+| steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| steps[].sortOrder | integer | yes | (min 0) |
+| steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+| settings | BookingFlowLevelSettings |  | The settings that belong to one flow, not to the venue (decided 29 September, W12). |
+| settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (rev 3 REV3-2). (default dateTimeTicket) |
+| settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3). (default afterAddOns) |
+| settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (rev 3 REV3-4). (default inlineStep) |
+| settings.extrasStep | enum (auto, always, never) |  | auto shows the extras step only when the cart's products have add-ons; never is the same as turning the optional extras step off. (default auto) |
+| settings.quickTour | boolean |  | Quick tour (rev 3 REV3-20). (default False) |
+| settings.consentQuestionIds | array of string (uuid) |  | The flow's own consent questions (rev 3 REV3-26). (max items 10; default []) |
+
+**Response**: `BookingFlow`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| venueId | string (uuid) |  | From the path of createBookingFlowDefinition. (read-only) |
+| flowTypeKey | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
+| name | string | yes | Staff-facing, e.g. (max length 80) |
+| isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
+| isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
+| steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].id | string (uuid) |  | (read-only) |
+| steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| steps[].sortOrder | integer | yes | (min 0) |
+| steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+| settings | BookingFlowLevelSettings |  | The settings that belong to one flow, not to the venue (decided 29 September, W12). |
+| settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (rev 3 REV3-2). (default dateTimeTicket) |
+| settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3). (default afterAddOns) |
+| settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (rev 3 REV3-4). (default inlineStep) |
+| settings.extrasStep | enum (auto, always, never) |  | auto shows the extras step only when the cart's products have add-ons; never is the same as turning the optional extras step off. (default auto) |
+| settings.quickTour | boolean |  | Quick tour (rev 3 REV3-20). (default False) |
+| settings.consentQuestionIds | array of string (uuid) |  | The flow's own consent questions (rev 3 REV3-26). (max items 10; default []) |
+| isValid | boolean |  | Whether the flow passes validateBookingFlow; worked out in the same transaction as each write. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 400 |  | A step the type does not have, or a step given twice |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### validateBookingFlow
+
+**`POST /booking-flows/{bookingFlowId}/validate`**: Check a flow against its type
+
+**Says whether a flow can be published, and why not (decided 29 September, W12).** With no body it checks the saved flow; with `steps` it checks that order without saving it, so the builder can mark a drag that breaks a constraint before it is dropped. A required step turned off, a step out of its allowed order, a conditional step whose condition can never hold, a step the type does not have and a step given twice are each a problem. Writes nothing.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step` |
+| Writes | `cache:idempotency`, `whitelabel.booking_flow_step` |
+| Called by | CMS-103 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| bookingFlowId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| steps | array of BookingFlowStep |  | (max items 30) |
+| steps[].id | string (uuid) |  | (read-only) |
+| steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| steps[].sortOrder | integer | yes | (min 0) |
+| steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+
+**Response**: `BookingFlowValidation`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| valid | boolean | yes |  |
+| problems | array of object | yes |  |
+| problems[].kind | enum (requiredStepDisabled, orderConstraintBroken, conditionNeverHolds, stepNotInType, duplicateStep, unknownStepSetting) | yes |  |
+| problems[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| problems[].otherStepKey | object |  | For orderConstraintBroken, the step it must come before or after. (nullable) |
+| problems[].message | string | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The findings; valid false lists every problem |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
 
 ## Group: brand
 
@@ -158,6 +1006,8 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | splashBackgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | showLoadingIndicator | boolean |  | (default True) |
 | splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
+| introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
+| introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
 
 **Responses**
 
@@ -256,6 +1106,8 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | splashBackgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | showLoadingIndicator | boolean |  | (default True) |
 | splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
+| introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
+| introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
 
 **Response**: `BrandIdentity`
 
@@ -270,6 +1122,8 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | splashBackgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | showLoadingIndicator | boolean |  | (default True) |
 | splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
+| introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
+| introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
 
 **Responses**
 
@@ -314,8 +1168,6 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
 | cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
 | cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
-| categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
-| extrasStep | enum (auto, always, never) |  | (default auto) |
 | seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | mapView | enum (2d, 3d) |  | (default 3d) |
 | density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
@@ -330,19 +1182,16 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
 | dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
 | dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
-| signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
-| seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
 | seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
 | seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
 | ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
 | ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
 | cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
-| quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
 | conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
-| performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
 | showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
 | locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
-| consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| guestContactFields | array of enum (email, mobile, name) |  | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). (min items 1; max items 3; default ['email']) |
+| dateStripDays | integer |  | The date strip (decided 17 September, M17-08). (min 3; max 31; default 7) |
 | venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
 | venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
 | venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
@@ -352,8 +1201,6 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | venueOverrides[].settings.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
 | venueOverrides[].settings.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
 | venueOverrides[].settings.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
-| venueOverrides[].settings.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
-| venueOverrides[].settings.extrasStep | enum (auto, always, never) |  | (default auto) |
 | venueOverrides[].settings.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | venueOverrides[].settings.mapView | enum (2d, 3d) |  | (default 3d) |
 | venueOverrides[].settings.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
@@ -366,19 +1213,16 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | venueOverrides[].settings.timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
 | venueOverrides[].settings.dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
 | venueOverrides[].settings.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
-| venueOverrides[].settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
-| venueOverrides[].settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
 | venueOverrides[].settings.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
 | venueOverrides[].settings.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
 | venueOverrides[].settings.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
 | venueOverrides[].settings.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
 | venueOverrides[].settings.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
-| venueOverrides[].settings.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
 | venueOverrides[].settings.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
-| venueOverrides[].settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
 | venueOverrides[].settings.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
 | venueOverrides[].settings.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
-| venueOverrides[].settings.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| venueOverrides[].settings.guestContactFields | array of enum (email, mobile, name) |  | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). (min items 1; max items 3; default ['email']) |
+| venueOverrides[].settings.dateStripDays | integer |  | The date strip (decided 17 September, M17-08). (min 3; max 31; default 7) |
 
 **Responses**
 
@@ -392,7 +1236,8 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 **`PUT /tenant-config/booking-flow`**: Set how the guest booking flow looks and steps
 
 **Design gap, 23 September.** The booking design has a white-label engine drawer (preset, step indicator, card and cart layout, extras step, seat picker, map view, density, embed mode) and White Labelling had no setting or screen for any of it. **Part of the published tenant config**, like the theme: a change goes live through `publishTenantConfig`, never directly.
-**Rev 3 settings (decided 29 September, rev 3).** Times per page and the day-part chips with their boundaries (REV3-1), where sign-in is asked (REV3-3), date and time on seated events (REV3-4), the seat-view box position (REV3-5), the time bar above the seat map (REV3-6), the floating cart icon and the cart side in Arabic (REV3-10), ticket categories (REV3-16), the quick tour (REV3-20), tags on tickets (23SEP-3), extra info on cards (23SEP-6), category display (23SEP-18), dates in the event banner (23SEP-19), the card layout, size and density enums (DG-6), and the concierge mascot (CFG-5). Help me choose is a venue's `GuidedChoice`, not a field here (REV3-11).
+**Rev 3 settings (decided 29 September, rev 3).** Times per page and the day-part chips with their boundaries (REV3-1), where sign-in is asked (REV3-3), date and time on seated events (REV3-4), the seat-view box position (REV3-5), the time bar above the seat map (REV3-6), the floating cart icon and the cart side in Arabic (REV3-10), ticket categories (REV3-16), the quick tour (REV3-20), tags on tickets (23SEP-3), extra info on cards (23SEP-6), dates in the event banner (23SEP-19), the card layout, size and density enums (DG-6), and the concierge mascot (CFG-5). Help me choose is a venue's `GuidedChoice`, not a field here (REV3-11).
+**What is left here is venue-wide (decided 29 September, W12).** `performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour` and `consentQuestionIds` belong to one booking flow and moved to `BookingFlow.settings` (`updateBookingFlowDefinition`, CMS-103); `categoryDisplay` is removed (W7, superseding 23SEP-18: `cardLayout` carries rows or grid). Added: `guestContactFields` (W1) and `dateStripDays` (M17-08).
 **Per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** `venueOverrides` holds the fields a venue changes; everything else it inherits. A `venueId` not among the tenant's active venues, or one given twice, is refused with 400.
 
 |  |  |
@@ -424,8 +1269,6 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
 | cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
 | cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
-| categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
-| extrasStep | enum (auto, always, never) |  | (default auto) |
 | seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | mapView | enum (2d, 3d) |  | (default 3d) |
 | density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
@@ -440,19 +1283,16 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
 | dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
 | dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
-| signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
-| seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
 | seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
 | seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
 | ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
 | ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
 | cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
-| quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
 | conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
-| performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
 | showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
 | locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
-| consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| guestContactFields | array of enum (email, mobile, name) |  | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). (min items 1; max items 3; default ['email']) |
+| dateStripDays | integer |  | The date strip (decided 17 September, M17-08). (min 3; max 31; default 7) |
 | venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
 | venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
 | venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
@@ -462,8 +1302,6 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | venueOverrides[].settings.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
 | venueOverrides[].settings.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
 | venueOverrides[].settings.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
-| venueOverrides[].settings.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
-| venueOverrides[].settings.extrasStep | enum (auto, always, never) |  | (default auto) |
 | venueOverrides[].settings.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | venueOverrides[].settings.mapView | enum (2d, 3d) |  | (default 3d) |
 | venueOverrides[].settings.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
@@ -476,19 +1314,16 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | venueOverrides[].settings.timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
 | venueOverrides[].settings.dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
 | venueOverrides[].settings.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
-| venueOverrides[].settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
-| venueOverrides[].settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
 | venueOverrides[].settings.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
 | venueOverrides[].settings.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
 | venueOverrides[].settings.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
 | venueOverrides[].settings.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
 | venueOverrides[].settings.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
-| venueOverrides[].settings.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
 | venueOverrides[].settings.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
-| venueOverrides[].settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
 | venueOverrides[].settings.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
 | venueOverrides[].settings.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
-| venueOverrides[].settings.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| venueOverrides[].settings.guestContactFields | array of enum (email, mobile, name) |  | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). (min items 1; max items 3; default ['email']) |
+| venueOverrides[].settings.dateStripDays | integer |  | The date strip (decided 17 September, M17-08). (min 3; max 31; default 7) |
 
 **Response**: `BookingFlowConfig`
 
@@ -500,8 +1335,6 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
 | cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
 | cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
-| categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
-| extrasStep | enum (auto, always, never) |  | (default auto) |
 | seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | mapView | enum (2d, 3d) |  | (default 3d) |
 | density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
@@ -516,19 +1349,16 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
 | dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
 | dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
-| signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
-| seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
 | seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
 | seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
 | ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
 | ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
 | cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
-| quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
 | conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
-| performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
 | showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
 | locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
-| consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| guestContactFields | array of enum (email, mobile, name) |  | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). (min items 1; max items 3; default ['email']) |
+| dateStripDays | integer |  | The date strip (decided 17 September, M17-08). (min 3; max 31; default 7) |
 | venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
 | venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
 | venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
@@ -538,8 +1368,6 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | venueOverrides[].settings.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
 | venueOverrides[].settings.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
 | venueOverrides[].settings.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
-| venueOverrides[].settings.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
-| venueOverrides[].settings.extrasStep | enum (auto, always, never) |  | (default auto) |
 | venueOverrides[].settings.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | venueOverrides[].settings.mapView | enum (2d, 3d) |  | (default 3d) |
 | venueOverrides[].settings.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
@@ -552,19 +1380,16 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | venueOverrides[].settings.timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
 | venueOverrides[].settings.dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
 | venueOverrides[].settings.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
-| venueOverrides[].settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
-| venueOverrides[].settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
 | venueOverrides[].settings.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
 | venueOverrides[].settings.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
 | venueOverrides[].settings.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
 | venueOverrides[].settings.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
 | venueOverrides[].settings.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
-| venueOverrides[].settings.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
 | venueOverrides[].settings.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
-| venueOverrides[].settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
 | venueOverrides[].settings.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
 | venueOverrides[].settings.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
-| venueOverrides[].settings.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| venueOverrides[].settings.guestContactFields | array of enum (email, mobile, name) |  | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). (min items 1; max items 3; default ['email']) |
+| venueOverrides[].settings.dateStripDays | integer |  | The date strip (decided 17 September, M17-08). (min 3; max 31; default 7) |
 
 **Responses**
 
@@ -612,8 +1437,9 @@ Scheduled by date window. A campaign banner set to run through a religious or na
 | imageAssetRef | string (uuid) | yes |  |
 | placement | enum (homepageHero, homepageBlock, explore, checkout) |  |  |
 | linkTarget | LinkTarget |  |  |
-| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| linkTarget.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | linkTarget.contentPageId | string (uuid) |  |  |
 | linkTarget.productId | string (uuid) |  |  |
 | linkTarget.eventId | string (uuid) |  |  |
@@ -634,8 +1460,9 @@ Scheduled by date window. A campaign banner set to run through a religious or na
 | imageAssetRef | string (uuid) | yes |  |
 | placement | enum (homepageHero, homepageBlock, explore, checkout) |  |  |
 | linkTarget | LinkTarget |  |  |
-| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| linkTarget.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | linkTarget.contentPageId | string (uuid) |  |  |
 | linkTarget.productId | string (uuid) |  |  |
 | linkTarget.eventId | string (uuid) |  |  |
@@ -755,9 +1582,12 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
 | showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
-| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
+| showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
+| questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
 | questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
 | questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
@@ -766,7 +1596,9 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
 | questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
 | questions[].answers[].sortOrder | integer | yes | (min 0) |
-| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].target | object |  | Required with behaviour recommend on the last question; optional with filter, where it is the card shown above the filtered list. (nullable) |
+| questions[].answers[].filter | object |  | What this answer keeps in the list (decided 29 September, W4). (nullable) |
+| questions[].answers[].consentPrefill | object |  | Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4). (nullable) |
 | questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
 | status | object | yes | (read-only) |
 | source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
@@ -784,9 +1616,12 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
 | showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
-| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
+| showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
+| questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
 | questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
 | questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
@@ -795,7 +1630,9 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
 | questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
 | questions[].answers[].sortOrder | integer | yes | (min 0) |
-| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].target | object |  | Required with behaviour recommend on the last question; optional with filter, where it is the card shown above the filtered list. (nullable) |
+| questions[].answers[].filter | object |  | What this answer keeps in the list (decided 29 September, W4). (nullable) |
+| questions[].answers[].consentPrefill | object |  | Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4). (nullable) |
 | questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
 | status | object | yes | (read-only) |
 | source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
@@ -846,8 +1683,9 @@ Presentation only. A block may point at a promotion, but it does not create or p
 | iconAssetRef | string (uuid) |  | (nullable) |
 | promotionId | string (uuid) |  | Presentation only. (nullable) |
 | linkTarget | LinkTarget |  |  |
-| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| linkTarget.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | linkTarget.contentPageId | string (uuid) |  |  |
 | linkTarget.productId | string (uuid) |  |  |
 | linkTarget.eventId | string (uuid) |  |  |
@@ -868,8 +1706,9 @@ Presentation only. A block may point at a promotion, but it does not create or p
 | iconAssetRef | string (uuid) |  | (nullable) |
 | promotionId | string (uuid) |  | Presentation only. (nullable) |
 | linkTarget | LinkTarget |  |  |
-| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| linkTarget.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | linkTarget.contentPageId | string (uuid) |  |  |
 | linkTarget.productId | string (uuid) |  |  |
 | linkTarget.eventId | string (uuid) |  |  |
@@ -1030,7 +1869,7 @@ A `published` choice is unpublished first, or 409.
 | Read routing | replica |
 | Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
 | Writes | - |
-| Called by | GST-008, WEB-005 |
+| Called by | GST-003, GST-008, WEB-002, WEB-005 |
 
 **Parameters**
 
@@ -1047,9 +1886,12 @@ A `published` choice is unpublished first, or 409.
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
 | showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
-| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
+| showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
+| questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
 | questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
 | questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
@@ -1058,7 +1900,9 @@ A `published` choice is unpublished first, or 409.
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
 | questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
 | questions[].answers[].sortOrder | integer | yes | (min 0) |
-| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].target | object |  | Required with behaviour recommend on the last question; optional with filter, where it is the card shown above the filtered list. (nullable) |
+| questions[].answers[].filter | object |  | What this answer keeps in the list (decided 29 September, W4). (nullable) |
+| questions[].answers[].consentPrefill | object |  | Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4). (nullable) |
 | questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
 | status | object | yes | (read-only) |
 | source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
@@ -1110,8 +1954,9 @@ A `published` choice is unpublished first, or 409.
 | items[].imageAssetRef | string (uuid) | yes |  |
 | items[].placement | enum (homepageHero, homepageBlock, explore, checkout) |  |  |
 | items[].linkTarget | LinkTarget |  |  |
-| items[].linkTarget.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| items[].linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| items[].linkTarget.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| items[].linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| items[].linkTarget.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | items[].linkTarget.contentPageId | string (uuid) |  |  |
 | items[].linkTarget.productId | string (uuid) |  |  |
 | items[].linkTarget.eventId | string (uuid) |  |  |
@@ -1251,9 +2096,12 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | items[].name | string | yes | Staff-facing name, e.g. (max length 80) |
 | items[].mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
 | items[].showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
-| items[].questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| items[].behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
+| items[].showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
+| items[].questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
 | items[].questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | items[].questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| items[].questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | items[].questions[].sortOrder | integer | yes | (min 0) |
 | items[].questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
 | items[].status | object | yes | (read-only) |
@@ -1327,11 +2175,113 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 |---|---|---|
 | 200 |  | Blocks |
 
+### proposeGuidedChoice
+
+**`POST /venues/{venueId}/guided-choice-suggestions`**: Record an AI-proposed Help me choose set-up for review
+
+**Where the AI's proposal lands (decided 29 September, rev 3 REV3-11).** After a venue's products are uploaded, the `ai` service analyses them and calls this once per proposed set-up. It is stored as `draft` with `source` `aiSuggested` and the proposing job in `suggestionRef`, and appears in `listGuidedChoices` for a person to review, edit, publish or delete. **A suggestion is never published by the system**: this operation cannot publish, and `publishGuidedChoice` refuses a service caller.
+**The caller is ai `suggestGuidedChoice`** (29 September, build; AI system design 3.11). `suggestionRef` is the id of its `AiGuidedChoiceSuggestion`, which the review screen passes to ai `getGuidedChoiceSuggestion` to show why each question, answer and target was proposed.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| State model | Guided choice ([states/guided-choice.yaml](../../../states/guided-choice.yaml)): created as `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
+| name | string | yes | Staff-facing name, e.g. (max length 80) |
+| mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
+| showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
+| behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
+| showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
+| questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
+| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
+| questions[].sortOrder | integer | yes | (min 0) |
+| questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
+| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
+| questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
+| questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
+| questions[].answers[].sortOrder | integer | yes | (min 0) |
+| questions[].answers[].target | object |  | Required with behaviour recommend on the last question; optional with filter, where it is the card shown above the filtered list. (nullable) |
+| questions[].answers[].filter | object |  | What this answer keeps in the list (decided 29 September, W4). (nullable) |
+| questions[].answers[].consentPrefill | object |  | Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4). (nullable) |
+| questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
+| status | object | yes | (read-only) |
+| source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
+| suggestionRef | string | yes | The id of the ai AiGuidedChoiceSuggestion that produced the proposal (suggestGuidedChoice); ai getGuidedChoiceSuggestion reads it back. |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| publishedBy | string (uuid) |  | The person who published it. (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `GuidedChoice`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
+| name | string | yes | Staff-facing name, e.g. (max length 80) |
+| mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
+| showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
+| behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
+| showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
+| questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
+| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
+| questions[].sortOrder | integer | yes | (min 0) |
+| questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
+| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
+| questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
+| questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
+| questions[].answers[].sortOrder | integer | yes | (min 0) |
+| questions[].answers[].target | object |  | Required with behaviour recommend on the last question; optional with filter, where it is the card shown above the filtered list. (nullable) |
+| questions[].answers[].filter | object |  | What this answer keeps in the list (decided 29 September, W4). (nullable) |
+| questions[].answers[].consentPrefill | object |  | Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4). (nullable) |
+| questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
+| status | object | yes | (read-only) |
+| source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
+| suggestionRef | string |  | For aiSuggested, the id of the ai job that proposed it. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| publishedBy | string (uuid) |  | The person who published it. (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Stored as a draft suggestion |
+| 400 |  | A target is not in this venue, or the counts are outside their bounds |
+
 ### publishGuidedChoice
 
 **`POST /guided-choices/{guidedChoiceId}/publish`**: Publish a Help me choose set-up to guests
 
-**A person publishes, always (decided 29 September, rev 3 REV3-11).** Needs a staff session; a service caller is refused with 403, so an AI suggestion cannot publish itself. Every target is checked at this moment: a product or event not on sale, a category with no products on sale, or a module not enabled is refused with 422 naming the answer. **One published choice per venue**: publishing this one returns the venue's previously published choice to `draft` in the same transaction. Live at once; not part of `publishTenantConfig`.
+**A person publishes, always (decided 29 September, rev 3 REV3-11).** Needs a staff session; a service caller is refused with 403, so an AI suggestion cannot publish itself. Every target is checked at this moment: a product or event not on sale, a category with no products on sale, or a module not enabled is refused with 422 naming the answer, and so is an answer without the `filter` (`behaviour` `filter`) or the last-question `target` (`recommend`) it needs (W4). **One published choice per venue**: publishing this one returns the venue's previously published choice to `draft` in the same transaction. Live at once; not part of `publishTenantConfig`.
 
 |  |  |
 |---|---|
@@ -1342,8 +2292,8 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
-| Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
-| Writes | - |
+| Reads | `whitelabel.booking_flow`, `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | `cache:idempotency`, `whitelabel.guided_choice` |
 | Called by | CMS-101 |
 | State model | Guided choice ([states/guided-choice.yaml](../../../states/guided-choice.yaml)): moves `draft` -> `published`, `published` -> `draft` |
 
@@ -1363,9 +2313,12 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
 | showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
-| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
+| showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
+| questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
 | questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
 | questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
@@ -1374,7 +2327,9 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
 | questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
 | questions[].answers[].sortOrder | integer | yes | (min 0) |
-| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].target | object |  | Required with behaviour recommend on the last question; optional with filter, where it is the card shown above the filtered list. (nullable) |
+| questions[].answers[].filter | object |  | What this answer keeps in the list (decided 29 September, W4). (nullable) |
+| questions[].answers[].consentPrefill | object |  | Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4). (nullable) |
 | questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
 | status | object | yes | (read-only) |
 | source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
@@ -1391,7 +2346,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Already published |
-| 422 |  | An answer's target is not on sale or not enabled; the problem names the answer |
+| 422 |  | An answer's target is not on sale or not enabled, or an answer lacks the filter or target its behaviour needs; the problem names the answer |
 
 ### setFaqs
 
@@ -1531,9 +2486,12 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
 | showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
-| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
+| showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
+| questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
 | questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
 | questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
@@ -1542,7 +2500,9 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
 | questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
 | questions[].answers[].sortOrder | integer | yes | (min 0) |
-| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].target | object |  | Required with behaviour recommend on the last question; optional with filter, where it is the card shown above the filtered list. (nullable) |
+| questions[].answers[].filter | object |  | What this answer keeps in the list (decided 29 September, W4). (nullable) |
+| questions[].answers[].consentPrefill | object |  | Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4). (nullable) |
 | questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
 | status | object | yes | (read-only) |
 | source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
@@ -1592,8 +2552,9 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | imageAssetRef | string (uuid) |  |  |
 | placement | enum (homepageHero, homepageBlock, explore, checkout) |  |  |
 | linkTarget | LinkTarget |  |  |
-| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| linkTarget.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | linkTarget.contentPageId | string (uuid) |  |  |
 | linkTarget.productId | string (uuid) |  |  |
 | linkTarget.eventId | string (uuid) |  |  |
@@ -1613,8 +2574,9 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | imageAssetRef | string (uuid) | yes |  |
 | placement | enum (homepageHero, homepageBlock, explore, checkout) |  |  |
 | linkTarget | LinkTarget |  |  |
-| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| linkTarget.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | linkTarget.contentPageId | string (uuid) |  |  |
 | linkTarget.productId | string (uuid) |  |  |
 | linkTarget.eventId | string (uuid) |  |  |
@@ -1727,7 +2689,9 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | name | string |  | (max length 80) |
 | mode | enum (button, popupOnArrival, off) |  |  |
 | showBanner | boolean |  |  |
-| questions | array of object |  | Replaces the whole question list; same shape and bounds as GuidedChoice.questions. (min items 1; max items 2) |
+| behaviour | enum (filter, recommend) |  |  |
+| showEverything | boolean |  |  |
+| questions | array of object |  | Replaces the whole question list; same shape and bounds as GuidedChoice.questions. (min items 1; max items 4) |
 
 **Response**: `GuidedChoice`
 
@@ -1738,9 +2702,12 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
 | showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
-| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
+| showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
+| questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
 | questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
 | questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
@@ -1749,7 +2716,9 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
 | questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
 | questions[].answers[].sortOrder | integer | yes | (min 0) |
-| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].target | object |  | Required with behaviour recommend on the last question; optional with filter, where it is the card shown above the filtered list. (nullable) |
+| questions[].answers[].filter | object |  | What this answer keeps in the list (decided 29 September, W4). (nullable) |
+| questions[].answers[].consentPrefill | object |  | Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4). (nullable) |
 | questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
 | status | object | yes | (read-only) |
 | source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
@@ -1802,8 +2771,9 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | iconAssetRef | string (uuid) |  |  |
 | promotionId | string (uuid) |  |  |
 | linkTarget | LinkTarget |  |  |
-| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| linkTarget.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | linkTarget.contentPageId | string (uuid) |  |  |
 | linkTarget.productId | string (uuid) |  |  |
 | linkTarget.eventId | string (uuid) |  |  |
@@ -1822,8 +2792,9 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | iconAssetRef | string (uuid) |  | (nullable) |
 | promotionId | string (uuid) |  | Presentation only. (nullable) |
 | linkTarget | LinkTarget |  |  |
-| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| linkTarget.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| linkTarget.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| linkTarget.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | linkTarget.contentPageId | string (uuid) |  |  |
 | linkTarget.productId | string (uuid) |  |  |
 | linkTarget.eventId | string (uuid) |  |  |
@@ -1875,7 +2846,8 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | sections[].sortOrder | integer | yes |  |
 | sections[].isVisible | boolean | yes |  |
 | sections[].contentPageId | string (uuid) |  | (nullable) |
-| sections[].maxItems | integer |  | (nullable) |
+| sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 
 **Responses**
 
@@ -1924,7 +2896,8 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 | sections[].sortOrder | integer | yes |  |
 | sections[].isVisible | boolean | yes |  |
 | sections[].contentPageId | string (uuid) |  | (nullable) |
-| sections[].maxItems | integer |  | (nullable) |
+| sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 
 **Response**: `HomepageLayout`
 
@@ -1938,7 +2911,8 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 | sections[].sortOrder | integer | yes |  |
 | sections[].isVisible | boolean | yes |  |
 | sections[].contentPageId | string (uuid) |  | (nullable) |
-| sections[].maxItems | integer |  | (nullable) |
+| sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 
 **Responses**
 
@@ -2118,7 +3092,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | modules | array of object | yes |  |
-| modules[].moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) | yes |  |
+| modules[].moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) | yes | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
 | modules[].isEnabled | boolean | yes |  |
 
 **Responses**
@@ -2130,6 +3104,54 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 
 
 ## Group: navigation
+
+### getNavigation
+
+**`GET /tenant-config/navigation`**: Read navigation
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `cache:resolution`, `whitelabel.navigation_item` |
+| Writes | `cache:resolution` |
+| Called by | CMS-009 |
+
+**Response**: `NavigationConfig`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | Added 20 August. (read-only) |
+| kind | enum (bottomNavigation, drawer, tabs) | yes |  |
+| items | array of object | yes | (max items 12) |
+| items[].id | string (uuid) |  | Added 20 August. (read-only) |
+| items[].label | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| items[].icon | string |  |  |
+| items[].target | LinkTarget | yes |  |
+| items[].target.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| items[].target.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| items[].target.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
+| items[].target.contentPageId | string (uuid) |  |  |
+| items[].target.productId | string (uuid) |  |  |
+| items[].target.eventId | string (uuid) |  |  |
+| items[].target.url | string |  |  |
+| items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| items[].sortOrder | integer | yes |  |
+| buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
+| buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
+| buyButton.label | LocalisedText |  | Keyed by ISO 639-1 code. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Navigation |
+| 404 | NotConfigured | This part of the working draft has never been saved. |
 
 ### setHeader
 
@@ -2220,14 +3242,18 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | items[].label | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | items[].icon | string |  |  |
 | items[].target | LinkTarget | yes |  |
-| items[].target.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| items[].target.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| items[].target.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| items[].target.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| items[].target.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | items[].target.contentPageId | string (uuid) |  |  |
 | items[].target.productId | string (uuid) |  |  |
 | items[].target.eventId | string (uuid) |  |  |
 | items[].target.url | string |  |  |
 | items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
 | items[].sortOrder | integer | yes |  |
+| buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
+| buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
+| buyButton.label | LocalisedText |  | Keyed by ISO 639-1 code. |
 
 **Response**: `NavigationConfig`
 
@@ -2240,14 +3266,18 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | items[].label | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | items[].icon | string |  |  |
 | items[].target | LinkTarget | yes |  |
-| items[].target.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
-| items[].target.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| items[].target.kind | enum (module, contentPage, product, event, externalUrl, appSection, none) | yes | appSection points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. |
+| items[].target.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
+| items[].target.appSection | enum (home, explore, plan, tickets, map, account, buyTickets) |  | Required when kind is appSection. |
 | items[].target.contentPageId | string (uuid) |  |  |
 | items[].target.productId | string (uuid) |  |  |
 | items[].target.eventId | string (uuid) |  |  |
 | items[].target.url | string |  |  |
 | items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
 | items[].sortOrder | integer | yes |  |
+| buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
+| buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
+| buyButton.label | LocalisedText |  | Keyed by ISO 639-1 code. |
 
 **Responses**
 
@@ -2280,7 +3310,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | Read routing | replica |
 | Reads | `whitelabel.config_version`, `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | CMS-001, CMS-014, GST-001, GST-029, GST-038, GST-040, GST-047, KSK-002, WEB-001, WEB-025, WEB-028, WEB-029, WEB-045 |
+| Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, KSK-002, WEB-001, WEB-025, WEB-028, WEB-029, WEB-045 |
 
 **Response**: `TenantAppStatus`
 
@@ -2347,8 +3377,8 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `cache:resolution`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
-| Writes | `cache:resolution` |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
+| Writes | - |
 | Called by | BO-599, BO-834, CMS-001, CMS-012, CMS-016, GST-001, KSK-002, WEB-001 |
 
 **Parameters**
@@ -2374,6 +3404,8 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | brand.splashBackgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | brand.showLoadingIndicator | boolean |  | (default True) |
 | brand.splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
+| brand.introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
+| brand.introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
 | appIcons | AppIcons |  |  |
 | appIcons.sourceAssetRef | string (uuid) | yes | The MediaAsset id of the 1024×1024 source. |
 | appIcons.derived | array of object |  | Generated by setAppIcons from the source, one entry per platform and size — the iOS and Android store sets and the web favicons listed on setAppIcons (audit R163). (read-only) |
@@ -2390,8 +3422,6 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | bookingFlow.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
 | bookingFlow.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
 | bookingFlow.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
-| bookingFlow.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
-| bookingFlow.extrasStep | enum (auto, always, never) |  | (default auto) |
 | bookingFlow.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | bookingFlow.mapView | enum (2d, 3d) |  | (default 3d) |
 | bookingFlow.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
@@ -2406,22 +3436,44 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | bookingFlow.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
 | bookingFlow.dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
 | bookingFlow.dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
-| bookingFlow.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
-| bookingFlow.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
 | bookingFlow.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
 | bookingFlow.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
 | bookingFlow.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
 | bookingFlow.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
 | bookingFlow.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
-| bookingFlow.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
 | bookingFlow.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
-| bookingFlow.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
 | bookingFlow.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
 | bookingFlow.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
-| bookingFlow.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| bookingFlow.guestContactFields | array of enum (email, mobile, name) |  | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). (min items 1; max items 3; default ['email']) |
+| bookingFlow.dateStripDays | integer |  | The date strip (decided 17 September, M17-08). (min 3; max 31; default 7) |
 | bookingFlow.venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
 | bookingFlow.venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
 | bookingFlow.venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
+| bookingFlows | array of BookingFlow |  | Every venue's booking flows in the draft (whitelabel.booking_flow), so a publish snapshots them with the rest (decided 29 September, W12). (read-only) |
+| bookingFlows[].id | string (uuid) |  | (read-only) |
+| bookingFlows[].venueId | string (uuid) |  | From the path of createBookingFlowDefinition. (read-only) |
+| bookingFlows[].flowTypeKey | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
+| bookingFlows[].name | string | yes | Staff-facing, e.g. (max length 80) |
+| bookingFlows[].isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
+| bookingFlows[].isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
+| bookingFlows[].steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| bookingFlows[].steps[].id | string (uuid) |  | (read-only) |
+| bookingFlows[].steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| bookingFlows[].steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| bookingFlows[].steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| bookingFlows[].steps[].sortOrder | integer | yes | (min 0) |
+| bookingFlows[].steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| bookingFlows[].steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+| bookingFlows[].settings | BookingFlowLevelSettings |  | The settings that belong to one flow, not to the venue (decided 29 September, W12). |
+| bookingFlows[].settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (rev 3 REV3-2). (default dateTimeTicket) |
+| bookingFlows[].settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3). (default afterAddOns) |
+| bookingFlows[].settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (rev 3 REV3-4). (default inlineStep) |
+| bookingFlows[].settings.extrasStep | enum (auto, always, never) |  | auto shows the extras step only when the cart's products have add-ons; never is the same as turning the optional extras step off. (default auto) |
+| bookingFlows[].settings.quickTour | boolean |  | Quick tour (rev 3 REV3-20). (default False) |
+| bookingFlows[].settings.consentQuestionIds | array of string (uuid) |  | The flow's own consent questions (rev 3 REV3-26). (max items 10; default []) |
+| bookingFlows[].isValid | boolean |  | Whether the flow passes validateBookingFlow; worked out in the same transaction as each write. (read-only) |
+| bookingFlows[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| bookingFlows[].updatedAt | string (date-time) |  | (read-only) |
 | theme | Theme |  |  |
 | theme.primaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.secondaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -2435,6 +3487,13 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | theme.cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | theme.surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | theme.buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| theme.componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
+| theme.componentColours.primaryCta | ThemeComponentColour |  |  |
+| theme.componentColours.payButton | ThemeComponentColour |  |  |
+| theme.componentColours.addToCart | ThemeComponentColour |  |  |
+| theme.componentColours.buyTicketsButton | ThemeComponentColour |  |  |
+| theme.componentColours.link | ThemeComponentColour |  |  |
+| theme.componentColours.badge | ThemeComponentColour |  |  |
 | fonts | FontConfig |  |  |
 | fonts.primaryLatin | string | yes |  |
 | fonts.primaryArabic | string |  | Required when ar is among the tenant's languages (audit R163). (nullable) |
@@ -2477,7 +3536,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | header.showMenu | boolean |  | (default True) |
 | header.showNotifications | boolean |  | (default True) |
 | header.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
-| navigation | NavigationConfig |  |  |
+| navigation | NavigationConfig |  | The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6). |
 | navigation.id | string (uuid) |  | Added 20 August. (read-only) |
 | navigation.kind | enum (bottomNavigation, drawer, tabs) | yes |  |
 | navigation.items | array of object | yes | (max items 12) |
@@ -2487,6 +3546,9 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | navigation.items[].target | LinkTarget | yes |  |
 | navigation.items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
 | navigation.items[].sortOrder | integer | yes |  |
+| navigation.buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
+| navigation.buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
+| navigation.buyButton.label | LocalisedText |  | Keyed by ISO 639-1 code. |
 | homepage | HomepageLayout |  |  |
 | homepage.id | string (uuid) |  | Added 20 August. (read-only) |
 | homepage.sections | array of object | yes |  |
@@ -2496,9 +3558,10 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | homepage.sections[].sortOrder | integer | yes |  |
 | homepage.sections[].isVisible | boolean | yes |  |
 | homepage.sections[].contentPageId | string (uuid) |  | (nullable) |
-| homepage.sections[].maxItems | integer |  | (nullable) |
+| homepage.sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| homepage.sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 | modules | array of ModuleEnablement |  |  |
-| modules[].moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) | yes |  |
+| modules[].moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) | yes | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
 | modules[].displayName | string |  |  |
 | modules[].isLicensed | boolean | yes | From the tenant's subscription. |
 | modules[].isEnabled | boolean | yes |  |
@@ -2924,6 +3987,44 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 |---|---|---|
 | 200 |  | Diff |
 
+### getSiteSetupProgress
+
+**`GET /tenant-config/site-setup`**: Where the tenant is in the Site Builder
+
+The builder's checklist (decided 29 September, W12 and M24-05): the preset picked, each of the seven steps and its state. Before the first save every step comes back `notStarted` and no preset; there is no `not-configured` for this part.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.booking_flow`, `whitelabel.config_version`, `whitelabel.site_setup_progress`, `whitelabel.tenant_config` |
+| Writes | - |
+| Called by | CMS-102 |
+
+**Response**: `SiteSetupProgress`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| presetKey | enum (themePark, waterPark, museum, theatreAndArena, singleAttraction, playCentre, multiVenue, None) |  | The starting point. (nullable) |
+| currentStep | object |  | (nullable) |
+| steps | object |  | One entry per SiteSetupStepKey. |
+| minimumPathDone | boolean |  | True once the minimum path is done: a logo, the four theme colours, at least one enabled valid booking flow and a published version. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The progress |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
 ### listConfigVersions
 
 **`GET /tenant-config/versions`**: Version history
@@ -2982,19 +4083,20 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 
 Validates, snapshots, versions and activates atomically: the draft is copied into the new version's `snapshot`, and that version becomes the one guests read. Guests receive the new configuration on next launch — no store release, because runtime configuration is deliberately separated from build-time.
 The response names any build-time change in the draft that will **not** reach guests until the next release. A tenant who changed their app icon and published should be told plainly that the icon has not shipped.
+**Booking flows are published here (decided 29 September, W12).** Each venue's enabled flows are copied into the snapshot with the rest of the draft; `getPublishedBookingFlow` reads them from the current version. An invalid enabled flow fails validation (409, `bookingFlowInvalid`).
 
 |  |  |
 |---|---|
 | Permission | `TENANT_PUBLISH` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.config_version` |
-| Writes | `cache:idempotency`, `cache:resolution`, `platform.outbox`, `whitelabel.config_version` |
-| Called by | ADM-016, BO-843, CMS-006, CMS-014 |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.config_version`, `whitelabel.tenant_config` |
+| Writes | `cache:idempotency`, `whitelabel.config_version` |
+| Called by | ADM-016, BO-843, CMS-006, CMS-014, CMS-103 |
 | State model | White-label content ([states/content.yaml](../../../states/content.yaml)): moves `draft` -> `published`, `archived` -> `published` |
 
 **Parameters**
@@ -3051,7 +4153,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
+| Reads | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.feature_toggle`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Called by | ADM-016, CMS-006, CMS-015 |
 | State model | White-label content ([states/content.yaml](../../../states/content.yaml)): moves `published` -> `draft` |
@@ -3080,6 +4182,8 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | brand.splashBackgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | brand.showLoadingIndicator | boolean |  | (default True) |
 | brand.splashChangeScope | object |  | Always buildTime for native apps. (read-only) |
+| brand.introVideoAssetRef | string (uuid) |  | The optional intro video (decided 29 September, MOB-5). (nullable) |
+| brand.introVideoMode | enum (off, firstLaunch, everyLaunch) |  | When GST-001 plays it full screen. (default off) |
 | appIcons | AppIcons |  |  |
 | appIcons.sourceAssetRef | string (uuid) | yes | The MediaAsset id of the 1024×1024 source. |
 | appIcons.derived | array of object |  | Generated by setAppIcons from the source, one entry per platform and size — the iOS and Android store sets and the web favicons listed on setAppIcons (audit R163). (read-only) |
@@ -3096,8 +4200,6 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | bookingFlow.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
 | bookingFlow.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
 | bookingFlow.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
-| bookingFlow.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
-| bookingFlow.extrasStep | enum (auto, always, never) |  | (default auto) |
 | bookingFlow.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | bookingFlow.mapView | enum (2d, 3d) |  | (default 3d) |
 | bookingFlow.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
@@ -3112,22 +4214,44 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | bookingFlow.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
 | bookingFlow.dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
 | bookingFlow.dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
-| bookingFlow.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
-| bookingFlow.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
 | bookingFlow.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
 | bookingFlow.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
 | bookingFlow.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
 | bookingFlow.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
 | bookingFlow.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
-| bookingFlow.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
 | bookingFlow.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
-| bookingFlow.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
 | bookingFlow.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
 | bookingFlow.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
-| bookingFlow.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| bookingFlow.guestContactFields | array of enum (email, mobile, name) |  | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). (min items 1; max items 3; default ['email']) |
+| bookingFlow.dateStripDays | integer |  | The date strip (decided 17 September, M17-08). (min 3; max 31; default 7) |
 | bookingFlow.venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
 | bookingFlow.venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
 | bookingFlow.venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
+| bookingFlows | array of BookingFlow |  | Every venue's booking flows in the draft (whitelabel.booking_flow), so a publish snapshots them with the rest (decided 29 September, W12). (read-only) |
+| bookingFlows[].id | string (uuid) |  | (read-only) |
+| bookingFlows[].venueId | string (uuid) |  | From the path of createBookingFlowDefinition. (read-only) |
+| bookingFlows[].flowTypeKey | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
+| bookingFlows[].name | string | yes | Staff-facing, e.g. (max length 80) |
+| bookingFlows[].isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
+| bookingFlows[].isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
+| bookingFlows[].steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| bookingFlows[].steps[].id | string (uuid) |  | (read-only) |
+| bookingFlows[].steps[].bookingFlowId | string (uuid) |  | (read-only) |
+| bookingFlows[].steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
+| bookingFlows[].steps[].enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| bookingFlows[].steps[].sortOrder | integer | yes | (min 0) |
+| bookingFlows[].steps[].requirement | enum (required, optional, conditional) |  | From the flow type, so the CMS can mark the step without a second read. (read-only) |
+| bookingFlows[].steps[].settings | object |  | The step's own settings, by the names the type's stepSettings gives for this step (e.g. (default {}) |
+| bookingFlows[].settings | BookingFlowLevelSettings |  | The settings that belong to one flow, not to the venue (decided 29 September, W12). |
+| bookingFlows[].settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (rev 3 REV3-2). (default dateTimeTicket) |
+| bookingFlows[].settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3). (default afterAddOns) |
+| bookingFlows[].settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (rev 3 REV3-4). (default inlineStep) |
+| bookingFlows[].settings.extrasStep | enum (auto, always, never) |  | auto shows the extras step only when the cart's products have add-ons; never is the same as turning the optional extras step off. (default auto) |
+| bookingFlows[].settings.quickTour | boolean |  | Quick tour (rev 3 REV3-20). (default False) |
+| bookingFlows[].settings.consentQuestionIds | array of string (uuid) |  | The flow's own consent questions (rev 3 REV3-26). (max items 10; default []) |
+| bookingFlows[].isValid | boolean |  | Whether the flow passes validateBookingFlow; worked out in the same transaction as each write. (read-only) |
+| bookingFlows[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| bookingFlows[].updatedAt | string (date-time) |  | (read-only) |
 | theme | Theme |  |  |
 | theme.primaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.secondaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -3141,6 +4265,13 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | theme.cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | theme.surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | theme.buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| theme.componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
+| theme.componentColours.primaryCta | ThemeComponentColour |  |  |
+| theme.componentColours.payButton | ThemeComponentColour |  |  |
+| theme.componentColours.addToCart | ThemeComponentColour |  |  |
+| theme.componentColours.buyTicketsButton | ThemeComponentColour |  |  |
+| theme.componentColours.link | ThemeComponentColour |  |  |
+| theme.componentColours.badge | ThemeComponentColour |  |  |
 | fonts | FontConfig |  |  |
 | fonts.primaryLatin | string | yes |  |
 | fonts.primaryArabic | string |  | Required when ar is among the tenant's languages (audit R163). (nullable) |
@@ -3183,7 +4314,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | header.showMenu | boolean |  | (default True) |
 | header.showNotifications | boolean |  | (default True) |
 | header.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
-| navigation | NavigationConfig |  |  |
+| navigation | NavigationConfig |  | The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6). |
 | navigation.id | string (uuid) |  | Added 20 August. (read-only) |
 | navigation.kind | enum (bottomNavigation, drawer, tabs) | yes |  |
 | navigation.items | array of object | yes | (max items 12) |
@@ -3193,6 +4324,9 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | navigation.items[].target | LinkTarget | yes |  |
 | navigation.items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
 | navigation.items[].sortOrder | integer | yes |  |
+| navigation.buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
+| navigation.buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
+| navigation.buyButton.label | LocalisedText |  | Keyed by ISO 639-1 code. |
 | homepage | HomepageLayout |  |  |
 | homepage.id | string (uuid) |  | Added 20 August. (read-only) |
 | homepage.sections | array of object | yes |  |
@@ -3202,9 +4336,10 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | homepage.sections[].sortOrder | integer | yes |  |
 | homepage.sections[].isVisible | boolean | yes |  |
 | homepage.sections[].contentPageId | string (uuid) |  | (nullable) |
-| homepage.sections[].maxItems | integer |  | (nullable) |
+| homepage.sections[].maxItems | integer |  | How many items the section shows. (nullable) |
+| homepage.sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
 | modules | array of ModuleEnablement |  |  |
-| modules[].moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) | yes |  |
+| modules[].moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) | yes | visitPlanner (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. |
 | modules[].displayName | string |  |  |
 | modules[].isLicensed | boolean | yes | From the tenant's subscription. |
 | modules[].isEnabled | boolean | yes |  |
@@ -3251,23 +4386,80 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | 200 |  | Restored into the working draft |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
-### validateTenantConfig
+### setSiteSetupProgress
 
-**`POST /tenant-config/validate`**: Validate the working draft
+**`PUT /tenant-config/site-setup`**: Save the Site Builder's progress
 
-Run before publishing. Reports missing translations, navigation pointing at disabled modules, unset required assets, contrast failures, and policies without a current version.
+Records the preset and which steps are done, skipped or in progress, so the builder reopens where the operator left it. **Progress, not configuration**: it changes nothing a guest sees and is neither published nor restored, like `setMaintenanceMode`, so it carries no config scope. Marking `previewAndPublish` done while the tenant has never published is refused with 409.
 
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.tenant_config` |
-| Writes | `cache:idempotency`, `whitelabel.tenant_config` |
-| Called by | CMS-012, CMS-014 |
+| Reads | `whitelabel.config_version`, `whitelabel.site_setup_progress` |
+| Writes | `cache:idempotency`, `whitelabel.site_setup_progress` |
+| Called by | CMS-102 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `SiteSetupProgress`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| presetKey | enum (themePark, waterPark, museum, theatreAndArena, singleAttraction, playCentre, multiVenue, None) |  | The starting point. (nullable) |
+| currentStep | object |  | (nullable) |
+| steps | object |  | One entry per SiteSetupStepKey. |
+| minimumPathDone | boolean |  | True once the minimum path is done: a logo, the four theme colours, at least one enabled valid booking flow and a published version. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `SiteSetupProgress`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| presetKey | enum (themePark, waterPark, museum, theatreAndArena, singleAttraction, playCentre, multiVenue, None) |  | The starting point. (nullable) |
+| currentStep | object |  | (nullable) |
+| steps | object |  | One entry per SiteSetupStepKey. |
+| minimumPathDone | boolean |  | True once the minimum path is done: a logo, the four theme colours, at least one enabled valid booking flow and a published version. (read-only) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 400 | BadRequest | Validation failed |
+| 409 |  | previewAndPublish marked done while no version has been published |
+
+### validateTenantConfig
+
+**`POST /tenant-config/validate`**: Validate the working draft
+
+Run before publishing. Reports missing translations, navigation pointing at disabled modules, unset required assets, contrast failures, and policies without a current version.
+**And the booking flows (decided 29 September, W12):** an enabled flow that fails `validateBookingFlow` is `bookingFlowInvalid`; a venue with bookable products and no flow serving their kind is `bookingFlowMissing`.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.tenant_config` |
+| Writes | `cache:idempotency` |
+| Called by | CMS-012, CMS-014, CMS-102 |
 
 **Parameters**
 
@@ -3366,6 +4558,25 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
+| componentColours.primaryCta | ThemeComponentColour |  |  |
+| componentColours.primaryCta.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.primaryCta.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.payButton | ThemeComponentColour |  |  |
+| componentColours.payButton.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.payButton.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.addToCart | ThemeComponentColour |  |  |
+| componentColours.addToCart.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.addToCart.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.buyTicketsButton | ThemeComponentColour |  |  |
+| componentColours.buyTicketsButton.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.buyTicketsButton.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.link | ThemeComponentColour |  |  |
+| componentColours.link.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.link.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.badge | ThemeComponentColour |  |  |
+| componentColours.badge.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.badge.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 
 **Responses**
 
@@ -3472,6 +4683,25 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
+| componentColours.primaryCta | ThemeComponentColour |  |  |
+| componentColours.primaryCta.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.primaryCta.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.payButton | ThemeComponentColour |  |  |
+| componentColours.payButton.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.payButton.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.addToCart | ThemeComponentColour |  |  |
+| componentColours.addToCart.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.addToCart.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.buyTicketsButton | ThemeComponentColour |  |  |
+| componentColours.buyTicketsButton.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.buyTicketsButton.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.link | ThemeComponentColour |  |  |
+| componentColours.link.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.link.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.badge | ThemeComponentColour |  |  |
+| componentColours.badge.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.badge.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 
 **Response**: `Theme`
 
@@ -3489,6 +4719,25 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
+| componentColours.primaryCta | ThemeComponentColour |  |  |
+| componentColours.primaryCta.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.primaryCta.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.payButton | ThemeComponentColour |  |  |
+| componentColours.payButton.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.payButton.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.addToCart | ThemeComponentColour |  |  |
+| componentColours.addToCart.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.addToCart.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.buyTicketsButton | ThemeComponentColour |  |  |
+| componentColours.buyTicketsButton.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.buyTicketsButton.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.link | ThemeComponentColour |  |  |
+| componentColours.link.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.link.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.badge | ThemeComponentColour |  |  |
+| componentColours.badge.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+| componentColours.badge.text | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 
 **Responses**
 
@@ -3593,6 +4842,8 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 **Refused while it is the only active domain for a live app.** Releasing the hostname a tenant's guests are using takes their storefront down, and the confirmation should say so rather than the request succeeding.
 **A live app is an app with a published configuration (decided 28 September, audit R096)**: the tenant has a current `ConfigVersion` (`TenantAppStatus.isPublished` true) for the app the domain serves. Maintenance mode does not make an app less live.
 
+**Detaching unroutes the hostname** (SD-021, applied 30 September): the release calls tenancy `setTenantDomainMapping` with status `detached`, so the edge stops routing the host to this tenant in the same step; the row is kept for the audit trail, not deleted.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -3626,6 +4877,8 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 
 **Verification and issuance are one act from the tenant's point of view and two states in the model.** A tenant who has published the record wants a working domain, not a green tick.
 **Retried by a job rather than by the tenant.** DNS propagation takes hours and a tenant clicking *verify* every ten minutes is a tenant who will give up before it resolves.
+
+**Verification routes the hostname** (system-design review SD-021, 29 September; applied 30 September). In the same step that marks the domain verified, it calls tenancy `setTenantDomainMapping`, which writes `control.tenant_domain` (hostname, tenant, cell, database, channel, status `active`) so the edge's `resolveTenantHost` can route the host. Until that write succeeds the domain is not reported live. A hostname already routed to another tenant is refused 409 `hostname-taken` and nothing is issued.
 
 |  |  |
 |---|---|
@@ -3671,6 +4924,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Verified, or the reason it is not yet |
+| 409 |  | The hostname is already routed to another tenant (hostname-taken, from tenancy setTenantDomainMapping, SD-021); nothing was verified or issued. |
 
 
 ## Group: whiteLabel
@@ -3897,6 +5151,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no | The partition key (ADR-0005). |
 | updated_at | timestamptz | no |  |
 
+### `whitelabel.app_build`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| platform | text | yes |  |
+| config_version | text | yes | The ConfigVersion.version built. |
+| store_account_id | uuid | no |  |
+| version_name | text | no | The marketing version, e.g. |
+| build_number | integer | no |  |
+| status | text | yes | queued to built or failed is the build service's; from submitted on it is read from the store with the client's credential, or stays built when the client uploads by hand. |
+| failure_reason | text | no |  |
+| package_asset_ref | uuid | no | The signed .ipa or .aab in the assets library, for the client to download and upload. |
+| release_notes | jsonb | no |  |
+| submit_to_store | boolean | no |  |
+| requested_at | timestamptz | yes |  |
+| requested_by_principal_id | uuid | no |  |
+| finished_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `whitelabel.banner`
 
 | Column | Type | Required | Notes |
@@ -3913,6 +5187,33 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sort_order | integer | no |  |
 | is_active | boolean | no |  |
 | tenant_config_id | uuid | yes | Points at whitelabel.tenant_config. |
+
+### `whitelabel.booking_flow`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| venue_id | uuid | no | From the path of createBookingFlowDefinition. |
+| flow_type_key | text | yes |  |
+| name | text | yes | Staff-facing, e.g. |
+| is_default_for_type | boolean | no | At most one per venue and type; setting it takes it from the previous default. |
+| is_enabled | boolean | no | A disabled flow is kept and not published; products naming it fall back to the default. |
+| settings | jsonb | no |  |
+| is_valid | boolean | no | Whether the flow passes validateBookingFlow; worked out in the same transaction as each write. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+
+### `whitelabel.booking_flow_step`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| booking_flow_id | uuid | no |  |
+| step_key | text | yes |  |
+| is_enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
+| sort_order | integer | yes |  |
+| requirement | text | no | From the flow type, so the CMS can mark the step without a second read. |
+| settings | jsonb | no | The step's own settings, by the names the type's stepSettings gives for this step (e.g. |
 
 ### `whitelabel.config_version`
 
@@ -4030,6 +5331,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | name | text | yes | Staff-facing name, e.g. |
 | mode | text | yes | How the guest reaches it (rev 3 REV3-11). |
 | show_banner | boolean | no | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. |
+| behaviour | text | no | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). |
+| show_everything | boolean | no | The "Show everything" link under a filtered list, which clears the answers (W4). |
 | status | text | yes |  |
 | source | text | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). |
 | suggestion_ref | text | no | For aiSuggested, the id of the ai job that proposed it. |
@@ -4044,6 +5347,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guided_choice_id | text | yes | The parent row. |
 | id | text | no | ULID. |
 | title | jsonb | yes |  |
+| kind | text | no | What the question asks (decided 29 September, W4). |
 | sort_order | integer | yes |  |
 
 ### `whitelabel.guided_choice_question`
@@ -4053,6 +5357,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guided_choice_id | text | yes | The parent row. |
 | id | text | no | ULID. |
 | title | jsonb | yes |  |
+| kind | text | no | What the question asks (decided 29 September, W4). |
 | sort_order | integer | yes |  |
 
 ### `whitelabel.homepage_section`
@@ -4081,6 +5386,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | no | Added 20 August. |
 | kind | text | yes |  |
+| buy_button | jsonb | no | The persistent Buy tickets button (decided 29 September, MOB-2). |
 | navigation_item_id | uuid | yes | Points at whitelabel.navigation_item. |
 
 ### `whitelabel.policy`
@@ -4114,6 +5420,34 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sort_order | integer | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `whitelabel.site_setup_progress`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| preset_key | text | no | The starting point. |
+| current_step | text | no |  |
+| steps | jsonb | no | One entry per SiteSetupStepKey. |
+| minimum_path_done | boolean | no | True once the minimum path is done: a logo, the four theme colours, at least one enabled valid booking flow and a published version. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+
+### `whitelabel.store_account`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| store | text | yes |  |
+| account_holder_name | text | yes | The client's legal entity as the store knows it. |
+| duns_number | text | no | Required for appleAppStore; Apple enrols an organisation only with its D-U-N-S number. |
+| developer_account_id | text | yes | Apple Team ID, or the Google Play developer account id. |
+| app_identifier | text | yes | The bundle id (Apple) or application id (Google) the app is signed with. |
+| api_credential_secret_ref | text | no | App Store Connect API key or Play service-account key, sent once and kept in the secret store; this is its reference. |
+| has_api_credential | boolean | no |  |
+| listing | jsonb | no | The store listing. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+
 ### `whitelabel.tenant_config`
 
 | Column | Type | Required | Notes |
@@ -4146,10 +5480,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-3 operations, added to this service in later releases without changing any of the above.
+1 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| content | `proposeGuidedChoice` |
-| navigation | `getNavigation` |
 | overview | `getStorefrontInsights` |

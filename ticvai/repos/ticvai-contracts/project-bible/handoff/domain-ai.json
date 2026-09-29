@@ -340,6 +340,14 @@
    "guestCallable": false,
    "scopeLevel": "tenant"
   },
+  "getAiVenueSettings": {
+   "path": "/venues/{venueId}/ai-settings",
+   "verb": "GET",
+   "summary": "The venue AI profile the baselines stand on",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "getApprovalRequestScore": {
    "path": "/approval-requests/{approvalRequestId}/score",
    "verb": "GET",
@@ -412,6 +420,22 @@
    "guestCallable": false,
    "scopeLevel": "venue"
   },
+  "getVenueHistoryImport": {
+   "path": "/history-imports/{importId}",
+   "verb": "GET",
+   "summary": "One history import, with its findings",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "importVenueHistory": {
+   "path": "/venues/{venueId}/history-imports",
+   "verb": "POST",
+   "summary": "Import the venue's own historical exports for the AI baselines",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "ingestKnowledgeDocument": {
    "path": "/collections/{collectionId}/documents",
    "verb": "POST",
@@ -424,6 +448,22 @@
    "path": "/governance/capabilities",
    "verb": "GET",
    "summary": "The capability registry",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listAiCapabilityHealth": {
+   "path": "/governance/capability-health",
+   "verb": "GET",
+   "summary": "How each AI capability is running now",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiCapabilityMaturity": {
+   "path": "/capability-maturity",
+   "verb": "GET",
+   "summary": "Where each AI answer stands on the way from baseline to learned",
    "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "venue"
@@ -520,6 +560,14 @@
    "path": "/tools",
    "verb": "GET",
    "summary": "The tool registry",
+   "permission": "AI_USE",
+   "guestCallable": false,
+   "scopeLevel": "tenant"
+  },
+  "listAiTrainingRuns": {
+   "path": "/training-runs",
+   "verb": "GET",
+   "summary": "The per-tenant training and backtest runs",
    "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "tenant"
@@ -657,6 +705,14 @@
    "verb": "GET",
    "summary": "Risk alerts",
    "permission": "RISK_REVIEW",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
+  "listVenueHistoryImports": {
+   "path": "/venues/{venueId}/history-imports",
+   "verb": "GET",
+   "summary": "The venue's history imports",
+   "permission": "AI_USE",
    "guestCallable": false,
    "scopeLevel": "venue"
   },
@@ -1013,6 +1069,14 @@
    "guestCallable": false,
    "scopeLevel": "platform"
   },
+  "setAiVenueSettings": {
+   "path": "/venues/{venueId}/ai-settings",
+   "verb": "PUT",
+   "summary": "Set the venue AI profile",
+   "permission": "AI_CONFIGURE",
+   "guestCallable": false,
+   "scopeLevel": "venue"
+  },
   "setForecastDefinition": {
    "path": "/forecast-definitions/{definitionKey}",
    "verb": "PUT",
@@ -1102,6 +1166,8 @@
   "AiByokEnablement",
   "AiCapability",
   "AiCapabilityFamily",
+  "AiCapabilityHealth",
+  "AiCapabilityMaturity",
   "AiCapabilityRegistration",
   "AiConfigurationBlueprint",
   "AiConfigurationQuestion",
@@ -1134,6 +1200,7 @@
   "AiGovernanceRule",
   "AiGovernanceRuleList",
   "AiGuidedChoiceSuggestion",
+  "AiHistoryImport",
   "AiIncident",
   "AiInsight",
   "AiInteraction",
@@ -1141,8 +1208,10 @@
   "AiKnowledgeGap",
   "AiLookalikeSegmentProposal",
   "AiMarketingRecommendation",
+  "AiMaturity",
   "AiMessage",
   "AiMetricChangeExplanation",
+  "AiMissingSettingProblem",
   "AiModel",
   "AiOperationalRequirement",
   "AiPolicy",
@@ -1177,13 +1246,14 @@
   "AiSource",
   "AiSourceList",
   "AiTool",
+  "AiTrainingRun",
   "AiTransactionRiskScore",
   "AiUsageReport",
+  "AiVenueSettings",
   "GeneratedConfiguration",
   "IndexFailure",
   "IndexJob",
   "IndexSource",
-  "InsufficientDataProblem",
   "KnowledgeCollection",
   "KnowledgeDocument",
   "LayoutDraft",
@@ -1222,6 +1292,7 @@
   "AiGovernanceOutcome",
   "AiGovernancePolicyVersion.status",
   "AiGuidedChoiceSuggestion.status",
+  "AiHistoryImport.status",
   "AiIncident.status",
   "AiInsight.status",
   "AiKnowledgeGap.status",
@@ -1238,6 +1309,7 @@
   "AiRiskRegisterEntry.status",
   "AiRiskStrategy.status",
   "AiTool.status",
+  "AiTrainingRun.status",
   "ApprovalStatus",
   "CartStatus",
   "CaseStatus",
@@ -1877,7 +1949,7 @@
   },
   {
    "name": "entitlement.issued",
-   "publisher": "catalogue",
+   "publisher": "access",
    "role": "consumes",
    "critical": true
   },
@@ -1966,6 +2038,12 @@
    "critical": false
   },
   {
+   "name": "payment.captured",
+   "publisher": "orders",
+   "role": "consumes",
+   "critical": false
+  },
+  {
    "name": "performance.cancelled",
    "publisher": "catalogue",
    "role": "consumes",
@@ -2039,6 +2117,7 @@
    "ai.blueprint_decision",
    "ai.byok_enablement",
    "ai.capability",
+   "ai.capability_maturity",
    "ai.case_action",
    "ai.case_evidence",
    "ai.chunk_embedding",
@@ -2063,6 +2142,8 @@
    "ai.governance_policy",
    "ai.governance_policy_version",
    "ai.guided_choice_suggestion",
+   "ai.history_import",
+   "ai.history_observation",
    "ai.incident",
    "ai.index_entry",
    "ai.index_failure",
@@ -2092,14 +2173,16 @@
    "ai.risk_edge",
    "ai.risk_register",
    "ai.risk_strategy",
-   "ai.signal_observation",
    "ai.signal_source",
    "ai.suggestion",
    "ai.suggestion_outcome",
    "ai.tool",
+   "ai.training_run",
+   "ai.venue_settings",
    "approvals.request",
    "approvals.sla_policy",
    "assets.media_asset",
+   "cache:ai-breaker",
    "cache:answer",
    "cache:embedding",
    "cache:governance-policy",
@@ -2152,6 +2235,8 @@
    "venuemap.import_job",
    "venuemap.map",
    "venuemap.point",
+   "venuemap.visit_plan",
+   "venuemap.visit_plan_item",
    "whitelabel.banner",
    "whitelabel.content_page",
    "whitelabel.faq_entry",
@@ -2183,7 +2268,6 @@
    "ai.entity_risk",
    "ai.eval_run",
    "ai.evidence_package",
-   "ai.forecast_accuracy",
    "ai.forecast_definition",
    "ai.forecast_export",
    "ai.forecast_point",
@@ -2193,6 +2277,8 @@
    "ai.governance_policy",
    "ai.governance_policy_version",
    "ai.guided_choice_suggestion",
+   "ai.history_import",
+   "ai.history_observation",
    "ai.incident",
    "ai.index_entry",
    "ai.index_job",
@@ -2224,6 +2310,7 @@
    "ai.suggestion",
    "ai.suggestion_outcome",
    "ai.tool",
+   "ai.venue_settings",
    "cache:answer",
    "cache:embedding",
    "cache:governance-policy",
@@ -2243,6 +2330,7 @@
     "ai.blueprint_decision",
     "ai.byok_enablement",
     "ai.capability",
+    "ai.capability_maturity",
     "ai.case_action",
     "ai.case_evidence",
     "ai.chunk_embedding",
@@ -2266,6 +2354,8 @@
     "ai.governance_policy",
     "ai.governance_policy_version",
     "ai.guided_choice_suggestion",
+    "ai.history_import",
+    "ai.history_observation",
     "ai.incident",
     "ai.index_entry",
     "ai.index_failure",
@@ -2294,9 +2384,10 @@
     "ai.risk_edge",
     "ai.risk_register",
     "ai.risk_strategy",
-    "ai.signal_observation",
     "ai.signal_source",
     "ai.tool",
+    "ai.training_run",
+    "ai.venue_settings",
     "approvals.request",
     "approvals.sla_policy",
     "assets.media_asset",
@@ -2344,6 +2435,8 @@
     "venuemap.import_job",
     "venuemap.map",
     "venuemap.point",
+    "venuemap.visit_plan",
+    "venuemap.visit_plan_item",
     "whitelabel.banner",
     "whitelabel.content_page",
     "whitelabel.faq_entry",
@@ -2359,6 +2452,7 @@
     "ai.suggestion_outcome"
    ],
    "redis": [
+    "cache:ai-breaker",
     "cache:answer",
     "cache:embedding",
     "cache:governance-policy",
@@ -2424,7 +2518,7 @@
   },
   {
    "id": "GST-001",
-   "name": "Home \u2013 Default",
+   "name": "Home",
    "platform": "P02",
    "platformName": "Guest App",
    "wave": 1,
@@ -2490,11 +2584,13 @@
   },
   {
    "id": "GST-054",
-   "name": "AI Optimized Itinerary",
+   "name": "AI Planner",
    "platform": "P02",
    "platformName": "Guest App",
-   "wave": 4,
+   "wave": 1,
    "operations": [
+    "createAiConversation",
+    "requestSuggestion",
     "sendAiMessage"
    ]
   },
@@ -3393,7 +3489,9 @@
    "wave": 3,
    "operations": [
     "getActionPlan",
-    "getEffectiveAiPolicy"
+    "getAiVenueSettings",
+    "getEffectiveAiPolicy",
+    "setAiVenueSettings"
    ]
   },
   {
@@ -3740,6 +3838,7 @@
    "wave": 3,
    "operations": [
     "listAiCapabilities",
+    "listAiCapabilityMaturity",
     "listAiGovernanceAlerts",
     "pauseAiCapability",
     "promoteAiRelease"
@@ -3929,7 +4028,8 @@
     "cancelActionPlan",
     "getActionPlan",
     "pauseActionPlan",
-    "resumeActionPlan"
+    "resumeActionPlan",
+    "rollbackActionPlan"
    ]
   },
   {
@@ -4080,6 +4180,8 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
+    "getAiUsage",
+    "listAiCapabilityHealth",
     "listAiGovernanceAlerts",
     "listAiIncidents"
    ]
@@ -4137,6 +4239,7 @@
    "operations": [
     "listAiEvaluations",
     "listAiGovernanceAlerts",
+    "listAiTrainingRuns",
     "promoteAiRelease",
     "rollbackAiRelease",
     "runAiEvaluation"
@@ -4401,6 +4504,17 @@
    ]
   },
   {
+   "id": "CMS-104",
+   "name": "App Build & Store Publishing",
+   "platform": "P13",
+   "platformName": "Venue CMS",
+   "wave": 1,
+   "operations": [
+    "createAiConversation",
+    "sendAiMessage"
+   ]
+  },
+  {
    "id": "KIT-010",
    "name": "Kitchen Performance, AI & Operational Optimization",
    "platform": "P15",
@@ -4563,6 +4677,21 @@
     "publishPromptTemplate",
     "runAiEvaluation"
    ]
+  },
+  {
+   "id": "ANL-071",
+   "name": "AI Maturity & Learning",
+   "platform": "P16",
+   "platformName": "Venue Analytics",
+   "wave": 3,
+   "operations": [
+    "getAiVenueSettings",
+    "getVenueHistoryImport",
+    "importVenueHistory",
+    "listAiCapabilityMaturity",
+    "listVenueHistoryImports",
+    "setAiVenueSettings"
+   ]
   }
  ],
  "flows": [
@@ -4624,6 +4753,15 @@
    ]
   },
   {
+   "id": "F49",
+   "name": "A guest plans a day and follows it",
+   "wave": 1,
+   "operations": [
+    "requestSuggestion",
+    "sendAiMessage"
+   ]
+  },
+  {
    "id": "F77",
    "name": "A promotion is built, bundled, published and measured",
    "wave": 3,
@@ -4666,6 +4804,12 @@
    "title": "Action register \u2014 22 September 2026",
    "status": "",
    "mentions": 6
+  },
+  {
+   "file": "docs\\active\\ai-functions-review-30-september.md",
+   "title": "AI functions review: build every AI function now, then let it learn",
+   "status": "",
+   "mentions": 18
   },
   {
    "file": "docs\\active\\ai-scope-for-confirmation.md",
@@ -4836,6 +4980,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\system-design-review-30-september.md",
+   "title": "TICVAI system design review (re-audit before Block A tickets)",
+   "status": "",
+   "mentions": 4
+  },
+  {
    "file": "docs\\active\\undrafted-packs-scope-20-september.md",
    "title": "The 26 undrafted packs \u2014 what is in them and what they would cost",
    "status": "",
@@ -4863,7 +5013,7 @@
    "file": "docs\\adr\\0020-ai-isolation-boundary.md",
    "title": "ADR-0020 \u2014 Where AI runs, and what it is isolated from",
    "status": "Proposed \u00b7 17 August 2026",
-   "mentions": 13
+   "mentions": 20
   },
   {
    "file": "docs\\adr\\0021-qdrant-partitioning.md",
@@ -4917,7 +5067,7 @@
    "file": "docs\\architecture\\ai-system-design.md",
    "title": "TICVAI AI subsystem: system design",
    "status": "",
-   "mentions": 150
+   "mentions": 162
   },
   {
    "file": "docs\\architecture\\README.md",
@@ -5104,14 +5254,14 @@
   }
  ],
  "counts": {
-  "operations": 135,
-  "schemas": 116,
+  "operations": 143,
+  "schemas": 122,
   "states": 42,
-  "events": 46,
-  "tables": 131,
-  "screens": 193,
-  "flows": 10,
-  "documents": 44,
+  "events": 47,
+  "tables": 138,
+  "screens": 195,
+  "flows": 11,
+  "documents": 46,
   "openConflicts": 1
  }
 }

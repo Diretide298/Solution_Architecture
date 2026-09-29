@@ -38,7 +38,7 @@ END
 $$;
 
 
--- **85 tables qualify today** — a NOT NULL `venue_id` in the schema reference.
+-- **89 tables qualify today** — a NOT NULL `venue_id` in the schema reference.
 -- Listed rather than counted, because ADR-0044's rule is checkable and the list is how.
 
 --   access.access_device
@@ -69,6 +69,9 @@ $$;
 --   access.podium_shift
 --   access.scan_event
 --   ai.guided_choice_suggestion
+--   ai.history_import
+--   ai.history_observation
+--   ai.venue_settings
 --   catalogue.donation_campaign
 --   catalogue.event
 --   catalogue.price_list
@@ -121,6 +124,7 @@ $$;
 --   transport.route
 --   transport.station
 --   venuemap.map
+--   venuemap.visit_plan
 --   whitelabel.guided_choice
 --   workforce.announcement
 --   workforce.labour_budget

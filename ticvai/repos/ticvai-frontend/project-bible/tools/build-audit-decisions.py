@@ -98,8 +98,12 @@ def rev3():
         if not rs:
             continue
         out += [f"## {title} ({len(rs)})", "", "| Ref | What the prototype does | Decision | Screens |", "| --- | --- | --- | --- |"]
-        out += ["| {} | {} | {} | {} |".format(r["ref"], cell(r["what"]), cell(r["decision"]),
-                                             cell(", ".join(r.get("screens") or []))) for r in rs]
+        # A later decision that replaced or re-read this one is shown on the row (added 30 September:
+        # GAP-C3 by MOB-6, 23SEP-18 by W7, REV3-11 by W4, the flow settings by W12).
+        out += ["| {} | {} | {} | {} |".format(
+            r["ref"], cell(r["what"]),
+            cell(r["decision"]) + (" **Superseded:** " + cell(r["superseded"]) if r.get("superseded") else ""),
+            cell(", ".join(r.get("screens") or []))) for r in rs]
         out.append("")
     io.open(out_path, "w", encoding="utf-8", newline="\n").write("\n".join(out))
     print(f"{len(rows)} rev 3 decisions -> {os.path.relpath(out_path, ROOT)}")

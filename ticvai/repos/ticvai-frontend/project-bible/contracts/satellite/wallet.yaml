@@ -65,6 +65,8 @@ info:
     '
 servers:
 - url: https://api.ticvai.com/v1
+security:
+- bearerAuth: []
 paths:
   /wallet-types:
     get:
@@ -103,6 +105,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1084 Wallet Type Library"
         - "P08 BO-1085 Wallet Creation & Provisioning Rules"
+      x-ticvai-conflict-policy: serverWins
       summary: Define a kind of wallet
       tags:
       - wallet
@@ -146,6 +149,7 @@ paths:
         - "P08 BO-1089 Wallet Feature Profile"
         - "P08 BO-1090 Wallet Lifecycle Configuration"
         - "P08 BO-1091 Wallet Numbering, Identity & Digital Credentials"
+      x-ticvai-conflict-policy: serverWins
       summary: Change a kind of wallet
       tags:
       - wallet
@@ -155,6 +159,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -163,6 +168,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletType'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -219,6 +226,7 @@ paths:
         - "P08 BO-1088 Credit & Balance Type Configuration"
         - "P08 BO-1104 Credit Type Definition Studio"
         - "P08 BO-415 Wallet & Credit Type Configuration"
+      x-ticvai-conflict-policy: serverWins
       summary: Define a kind of credit, without a release
       tags:
       - wallet
@@ -261,6 +269,7 @@ paths:
         - "P08 BO-1105 Credit Issuance Rule Configuration"
         - "P08 BO-1108 Expiry & Validity Policy Configuration"
         - "P08 BO-420 Bonus Validity & Expiry Configuration"
+      x-ticvai-conflict-policy: serverWins
       summary: Change a kind of credit
       description: '**Changing expiry or refundability does not reach credit already issued.** A lot
         carries the terms it was issued under, because retro-expiring somebody''s gift card is the kind
@@ -275,6 +284,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -283,6 +293,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditType'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -306,6 +318,7 @@ paths:
         - "P08 BO-1106 Credit Usage & Eligibility Rules"
         - "P08 BO-399 Wallet & Credit Acceptance Mapping"
         - "P08 BO-419 Bonus Usage Restrictions"
+      x-ticvai-conflict-policy: serverWins
       summary: Where this credit may be spent, and on what
       description: 'Board 3.4, and it supersedes the gaming pack''s *Wallet & Credit Acceptance
         Mapping* — **acceptance is where credit may be spent, not where it is loaded from.**
@@ -322,6 +335,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -330,6 +344,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditEligibility'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -365,6 +381,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1107 Consumption Priority Engine"
         - "P08 BO-1110 Split Tender & Multi-Credit Consumption"
+      x-ticvai-conflict-policy: serverWins
       summary: The order credit is drawn down in
       description: 'Boards 3.5 and 3.7. **A commercial decision worth real money, and a balance cannot
         hold it.**
@@ -388,6 +405,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -396,6 +414,8 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditConsumptionPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -455,6 +475,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1111 Credit Expiry, Extension & Forfeiture Operations"
         - "P08 BO-1130 Gift Card & Voucher Expiry Management"
+      x-ticvai-conflict-policy: serverWins
       summary: Expire, extend or forfeit credit that has run out of time
       description: 'Board 3.9. **Expiry is an act with an accounting consequence, not a clock.** The
         moment unspent credit expires it stops being a liability and becomes breakage — recognised
@@ -528,6 +549,7 @@ paths:
         - "P08 BO-1122 Shared Wallet Simulator, Monitoring & Audit"
         - "P08 BO-1142 Wallet Transaction Simulator, Monitoring & Channel Audit"
         - "P08 BO-1161 Security Rules Testing, Simulation & AI Sandbox"
+      x-ticvai-conflict-policy: serverWins
       summary: Which credit this purchase would actually use
       description: 'Board 3.10. **Split tender across several credit types and lots is hard to reason
         about and trivial to get wrong**, and the guest finds out at the till. Simulation takes a basket
@@ -605,6 +627,7 @@ paths:
         - "P08 BO-1101 Funding Limits & Velocity Controls"
         - "P08 BO-417 Top-Up Configuration"
         - "P08 BO-418 Top-Up Bonus Rule Configuration"
+      x-ticvai-conflict-policy: serverWins
       summary: Amounts, channels, bonuses, limits and velocity
       description: '**Board 2 is the 27 August minute, one screen for one**, and the matrix agrees on
         four of them: auto-reload on threshold (4.3.28), calendar-based recurring funding (4.3.29,
@@ -627,6 +650,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -635,6 +659,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletFundingRules'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -650,6 +676,14 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1100 Funding Reversal & Correction Management"
         - "P08 BO-1148 Reversal & Transaction Correction Management"
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-note: >-
+        **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
+        locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
+        written in the same transaction.
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
       summary: Undo a top-up, in full or in part
       description: 'Board 2.8. **A reversal is not a spend and must not look like one.** A top-up taken
         on the wrong wallet, a card that later charged back, a duplicated recharge — all three put the
@@ -746,6 +780,7 @@ paths:
         - "P08 BO-1113 Shared Wallet Command Center"
         - "P08 BO-1114 Shared Wallet Model Configuration"
         - "P08 BO-1119 Corporate Wallet & Organizational Hierarchy"
+      x-ticvai-conflict-policy: serverWins
       summary: Set up a family, household or corporate wallet
       tags:
       - wallet
@@ -789,6 +824,10 @@ paths:
         - "P08 BO-1117 Allowance & Budget Allocation Engine"
         - "P08 BO-1118 Member Spending Controls & Permissions"
         - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Allowances, budgets and what each member may spend on
       description: 'Boards 4.5 and 4.6. **An allowance is a cap with a refresh, not a transfer.** Moving
         fifty dirhams into a child''s wallet every Monday is a transfer and a parent has to remember it;
@@ -808,6 +847,7 @@ paths:
       - guest
       x-ticvai-scope-level: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -823,6 +863,8 @@ paths:
                   items:
                     $ref: '#/components/schemas/SharedWalletMember'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -869,6 +911,7 @@ paths:
         - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
         - "P08 BO-1126 Voucher & Coupon Type Configuration"
         - "P08 BO-1127 Voucher Eligibility & Redemption Rule Studio"
+      x-ticvai-conflict-policy: serverWins
       summary: Define a voucher or benefit
       tags:
       - wallet
@@ -901,6 +944,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
         - "P08 BO-1124 Gift Card Product Configuration"
+      x-ticvai-conflict-policy: serverWins
       summary: Denominations, validity, activation and distribution
       description: 'Boards 5.2 and 5.3. **`issueGiftCard` and `activateGiftCard` exist in `retail` and
         nothing said what a gift card is.** Denominations, whether an open amount is allowed and between
@@ -918,6 +962,7 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -926,6 +971,8 @@ paths:
             schema:
               $ref: '#/components/schemas/GiftCardProduct'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -948,6 +995,7 @@ paths:
         - "P08 BO-1140 Offline Wallet & Degraded Mode Configuration"
         - "P08 BO-1141 Device, Terminal & Acceptance Point Mapping"
         - "P08 BO-1175 Integration Profile & System Mapping"
+      x-ticvai-conflict-policy: serverWins
       summary: Where a wallet may be used, on what, and when it may not
       description: 'Board 6. Channels, terminals, acceptance points, and the credential a guest presents
         — card, wristband, NFC, RFID, QR or a digital key.
@@ -966,6 +1014,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -974,6 +1023,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletChannelRules'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -991,6 +1042,7 @@ paths:
         - "P08 BO-1137 Wearable Linking & Wallet Association Rules"
         - "P08 BO-1157 Device, Credential & Account Security"
         - "P08 BO-461 Card Replacement & Wallet Relinking"
+      x-ticvai-conflict-policy: serverWins
       summary: Bind a wristband, card or device to a wallet
       description: 'Boards 6.4 and 6.5. **A credential is not the wallet and the distinction is the
         whole of lost-property.** A lost wristband is relinked, not refunded; the balance never moved.
@@ -1036,6 +1088,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1144 Peer-to-Peer Transfer Configuration"
         - "P08 BO-1145 Transfer Eligibility, Limits & Approval Rules"
+      x-ticvai-conflict-policy: serverWins
       summary: Whether guests may move money to each other, and on what terms
       description: 'Boards 7.2 and 7.3. **Peer-to-peer transfer is a money-transmission question before
         it is a feature.** Limits, approval above a threshold, which credit types may move at all —
@@ -1053,6 +1106,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1061,6 +1115,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletTransferRules'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1077,6 +1133,7 @@ paths:
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
         - "P09 ADM-612 Refund Allocation & Original Tender Manager\t119"
+      x-ticvai-conflict-policy: serverWins
       summary: What a refund puts back, and where
       description: 'Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different
         promises**, and which one a guest gets should not depend on who is at the counter.
@@ -1094,6 +1151,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1102,6 +1160,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletRefundPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1117,6 +1177,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1150 Wallet Block, Freeze & Restriction Management"
         - "P08 BO-1159 Automated Security Action Orchestration"
+      x-ticvai-conflict-policy: serverWins
       summary: Block, freeze or restrict a wallet
       description: 'Board 7.8. **Three different things that a single "suspended" flag conflates.** A
         freeze stops spending and allows funding — what you do while investigating. A block stops both —
@@ -1186,6 +1247,7 @@ paths:
       operationId: raiseWalletDispute
       x-ticvai-consumed-by:
         - "P08 BO-1151 Wallet Disputes & Operational Exception Queue"
+      x-ticvai-conflict-policy: append
       summary: A guest contests a wallet transaction
       description: 'Board 7.9. **Distinct from a payment chargeback**, which arrives from a card scheme
         and has a deadline set by somebody else. A wallet dispute is internal — *I was charged twice at
@@ -1227,6 +1289,7 @@ paths:
         - "P08 BO-1158 AI Fraud & Anomaly Detection Studio"
         - "P08 BO-1159 Automated Security Action Orchestration"
         - "P08 BO-1176 Wallet Events, Webhooks & Notification Orchestration"
+      x-ticvai-conflict-policy: serverWins
       summary: Velocity, behaviour and what happens when a rule trips
       description: 'Boards 8.2 to 8.7. **A risk rule with no action is a report.** Each rule names what
         it does — score only, challenge, hold the transaction, freeze the wallet, raise a case — because
@@ -1245,6 +1308,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1253,6 +1317,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletRiskRules'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1268,6 +1334,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1164 Wallet Financial Classification & Accounting Mapping"
         - "P08 BO-1169 Breakage & Revenue Recognition Policy"
+      x-ticvai-conflict-policy: serverWins
       summary: Which ledger account each credit type sits in
       description: 'Boards 9.2 and 9.3. **27 August, minuted:** *"every financial transaction is tied to
         a chart-of-account entry… total wallet balances outstanding are reported as a liability owed to
@@ -1287,6 +1354,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1295,6 +1363,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletAccountingMapping'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -1414,6 +1484,7 @@ paths:
         - "P08 BO-1173 Wallet Integration Command Center"
         - "P08 BO-1180 Wallet Configuration Governance & Version Control"
         - "P08 BO-1181 Approval, Publication & Change Management"
+      x-ticvai-conflict-policy: serverWins
       summary: Validate and publish the wallet configuration as a version
       description: 'Boards 1.10, 10.8 and 10.9. **Ten boards of configuration that interact**, and the
         failure mode is a credit type with no accounting mapping or a consumption policy naming a type
@@ -1473,6 +1544,16 @@ paths:
         - "P02 GST-071 Payment Methods"
         - "P08 BO-1116 Parent–Child Stored Value Distribution"
         - "P08 BO-1121 Shared Wallet Transfers & Balance Reallocation"
+      x-ticvai-note: >-
+        **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
+        locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
+        written in the same transaction.
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Send balance to another guest
       description: >
         BL-121. **Peer-to-peer transfer was declared on the wallet and unreachable** — a field with
@@ -1678,6 +1759,11 @@ paths:
         - "P08 BO-416 Wallet Account & Balance View"
         - "P08 BO-448 Redemption Wallet & Balance View"
         - "P08 BO-487 Customer Wallet & Balance Summary"
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary
       summary: Read a guest wallet
@@ -1706,6 +1792,16 @@ paths:
       operationId: topUpWallet
       x-ticvai-consumed-by:
         - "P08 BO-488 Self-Service Wallet Top-Up"
+      x-ticvai-note: >-
+        **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
+        locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
+        written in the same transaction.
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       x-ticvai-guest-callable: true
       summary: Add value to a wallet
@@ -1769,6 +1865,9 @@ paths:
         - "P08 BO-414 Wallet & Credit Management Dashboard"
         - "P08 BO-423 Wallet Credit Transaction Ledger & Audit"
         - "P08 BO-469 Wallet & Deduction Transaction Monitor"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # reconciling a disputed balance needs the current one
       summary: Wallet transaction history
@@ -1786,6 +1885,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
@@ -1816,6 +1916,13 @@ paths:
         - "P08 BO-1167 Reconciliation Exception & Resolution Workbench"
         - "P08 BO-416 Wallet Account & Balance View"
         - "P08 BO-422 Refund, Adjustment & Manual Bonus Control"
+      x-ticvai-note: >-
+        **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
+        locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
+        written in the same transaction.
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
       x-ticvai-audience: [staff]
       summary: Manually adjust a wallet balance
       description: >
@@ -1904,6 +2011,9 @@ paths:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
         - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # bearer instrument. Stale balance is double-spend
       summary: Check a gift card balance
@@ -2010,6 +2120,13 @@ paths:
       operationId: redeemGiftCard
       x-ticvai-consumed-by:
         - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
+      x-ticvai-note: >-
+        **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
+        locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
+        written in the same transaction.
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
       x-ticvai-audience: [staff]
       summary: Spend against a card
       description: >
@@ -2064,6 +2181,16 @@ paths:
       operationId: loadGameCredits
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+      x-ticvai-note: >-
+        **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
+        locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
+        written in the same transaction.
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -2206,6 +2333,7 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
       - name: walletId
         in: path
         required: true
@@ -2250,6 +2378,197 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WalletHold'
+    post:
+      operationId: holdWalletFunds
+      security:
+      - serviceAuth: []
+      - bearerAuth: []
+      x-ticvai-audience:
+      - service
+      - staff
+      x-ticvai-agreed: '29 September: system-design review SD-027 (wallet double-spend)'
+      summary: Hold wallet funds for a spend in progress
+      description: '**The only way wallet money is reserved** (system-design review SD-027, 29 September). A guarded decrement of the locked `wallet.balance` row moves the amount from available to held and writes a `wallet.hold` and a `wallet.wallet_transaction` (kind `spend`, pending) in one transaction; two spends racing for the same money cannot both succeed. Called by the order service for a `wallet` tender (`orders.authoriseStoredValue`, `orders.createPayment`) and by the cross-region wallet authorisation, which keeps only a reference to this hold. **Refused `409` when the available balance is short** (`insufficient-funds`).'
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_OPERATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
+      x-ticvai-lock-note: 'SD-027 (29 September). One balance writer: the `wallet.balance` row is locked for one
+        statement, `UPDATE wallet.balance SET available_balance = available_balance - n, hold_balance =
+        hold_balance + n, version = version + 1 WHERE wallet_id = ? AND available_balance >= n`, and the hold
+        and the `wallet.wallet_transaction` row are written in the same transaction.'
+      x-ticvai-emits:
+      - wallet.debited
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - name: walletId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - amount
+              properties:
+                amount:
+                  $ref: '../shared/common.yaml#/components/schemas/Money'
+                orderId:
+                  type: string
+                  nullable: true
+                paymentId:
+                  type: string
+                  nullable: true
+                expiresInSeconds:
+                  type: integer
+                  minimum: 30
+                  maximum: 3600
+                  default: 900
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The hold
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletHold'
+        '409':
+          description: The available balance is less than the amount (`insufficient-funds`), or the wallet is
+            suspended or closed (`wallet-not-active`).
+          x-ticvai-problem-types:
+          - insufficient-funds
+          - wallet-not-active
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+  /wallet-holds/{walletHoldId}/capture:
+    post:
+      operationId: captureWalletHold
+      security:
+      - serviceAuth: []
+      - bearerAuth: []
+      x-ticvai-audience:
+      - service
+      - staff
+      x-ticvai-agreed: '29 September: system-design review SD-027 (wallet double-spend)'
+      summary: Debit a held amount
+      description: 'Turns a `held` hold into a debit (SD-027): under the same balance row lock the held amount leaves `hold_balance` and `balance_amount`, the hold is `captured` and the pending transaction settles with `balanceAfter`. An amount below the hold captures that much and returns the rest to available. **Refused `409` unless the hold is `held`** (`hold-not-held`).'
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_OPERATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
+      x-ticvai-lock-note: 'SD-027 (29 September). One balance writer: the `wallet.balance` row is locked for one
+        statement, `UPDATE wallet.balance SET available_balance = available_balance - n, hold_balance =
+        hold_balance + n, version = version + 1 WHERE wallet_id = ? AND available_balance >= n`, and the hold
+        and the `wallet.wallet_transaction` row are written in the same transaction.'
+      x-ticvai-emits:
+      - wallet.debited
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - name: walletHoldId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  $ref: '../shared/common.yaml#/components/schemas/Money'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The hold
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletHold'
+        '409':
+          description: The hold is not `held` (already captured, released or expired) (`hold-not-held`).
+          x-ticvai-problem-types:
+          - hold-not-held
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+  /wallet-holds/{walletHoldId}/release:
+    post:
+      operationId: releaseWalletHold
+      security:
+      - serviceAuth: []
+      - bearerAuth: []
+      x-ticvai-audience:
+      - service
+      - staff
+      x-ticvai-agreed: '29 September: system-design review SD-027 (wallet double-spend)'
+      summary: Give held wallet funds back
+      description: 'Returns a `held` hold to available under the balance row lock (SD-027); the sweeper does the same for a hold past `expiresAt`. **Refused `409` unless the hold is `held`** (`hold-not-held`).'
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_OPERATE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
+      x-ticvai-lock-note: 'SD-027 (29 September). One balance writer: the `wallet.balance` row is locked for one
+        statement, `UPDATE wallet.balance SET available_balance = available_balance - n, hold_balance =
+        hold_balance + n, version = version + 1 WHERE wallet_id = ? AND available_balance >= n`, and the hold
+        and the `wallet.wallet_transaction` row are written in the same transaction.'
+      x-ticvai-emits:
+      - wallet.credited
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - name: walletHoldId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The hold
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletHold'
+        '409':
+          description: The hold is not `held` (already captured, released or expired) (`hold-not-held`).
+          x-ticvai-problem-types:
+          - hold-not-held
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
   /wallet-authentication-policy:
     put:
       operationId: setWalletAuthenticationPolicy
@@ -2282,6 +2601,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2290,6 +2610,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletAuthenticationPolicy'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -2561,6 +2883,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2569,6 +2892,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletReconciliationSources'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -2613,6 +2938,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2621,6 +2947,8 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletIntegrationMapping'
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -2747,6 +3075,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1151 Wallet Disputes & Operational Exception Queue"
         - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: VM close-out follow-up; our build plan'
       summary: Withdraw a wallet dispute that is still open or under review
       description: 'The only way into `withdrawn` (states/wallet-dispute.yaml). **A guest who finds the
@@ -2812,6 +3143,9 @@ paths:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
         - "P08 BO-416 Wallet Account & Balance View"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17 auto top-up); shape follows getWallet'
       summary: A wallet's own auto top-up, if the holder set one
       tags: [retail]
@@ -2835,6 +3169,9 @@ paths:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
         - "P08 BO-416 Wallet Account & Balance View"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17 auto top-up); shape follows transferWalletBalance'
       summary: Top the wallet up automatically from a stored card when it runs low
       description: >
@@ -2854,6 +3191,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -2861,6 +3199,8 @@ paths:
           application/json:
             schema: { $ref: '#/components/schemas/WalletAutoReloadSetting' }
       responses:
+        '412':
+          $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
         '200':
           headers:
             X-Consistency-Token:
@@ -2894,6 +3234,9 @@ paths:
         - "P02 GST-011 Wallet Overview"
         - "P08 BO-416 Wallet Account & Balance View"
         - "P08 BO-487 Customer Wallet & Balance Summary"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: our build plan (retrace 4.3.4 exit settlement); shape follows getWalletBalance'
       summary: What the holder owes or is owed on leaving
       description: >
@@ -2928,6 +3271,16 @@ paths:
         - "P02 GST-011 Wallet Overview"
         - "P08 BO-416 Wallet Account & Balance View"
         - "P08 BO-487 Customer Wallet & Balance Summary"
+      x-ticvai-note: >-
+        **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
+        locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
+        written in the same transaction.
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+      - "cache:idempotency"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-agreed: '29 September: our build plan (retrace 4.3.4 exit settlement); shape follows adjustWallet'
       summary: Settle a short balance, or refund a credit, when the holder leaves
       description: >
@@ -2987,6 +3340,27 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Staff session token (common.yaml bearerAuth). Added 29 September (system-design review SD-054).
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
   schemas:
     WalletAutoReloadSetting:
       type: object
@@ -4793,6 +5167,18 @@ components:
       required: [id, kind, amount, balanceAfter, recordedAt]
       properties:
         id: { type: string }
+        walletId:
+          type: string
+          format: uuid
+          x-ticvai-references: wallet.wallet
+          description: The wallet this movement is on (SD-027, 29 September). A shared wallet has many
+            subjects, so the subject alone cannot say which balance moved.
+        walletHoldId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: wallet.hold
+          description: The hold a spend settled, where it came through `holdWalletFunds`.
         kind: { $ref: '#/components/schemas/WalletTransactionKind' }
         amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         balanceAfter: { $ref: '../shared/common.yaml#/components/schemas/Money' }

@@ -4,13 +4,13 @@
 
 | | |
 |---|---|
-| Screens | 49 |
-| Operations | 208 |
+| Screens | 50 |
+| Operations | 214 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
 | Operations with no screen | 19 |
-| Waves | wave1 21 · wave2 21 · wave3 7 |
+| Waves | wave1 22 · wave2 21 · wave3 7 |
 
 ## Gaps
 
@@ -57,10 +57,10 @@
 | Booking & Selection | 7 | 1, 2, 3 |
 | Engagement & Support | 6 | 1, 2, 3 |
 | In-venue Services | 6 | 2 |
+| Discovery & Browse | 5 | 1 |
 | Cart & Checkout | 5 | 1 |
 | Account & Self-Service | 5 | 1 |
 | Membership, Loyalty & Value | 5 | 2, 3 |
-| Discovery & Browse | 4 | 1 |
 | Ticketing | 3 | 1, 2 |
 | Retail | 2 | 2 |
 | Support | 2 | 2, 3 |
@@ -74,17 +74,17 @@
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
 | `WEB-001` | Home / Landing | Discovery & Browse | 1 | 10 | yes |
-| `WEB-002` | Event & Attraction Listing | Discovery & Browse | 1 | 5 | yes |
+| `WEB-002` | Event & Attraction Listing | Discovery & Browse | 1 | 6 | yes |
 | `WEB-003` | Search Results | Discovery & Browse | 1 | 2 | yes |
 | `WEB-004` | Attraction Details | Discovery & Browse | 1 | 5 | yes |
-| `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 5 | yes |
-| `WEB-006` | Date & Performance Selection | Booking & Selection | 1 | 7 | yes |
-| `WEB-007` | Interactive Seat Selection | Booking & Selection | 2 | 5 | yes |
-| `WEB-008` | Add-ons & Upsell | Booking & Selection | 2 | 5 | yes |
+| `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 6 | yes |
+| `WEB-006` | Date & Performance Selection | Booking & Selection | 1 | 8 | yes |
+| `WEB-007` | Interactive Seat Selection | Booking & Selection | 2 | 6 | yes |
+| `WEB-008` | Add-ons & Upsell | Booking & Selection | 2 | 6 | yes |
 | `WEB-009` | Wishlist | Booking & Selection | 3 | 3 | yes |
-| `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 13 | yes |
-| `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 13 | yes |
-| `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 5 | yes |
+| `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 14 | yes |
+| `WEB-011` | Guest Details & Attendee Forms | Cart & Checkout | 1 | 14 | yes |
+| `WEB-012` | Checkout — Payment | Cart & Checkout | 1 | 6 | yes |
 | `WEB-013` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
 | `WEB-014` | Pay for a Booking | Cart & Checkout | 1 | 2 | yes |
 | `WEB-015` | Branded Queue / Waiting Room | High-Demand Access | 2 | 3 | yes |
@@ -122,4 +122,5 @@
 | `WEB-047` | Map Booking — Cabanas & Spots | Booking & Selection | 3 | 8 | yes |
 | `WEB-048` | Book a Space by the Hour | Booking & Selection | 3 | 4 | yes |
 | `WEB-049` | Transport — Route & Schedule | Transport | 3 | 13 | yes |
+| `WEB-050` | Plan Your Visit | Discovery & Browse | 1 | 6 | yes |
 

@@ -1,7 +1,7 @@
 -- References that cross the control/tenant database boundary.
 -- **Derived by tools/derive-ddl.py. Do not hand-edit.**
 --
--- 15 declared references stopped being constraints when ADR-0039 made `control` a
+-- 16 declared references stopped being constraints when ADR-0039 made `control` a
 -- database of its own. **Postgres has no cross-database foreign key**, so each one is now
 -- a rule the caller has to keep, and the index below is all the database can offer.
 --
@@ -40,6 +40,9 @@
 -- control.partner_user.principal_id -> identity.principal
 -- control database -> tenant database. Enforced by the caller, not by Postgres.
 -- ALTER TABLE control.partner_user ADD CONSTRAINT partner_user_principal_id_fkey FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
+-- control.production_access_request.decided_by_principal_id -> identity.principal
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.production_access_request ADD CONSTRAINT production_access_request_decided_by_principal_id_fkey FOREIGN KEY (decided_by_principal_id) REFERENCES identity.principal(id);
 -- control.rollout.approved_by_principal_id -> identity.principal
 -- control database -> tenant database. Enforced by the caller, not by Postgres.
 -- ALTER TABLE control.rollout ADD CONSTRAINT rollout_approved_by_principal_id_fkey FOREIGN KEY (approved_by_principal_id) REFERENCES identity.principal(id);

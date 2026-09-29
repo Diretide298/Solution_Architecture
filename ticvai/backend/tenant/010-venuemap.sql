@@ -1,4 +1,4 @@
--- venuemap — 6 tables
+-- venuemap — 8 tables
 -- **Derived. Do not hand-edit.**
 
 -- Two-phase geometry extraction, following seating.ImportJob. A job that finds nothing is not a
@@ -83,8 +83,8 @@ CREATE TABLE IF NOT EXISTS venuemap.placed_resource (
 
 -- What a venue places on the map (19.2.57–19.2.60) — rides, restaurants, toilets, exits.
 -- emergencyExit is separate from exit on purpose. Hangs off: reaches venuemap.map through its
--- keys; references access.access_point, catalogue.product, platform.outlet. Reached by: 16
--- operations read it and 4 write it; 3 tables reference it.
+-- keys; references access.access_point, catalogue.product, platform.outlet. Reached by: 19
+-- operations read it and 4 write it; 4 tables reference it.
 CREATE TABLE IF NOT EXISTS venuemap.point (
     id                                uuid PRIMARY KEY NOT NULL,
     map_id                            uuid NOT NULL,
@@ -100,6 +100,52 @@ CREATE TABLE IF NOT EXISTS venuemap.point (
     icon_ref                          text,
     is_active                         boolean DEFAULT true,
     is_navigable                      boolean DEFAULT true,
-    is_destination                    boolean DEFAULT true
+    is_destination                    boolean DEFAULT true,
+    description                       jsonb,
+    featured_offer                    jsonb,
+    typical_duration_minutes          integer,
+    interest_tags                     text[],
+    cuisine_tags                      text[]
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS venuemap.visit_plan (
+    id                                uuid PRIMARY KEY NOT NULL,
+    venue_id                          uuid NOT NULL,
+    scope_path                        ltree NOT NULL,
+    subject_id                        uuid,
+    session_ref                       text,
+    status                            text NOT NULL CONSTRAINT visit_plan_status_chk CHECK (status IN ('draft', 'booked', 'archived')),
+    version                           integer NOT NULL,
+    source                            text CONSTRAINT visit_plan_source_chk CHECK (source IN ('rules', 'preset', 'aiAgent')),
+    inputs                            jsonb,
+    map_version                       integer,
+    cart_id                           uuid,
+    created_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 18 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS venuemap.visit_plan_item (
+    id                                uuid PRIMARY KEY NOT NULL,
+    plan_id                           uuid NOT NULL,
+    plan_version                      integer NOT NULL,
+    date                              date NOT NULL,
+    sequence                          integer NOT NULL,
+    kind                              text NOT NULL CONSTRAINT visit_plan_item_kind_chk CHECK (kind IN ('attraction', 'show', 'meal', 'shop', 'rest', 'travel')),
+    point_id                          uuid,
+    product_id                        uuid,
+    bundle_id                         uuid,
+    performance_id                    uuid,
+    starts_at                         timestamptz NOT NULL,
+    ends_at                           timestamptz NOT NULL,
+    walk_minutes_before               integer,
+    expected_wait_minutes             integer,
+    add_on_suggestion                 jsonb,
+    is_add_on_accepted                boolean DEFAULT false,
+    is_pinned                         boolean DEFAULT false,
+    note                              text CONSTRAINT visit_plan_item_note_chk CHECK (char_length(note) <= 200)
 );
 

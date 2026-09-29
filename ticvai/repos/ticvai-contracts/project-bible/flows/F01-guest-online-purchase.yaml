@@ -52,10 +52,11 @@ steps:
   operations:
   - listPerformances
   - getAvailability
-  outcome: 'Holds nothing yet. Availability is read live, never cached, in one call for every time of the
-    event in the window (`eventId`, `from`, `to`). **Date first, then time, then tickets** (decided 29
-    September, rev 3 REV3-2): the times stay hidden until a date is picked, per
-    `BookingFlowConfig.performanceReveal` (default `dateTimeTicket`)'
+  outcome: 'Holds nothing yet: capacity is held when the tickets go into the cart (step 4, `addCartLine`,
+    a 15-minute cart hold), not on a look. Availability is read live, never cached, in one call for every time of the event in the
+    window (`eventId`, `from`, `to`). **Date first, then time, then tickets** (decided 29 September,
+    rev 3 REV3-2): the times stay hidden until a date is picked, per the product''s published booking
+    flow `settings.performanceReveal` (`getPublishedBookingFlow`, W12; default `dateTimeTicket`)'
   duration: Availability must return in under 400ms or guests reload and double-book
 - step: 4
   screen: WEB-005
@@ -74,12 +75,14 @@ steps:
   outcome: Final price, with any rejected code explained rather than silently ignored
 - step: 6
   screen: WEB-011
-  action: Enters contact details and answers consent
+  action: Answers attendee forms and consent, only where the cart needs them
   operations:
   - getGuestProfile
   - listConsentPurposes
   outcome: 'Marketing consent unticked by default. Transactional consent presented as required for service,
-    not as a choice dressed up as one
+    not as a choice dressed up as one. **Skipped for a guest who proved the contact with the code, or is
+    signed in, when the cart needs no attendee forms or consents** (decided 29 September, W1): code,
+    then T&Cs, then pay; no second details form
 
     '
 - step: 7
@@ -89,7 +92,10 @@ steps:
   - createOrder
   - createPayment
   outcome: 'Order created before payment, so an unknown payment outcome has an order to attach to. This
-    ordering is the whole reason recovery is possible
+    ordering is the whole reason recovery is possible. **Payment converts the cart''s holds**: in the
+    paying transaction catalogue `convertInventoryHold` turns each held unit into a sold one (SD-023), so
+    a paid order can never find its capacity expired; a hold that lapsed before payment is re-acquired
+    first, or the line is refused before the card is charged
 
     '
   duration: The guest is watching. Anything past 8 seconds reads as failure
@@ -121,7 +127,8 @@ branches:
   resolvedBy: recordConsentAnswers
 - at: 4
   condition: The guest is not signed in and leaves the ticket step (or Add-ons, where the booking has one)
-  behaviour: 'With `BookingFlowConfig.signInAt` `afterAddOns` (the default) the guest is asked to sign in,
+  behaviour: 'With the published flow''s `settings.signInAt` `afterAddOns` (the default; read with
+    `getPublishedBookingFlow`, W12) the guest is asked to sign in,
     or for a guest code when guest checkout is on, before the cart; with `atPayment` the gate is at
     WEB-012. The basket is kept either way (decided 29 September, rev 3 REV3-3).
 
@@ -172,10 +179,33 @@ branches:
     '
   severity: recoverable
   resolvedBy: WEB-013
+- at: 4
+  condition: The guest checks out as a guest (guest checkout on for the venue)
+  behaviour: 'The pop-up asks only `BookingFlowSettings.guestContactFields` (email, and name or mobile
+    where configured), then the six-digit code. After the code nothing is asked again: the cart goes
+    to WEB-012, where the guest ticks the T&Cs (and may tick the unticked marketing opt-in, M18-15) and
+    pays. The profile is created and completed later on WEB-020 (decided 29 September, W1).
+
+    '
+  severity: recoverable
+  resolvedBy: WEB-016
+- at: 2
+  condition: The product's published booking flow orders the steps differently (e.g. a workshop is
+    chosen before the date, or a seated event opens on the seat map)
+  behaviour: 'Steps 3 and 4 follow the published flow (`getPublishedBookingFlow`, W12): a product-first
+    flow (workshop, experience) picks the product on WEB-005 and then the date and time on WEB-006
+    (W8); surf levels appear only after the time slot (W5).
+
+    '
+  severity: recoverable
+  resolvedBy: Automatic
 - at: 6
   condition: The guest abandons at the details form
-  behaviour: 'Nothing is held, so nothing needs releasing. The abandoned cart is a marketing trigger
-    only where consent already exists — an abandonment is not itself consent to be emailed.
+  behaviour: '**The cart''s capacity holds lapse on their own.** `addCartLine` took a cart hold
+    (catalogue `acquireInventoryHold`, holder kind `cart`, 15 minutes, extended while the guest is
+    active); left alone, the expiry sweeper returns the units and publishes `inventoryHold.expired`
+    (SD-023), so nothing needs releasing by hand. The abandoned cart is a marketing trigger only where
+    consent already exists — an abandonment is not itself consent to be emailed.
 
     '
   severity: abandonsFlow
@@ -184,7 +214,8 @@ exitStates:
 - state: completed
   description: Order paid, entitlements issued, tickets delivered
 - state: abandoned
-  description: 'Guest left before payment. No capacity was held on an unseated flow, so nothing to reclaim
+  description: 'Guest left before payment. The cart''s capacity holds expire and the sweeper returns the
+    units (SD-023), so nothing is reclaimed by hand
 
     '
 - state: deferred

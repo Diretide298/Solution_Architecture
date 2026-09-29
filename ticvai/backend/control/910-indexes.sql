@@ -239,6 +239,8 @@ CREATE INDEX IF NOT EXISTS partner_status_history_approval_request_id_idx ON con
 CREATE INDEX IF NOT EXISTS partner_status_history_partner_id_idx ON control.partner_status_history (partner_id);
 -- convention, not declared: control.partner_status_history.requested_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS partner_status_history_requested_by_principal_id_idx ON control.partner_status_history (requested_by_principal_id);
+-- convention, not declared: control.production_access_request.developer_id -> control.developer_account
+CREATE INDEX IF NOT EXISTS production_access_request_developer_id_idx ON control.production_access_request (developer_id);
 -- convention, not declared: control.release.created_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS release_created_by_principal_id_idx ON control.release (created_by_principal_id);
 -- convention, not declared: control.rollout.reinventory_hold_id -> wallet.hold
@@ -257,6 +259,8 @@ CREATE INDEX IF NOT EXISTS scaling_policy_cell_id_idx ON control.scaling_policy 
 CREATE INDEX IF NOT EXISTS tenant_region_id_idx ON control.tenant (region_id);
 -- convention, not declared: control.tenant.termination_requested_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS tenant_termination_requested_by_principal_id_idx ON control.tenant (termination_requested_by_principal_id);
+-- convention, not declared: control.tenant_domain.cell_id -> control.cell
+CREATE INDEX IF NOT EXISTS tenant_domain_cell_id_idx ON control.tenant_domain (cell_id);
 -- convention, not declared: control.tenant_migration.from_cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS tenant_migration_from_cell_id_idx ON control.tenant_migration (from_cell_id);
 -- convention, not declared: control.tenant_migration.to_cell_id -> control.cell
@@ -289,6 +293,8 @@ CREATE INDEX IF NOT EXISTS partner_agreement_approval_request_id_idx ON control.
 CREATE INDEX IF NOT EXISTS partner_case_sla_policy_id_idx ON control.partner_case (sla_policy_id);
 -- crosses the database boundary: control.partner_user.principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS partner_user_principal_id_idx ON control.partner_user (principal_id);
+-- crosses the database boundary: control.production_access_request.decided_by_principal_id -> identity.principal
+CREATE INDEX IF NOT EXISTS production_access_request_decided_by_principal_id_idx ON control.production_access_request (decided_by_principal_id);
 -- crosses the database boundary: control.rollout.approved_by_principal_id -> identity.principal
 CREATE INDEX IF NOT EXISTS rollout_approved_by_principal_id_idx ON control.rollout (approved_by_principal_id);
 -- crosses the database boundary: control.rollout.started_by_principal_id -> identity.principal
@@ -301,6 +307,12 @@ CREATE INDEX IF NOT EXISTS tenant_account_manager_principal_id_idx ON control.te
 CREATE INDEX IF NOT EXISTS tenant_subscription_id_idx ON control.tenant (subscription_id);
 -- crosses the database boundary: control.usage_record.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS usage_record_venue_id_idx ON control.usage_record (venue_id);
+-- declared: control.api_anomaly.client_id -> control.api_client
+CREATE INDEX IF NOT EXISTS api_anomaly_client_id_idx ON control.api_anomaly (client_id);
+-- declared: control.api_anomaly_rule.client_id -> control.api_client
+CREATE INDEX IF NOT EXISTS api_anomaly_rule_client_id_idx ON control.api_anomaly_rule (client_id);
+-- declared: control.api_client.certification_listing_id -> control.integration_listing
+CREATE INDEX IF NOT EXISTS api_client_certification_listing_id_idx ON control.api_client (certification_listing_id);
 -- declared: control.api_licence.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS api_licence_tenant_id_idx ON control.api_licence (tenant_id);
 -- declared: control.cell_job.cell_id -> control.cell
@@ -337,18 +349,28 @@ CREATE INDEX IF NOT EXISTS partner_commission_rule_tier_partner_commission_rule_
 CREATE INDEX IF NOT EXISTS partner_rate_volume_band_partner_rate_id_idx ON control.partner_rate_volume_band (partner_rate_id);
 -- declared: control.partner_user.partner_id -> control.partner
 CREATE INDEX IF NOT EXISTS partner_user_partner_id_idx ON control.partner_user (partner_id);
+-- declared: control.production_access_request.listing_id -> control.integration_listing
+CREATE INDEX IF NOT EXISTS production_access_request_listing_id_idx ON control.production_access_request (listing_id);
+-- declared: control.production_access_request.production_client_id -> control.api_client
+CREATE INDEX IF NOT EXISTS production_access_request_production_client_id_idx ON control.production_access_request (production_client_id);
+-- declared: control.production_access_request.sandbox_client_id -> control.api_client
+CREATE INDEX IF NOT EXISTS production_access_request_sandbox_client_id_idx ON control.production_access_request (sandbox_client_id);
 -- declared: control.release_component.release_id -> control.release
 CREATE INDEX IF NOT EXISTS release_component_release_id_idx ON control.release_component (release_id);
 -- declared: control.rollout.release_id -> control.release
 CREATE INDEX IF NOT EXISTS rollout_release_id_idx ON control.rollout (release_id);
 -- declared: control.rollout_cell.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS rollout_cell_cell_id_idx ON control.rollout_cell (cell_id);
+-- declared: control.tenant_domain.tenant_id -> control.tenant
+CREATE INDEX IF NOT EXISTS tenant_domain_tenant_id_idx ON control.tenant_domain (tenant_id);
 -- declared: control.tenant_migration.plan_id -> control.tenant_migration_plan
 CREATE INDEX IF NOT EXISTS tenant_migration_plan_id_idx ON control.tenant_migration (plan_id);
 -- declared: control.tenant_migration.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS tenant_migration_tenant_id_idx ON control.tenant_migration (tenant_id);
 -- declared: control.tenant_migration_plan.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS tenant_migration_plan_tenant_id_idx ON control.tenant_migration_plan (tenant_id);
+-- unique per tenant (x-ticvai-unique): control.tenant_domain.hostname
+CREATE UNIQUE INDEX IF NOT EXISTS tenant_domain_tenant_id_hostname_uniq ON control.tenant_domain (tenant_id, hostname);
 CREATE INDEX IF NOT EXISTS channel_listing_scope_path_idx ON control.channel_listing USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS content_block_scope_path_idx ON control.content_block USING gist (scope_path);
 CREATE INDEX IF NOT EXISTS migration_plan_scope_path_idx ON control.migration_plan USING gist (scope_path);

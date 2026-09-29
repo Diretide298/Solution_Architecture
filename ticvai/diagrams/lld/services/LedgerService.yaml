@@ -1,16 +1,16 @@
 id: LLD-LedgerService
-title: LedgerService — 71 operations, 27 tables
+title: LedgerService — 72 operations, 27 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
-why: '**Money, and it is append-only.** 71 operations over 27 tables that are never updated and never
+why: '**Money, and it is append-only.** 72 operations over 27 tables that are never updated and never
   deleted — a different discipline from everything around it, and one that should not share a deploy
   with anything that does mutate.'
 scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
 ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable; one
   that is briefly wrong is not.'
 coverage:
-  operations: 71
+  operations: 72
   inAFlow: 33
   percent: 46%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -23,7 +23,7 @@ schemas:
   largestTable: ledger.tax_invoice
 operationsByContract:
 - contract: finance
-  count: 71
+  count: 72
   operations:
   - operation: abandonPeriodClose
     verb: POST
@@ -409,6 +409,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: postOrderRevenue
+    verb: POST
+    path: /internal/order-postings
+    scope: venue
+    permission: null
+    offline: false
+    reads: 6
+    writes: 4
   - operation: recordDeposit
     verb: POST
     path: /deposits
@@ -802,9 +810,11 @@ tables:
   writtenBy:
   - finance
   - orders
+  - payments
   - shift
   foreignWriters:
   - orders
+  - payments
   - shift
 - table: ledger.journal_line
   columns: 8
@@ -813,8 +823,10 @@ tables:
   writtenBy:
   - finance
   - orders
+  - payments
   foreignWriters:
   - orders
+  - payments
 - table: ledger.legal_entity
   columns: 11
   store: postgres
@@ -839,7 +851,9 @@ tables:
   parent: null
   writtenBy:
   - finance
-  foreignWriters: null
+  - orders
+  foreignWriters:
+  - orders
 - table: ledger.recognition_schedule
   columns: 15
   store: postgres
@@ -898,7 +912,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: OrderService
-  operations: 8
+  operations: 9
 - service: TenancyService
   operations: 3
 - service: CatalogueService
@@ -909,7 +923,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 8
+  operations: 9
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -929,6 +943,10 @@ writesOutside:
   - operation: issueTaxInvoice
     tables:
     - platform.audit_record
+    - platform.outbox
+  - operation: postOrderRevenue
+    tables:
+    - platform.idempotency_record
     - platform.outbox
   - operation: setEInvoicingProvider
     tables:

@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS ledger.cost_center (
 );
 
 -- Holds 21 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 5 operations read it and 1 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS ledger.credit_memo (
     id                                uuid PRIMARY KEY NOT NULL,
     credit_memo_number                text NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS ledger.deposit (
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 5 operations read it and 2 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS ledger.einvoice_transmission (
     id                                uuid PRIMARY KEY NOT NULL,
     document_kind                     text NOT NULL CONSTRAINT einvoice_transmission_document_kind_chk CHECK (document_kind IN ('taxInvoice', 'creditMemo')),
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS ledger.einvoice_transmission (
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 3 operations read it and 2 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS ledger.einvoicing_provider (
     id                                uuid PRIMARY KEY,
     legal_entity_id                   uuid NOT NULL,
@@ -279,7 +279,7 @@ CREATE TABLE IF NOT EXISTS ledger.legal_entity (
 -- One side of a double-entry movement. Renamed from entry, which sat beside journal_entry and
 -- journal_line — three things called entry in one schema is a schema nobody reads twice. Hangs
 -- off: reaches ledger.account through its keys; references ledger.account, ledger.cost_center,
--- ledger.journal_entry. Reached by: 14 operations read it and 13 write it; written by 3 contracts
+-- ledger.journal_entry. Reached by: 14 operations read it and 12 write it; written by 3 contracts
 -- — finance, orders, shift.
 CREATE TABLE IF NOT EXISTS ledger.posting (
     id                                text PRIMARY KEY NOT NULL,
@@ -410,7 +410,7 @@ CREATE TABLE IF NOT EXISTS ledger.tax_exemption (
 );
 
 -- Holds 32 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 6 operations read it and 2 write it; 3 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS ledger.tax_invoice (
     id                                uuid PRIMARY KEY NOT NULL,
     invoice_number                    text NOT NULL,
@@ -468,7 +468,7 @@ CREATE TABLE IF NOT EXISTS ledger.tax_invoice_line (
 );
 
 -- Holds 18 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 3 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS ledger.tax_invoice_template (
     id                                uuid PRIMARY KEY,
     legal_entity_id                   uuid NOT NULL,

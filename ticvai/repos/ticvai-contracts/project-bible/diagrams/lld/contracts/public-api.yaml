@@ -1,5 +1,5 @@
 id: LLD-public-api
-title: public-api — 25 operations
+title: public-api — 31 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -34,6 +34,7 @@ operations:
   - control.api_client
   - control.api_licence
   - control.developer_account
+  - control.integration_listing
   writes:
   - cache:idempotency
   - control.api_client
@@ -69,6 +70,22 @@ operations:
   writes:
   - cache:idempotency
   - control.webhook_subscription
+- operation: decideProductionAccess
+  verb: POST
+  path: /production-access-requests/{requestId}/decide
+  scope: tenant
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.integration_listing
+  - control.production_access_request
+  writes:
+  - cache:idempotency
+  - control.api_client
+  - control.production_access_request
 - operation: deprecateApiVersion
   verb: POST
   path: /api-versions/{version}/deprecate
@@ -110,6 +127,18 @@ operations:
   - control.api_client
   - control.api_licence
   writes: []
+- operation: listApiAnomalies
+  verb: GET
+  path: /api-anomalies
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.api_anomaly
+  writes: []
 - operation: listApiClients
   verb: GET
   path: /api-clients
@@ -121,6 +150,19 @@ operations:
   offline: false
   reads:
   - control.api_client
+  writes: []
+- operation: listApiScopes
+  verb: GET
+  path: /api-scopes
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - public
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.api_licence
   writes: []
 - operation: listApiVersions
   verb: GET
@@ -144,6 +186,18 @@ operations:
   offline: false
   reads:
   - control.integration_listing
+  writes: []
+- operation: listProductionAccessRequests
+  verb: GET
+  path: /production-access-requests
+  scope: tenant
+  permission: DEVELOPER_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - control.production_access_request
   writes: []
 - operation: listSandboxes
   verb: GET
@@ -222,6 +276,23 @@ operations:
   writes:
   - cache:idempotency
   - control.webhook_delivery
+- operation: requestProductionAccess
+  verb: POST
+  path: /api-clients/{clientId}/production-access
+  scope: tenant
+  permission: DEVELOPER_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_client
+  - control.developer_account
+  - control.integration_listing
+  - control.production_access_request
+  writes:
+  - cache:idempotency
+  - control.production_access_request
 - operation: resetSandbox
   verb: POST
   path: /sandboxes/{sandboxId}/reset
@@ -266,6 +337,20 @@ operations:
   writes:
   - cache:idempotency
   - control.api_client
+- operation: setApiAnomalyRule
+  verb: PUT
+  path: /api-anomaly-rules
+  scope: tenant
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.api_anomaly_rule
+  writes:
+  - cache:idempotency
+  - control.api_anomaly_rule
 - operation: setApiClientStatus
   verb: POST
   path: /api-clients/{clientId}/status

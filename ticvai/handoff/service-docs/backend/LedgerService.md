@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `finance` |
 | Schemas owned | `ledger` |
-| Operations in the slice | 18 of 71 |
+| Operations in the slice | 18 of 72 |
 | Scale | Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs. |
 | If it is down | Correctness over availability. A ledger that is briefly unavailable is recoverable; one that is briefly wrong is not. |
 
@@ -521,7 +521,7 @@ Six reports, named by `report`: profit and loss, balance sheet, cash flow, reven
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | analytical |
-| Reads | `ledger.account`, `ledger.posting`, `ledger.event_budget`, `ledger.fiscal_period` |
+| Reads | `ledger.account`, `ledger.event_budget`, `ledger.fiscal_period`, `ledger.posting` |
 | Writes | - |
 | Called by | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
@@ -1761,7 +1761,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-53 operations, added to this service in later releases without changing any of the above.
+54 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -1769,7 +1769,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | finance | `disputeObligation`, `getUnifiedReconciliation`, `recordDeposit`, `recordSettlement`, `recordWriteOff`, `resolveObligationDispute`, `settleDeposit`, `validateRecognitionSchedules` |
 | fiscal | `closeFiscalPeriod`, `listFiscalPeriods`, `listLegalEntities` |
 | journal | `approveJournalEntry`, `createJournalEntry`, `getJournalEntry`, `listJournalEntries`, `reverseJournalEntry` |
-| ledger | `abandonPeriodClose`, `beginPeriodClose`, `getTrialBalance`, `listInterEntityObligations`, `listLedgerEntries`, `rejectJournal`, `reopenPeriod`, `runFxRevaluation` |
+| ledger | `abandonPeriodClose`, `beginPeriodClose`, `getTrialBalance`, `listInterEntityObligations`, `listLedgerEntries`, `postOrderRevenue`, `rejectJournal`, `reopenPeriod`, `runFxRevaluation` |
 | recognition | `createRecognitionSchedule`, `getDeferredRevenue`, `listRecognitionSchedules`, `runRecognition` |
 | reporting | `getForeignTenderReport`, `getVatReturn` |
 | settlement | `getSettlement`, `ingestSettlementFile`, `listSettlementExceptions`, `listSettlements`, `resolveSettlementException` |

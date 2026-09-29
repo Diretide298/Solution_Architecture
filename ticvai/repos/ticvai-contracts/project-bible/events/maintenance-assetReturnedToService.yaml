@@ -7,6 +7,8 @@ publisher: maintenance
 description: An asset is verified and back in service.
 aggregate: asset
 emittedWhen: WorkOrderStatus completed to verified
+emittedBy:
+- verifyWorkOrder
 payload:
 - field: assetId
   type: uuid

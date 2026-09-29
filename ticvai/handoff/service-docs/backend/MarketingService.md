@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 60 of 263 |
+| Operations in the slice | 60 of 264 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -44,7 +44,7 @@
 | consent | [`getGuestConsents`](#getguestconsents) | GET | `/guests/{subjectId}/consents` | core | 2 | BO-749, GST-066, WEB-024 |
 | consent | [`listConsentAnswers`](#listconsentanswers) | GET | `/consent-answers` | core | 2 | CMS-018 |
 | consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, GST-065, WEB-011, WEB-020 |
-| consent | [`listConsentQuestions`](#listconsentquestions) | GET | `/consent-questions` | core | 2 | BO-008, CMS-016, CMS-018 |
+| consent | [`listConsentQuestions`](#listconsentquestions) | GET | `/consent-questions` | core | 1 | BO-008, CMS-018, CMS-103 |
 | consent | [`listPublishedTrackingTechnologies`](#listpublishedtrackingtechnologies) | GET | `/storefront/cookie-consent/technologies` | core | 2 | GST-066, WEB-024 |
 | consent | [`recordConsent`](#recordconsent) | POST | `/guests/{subjectId}/consents` | core | 1 | BO-748, GST-039, GST-065, WEB-011, WEB-017, WEB-020 … |
 | consent | [`recordConsentAnswers`](#recordconsentanswers) | POST | `/consent-answers` | core | 1 | GST-007, WEB-006, WEB-011 |
@@ -90,7 +90,7 @@
 | message | [`createMessageTemplate`](#createmessagetemplate) | POST | `/message-templates` | setup | 2 | BO-785, BO-786, BO-787, SUP-007 |
 | message | [`listMyNotifications`](#listmynotifications) | GET | `/me/notifications` | core | 2 | GST-030, WEB-046 |
 | message | [`markMyNotificationsRead`](#markmynotificationsread) | POST | `/me/notifications/read` | core | 2 | GST-030, WEB-046 |
-| segment | [`createSegment`](#createsegment) | POST | `/segments` | setup | 2 | ANL-007, BO-755, BO-757, BO-758, BO-759, BO-760 … |
+| segment | [`createSegment`](#createsegment) | POST | `/segments` | setup | 1 | ANL-007, BO-755, BO-757, BO-758, BO-759, BO-760 … |
 
 ## Group: campaign
 
@@ -416,7 +416,7 @@ Content and audience are editable only in draft. A live campaign may be paused, 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_variant`, `marketing.segment_criterion` |
-| Writes | `cache:idempotency`, `marketing.campaign`, `marketing.segment_criterion`, `marketing.campaign_target` |
+| Writes | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_target`, `marketing.segment_criterion` |
 | Called by | BO-005, BO-767, BO-768, BO-769, BO-772 |
 
 **Parameters**
@@ -859,7 +859,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | decision.noticeVersion | string | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
 | decision.language | string |  | (max length 10; nullable) |
 | decision.globalPrivacyControl | boolean |  | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. (default False) |
-| decision.source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) |  | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| decision.source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) |  | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
 | decision.country | string |  | The edge's geolocation of the request, for the geographic statistics (2.6.63). (pattern ^[A-Z]{2}$; read-only; nullable) |
 | decision.decidedAt | string (date-time) | yes |  |
 | decision.expiresAt | string (date-time) |  | A device consent expires and a subject consent does not. (read-only; nullable) |
@@ -894,6 +894,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 **`GET /consent/device/history`**: A visitor's own cookie decisions, oldest first
 
 **What the preference centre shows a visitor who has not signed in** (2.6.61): every decision recorded against the key their browser or app holds, oldest first by `decidedAt` then `id`, keyset cursor. Changing or withdrawing is `recordDeviceConsent`; a signed-in guest reads their own consents with `getGuestConsents`, and deletion is identity `deleteGuestAccount`. **The key is the only credential**, so it travels in a header, not the URL. A key claimed by a guest answers 404: its decisions are that guest's now, and a shared browser must not show them to the next person.
+**No longer open** (system-design review SD-056, 29 September): `security: []` let anyone who guessed or copied a key read its history. The call now needs the device's own cookie-consent token (`consentKeyAuth`: the `X-Consent-Key` the storefront issued to that browser or app, bound to it, rotated when the visitor records a new decision) or a guest session, and answers only for that one key: self-scoped to the device, never a lookup by someone else's key.
 
 |  |  |
 |---|---|
@@ -933,7 +934,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | items[].noticeVersion | string | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
 | items[].language | string |  | (max length 10; nullable) |
 | items[].globalPrivacyControl | boolean |  | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. (default False) |
-| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) |  | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) |  | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
 | items[].country | string |  | The edge's geolocation of the request, for the geographic statistics (2.6.63). (pattern ^[A-Z]{2}$; read-only; nullable) |
 | items[].decidedAt | string (date-time) | yes |  |
 | items[].expiresAt | string (date-time) |  | A device consent expires and a subject consent does not. (read-only; nullable) |
@@ -1045,7 +1046,7 @@ Current position per purpose and channel, with the version of the notice consent
 | items[].personSubjectId | string (uuid) |  | (nullable) |
 | items[].answeredBySubjectId | string (uuid) |  | The guest who answered, from the session. (read-only; nullable) |
 | items[].answeredByPrincipalId | string (uuid) |  | The staff member who answered on the guest's behalf. (read-only; nullable) |
-| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) | yes | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) | yes | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
 | items[].answeredAt | string (date-time) | yes |  |
 | items[].supersededAt | string (date-time) |  | (read-only; nullable) |
 | items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
@@ -1115,13 +1116,13 @@ Current position per purpose and channel, with the version of the notice consent
 | Permission | `GUEST_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Reads | `marketing.consent_question`, `marketing.consent_question_version` |
 | Writes | - |
-| Called by | BO-008, CMS-016, CMS-018 |
+| Called by | BO-008, CMS-018, CMS-103 |
 
 **Parameters**
 
@@ -1245,7 +1246,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | decision | ConsentDecision: enum (granted, withdrawn, notAsked) | yes |  |
 | channels | array of MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  | Omit to apply to every channel the purpose covers. |
 | noticeVersion | string | yes |  |
-| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) | yes | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) | yes | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `ConsentState`
@@ -1308,7 +1309,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | answers[].personIndex | integer |  | For a perPerson question, the person's row in that line's eligibilityDeclaration, counting from 0. (min 0; nullable) |
 | answers[].personName | string |  | (max length 120; nullable) |
 | answers[].personSubjectId | string (uuid) |  | Where the person is a known guest, such as the booker or a family member. (nullable) |
-| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) | yes | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) | yes | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
 | answeredAt | string (date-time) | yes |  |
 
 **Response**: `object`
@@ -1332,7 +1333,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | items[].personSubjectId | string (uuid) |  | (nullable) |
 | items[].answeredBySubjectId | string (uuid) |  | The guest who answered, from the session. (read-only; nullable) |
 | items[].answeredByPrincipalId | string (uuid) |  | The staff member who answered on the guest's behalf. (read-only; nullable) |
-| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) | yes | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) | yes | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
 | items[].answeredAt | string (date-time) | yes |  |
 | items[].supersededAt | string (date-time) |  | (read-only; nullable) |
 | items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
@@ -1388,7 +1389,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | noticeVersion | string | yes |  |
 | language | string |  | (max length 10; nullable) |
 | globalPrivacyControl | boolean |  | (default False) |
-| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) |  | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) |  | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
 | decidedAt | string (date-time) | yes |  |
 
 **Response**: `DeviceConsent`
@@ -1407,7 +1408,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | noticeVersion | string | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
 | language | string |  | (max length 10; nullable) |
 | globalPrivacyControl | boolean |  | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. (default False) |
-| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner) |  | cookieBanner (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by claimDeviceConsent. |
+| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) |  | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
 | country | string |  | The edge's geolocation of the request, for the geographic statistics (2.6.63). (pattern ^[A-Z]{2}$; read-only; nullable) |
 | decidedAt | string (date-time) | yes |  |
 | expiresAt | string (date-time) |  | A device consent expires and a subject consent does not. (read-only; nullable) |
@@ -3888,7 +3889,7 @@ Per-language bodies with named merge fields. A template missing a version in an 
 |---|---|
 | Permission | `MARKETING_MANAGE` |
 | Scope level | tenant |
-| Part of slice | setup, makes `marketing.message_template` non-empty |
+| Part of slice | setup, makes `marketing.message_template`, `marketing.message_template_version` non-empty |
 | Wave | 2 |
 | Offline | no |
 | Config scope | tenant |
@@ -4053,7 +4054,7 @@ Marks the given notifications, or all of them when `all` is true, as opened. Onl
 | Permission | `MARKETING_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `marketing.segment` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.segment`, `marketing.segment_criterion` |
@@ -4366,6 +4367,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | text | yes |  |
 | subject_id | uuid | yes |  |
 | recorded_by_principal_id | uuid | no |  |
+| order_id | text | no | The order whose checkout carried the opt-in (source checkout, M18-15): the ULID of orders.sales_order. |
+| verified_contact_ref | text | no | The verified contact the checkout opt-in was given against (ADR-0045), as the keyed hash the guest match policy uses; never the raw address. |
 | superseded_at | timestamptz | no |  |
 
 ### `marketing.conversation`
@@ -4908,13 +4911,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-203 operations, added to this service in later releases without changing any of the above.
+204 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | campaign | `getCampaign`, `getCampaignPerformance`, `listCampaigns`, `pauseCampaign`, `testSendCampaign`, `unscheduleCampaign` |
 | case | `addCaseMessage`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseCategories`, `listCaseResolutionClosure`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceQueues`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseCategoryDefinition`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `setServiceQueueDefinition`, `updateCase` |
-| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listSiteWaiverException`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCookieScan`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setDynamicFieldQuestion`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
+| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listSiteWaiverException`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setDynamicFieldQuestion`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
 | feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
 | guest | `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |

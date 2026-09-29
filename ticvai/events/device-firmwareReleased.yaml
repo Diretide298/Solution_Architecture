@@ -7,6 +7,8 @@ publisher: tenancy
 description: A firmware or software release was cleared for the fleet.
 aggregate: deviceFirmware
 emittedWhen: DeviceFirmware.status draft to released (setDeviceFirmwareStatus)
+emittedBy:
+- setDeviceFirmwareStatus
 payload:
 - field: firmwareId
   type: uuid

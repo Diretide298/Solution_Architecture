@@ -1453,6 +1453,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-987 Hold Tracker"
         - "P10 PTR-009 Group / Bulk Booking"
+      x-ticvai-api-scope: seating.read
       x-ticvai-audience:
       - staff
       - partner
@@ -1499,6 +1500,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-990 Maintenance & Out of Service"
         - "P10 PTR-009 Group / Bulk Booking"
+      x-ticvai-api-scope: seating.write
       x-ticvai-audience:
       - staff
       - partner
@@ -1545,6 +1547,7 @@ paths:
       operationId: relinquishSeatBlock
       x-ticvai-consumed-by:
         - "P10 PTR-009 Group / Bulk Booking"
+      x-ticvai-api-scope: seating.write
       x-ticvai-audience:
       - staff
       - partner
@@ -1590,6 +1593,7 @@ paths:
       operationId: allocateBlockedSeats
       x-ticvai-consumed-by:
         - "P10 PTR-009 Group / Bulk Booking"
+      x-ticvai-api-scope: seating.write
       x-ticvai-audience:
       - staff
       - partner

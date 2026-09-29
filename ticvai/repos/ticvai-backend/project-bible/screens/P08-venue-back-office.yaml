@@ -2843,6 +2843,17 @@ screens:
         label: Bulk update products
         operation: bulkUpdateProducts
         provenance: contract inventory.yaml POST /products/bulk
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: selectField
+        label: Booking flow
+        bindsTo: Product.bookingFlowId
+        operation: listBookingFlows
+        notes: The venue's booking flows from CMS-103 (`white-label.listBookingFlows`). Empty means the
+          category's flow, then the venue's flow for the product kind (W8, W12). Saved with `createProduct`
+          or `updateProduct`.
+        provenance: decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)
   states:
     loading: The product list.
     error: Could not load. Names which read failed and leaves the product untouched.
@@ -2854,6 +2865,11 @@ screens:
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
   apis:
+  - operationId: listBookingFlows
+    contract: white-label
+    purpose: The booking flows a product can be sold through (W12)
+    trigger: onAction
+    provenance: decided 29 September, W12 (P29)
   - operationId: listProducts
     contract: catalogue
     purpose: List products
@@ -2928,6 +2944,8 @@ screens:
     params:
     - name: productId
       from: deepLink
+    - name: venueId
+      from: session
     coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a successor
       exists, and the catalogue where none does.'
     preloaded:
@@ -2955,8 +2973,10 @@ screens:
     body: '**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`,
       `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing`
       and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds`
-      (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3. Dismissing sends nothing;
-      the screen behind is unchanged.'
+      (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3; `salesContact` (W3:
+      who a guest calls or emails to book an info-only product) and `bookingFlowId` (W8, W12: the booking
+      flow the product is sold through; empty means the category''s flow, then the venue''s flow for its
+      kind), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: CreateProductRequest
     confirm:
       label: Create product
@@ -2978,6 +2998,8 @@ screens:
       - media
       - consentQuestionIds
       - requiresTimeWindow
+      - salesContact
+      - bookingFlowId
     provenance: contract catalogue.yaml POST /products
   - id: formSetAlternativeCodes
     component: modal
@@ -3028,7 +3050,8 @@ screens:
     body: '**Collects what `updateProduct` sends before it is called.** Nothing in the body is required.
       Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`,
       `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3
-      REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13). Dismissing sends nothing; the screen behind is unchanged.'
+      REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13), `salesContact` (W3) and `bookingFlowId` (W8, W12),
+      decided 29 September. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: UpdateProductRequest
     confirm:
       label: Save product
@@ -3046,6 +3069,8 @@ screens:
       - media
       - consentQuestionIds
       - requiresTimeWindow
+      - salesContact
+      - bookingFlowId
     provenance: contract catalogue.yaml PATCH /products/{productId}
   - id: formCreateMerchandise
     component: modal
@@ -3195,6 +3220,8 @@ screens:
         - Product.consentQuestionIds
         - Product.requiresTimeWindow
         - Product.segmentTags
+        - Product.salesContact
+        - Product.bookingFlowId
         operation: getProduct
         notes: '**What the guest sees of the product** (decided 29 September, rev 3). `guestListing`:
           bookable (the default), info only, or hidden; an info-only product keeps its details and photo,
@@ -3241,6 +3268,37 @@ screens:
           3 23SEP-6), its barcode, and whether it is the default. The combination of values and the SKU
           come from the attributes and are not edited here. A retired variant is refused `409`.'
         provenance: contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: selectField
+        label: Booking flow
+        bindsTo: Product.bookingFlowId
+        operation: listBookingFlows
+        notes: '**Which booking flow sells this product** (decided 29 September, W8 and W12): a flow from
+          CMS-103, e.g. *workshop: product first, then date and time*. Empty means the category''s flow,
+          then the venue''s flow for the product kind; the screen shows which one applies. Saved with
+          `updateProduct`.'
+        provenance: decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)
+      - kind: textField
+        label: Sales phone
+        bindsTo: Product.salesContact.phone
+        operation: updateProduct
+        notes: '**Contact sales to book** (decided 29 September, W3). Shown beside `guestListing`; used
+          only when the product is info only, as *Call sales* on WEB-004 and GST-004. Empty phone and
+          email means the venue''s contact.'
+        provenance: contract catalogue.yaml Product.salesContact
+      - kind: textField
+        label: Sales email
+        bindsTo: Product.salesContact.email
+        operation: updateProduct
+        provenance: contract catalogue.yaml Product.salesContact
+      - kind: textField
+        label: Note under the contact
+        bindsTo: Product.salesContact.note
+        operation: updateProduct
+        notes: At most 200 characters per language, e.g. *Group courses are booked by phone*.
+        provenance: contract catalogue.yaml Product.salesContact
   states:
     loading: The product variants list.
     error: Could not load. Names which read failed and leaves the product variants untouched.
@@ -3252,6 +3310,11 @@ screens:
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
   apis:
+  - operationId: listBookingFlows
+    contract: white-label
+    purpose: The booking flows a product can be sold through (W12)
+    trigger: onAction
+    provenance: decided 29 September, W12 (P29)
   - operationId: getProduct
     contract: catalogue
     purpose: Read a product
@@ -3366,8 +3429,9 @@ screens:
     body: '**Collects what `updateProduct` sends before it is called.** Nothing in the body is required.
       Optional: `name`, `description`, `channels`, `dataMaskValues`, and what the guest sees (decided
       29 September, rev 3): `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (at most six,
-      23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13).
-      Dismissing sends nothing; the screen behind is unchanged.'
+      23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13);
+      `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing;
+      the screen behind is unchanged.'
     bindsTo: UpdateProductRequest
     confirm:
       label: Save product
@@ -3385,6 +3449,8 @@ screens:
       - media
       - consentQuestionIds
       - requiresTimeWindow
+      - salesContact
+      - bookingFlowId
     provenance: contract catalogue.yaml PATCH /products/{productId}
   - id: formUpdateProductVariant
     component: modal
@@ -4581,6 +4647,24 @@ screens:
         permission: PRICE_CONFIGURE
         notes: '**The pricing model of a package, bundle or add-on** (29 September, writers pass).'
         provenance: contract catalogue.yaml PUT /package-pricing
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: selectField
+        label: Component kind
+        bindsTo: BundleComponent.componentKind
+        operation: createBundle
+        notes: '**Admission, F&B menu item, retail, add-on or other** (decided 29 September, MOB-4). A
+          *meal combo with admission* is one admission component and one F&B menu-item component; the
+          guest buys it from a restaurant''s item detail and the ticket comes with it.'
+        provenance: contract promotions.yaml BundleComponent.componentKind
+      - kind: selectField
+        label: Menu item
+        bindsTo: BundleComponent.menuItemId
+        operation: listMenus
+        notes: For an F&B menu-item component; the outlets that redeem it are `redeemAtOutletIds` (empty
+          means any outlet with the item on a live menu).
+        provenance: contract promotions.yaml BundleComponent.menuItemId
   states:
     loading: The packages bundles list.
     error: Could not load. Names which read failed and leaves the packages bundles untouched.
@@ -4591,6 +4675,11 @@ screens:
       and names that permission. **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question.
   apis:
+  - operationId: listMenus
+    contract: fnb
+    purpose: The menu item an F&B bundle component entitles the guest to (MOB-4)
+    trigger: onAction
+    provenance: decided 29 September, MOB-4 (P29)
   - operationId: getGroupPackageDefinition
     contract: catalogue
     purpose: A school-trip format or party package
@@ -6062,6 +6151,13 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: listPerformances
+        notes: Performances by day, week or month; a slot opens its performance. Day, week, month and
+          agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window
+          as `from`/`to` and the category filter as `categoryId`.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: datePicker
         label: From
         operation: listPerformances
@@ -6165,9 +6261,15 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Create performances
+        label: Create time slots
         operation: createPerformances
-        provenance: contract catalogue.yaml POST /events/{eventId}/performances
+        notes: '**Time-slot creation, as the 24 September review asked (M24-01)**: start date and end
+          date (`startsAt`, `recurrence.until`), first and last start time of the day, the interval between
+          starts (`recurrence.intervalMinutes`, e.g. every 30 minutes), the slot length (`endsAt`), the
+          days of the week (`recurrence.daysOfWeek`), language and format. A preview lists the slots it
+          will create (`Prefer: validate-only`) before one is written; one performance per slot.'
+        provenance: contract catalogue.yaml POST /events/{eventId}/performances; decided 29 September
+          2026, M24-01 (applied 30 September)
       - kind: destructiveButton
         label: Cancel performance
         operation: cancelPerformance
@@ -20264,6 +20366,13 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: listPerformances
+        notes: Opening days and performances placed in the venue calendar. Day, week, month and agenda
+          views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window as `from`/`to`
+          and the category filter as `categoryId`.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: datePicker
         label: From
         operation: listPerformances
@@ -21964,6 +22073,16 @@ screens:
         label: Sync game plays
         operation: syncGamePlays
         provenance: contract games.yaml POST /game-plays/sync
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: selectField
+        label: Fault priority override
+        bindsTo: Asset.priorityOverride
+        operation: updateAsset
+        notes: '**"If this goes down, raise this priority"** (decided 17 September, M17-01). A fault raised
+          on this asset takes this priority instead of the venue''s score. Empty means the score decides.'
+        provenance: contract maintenance.yaml Asset.priorityOverride
   states:
     loading: The asset register list.
     error: Could not load. Names which read failed and leaves the asset register untouched.
@@ -22088,6 +22207,7 @@ screens:
       - requiresInspectionToReturn
       - documents
       - documentRefs
+      - priorityOverride
     provenance: contract maintenance.yaml POST /assets
   - id: formSetAssetStatus
     component: modal
@@ -22127,6 +22247,7 @@ screens:
       - supplierId
       - documents
       - documentRefs
+      - priorityOverride
     provenance: contract maintenance.yaml PATCH /assets/{assetId}
   - id: formUpdateGame
     component: modal
@@ -22350,6 +22471,62 @@ screens:
         label: Cancel work order
         operation: cancelWorkOrder
         provenance: contract maintenance.yaml POST /work-orders/{workOrderId}/cancel
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: Priority and how it was set
+        bindsTo: WorkOrder
+        columns:
+        - WorkOrder.priority
+        - WorkOrder.priorityScore
+        - WorkOrder.prioritySource
+        - WorkOrder.faultAssessment
+        - WorkOrder.requiredQualificationCodes
+        operation: getWorkOrder
+        notes: '**The score and its source side by side** (decided 17 September, M17-01): *scored* (the
+          venue policy), *asset override* or *manual*, so a supervisor sees why a fault is urgent.'
+        provenance: contract maintenance.yaml WorkOrder.priorityScore
+      - kind: dataTable
+        label: Suggested technicians
+        bindsTo: WorkOrderAssigneeSuggestion
+        columns:
+        - WorkOrderAssigneeSuggestion.rank
+        - WorkOrderAssigneeSuggestion.name
+        - WorkOrderAssigneeSuggestion.hasAllQualifications
+        - WorkOrderAssigneeSuggestion.missingQualificationCodes
+        - WorkOrderAssigneeSuggestion.onShift
+        - WorkOrderAssigneeSuggestion.openWorkOrderCount
+        operation: suggestWorkOrderAssignee
+        notes: '**Smart assignment, confirmed by the maintenance head** (decided 17 September, M17-13).
+          The ranking assigns nothing; *Assign* on a row sends its principal with `updateWorkOrder`.'
+        provenance: contract maintenance.yaml GET /work-orders/{workOrderId}/assignee-suggestions
+      - kind: secondaryButton
+        label: Assign suggested technician
+        operation: updateWorkOrder
+        notes: Sends the chosen row's `principalId` as `assignedToPrincipalId` (M17-13).
+        provenance: contract maintenance.yaml PATCH /work-orders/{workOrderId}
+      - kind: dataTable
+        label: Vendor requests
+        bindsTo: VendorServiceRequest
+        columns:
+        - VendorServiceRequest.supplierId
+        - VendorServiceRequest.scope
+        - VendorServiceRequest.status
+        - VendorServiceRequest.vendorReference
+        - VendorServiceRequest.quotedCost
+        - VendorServiceRequest.scheduledVisitAt
+        operation: listVendorServiceRequests
+        notes: Outside vendors engaged on this work order (decided 17 September, M17-13).
+        provenance: contract maintenance.yaml GET /vendor-service-requests
+      - kind: secondaryButton
+        label: Request a vendor
+        operation: createVendorServiceRequest
+        provenance: contract maintenance.yaml POST /vendor-service-requests
+      - kind: secondaryButton
+        label: Update vendor request
+        operation: updateVendorServiceRequest
+        provenance: contract maintenance.yaml PATCH /vendor-service-requests/{vendorServiceRequestId}
   states:
     loading: The work orders list.
     error: Could not load. Names which read failed and leaves the work orders untouched.
@@ -22361,6 +22538,30 @@ screens:
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
   apis:
+  - operationId: suggestWorkOrderAssignee
+    contract: maintenance
+    purpose: Technicians ranked by skill, shift and load (M17-13)
+    trigger: onAction
+    provenance: decided 17 September, M17-13 (P29)
+  - operationId: listVendorServiceRequests
+    contract: maintenance
+    purpose: Outside vendors on this work order (M17-13)
+    trigger: onAction
+    provenance: decided 17 September, M17-13 (P29)
+  - operationId: createVendorServiceRequest
+    contract: maintenance
+    purpose: Engage an outside vendor (M17-13)
+    trigger: onAction
+    provenance: decided 17 September, M17-13 (P29)
+    invalidates:
+    - listVendorServiceRequests
+  - operationId: updateVendorServiceRequest
+    contract: maintenance
+    purpose: Move a vendor request along (M17-13)
+    trigger: onAction
+    provenance: decided 17 September, M17-13 (P29)
+    invalidates:
+    - listVendorServiceRequests
   - operationId: listWorkOrders
     contract: maintenance
     purpose: Maintenance work orders at the venue (rebound 28 September, audit R254)
@@ -22416,6 +22617,8 @@ screens:
     - name: workOrderId
       from: deepLink
       optional: true
+    - name: vendorServiceRequestId
+      from: navigation
     coldEntry: '**Without `workOrderId` the list opens** — the ordinary arrival from BO-108 Venue Operations
       (decided 29 September, VM close-out). **A staff link opened cold resolves the thing or says plainly
       that it is gone.** A work order opened from an alert shows its current state; if it was closed or
@@ -22438,9 +22641,11 @@ screens:
     component: modal
     trigger: Raise work order
     body: '**Collects what `createWorkOrder` sends before it is called.** Required: `id`, `title`, `venueId`,
-      `priority`, `recordedAt`. Optional: `description`, `assetId`, `locationDescription`, `kind`, `categoryId`,
-      `assignedToPrincipalId`, `dueAt`, `attachmentRefs`. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      `recordedAt`. Optional: `description`, `assetId`, `locationDescription`, `kind`, `priority`, `categoryId`,
+      `assignedToPrincipalId`, `dueAt`, `attachmentRefs`, `faultAssessment` and `requiredQualificationCodes`.
+      **Priority is left empty to be scored** (M17-01): the asset''s override, else the venue policy''s
+      score of the fault assessment; choosing one makes it manual. Dismissing sends nothing; the screen
+      behind is unchanged.'
     bindsTo: CreateWorkOrderRequest
     confirm:
       label: Raise work order
@@ -22458,6 +22663,8 @@ screens:
       - assignedToPrincipalId
       - dueAt
       - attachmentRefs
+      - faultAssessment
+      - requiredQualificationCodes
     provenance: contract maintenance.yaml POST /work-orders
   - id: formUpdateWorkOrder
     component: modal
@@ -27710,6 +27917,9 @@ screens:
       - kind: secondaryButton
         label: Propose venue labels
         operation: proposeVenueLabels
+        notes: '**Block A, bound here** (decided 29 September, AI2 review finding on BO-093). No-data
+          AI: it reads only the shapes the import extracted, proposes, and stops; `acceptVenueLabelProposals`
+          is the human half. When AI is off the button is hidden and the operator labels by hand on BO-094.'
         provenance: contract ai.yaml POST /ai/venue-map/{mapId}/propose-labels
       - kind: secondaryButton
         label: Accept venue label proposals
@@ -27997,6 +28207,49 @@ screens:
           Bookings follow the resource, not the placement, so moving a cabana on a later version keeps
           its bookings.
         provenance: contract venue-map.yaml POST /venue-maps/{mapId}/resources
+    - name: contentBody
+      slot: record
+      components:
+      - kind: textField
+        label: Item description
+        bindsTo: VenuePoint.description
+        operation: setVenuePoint
+        notes: '**What the guest reads on Item Detail** (decided 29 September, MOB-4): rides, shows, restaurants
+          and shops. Per language.'
+        provenance: agreed name venue-map VenuePoint.description (P29 brief)
+      - kind: multiSelect
+        label: Photos and video
+        bindsTo: VenuePoint.media
+        operation: searchMedia
+        notes: From the asset library; the first is the gallery cover on GST-004 Item Detail (MOB-4).
+        provenance: agreed name venue-map VenuePoint.media (P29 brief)
+      - kind: selectField
+        label: Featured offer
+        bindsTo: VenuePoint.featuredOffer
+        operation: listProducts
+        notes: '**The product or bundle the item detail proposes** (decided 29 September, MOB-4), on any
+          kind of point, e.g. a restaurant''s *meal combo with admission* (a bundle from BO-011). Products
+          from `listProducts`, bundles from `listCatalogueBundles`.'
+        provenance: agreed name venue-map VenuePoint.featuredOffer (P29 brief)
+      - kind: numberField
+        label: Typical visit (minutes)
+        bindsTo: VenuePoint.typicalDurationMinutes
+        operation: setVenuePoint
+        notes: What the Plan tab's planner allows for this stop (MOB-6).
+        provenance: agreed name venue-map VenuePoint.typicalDurationMinutes (P29 brief)
+      - kind: multiSelect
+        label: Interests
+        bindsTo: VenuePoint.interestTags
+        operation: setVenuePoint
+        notes: Matched against the guest's interests on the Plan tab (MOB-6).
+        provenance: agreed name venue-map VenuePoint.interestTags (P29 brief)
+      - kind: multiSelect
+        label: Cuisine
+        bindsTo: VenuePoint.cuisineTags
+        operation: setVenuePoint
+        notes: For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab
+          (MOB-6).
+        provenance: agreed name venue-map VenuePoint.cuisineTags (P29 brief)
   states:
     loading: The map editor publish, read by `getVenueMap`.
     error: Could not load. Names which read failed and leaves the map editor publish untouched.
@@ -28006,6 +28259,21 @@ screens:
       that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
   apis:
+  - operationId: searchMedia
+    contract: assets
+    purpose: Pick an item's photos and video (MOB-4)
+    trigger: onAction
+    provenance: decided 29 September, MOB-4 (P29)
+  - operationId: listProducts
+    contract: catalogue
+    purpose: Products a point can feature (MOB-4)
+    trigger: onAction
+    provenance: decided 29 September, MOB-4 (P29)
+  - operationId: listCatalogueBundles
+    contract: catalogue
+    purpose: Bundles a point can feature, e.g. a meal combo (MOB-4)
+    trigger: onAction
+    provenance: decided 29 September, MOB-4 (P29)
   - operationId: getVenueMap
     contract: venue-map
     purpose: The draft
@@ -28064,7 +28332,9 @@ screens:
     trigger: Save venue point
     body: '**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`,
       `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`,
-      `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`. Dismissing sends
+      `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details
+      decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle,
+      on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`. Dismissing sends
       nothing; the screen behind is unchanged.'
     bindsTo: SetVenuePointRequest
     confirm:
@@ -28089,6 +28359,12 @@ screens:
       - isNavigable
       - isDestination
       - pointId
+      - description
+      - media
+      - featuredOffer
+      - typicalDurationMinutes
+      - interestTags
+      - cuisineTags
     provenance: contract venue-map.yaml POST /venue-maps/{mapId}/points
   - id: formPublishVenueMap
     component: modal
@@ -28371,6 +28647,13 @@ screens:
     - name: contentBody
       slot: record
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: getResourceAvailability
+        notes: Each resource's bookings, blocks and cleanings placed by hour. Day, week, month and agenda
+          views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it
+          read.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: detailPanel
         label: The resource availability
         bindsTo: ResourceAvailability
@@ -32708,6 +32991,16 @@ screens:
         label: Run report
         operation: runReport
         provenance: contract reporting.yaml POST /reports/{reportId}/run
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: selectField
+        label: Booking flow for this category
+        bindsTo: ProductCategory.bookingFlowId
+        operation: listBookingFlows
+        notes: '**Every product filed here that names no flow of its own is sold through this one** (decided
+          29 September, W12). Empty means the venue''s flow for each product''s kind. Saved with `setProductCategories`.'
+        provenance: decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)
   states:
     loading: The category brand merchandise list.
     error: Could not load. Names which read failed and leaves the category brand merchandise untouched.
@@ -32718,6 +33011,11 @@ screens:
       and names that permission. **Never an empty table** — that reads as *there is no data* and sends
       somebody to support with the wrong question.
   apis:
+  - operationId: listBookingFlows
+    contract: white-label
+    purpose: The booking flows a category can default to (W12)
+    trigger: onAction
+    provenance: decided 29 September, W12 (P29)
   - operationId: listProductCategories
     contract: catalogue
     purpose: listProductCategories
@@ -39046,6 +39344,12 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: listOperatingCalendarSpecial
+        notes: Operating days and special access days on the month view. Day, week, month and agenda views;
+          the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: selectField
         label: normal operating days
         provenance: pack Access Control Module_Reference.pdf, page 13 §Configure
@@ -81939,6 +82243,12 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: listRealTimeAvailability
+        notes: Rental availability by day and hour. Day, week, month and agenda views; the day starts
+          at the venue's `calendarDayStartHour`. Filters the category on what it read.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: dataTable
         derived: true
         impliedBy: listRealTimeAvailability
@@ -82040,6 +82350,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: getResourceCalendar
+        notes: Resource and equipment bookings by hour. Day, week, month and agenda views; the day starts
+          at the venue's `calendarDayStartHour`. Filters the category on what it read.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: dataTable
         label: Equipment timeline
         bindsTo: ResourceCalendarRow
@@ -87598,6 +87914,13 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: getDueMaintenance
+        notes: Maintenance falling due, by day, week or month; a task opens a work order. Day, week, month
+          and agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window
+          as `from`/`to` and the category filter as `categoryId`.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: selectField
         label: Asset
         provenance: pack Rental_Management.pdf, page 111 §Configure
@@ -87715,6 +88038,80 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createWorkOrder
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: Priority and how it was set
+        bindsTo: WorkOrder
+        columns:
+        - WorkOrder.priority
+        - WorkOrder.priorityScore
+        - WorkOrder.prioritySource
+        - WorkOrder.faultAssessment
+        - WorkOrder.requiredQualificationCodes
+        operation: getWorkOrder
+        notes: '**The score and its source side by side** (decided 17 September, M17-01): *scored* (the
+          venue policy), *asset override* or *manual*, so a supervisor sees why a fault is urgent.'
+        provenance: contract maintenance.yaml WorkOrder.priorityScore
+      - kind: dataTable
+        label: Suggested technicians
+        bindsTo: WorkOrderAssigneeSuggestion
+        columns:
+        - WorkOrderAssigneeSuggestion.rank
+        - WorkOrderAssigneeSuggestion.name
+        - WorkOrderAssigneeSuggestion.hasAllQualifications
+        - WorkOrderAssigneeSuggestion.missingQualificationCodes
+        - WorkOrderAssigneeSuggestion.onShift
+        - WorkOrderAssigneeSuggestion.openWorkOrderCount
+        operation: suggestWorkOrderAssignee
+        notes: '**Smart assignment, confirmed by the maintenance head** (decided 17 September, M17-13).
+          The ranking assigns nothing; *Assign* on a row sends its principal with `updateWorkOrder`.'
+        provenance: contract maintenance.yaml GET /work-orders/{workOrderId}/assignee-suggestions
+      - kind: secondaryButton
+        label: Assign suggested technician
+        operation: updateWorkOrder
+        notes: Sends the chosen row's `principalId` as `assignedToPrincipalId` (M17-13).
+        provenance: contract maintenance.yaml PATCH /work-orders/{workOrderId}
+      - kind: dataTable
+        label: Vendor requests
+        bindsTo: VendorServiceRequest
+        columns:
+        - VendorServiceRequest.supplierId
+        - VendorServiceRequest.scope
+        - VendorServiceRequest.status
+        - VendorServiceRequest.vendorReference
+        - VendorServiceRequest.quotedCost
+        - VendorServiceRequest.scheduledVisitAt
+        operation: listVendorServiceRequests
+        notes: Outside vendors engaged on this work order (decided 17 September, M17-13).
+        provenance: contract maintenance.yaml GET /vendor-service-requests
+      - kind: secondaryButton
+        label: Request a vendor
+        operation: createVendorServiceRequest
+        provenance: contract maintenance.yaml POST /vendor-service-requests
+      - kind: secondaryButton
+        label: Update vendor request
+        operation: updateVendorServiceRequest
+        provenance: contract maintenance.yaml PATCH /vendor-service-requests/{vendorServiceRequestId}
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: How fault priority is scored
+        bindsTo: WorkOrderPriorityPolicy
+        columns:
+        - WorkOrderPriorityPolicy.weights
+        - WorkOrderPriorityPolicy.bands
+        - WorkOrderPriorityPolicy.updatedAt
+        operation: getWorkOrderPriorityPolicy
+        notes: '**The venue''s weights and bands** (decided 17 September, M17-01): safety, guest operations,
+          revenue and asset criticality, summing to 100.'
+        provenance: contract maintenance.yaml GET /work-order-priority-policy
+      - kind: secondaryButton
+        label: Save priority scoring
+        operation: setWorkOrderPriorityPolicy
+        provenance: contract maintenance.yaml PUT /work-order-priority-policy
   states:
     loading: The maintenance work order list.
     error: Could not load. Names which read failed and leaves the maintenance work order untouched.
@@ -87725,6 +88122,42 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: getWorkOrderPriorityPolicy
+    contract: maintenance
+    purpose: The venue's priority weights and bands (M17-01)
+    trigger: onAction
+    provenance: decided 17 September, M17-01 (P29)
+  - operationId: setWorkOrderPriorityPolicy
+    contract: maintenance
+    purpose: Change the priority weights and bands (M17-01)
+    trigger: onAction
+    provenance: decided 17 September, M17-01 (P29)
+    invalidates:
+    - getWorkOrderPriorityPolicy
+  - operationId: suggestWorkOrderAssignee
+    contract: maintenance
+    purpose: Technicians ranked by skill, shift and load (M17-13)
+    trigger: onAction
+    provenance: decided 17 September, M17-13 (P29)
+  - operationId: listVendorServiceRequests
+    contract: maintenance
+    purpose: Outside vendors on this work order (M17-13)
+    trigger: onAction
+    provenance: decided 17 September, M17-13 (P29)
+  - operationId: createVendorServiceRequest
+    contract: maintenance
+    purpose: Engage an outside vendor (M17-13)
+    trigger: onAction
+    provenance: decided 17 September, M17-13 (P29)
+    invalidates:
+    - listVendorServiceRequests
+  - operationId: updateVendorServiceRequest
+    contract: maintenance
+    purpose: Move a vendor request along (M17-13)
+    trigger: onAction
+    provenance: decided 17 September, M17-13 (P29)
+    invalidates:
+    - listVendorServiceRequests
   - operationId: listWorkOrders
     contract: maintenance
     purpose: List work orders
@@ -87763,6 +88196,8 @@ screens:
   entryState:
     params:
     - name: workOrderId
+      from: navigation
+    - name: vendorServiceRequestId
       from: navigation
 - id: BO-578
   name: Technician Repair Workspace
@@ -87920,6 +88355,33 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: recordWorkOrderParts
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: dataTable
+        label: Parts reserved for this work order
+        bindsTo: InventoryStockReservation
+        columns:
+        - InventoryStockReservation.itemId
+        - InventoryStockReservation.locationId
+        - InventoryStockReservation.quantity
+        - InventoryStockReservation.status
+        - InventoryStockReservation.expiresAt
+        operation: listStockReservations
+        notes: '**Reserved in the general inventory, not a maintenance stock** (decided 17 September,
+          M17-02). Sends `?sourceType=workOrder&sourceId=` the work order. Recording parts issues from
+          the reservation first.'
+        provenance: contract inventory.yaml GET /stock-reservations
+      - kind: secondaryButton
+        label: Reserve parts
+        operation: createStockReservation
+        notes: Refused when free stock at the location is short, naming the part (M17-02).
+        provenance: contract inventory.yaml POST /stock-reservations
+      - kind: secondaryButton
+        label: Release reservation
+        operation: releaseStockReservation
+        notes: Gives unused reserved parts back, e.g. when the job is cancelled.
+        provenance: contract inventory.yaml POST /stock-reservations/{stockReservationId}/release
   states:
     loading: The parts cost maintenance list.
     error: Could not load. Names which read failed and leaves the parts cost maintenance untouched.
@@ -87930,6 +88392,25 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: listStockReservations
+    contract: inventory
+    purpose: Parts reserved for the work order (M17-02)
+    trigger: onAction
+    provenance: decided 17 September, M17-02 (P29)
+  - operationId: createStockReservation
+    contract: inventory
+    purpose: Reserve parts for the work order (M17-02)
+    trigger: onAction
+    provenance: decided 17 September, M17-02 (P29)
+    invalidates:
+    - listStockReservations
+  - operationId: releaseStockReservation
+    contract: inventory
+    purpose: Give reserved parts back (M17-02)
+    trigger: onAction
+    provenance: decided 17 September, M17-02 (P29)
+    invalidates:
+    - listStockReservations
   - operationId: recordWorkOrderParts
     contract: maintenance
     purpose: Parts and cost
@@ -87945,6 +88426,8 @@ screens:
   entryState:
     params:
     - name: workOrderId
+      from: navigation
+    - name: stockReservationId
       from: navigation
 - id: BO-580
   name: Asset Maintenance History & Lifecycle
@@ -105748,6 +106231,12 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: listCampaignCalendarTimeline
+        notes: Campaigns placed across their run dates. Day, week, month and agenda views; the day starts
+          at the venue's `calendarDayStartHour`. Filters the category on what it read.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: dataTable
         derived: true
         impliedBy: listCampaignCalendarTimeline
@@ -112627,6 +113116,12 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-001 Tenant Workspace and CMS-102 Site Builder** (decided 24 September,
+    M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds the overview
+    of what is set up and what is left; the minute says to consolidate rather than build both. **One implementation,
+    both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and
+    nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies
+    of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -112835,6 +113330,12 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-002 Brand Kit and CMS-017 Domain & Certificate** (decided 24 September,
+    M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds site,
+    brand and domain set-up; the minute says to consolidate rather than build both. **One implementation,
+    both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and
+    nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies
+    of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -112926,6 +113427,12 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-005 Theme Editor, CMS-002 Brand Kit and CMS-006 Component Preview** (decided
+    24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which
+    builds the theme and the component set; the minute says to consolidate rather than build both. **One
+    implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the
+    P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these
+    are not copies of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113013,6 +113520,11 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-007 Page Builder** (decided 24 September, M24-03; applied 29 September,
+    P29). This screen duplicates the white-label CMS, which builds pages and landing pages from fixed
+    sections; the minute says to consolidate rather than build both. **One implementation, both ids kept**,
+    as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is
+    built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113114,6 +113626,12 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-008 Content Blocks and CMS-010 Media Library** (decided 24 September,
+    M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds content,
+    media and forms; the minute says to consolidate rather than build both. **One implementation, both
+    ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing
+    on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each
+    other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113210,6 +113728,12 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-008 Content Blocks** (decided 24 September, M24-03; applied 29 September,
+    P29). This screen duplicates the white-label CMS, which builds product content blocks; dynamic product
+    pages (matrix 22.10.18) are later, not Block A; the minute says to consolidate rather than build both.
+    **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to
+    the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and
+    these are not copies of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113297,6 +113821,13 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-007 Page Builder, CMS-009 Navigation & Menus and CMS-104 App Build & Store
+    Publishing** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the
+    white-label CMS, which builds the mobile app: home sections, tabs and the Buy tickets button, and
+    store publishing; the minute says to consolidate rather than build both. **One implementation, both
+    ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing
+    on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each
+    other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113383,6 +113914,12 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-011 Translations** (decided 24 September, M24-03; applied 29 September,
+    P29). This screen duplicates the white-label CMS, which builds localisation; personalisation (22.10.12,
+    22.10.27) is later; the minute says to consolidate rather than build both. **One implementation, both
+    ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing
+    on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each
+    other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113469,6 +114006,11 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-013 SEO & Metadata** (decided 24 September, M24-03; applied 29 September,
+    P29). This screen duplicates the white-label CMS, which builds SEO and redirects; the minute says
+    to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this
+    id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not
+    `source.sameAs` - that means twin, and these are not copies of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113559,6 +114101,12 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
+  notes: '**Merged into P13 CMS-014 Publishing Workflow and CMS-015 Version History** (decided 24 September,
+    M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds publishing,
+    audit and rollback; the minute says to consolidate rather than build both. **One implementation, both
+    ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing
+    on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each
+    other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -115080,6 +115628,48 @@ screens:
       - kind: selectField
         label: Maximum booking duration
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration
+    - name: contentBody
+      slot: fields
+      components:
+      - kind: selectField
+        label: Cleaning
+        bindsTo: Resource.cleaningPolicy.mode
+        operation: updateResource
+        notes: '**How the room is cleaned between uses** (decided 29 September, W10). *After every booking*
+          blocks a fixed buffer after each booking (e.g. 15 minutes); *N times a day* lets the system
+          place N cleanings in the day''s gaps. None means only setup and teardown.'
+        provenance: contract resources.yaml Resource.cleaningPolicy
+      - kind: numberField
+        label: Minutes per cleaning
+        bindsTo: Resource.cleaningPolicy.bufferMinutes
+        operation: updateResource
+        provenance: contract resources.yaml ResourceCleaningPolicy.bufferMinutes
+      - kind: numberField
+        label: Cleanings per day
+        bindsTo: Resource.cleaningPolicy.cleaningsPerDay
+        operation: updateResource
+        notes: Shown for *N times a day* only.
+        provenance: contract resources.yaml ResourceCleaningPolicy.cleaningsPerDay
+      - kind: textField
+        label: Cleaning window from
+        bindsTo: Resource.cleaningPolicy.windowStart
+        operation: updateResource
+        provenance: contract resources.yaml ResourceCleaningPolicy.windowStart
+      - kind: textField
+        label: Cleaning window to
+        bindsTo: Resource.cleaningPolicy.windowEnd
+        operation: updateResource
+        provenance: contract resources.yaml ResourceCleaningPolicy.windowEnd
+      - kind: timeline
+        label: Day preview
+        bindsTo: ResourceAvailability
+        columns:
+        - ResourceAvailability.freeWindows
+        - ResourceAvailability.blockedWindows
+        operation: getResourceAvailability
+        notes: '**A day preview before saving** (W10): bookings, holds and the cleanings the policy places,
+          as `cleaning` blocked windows, so an operator sees what the policy takes out of availability.'
+        provenance: contract resources.yaml GET /resources/{resourceId}/availability
   states:
     loading: The resource creation profile configuration as saved.
     error: Could not load. Names which read failed and leaves the resource creation profile untouched.
@@ -115090,6 +115680,11 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
+  - operationId: getResourceAvailability
+    contract: resources
+    purpose: Day preview of availability with cleanings placed (W10)
+    trigger: onAction
+    provenance: decided 29 September, W10 (P29)
   - operationId: getResource
     contract: resources
     purpose: The resource being edited
@@ -115966,6 +116561,12 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: getResourceCalendar
+        notes: Every resource's bookings and blocks on one calendar. Day, week, month and agenda views;
+          the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: primaryButton
         derived: true
         impliedBy: bookResource
@@ -116250,6 +116851,48 @@ screens:
         label: Availability Exceptions
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be
           configured using
+    - name: contentBody
+      slot: fields
+      components:
+      - kind: selectField
+        label: Cleaning
+        bindsTo: Resource.cleaningPolicy.mode
+        operation: updateResource
+        notes: '**How the room is cleaned between uses** (decided 29 September, W10). *After every booking*
+          blocks a fixed buffer after each booking (e.g. 15 minutes); *N times a day* lets the system
+          place N cleanings in the day''s gaps. None means only setup and teardown.'
+        provenance: contract resources.yaml Resource.cleaningPolicy
+      - kind: numberField
+        label: Minutes per cleaning
+        bindsTo: Resource.cleaningPolicy.bufferMinutes
+        operation: updateResource
+        provenance: contract resources.yaml ResourceCleaningPolicy.bufferMinutes
+      - kind: numberField
+        label: Cleanings per day
+        bindsTo: Resource.cleaningPolicy.cleaningsPerDay
+        operation: updateResource
+        notes: Shown for *N times a day* only.
+        provenance: contract resources.yaml ResourceCleaningPolicy.cleaningsPerDay
+      - kind: textField
+        label: Cleaning window from
+        bindsTo: Resource.cleaningPolicy.windowStart
+        operation: updateResource
+        provenance: contract resources.yaml ResourceCleaningPolicy.windowStart
+      - kind: textField
+        label: Cleaning window to
+        bindsTo: Resource.cleaningPolicy.windowEnd
+        operation: updateResource
+        provenance: contract resources.yaml ResourceCleaningPolicy.windowEnd
+      - kind: timeline
+        label: Day preview
+        bindsTo: ResourceAvailability
+        columns:
+        - ResourceAvailability.freeWindows
+        - ResourceAvailability.blockedWindows
+        operation: getResourceAvailability
+        notes: '**A day preview before saving** (W10): bookings, holds and the cleanings the policy places,
+          as `cleaning` blocked windows, so an operator sees what the policy takes out of availability.'
+        provenance: contract resources.yaml GET /resources/{resourceId}/availability
   states:
     loading: The resource availability schedule configuration as saved.
     error: Could not load. Names which read failed and leaves the resource availability schedule untouched.
@@ -116260,6 +116903,18 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
+  - operationId: getResourceAvailability
+    contract: resources
+    purpose: Day preview of availability with cleanings placed (W10)
+    trigger: onAction
+    provenance: decided 29 September, W10 (P29)
+  - operationId: updateResource
+    contract: resources
+    purpose: Save the cleaning policy (W10)
+    trigger: onAction
+    provenance: decided 29 September, W10 (P29)
+    invalidates:
+    - getResourceAvailability
   - operationId: getResourceSchedule
     contract: resources
     purpose: The pattern as configured
@@ -124560,6 +125215,12 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: calendarView
+        label: Calendar
+        operation: getResourceCalendar
+        notes: The signed-in person's schedule and assignments. Day, week, month and agenda views; the
+          day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.
+        provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: dataTable
         label: Every schedule calendar
         columns:
@@ -139432,6 +140093,21 @@ screens:
     regions:
     - name: contentBody
       components:
+      - kind: multiSelect
+        label: Scopes, by module
+        bindsTo: ApiScope
+        operation: listApiScopes
+        notes: '**A scope picker grouped by module** (M17-05): `{module}.read` and `{module}.write`, with
+          unlicensed modules shown and disabled rather than hidden. No scope opens a catalogue write (M17-04).'
+        provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
+      - kind: banner
+        label: Production access
+        bindsTo: ProductionAccessRequest
+        operation: listProductionAccessRequests
+        notes: '**Where production access stands** (M17-06): sandbox only, requested (pending), approved
+          (a production client issued by TICVAI) or rejected with the reason. Production keys only after
+          certification; a sandbox key is never promoted.'
+        provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
       - kind: dataTable
         derived: true
         impliedBy: listApiClients
@@ -139457,6 +140133,16 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: listApiScopes
+    contract: public-api
+    purpose: Scopes to choose from, by module
+    trigger: onLoad
+    provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
+  - operationId: listProductionAccessRequests
+    contract: public-api
+    purpose: Where production access stands for these clients
+    trigger: onLoad
+    provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
   - operationId: listApiClients
     contract: public-api
     purpose: Access and OAuth
@@ -153021,6 +153707,14 @@ screens:
     - name: contentBody
       slot: fields
       components:
+      - kind: banner
+        label: Production access
+        bindsTo: ProductionAccessRequest
+        operation: listProductionAccessRequests
+        notes: '**Where production access stands** (M17-06): sandbox only, requested (pending), approved
+          (a production client issued by TICVAI) or rejected with the reason. Production keys only after
+          certification; a sandbox key is never promoted.'
+        provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
       - kind: selectField
         label: Integration identity
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure
@@ -153035,6 +153729,9 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure
       - kind: selectField
         label: API scope
+        operation: listApiScopes
+        notes: Module scopes (`{module}.read`/`{module}.write`) from `listApiScopes`, grouped by module
+          (M17-05, applied 30 September); no scope opens a catalogue write (M17-04).
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure
       - kind: selectField
         label: Allowed operations
@@ -153103,6 +153800,16 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
+  - operationId: listApiScopes
+    contract: public-api
+    purpose: Scopes to choose from, by module
+    trigger: onLoad
+    provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
+  - operationId: listProductionAccessRequests
+    contract: public-api
+    purpose: Where production access stands for these clients
+    trigger: onLoad
+    provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
   - operationId: listAccessPolicies
     contract: identity
     purpose: API access and permissions

@@ -1,10 +1,9 @@
--- whitelabel — 20 tables
+-- whitelabel — 25 tables
 -- **Derived. Do not hand-edit.**
 
 -- An analytics platform a storefront or app reports to, per venue: which provider, its property or
 -- container id and which consent category gates it. The banner's consent-mode signals are what
--- switch it on, so a provider with no category never loads. Reached by: 3 operations read it and 1
--- write it.
+-- switch it on, so a provider with no category never loads
 CREATE TABLE IF NOT EXISTS whitelabel.analytics_provider (
     id                                uuid PRIMARY KEY,
     venue_id                          uuid,
@@ -21,6 +20,26 @@ CREATE TABLE IF NOT EXISTS whitelabel.analytics_provider (
     updated_at                        timestamptz
 );
 
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.app_build (
+    id                                uuid PRIMARY KEY NOT NULL,
+    platform                          text NOT NULL CONSTRAINT app_build_platform_chk CHECK (platform IN ('ios', 'android')),
+    config_version                    text NOT NULL,
+    store_account_id                  uuid,
+    version_name                      text,
+    build_number                      integer,
+    status                            text NOT NULL CONSTRAINT app_build_status_chk CHECK (status IN ('queued', 'building', 'built', 'failed', 'submitted', 'inReview', 'approved', 'rejected', 'released')),
+    failure_reason                    text,
+    package_asset_ref                 uuid,
+    release_notes                     jsonb,
+    submit_to_store                   boolean DEFAULT false,
+    requested_at                      timestamptz NOT NULL,
+    requested_by_principal_id         uuid,
+    finished_at                       timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
 -- A notice on a tenant storefront, scheduled
 CREATE TABLE IF NOT EXISTS whitelabel.banner (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -35,6 +54,33 @@ CREATE TABLE IF NOT EXISTS whitelabel.banner (
     sort_order                        integer,
     is_active                         boolean,
     tenant_config_id                  uuid NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.booking_flow (
+    id                                uuid PRIMARY KEY,
+    venue_id                          uuid,
+    flow_type_key                     text NOT NULL CONSTRAINT booking_flow_flow_type_key_chk CHECK (flow_type_key IN ('datedDayPass', 'timedEntry', 'openDated', 'seatedFixedPerformance', 'seatedDateTimeSeatMap', 'experienceWorkshop', 'surfSession', 'meetingRoomHourly', 'cabanaMap', 'cabanaBySize', 'guidedTourByLanguage', 'transport', 'tableReservation', 'membership', 'giftCard', 'multiLocation')),
+    name                              text NOT NULL CONSTRAINT booking_flow_name_chk CHECK (char_length(name) <= 80),
+    is_default_for_type               boolean DEFAULT false,
+    is_enabled                        boolean DEFAULT true,
+    settings                          jsonb,
+    is_valid                          boolean,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.booking_flow_step (
+    id                                uuid PRIMARY KEY,
+    booking_flow_id                   uuid,
+    step_key                          text NOT NULL CONSTRAINT booking_flow_step_step_key_chk CHECK (step_key IN ('location', 'helpMeChoose', 'product', 'date', 'time', 'performance', 'level', 'language', 'duration', 'route', 'partySize', 'resourceMap', 'resourceSize', 'seatMap', 'tickets', 'attendees', 'membershipPlan', 'giftCardValue', 'recipient', 'consent', 'extras', 'review', 'payment')),
+    is_enabled                        boolean NOT NULL,
+    sort_order                        integer NOT NULL,
+    requirement                       text CONSTRAINT booking_flow_step_requirement_chk CHECK (requirement IN ('required', 'optional', 'conditional')),
+    settings                          jsonb
 );
 
 -- One published version of a tenant’s configuration. Rolling back is selecting an earlier one
@@ -151,6 +197,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.guided_choice (
     name                              text NOT NULL CONSTRAINT guided_choice_name_chk CHECK (char_length(name) <= 80),
     mode                              text NOT NULL DEFAULT 'button' CONSTRAINT guided_choice_mode_chk CHECK (mode IN ('button', 'popupOnArrival', 'off')),
     show_banner                       boolean DEFAULT true,
+    behaviour                         text DEFAULT 'filter' CONSTRAINT guided_choice_behaviour_chk CHECK (behaviour IN ('filter', 'recommend')),
+    show_everything                   boolean DEFAULT true,
     status                            text NOT NULL,
     source                            text NOT NULL CONSTRAINT guided_choice_source_chk CHECK (source IN ('manual', 'aiSuggested')),
     suggestion_ref                    text,
@@ -165,6 +213,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_answer (
     guided_choice_id                  text NOT NULL,
     id                                text PRIMARY KEY,
     title                             jsonb NOT NULL,
+    kind                              text,
     sort_order                        integer NOT NULL
 );
 
@@ -174,6 +223,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_question (
     guided_choice_id                  text NOT NULL,
     id                                text PRIMARY KEY,
     title                             jsonb NOT NULL,
+    kind                              text,
     sort_order                        integer NOT NULL
 );
 
@@ -186,7 +236,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.homepage_section (
 
 -- Which modules a tenant has on. The gate every requiresModule screen resolves against
 CREATE TABLE IF NOT EXISTS whitelabel.module_enablement (
-    module_key                        text NOT NULL CONSTRAINT module_enablement_module_key_chk CHECK (module_key IN ('ticketsAndBooking', 'membership', 'events', 'attractions', 'virtualQueue', 'diningAndFnb', 'shop', 'parking', 'gamification', 'photoGallery', 'wallet', 'loyalty', 'lostAndFound', 'map')),
+    module_key                        text NOT NULL CONSTRAINT module_enablement_module_key_chk CHECK (module_key IN ('ticketsAndBooking', 'membership', 'events', 'attractions', 'virtualQueue', 'diningAndFnb', 'shop', 'parking', 'gamification', 'photoGallery', 'wallet', 'loyalty', 'lostAndFound', 'map', 'visitPlanner')),
     display_name                      text,
     is_licensed                       boolean NOT NULL,
     is_enabled                        boolean NOT NULL,
@@ -200,6 +250,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.module_enablement (
 CREATE TABLE IF NOT EXISTS whitelabel.navigation_item (
     id                                uuid PRIMARY KEY,
     kind                              text NOT NULL CONSTRAINT navigation_item_kind_chk CHECK (kind IN ('bottomNavigation', 'drawer', 'tabs')),
+    buy_button                        jsonb,
     navigation_item_id                uuid NOT NULL
 );
 
@@ -231,6 +282,34 @@ CREATE TABLE IF NOT EXISTS whitelabel.promo_block (
     state                             text,
     sort_order                        integer,
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.site_setup_progress (
+    id                                uuid PRIMARY KEY,
+    preset_key                        text CONSTRAINT site_setup_progress_preset_key_chk CHECK (preset_key IN ('themePark', 'waterPark', 'museum', 'theatreAndArena', 'singleAttraction', 'playCentre', 'multiVenue')),
+    current_step                      text,
+    steps                             jsonb,
+    minimum_path_done                 boolean,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.store_account (
+    id                                uuid PRIMARY KEY,
+    store                             text NOT NULL CONSTRAINT store_account_store_chk CHECK (store IN ('appleAppStore', 'googlePlay')),
+    account_holder_name               text NOT NULL CONSTRAINT store_account_account_holder_name_chk CHECK (char_length(account_holder_name) <= 200),
+    duns_number                       text,
+    developer_account_id              text NOT NULL CONSTRAINT store_account_developer_account_id_chk CHECK (char_length(developer_account_id) <= 64),
+    app_identifier                    text NOT NULL CONSTRAINT store_account_app_identifier_chk CHECK (char_length(app_identifier) <= 155),
+    api_credential_secret_ref         text,
+    has_api_credential                boolean,
+    listing                           jsonb,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- Everything a tenant has branded or switched on. Versioned, published, and the reason a guest

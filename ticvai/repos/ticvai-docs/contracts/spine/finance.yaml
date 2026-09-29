@@ -87,6 +87,66 @@ tags:
 - name: reporting
 - name: fiscal
 paths:
+  /internal/order-postings:
+    post:
+      operationId: postOrderRevenue
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '29 September: system-design review SD-026 (ledger posts once, from the event)'
+      summary: Post a paid order's revenue and tax
+      description: '**The ledger''s `order.paid` consumer, modelled as an operation so it has lineage and a
+        ticket** (system-design review SD-026, 29 September). Posts revenue and output tax for the order''s lines
+        against the guest-order clearing account the payment''s cash-receipt entry credited
+        (`orders.createPayment`), so the clearing account nets to zero and **revenue is posted exactly once**.
+        Deferred revenue follows the recognition schedule of the product.
+
+
+        **Idempotent on the order id**: the journal entry carries the order id as its source reference, and a
+        redelivered `order.paid` finds it and returns it unchanged. An offline sale replayed by `orders.syncOrders`
+        arrives by the same event and is dated by its `recordedAt`. Invoked by the event relay, never by a screen.
+
+        '
+      tags:
+      - ledger
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-consumes:
+      - order.paid
+      x-ticvai-emits:
+      - ledger.journalPosted
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - orderId
+              properties:
+                eventId:
+                  type: string
+                  description: The `order.paid` event id, for the consumer's inbox record.
+                orderId:
+                  type: string
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The revenue entry, posted now or already posted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
   /write-offs:
     post:
       operationId: recordWriteOff
@@ -1821,6 +1881,9 @@ paths:
         - "P01 WEB-035 Multi-Currency & Pricing"
         - "P02 GST-044 Multi-Currency & Pricing"
         - "P08 BO-077 FX Rates & Variances"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-audience:
       - staff
       - guest
@@ -2381,6 +2444,7 @@ paths:
         - "P09 ADM-619 Reconciliation & Settlement Command Center\t139"
         - "P09 ADM-623 Settlement & Payout Manager\t144"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
       - partner
@@ -2430,6 +2494,7 @@ paths:
         - "P08 BO-043 Daily Reconciliation"
         - "P09 ADM-620 Reconciliation Source & Import Manager\t141"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
       - partner
@@ -2538,6 +2603,7 @@ paths:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
       - partner
@@ -2573,6 +2639,7 @@ paths:
         - "P08 BO-043 Daily Reconciliation"
         - "P09 ADM-622 Reconciliation Exception & Investigation Center\t143"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
       - partner
@@ -2617,6 +2684,7 @@ paths:
         - "P08 BO-043 Daily Reconciliation"
         - "P09 ADM-622 Reconciliation Exception & Investigation Center\t143"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
       - partner
@@ -3095,6 +3163,7 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P10 PTR-018 Reports & Sales Performance"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
       - partner
@@ -7118,6 +7187,21 @@ components:
       - cardScheme
       - provider
   securitySchemes:
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
     bearerAuth:
       type: http
       scheme: bearer

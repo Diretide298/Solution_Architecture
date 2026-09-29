@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1186 |
-| Operations | 1448 |
+| Operations | 1460 |
 | Contracts | 32 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 185 |
+| Operations with no screen | 186 |
 | Waves | wave1 60 · wave2 86 · wave3 1040 |
 
 ## Gaps
 
-### 185 operations with no screen here
+### 186 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `listMenuSchedules` | fnb | GET | What is scheduled to go live, and when |
 | `listMenuVersions` | fnb | GET | Every published version of a menu |
 | `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
-| … | | | 145 more |
+| … | | | 146 more |
 
 ### 8 modules split across waves
 
@@ -104,11 +104,11 @@
 | `BO-004` | Manual Wait Time Entry | Access & Venue | 1 | 11 | yes |
 | `BO-005` | Queue Monitor | Access & Venue | 1 | 21 | yes |
 | `BO-006` | Parking Configuration | Access & Venue | 2 | 4 | yes |
-| `BO-007` | Product Directory | Sell | 1 | 14 | yes |
-| `BO-008` | Product Detail & Variants | Orders & Money | 1 | 11 | yes |
+| `BO-007` | Product Directory | Sell | 1 | 15 | yes |
+| `BO-008` | Product Detail & Variants | Orders & Money | 1 | 12 | yes |
 | `BO-009` | Pricing Rules | Sell | 1 | 11 | yes |
 | `BO-010` | Promotions & Coupons | Sell | 2 | 26 | yes |
-| `BO-011` | Packages & Bundles | Sell | 2 | 12 | yes |
+| `BO-011` | Packages & Bundles | Sell | 2 | 13 | yes |
 | `BO-012` | Membership Products | Sell | 2 | 12 | yes |
 | `BO-013` | Channel & Distribution | Sell | 2 | 10 | yes |
 | `BO-014` | Catalogue Publishing | Sell | 1 | 13 | yes |
@@ -167,7 +167,7 @@
 | `BO-067` | Integrations | Venue Operations | 2 | 5 | yes |
 | `BO-068` | Audit Log | Guests & Marketing | 2 | 3 | yes |
 | `BO-069` | Asset Register | Access & Venue | 2 | 11 | yes |
-| `BO-070` | Work Orders | Venue Operations | 2 | 9 | yes |
+| `BO-070` | Work Orders | Venue Operations | 2 | 13 | yes |
 | `BO-071` | Planned Maintenance | Access & Venue | 3 | 4 | yes |
 | `BO-072` | Incident Log | Access & Venue | 2 | 5 | yes |
 | `BO-073` | Lost & Found Register | Guests & Marketing | 2 | 3 | yes |
@@ -191,7 +191,7 @@
 | `BO-091` | AI Policy & Spend | Guests & Marketing | 1 | 8 | yes |
 | `BO-092` | Venue Maps | Access & Venue | 2 | 2 | yes |
 | `BO-093` | Map Import & Labelling | Access & Venue | 2 | 5 | yes |
-| `BO-094` | Map Editor & Publish | Access & Venue | 2 | 7 | yes |
+| `BO-094` | Map Editor & Publish | Access & Venue | 2 | 10 | yes |
 | `BO-095` | Resources | Access & Venue | 2 | 2 | yes |
 | `BO-096` | Resource Calendar | Access & Venue | 2 | 2 | yes |
 | `BO-097` | Check Out & Check In | Access & Venue | 2 | 5 | yes |
@@ -278,7 +278,7 @@
 | `BO-1070` | Setup, Clone & Inheritance | Access & Venue | 3 | 2 | yes |
 | `BO-1071` | Integration Command Center | Access & Venue | 3 | 1 | yes |
 | `BO-1072` | Seat Management APIs | Access & Venue | 3 | 1 | yes |
-| `BO-1073` | API Access & OAuth | Access & Venue | 3 | 2 | yes |
+| `BO-1073` | API Access & OAuth | Access & Venue | 3 | 4 | yes |
 | `BO-1074` | Webhook Configuration | Access & Venue | 3 | 3 | yes |
 | `BO-1075` | Seat Event Catalog | Access & Venue | 3 | 1 | yes |
 | `BO-1076` | Concurrency, Idempotency & Limits | Access & Venue | 3 | 1 | yes |
@@ -362,7 +362,7 @@
 | `BO-1147` | Refund Routing & Credit Restoration Engine | Orders & Money | 3 | 2 | yes |
 | `BO-1148` | Reversal & Transaction Correction Management | Orders & Money | 3 | 1 | yes |
 | `BO-1149` | Administrative Balance Adjustment Studio | Orders & Money | 3 | 2 | yes |
-| `BO-115` | Category, Brand & Merchandise Hierarchy | Sell | 2 | 5 | yes |
+| `BO-115` | Category, Brand & Merchandise Hierarchy | Sell | 2 | 6 | yes |
 | `BO-1150` | Wallet Block, Freeze & Restriction Management | Orders & Money | 3 | 2 | yes |
 | `BO-1151` | Wallet Disputes & Operational Exception Queue | Orders & Money | 3 | 3 | yes |
 | `BO-1152` | Operations Simulator, Approval & Audit Trail | Orders & Money | 3 | 1 | yes |
@@ -392,7 +392,7 @@
 | `BO-1174` | Wallet API Catalogue & Endpoint Configuration | Orders & Money | 3 | 1 | yes |
 | `BO-1175` | Integration Profile & System Mapping | Orders & Money | 3 | 2 | yes |
 | `BO-1176` | Wallet Events, Webhooks & Notification Orchestration | Orders & Money | 3 | 2 | yes |
-| `BO-1177` | API Security, Access & Integration Permissions | Orders & Money | 3 | 2 | yes |
+| `BO-1177` | API Security, Access & Integration Permissions | Orders & Money | 3 | 4 | yes |
 | `BO-1178` | Synchronization, Retry & Resilience Configuration | Orders & Money | 3 | 1 | yes |
 | `BO-1179` | Integration Monitoring & Exception Workbench | Orders & Money | 3 | 8 | yes |
 | `BO-118` | Campaign & Audience Management | Sell | 2 | 6 | yes |
@@ -862,9 +862,9 @@
 | `BO-574` | Maintenance Command Center | Rentals | 3 | 2 | yes |
 | `BO-575` | Maintenance Rule & Service Plan Configuration | Rentals | 3 | 3 | yes |
 | `BO-576` | Maintenance Calendar & Scheduling | Rentals | 3 | 2 | yes |
-| `BO-577` | Maintenance Work Order | Rentals | 3 | 5 | yes |
+| `BO-577` | Maintenance Work Order | Rentals | 3 | 11 | yes |
 | `BO-578` | Technician Repair Workspace | Rentals | 3 | 3 | yes |
-| `BO-579` | Parts, Cost & Maintenance Expense Tracking | Rentals | 3 | 1 | yes |
+| `BO-579` | Parts, Cost & Maintenance Expense Tracking | Rentals | 3 | 4 | yes |
 | `BO-580` | Asset Maintenance History & Lifecycle | Rentals | 3 | 1 | yes |
 | `BO-581` | Return-to-Service Inspection & Approval | Rentals | 3 | 2 | yes |
 | `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | Rentals | 3 | 2 | yes |
@@ -1141,7 +1141,7 @@
 | `BO-854` | Resource Management Command Center | Rentals | 3 | 3 | yes |
 | `BO-855` | Resource Type Configuration | Rentals | 3 | 3 | yes |
 | `BO-856` | Resource Category Management | Rentals | 3 | 3 | yes |
-| `BO-857` | Resource Creation & Profile | Rentals | 3 | 6 | yes |
+| `BO-857` | Resource Creation & Profile | Rentals | 3 | 7 | yes |
 | `BO-858` | Configurable Attribute Builder | Rentals | 3 | 2 | yes |
 | `BO-859` | Resource Hierarchy & Parent–Child Relationships | Rentals | 3 | 2 | yes |
 | `BO-860` | Resource Dependency Rules | Rentals | 3 | 2 | yes |
@@ -1150,7 +1150,7 @@
 | `BO-863` | Resource Lifecycle, Governance & Audit | Rentals | 3 | 6 | yes |
 | `BO-864` | Resource Calendar Command Center | Rentals | 3 | 3 | yes |
 | `BO-865` | Calendar Filters, Search & Smart Discovery | Rentals | 3 | 2 | yes |
-| `BO-866` | Resource Availability Schedule Configuration | Rentals | 3 | 2 | yes |
+| `BO-866` | Resource Availability Schedule Configuration | Rentals | 3 | 4 | yes |
 | `BO-867` | Resource Time-Slot Configuration | Rentals | 3 | 2 | yes |
 | `BO-868` | Advance Reservation Management | Rentals | 3 | 3 | yes |
 | `BO-869` | Recurring Reservation Configuration | Rentals | 3 | 2 | yes |

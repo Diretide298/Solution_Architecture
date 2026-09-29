@@ -376,6 +376,7 @@ paths:
         - "P09 ADM-140 Promotion Overview"
         - "P09 ADM-145 Promotion Approval Inbox"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - guest
@@ -434,6 +435,7 @@ paths:
       operationId: createPromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -508,6 +510,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - guest
@@ -542,6 +545,7 @@ paths:
       operationId: updatePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -612,6 +616,7 @@ paths:
       operationId: pausePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -666,6 +671,7 @@ paths:
       operationId: endPromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -721,6 +727,7 @@ paths:
       operationId: unschedulePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -764,6 +771,7 @@ paths:
       operationId: publishPromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -823,6 +831,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -866,6 +875,7 @@ paths:
         - "P08 BO-010 Promotions & Coupons"
         - "P09 ADM-138 Promotion Command Center Dashboard"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -1474,7 +1484,12 @@ paths:
         partner product mappings are set afterwards by setBundleCapacityPolicy and
         setBundlePartnerProductMappings (decided 29 September, writers pass).
 
+        **A meal combo with admission** (decided 29 September, MOB-4) is a bundle with an `admission`
+        component and a `fnbMenuItem` component naming the menu item; a `fnbMenuItem` component with no
+        `menuItemId`, or one whose menu item does not sell its `variantId`, is refused `422`.
+
         '
+      x-ticvai-agreed: '29 September: MOB-4 (meal combo with admission as a bundle)'
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -1499,6 +1514,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Bundle'
+        '422':
+          description: A `fnbMenuItem` component with no `menuItemId`, or whose menu item does not sell the
+            component's `variantId` (MOB-4, 29 September).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '400':
           description: 'Allocation does not sum to 100 per cent, or fixed amounts do not sum to the bundle
             price.
@@ -1520,6 +1542,7 @@ paths:
       operationId: getBundle
       x-ticvai-consumed-by:
         - "P01 WEB-008 Add-ons & Upsell"
+        - "P02 GST-004 Item Detail"
         - "P02 GST-056 Bundle Package"
       x-ticvai-audience:
       - staff
@@ -1907,6 +1930,7 @@ paths:
         - "P05 KSK-006 Review"
         - "P08 BO-010 Promotions & Coupons"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - guest
@@ -10188,6 +10212,22 @@ components:
       - mandatory
       - optional
       - promotional
+    BundleComponentKind:
+      type: string
+      enum:
+      - admission
+      - fnbMenuItem
+      - retail
+      - addOn
+      - other
+      default: admission
+      description: '**What a bundle component entitles the guest to** (decided 29 September, MOB-4). `admission`
+        is a ticket; `fnbMenuItem` is a meal redeemed at an F&B outlet, issued as an entitlement on the order
+        and redeemed by the outlet''s till or scanner, so a *meal combo with admission* is one bundle with an
+        `admission` component and an `fnbMenuItem` component. The guest buys it from the item detail of a
+        restaurant (GST-004 → GST-056 → GST-041), and the admission is included without a second choice.
+
+        '
     BundleChoiceGroup:
       type: object
       x-ticvai-persistence: promotions.bundle_choice_group + promotions.bundle_choice_option
@@ -10278,6 +10318,27 @@ components:
         variantId:
           type: string
           format: uuid
+        componentKind:
+          $ref: '#/components/schemas/BundleComponentKind'
+        menuItemId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The F&B menu item a `fnbMenuItem` component entitles the guest to** (decided 29
+            September, MOB-4): the meal of a *meal combo with admission*. `variantId` is still the catalogue
+            variant the menu item sells (fnb `MenuItem.variantId`), which prices and taxes it; this names what
+            the outlet redeems. Required when `componentKind` is `fnbMenuItem`, else ignored; a menu item that
+            does not sell `variantId` is a `422` on `createBundle`.
+
+            '
+        redeemAtOutletIds:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+            format: uuid
+          description: Outlets that redeem an `fnbMenuItem` component; empty means any outlet of the component's
+            venue that has the menu item on a live menu (MOB-4).
         quantity:
           type: integer
           minimum: 1

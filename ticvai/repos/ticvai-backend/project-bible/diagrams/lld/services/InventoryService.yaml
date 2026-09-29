@@ -1,17 +1,17 @@
 id: LLD-InventoryService
-title: InventoryService — 56 operations, 22 tables
+title: InventoryService — 58 operations, 22 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
 why: '**Stock, counting and procurement.** Its own service because `inventory.stock_level` is derived
-  from movements — a rule 56 operations broke on 20 August — and that derivation is expensive enough
+  from movements — a rule 58 operations broke on 20 August — and that derivation is expensive enough
   to want its own read path.'
 scale: Mixed. Counting is bursty; procurement is not.
 ifDown: Down blocks receiving and counting; selling continues from the till's cache.
 coverage:
-  operations: 56
+  operations: 58
   inAFlow: 47
-  percent: 84%
+  percent: 81%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -23,7 +23,7 @@ schemas:
   largestTable: inventory.purchase_order
 operationsByContract:
 - contract: inventory
-  count: 56
+  count: 58
   operations:
   - operation: acknowledgePurchaseOrder
     verb: POST
@@ -144,6 +144,14 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
+    writes: 2
+  - operation: createStockReservation
+    verb: POST
+    path: /stock-reservations
+    scope: venue
+    permission: PROCUREMENT_REQUEST
+    offline: false
+    reads: 5
     writes: 2
   - operation: createStockTransfer
     verb: POST
@@ -393,6 +401,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: releaseStockReservation
+    verb: POST
+    path: /stock-reservations/{stockReservationId}/release
+    scope: venue
+    permission: PROCUREMENT_REQUEST
+    offline: false
+    reads: 2
+    writes: 2
   - operation: returnRequisition
     verb: POST
     path: /requisitions/{requisitionId}/return
@@ -500,6 +516,7 @@ tables:
   - createRequisition
   - createStockLocation
   - createStockMovement
+  - createStockReservation
   - createStockTransfer
   - createSupplier
   - createSupplierContract
@@ -509,6 +526,7 @@ tables:
   - recountStockCount
   - rejectReceivedGoods
   - rejectRequisition
+  - releaseStockReservation
   - returnRequisition
   - sendPurchaseOrder
   - setDailyCount
@@ -534,6 +552,7 @@ tables:
   - createRequisition
   - createStockLocation
   - createStockMovement
+  - createStockReservation
   - createStockTransfer
   - createSupplier
   - createSupplierContract
@@ -543,6 +562,7 @@ tables:
   - recountStockCount
   - rejectReceivedGoods
   - rejectRequisition
+  - releaseStockReservation
   - returnRequisition
   - sendPurchaseOrder
   - setDailyCount
@@ -629,9 +649,11 @@ tables:
   writtenBy:
   - fnb
   - inventory
+  - maintenance
   - retail
   foreignWriters:
   - fnb
+  - maintenance
   - retail
 - table: inventory.purchase_order
   columns: 29
@@ -699,8 +721,11 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
-  foreignWriters: null
+  writtenBy:
+  - inventory
+  - maintenance
+  foreignWriters:
+  - maintenance
 - table: inventory.supplier
   columns: 16
   store: postgres
@@ -774,6 +799,7 @@ writesOutside:
     - catalogue.product
 screens:
 - P04:POS-011 Returns, Refunds & Exchanges
+- P06:EMP-005 Task detail
 - P06:EMP-061 Retail Inventory Command Center
 - P06:EMP-062 Store Stock & SKU Availability
 - P06:EMP-063 Requisition & Smart Store Replenishment
@@ -809,6 +835,7 @@ screens:
 - P08:BO-511 Inventory Transfer Management
 - P08:BO-512 Inventory Adjustment & Exception Management
 - P08:BO-513 Inventory Intelligence & Rebalancing
+- P08:BO-579 Parts, Cost & Maintenance Expense Tracking
 - P09:ADM-189 Component Inventory & Availability Matrix
 - P16:ANL-005 Cost, Margin & Profitability
 - P16:ANL-006 Inventory & Waste Intelligence

@@ -93,7 +93,7 @@ steps:
     '
 - step: 6
   screen: DEV-006
-  action: They go live, and watch whether it is healthy.
+  action: They go live (production keys only after certification, flow F36), and watch whether it is healthy.
   operations:
   - getApiUsage
   outcome: '**Client errors and server errors on separate series.** A 4xx is theirs and a 5xx is ours,
@@ -158,8 +158,9 @@ branches:
   resolvedBy: setApiQuota
 - at: 7
   condition: Certification is refused.
-  behaviour: '**API access is unaffected.** Certification gates the listing, not the calling — a developer
-    who thinks they need certifying to make a request will not make one.
+  behaviour: '**Sandbox access is unaffected; production stays closed.** Production keys are issued only
+    after certification (17 September minutes M17-06, decided again 29 September): the route is flow F36,
+    sandbox, then certification, then a production client TICVAI issues.
 
     '
   severity: recoverable
@@ -195,8 +196,8 @@ notes: '**Step 4 is the one D2 bought.** With synthetic data there is no data-re
 
   '
 openQuestions:
-- '**Whether a developer may reach production without certification.** The contract allows it and the
-  flow assumes it — certification gates the listing only. A venue may reasonably want the opposite,
-  and that is a commercial decision rather than a design one.
+- '**Answered 29 September (M17-06): a developer may not reach production without certification.**
+  Step 6 goes live only through flow F36 (requestProductionAccess, then TICVAI''s decideProductionAccess
+  issuing a production client). Kept here as the record of the question.
 
   '

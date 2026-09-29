@@ -7,6 +7,9 @@ publisher: seating
 description: A held or blocked seat became available again.
 aggregate: seat
 emittedWhen: SeatStatus held to available (relinquishSeatHold, or the hold timer) or blocked to available (relinquishSeatBlock)
+emittedBy:
+- relinquishSeatBlock
+- relinquishSeatHold
 payload:
 - field: seatId
   type: string

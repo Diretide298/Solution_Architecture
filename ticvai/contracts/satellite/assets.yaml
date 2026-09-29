@@ -106,6 +106,7 @@ paths:
       operationId: searchMedia
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
+        - "P08 BO-094 Map Editor & Publish"
         - "P08 BO-838 Content, Media & Forms"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-061 Digital Asset Management Command Center"

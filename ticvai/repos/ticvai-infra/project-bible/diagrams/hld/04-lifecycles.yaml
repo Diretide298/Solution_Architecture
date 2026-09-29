@@ -7,7 +7,7 @@ sourceFiles:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 206 state models and 69 events
+title: 206 state models and 77 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -1706,17 +1706,19 @@ stateModels:
   owner: catalogue
   service: CatalogueService
   states: null
-  transitions: 3
+  transitions: 4
   initial:
   - active
   terminal:
   - expired
   - released
   - forceReleased
+  - converted
   operations:
+  - convertInventoryHold
   - forceReleaseInventoryHold
   - relinquishInventoryHold
-  guarded: 3
+  guarded: 4
   ref: diagrams/lld/lifecycles/lease.yaml
 - entity: Product lifecycle action
   contract: catalogue
@@ -3394,6 +3396,10 @@ events:
   description: A risk alert was raised on an entity or transaction.
 - event: ai-riskCaseClosed
   description: A risk investigation was closed with an outcome.
+- event: apiClient-anomalyDetected
+  description: An API client's traffic breached an anomaly rule (volume against its own baseline or
+    a ceiling, 4xx share, refusals from outside the allow-list, calls outside its usual operations),
+    and the breach was recorded as an ApiAnomaly with the action taken.
 - event: approval-escalated
   description: An approval request was escalated, by a person or because its SLA was breached.
 - event: approval-expired
@@ -3443,6 +3449,8 @@ events:
 - event: entitlement-transferred
   description: An entitlement changed holder — a guest's transfer was claimed, or a resale completed.
     The same entitlement, a new owner.
+- event: fnb-kitchenTicketCreated
+  description: A kitchen ticket exists for a preparation station, from a till sale or a guest order.
 - event: fnb-menuPublished
   description: A menu is live at an outlet.
 - event: fnb-orderReady
@@ -3455,6 +3463,8 @@ events:
     failed, or was asked for a second factor.
 - event: inventory-purchaseOrderReceived
   description: A purchase order is fully received.
+- event: inventoryHold-expired
+  description: An active inventory hold passed its expiry and its units went back to remaining.
 - event: ledger-journalPosted
   description: A journal entry has been posted and is now immutable.
 - event: ledger-periodClosed
@@ -3475,6 +3485,8 @@ events:
     recorded.
 - event: order-completed
   description: Everything an order promised has been delivered.
+- event: order-created
+  description: An order exists, pending payment, from a checkout, a till or a replayed offline sale.
 - event: order-exchanged
   description: Lines on a paid order were exchanged for different products, dates or performances, settling
     only the difference.
@@ -3486,6 +3498,10 @@ events:
 - event: payment-attemptFailed
   description: A call to a payment provider was declined or errored. One event per failed attempt, whether
     or not a payment record ever existed.
+- event: payment-captured
+  description: Money was taken against an order, by a till, the guest web, or a provider webhook confirming
+    a 3-D Secure or terminal payment. One event per captured payment, whether or not the order is now
+    paid in full.
 - event: performance-cancelled
   description: A performance was cancelled and everyone holding a ticket must be made whole.
 - event: promotions-recommendationStrategyPublished
@@ -3512,7 +3528,13 @@ events:
 - event: storefront-sessionEvent
   description: A batch of browsing behaviour from one storefront or guest-app session — hashed, counted,
     and with no personal data.
+- event: sync-rejectionRaised
+  description: An entry replayed by an offline device was refused on its merits and quarantined.
 - event: tenant-suspended
   description: A tenant has been suspended, in one of three modes.
+- event: wallet-credited
+  description: Money reached a wallet's available balance (top-up, refund, adjustment, a released hold).
+- event: wallet-debited
+  description: Money left a wallet's available balance, held for a spend or captured.
 - event: whitelabel-contentPublished
   description: A tenant published content to their guest surfaces — a page, a banner, an FAQ or a policy.

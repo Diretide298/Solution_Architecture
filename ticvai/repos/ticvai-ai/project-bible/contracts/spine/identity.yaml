@@ -127,6 +127,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-073 Security & Sign-in"
+      security:
+      - guestAuth: []
+      - {}
       summary: Send a verification link, or consume one
       description: '**Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
         the address on it — and **a guest account with an unverified email can receive somebody else''s
@@ -211,6 +214,8 @@ paths:
 
                     '
       responses:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
           headers:
             X-Consistency-Token:
@@ -378,6 +383,7 @@ paths:
                   $ref: '#/components/schemas/ModuleAccess'
     put:
       operationId: setPrincipalModuleAccess
+      x-ticvai-conflict-policy: serverWins
       summary: Tick what they may do
       description: 'BL-110, 3.3.5. **The whole grant, replaced.** A partial update would make
         "everything else stays as it was" a claim the caller cannot verify, and access is the one
@@ -476,6 +482,7 @@ paths:
       operationId: setCapabilityTemplate
       x-ticvai-consumed-by:
         - "P08 BO-054 Role Assignment"
+      x-ticvai-conflict-policy: serverWins
       summary: Save a tick-set under a name
       tags:
       - administration
@@ -642,6 +649,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Everything the platform holds about one guest
       description: 'BL-149. **A subject access request has a statutory clock**, and answering it by hand
         across twenty-seven contracts is how a venue misses it.
@@ -724,6 +734,9 @@ paths:
         - "P02 GST-015 Memberships"
         - "P02 GST-069 Face Pass"
         - "P08 BO-385 Delegation Management"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Who may act for this guest, and for whom they may act
       description: 'CF-132. **Both directions, because a guest is usually in both.** A parent holds authority
         over two children and is a member of a corporate account — one screen, one question.
@@ -769,6 +782,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Let one guest act for another
       description: 'CF-132, CL-05. **A portfolio is delegated authority, not a household table.**
 
@@ -2541,6 +2557,9 @@ paths:
         - "P09 ADM-342 Authentication & MFA Policy Manager"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -2582,6 +2601,9 @@ paths:
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -2680,6 +2702,9 @@ paths:
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -2744,6 +2769,9 @@ paths:
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -2802,6 +2830,9 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -2909,6 +2940,9 @@ paths:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -3198,6 +3232,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
         - "P13 CMS-086 Role-Based Asset Access & Permission Management"
+      x-ticvai-conflict-policy: serverWins
       summary: Write a policy without writing code
       description: '3.3.5. *"Administrators shall configure access policies without software
         development."* **That sentence is the whole requirement and it decides the shape.** A policy is
@@ -3267,6 +3302,7 @@ paths:
       operationId: updateAccessPolicy
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-conflict-policy: serverWins
       summary: Change a policy, as a new version
       description: '3.3.24 and 3.3.39. **Every change is a version and the old one is kept.** An access
         policy is the thing an investigation asks about months later — *what was in force on the night*
@@ -3310,6 +3346,7 @@ paths:
       operationId: setAccessPolicyState
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-conflict-policy: serverWins
       summary: Submit, approve, activate or retire a policy
       description: '3.3.26. **A policy change is an authorisation change**, so it goes through the same
         approval machinery as anything else that moves money or opens a door — routed to `approvals`
@@ -3361,6 +3398,7 @@ paths:
       operationId: simulateAccessPolicy
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-conflict-policy: serverWins
       summary: What this policy would decide, before it decides anything
       description: '3.3.25. *"System shall support simulation and testing of policies prior to
         deployment."*
@@ -3415,6 +3453,7 @@ paths:
   /access-decisions:
     post:
       operationId: evaluateAccess
+      x-ticvai-conflict-policy: serverWins
       summary: Decide, now, and say why
       description: '3.3.27 and 3.3.29. **One decision point, called by everything.** Gates, turnstiles,
         back-office screens and APIs all ask the same question, and a second evaluator anywhere means two
@@ -3617,6 +3656,7 @@ paths:
       operationId: createEmergencyAccessOverride
       x-ticvai-consumed-by:
         - "P08 BO-1066 Roles, Permissions & Masking"
+      x-ticvai-conflict-policy: serverWins
       summary: Bypass the policy, loudly
       description: '3.3.6. *"Authorized users may temporarily bypass restrictions with full audit
         logging."*
@@ -3865,6 +3905,9 @@ paths:
   /customers/{customerId}/memberships:
     get:
       operationId: listCustomerMemberships
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Memberships a customer holds
       description: '**We had `entitlement_template` and no holder record** — the plan existed and
         nothing said who was on it. Decision 9 took `identity.customer_membership` for exactly that.
@@ -4999,6 +5042,27 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Staff session token (common.yaml bearerAuth). Added 29 September (system-design review SD-054).
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
   schemas:
     IdentityRoleSuggestion:
       type: object

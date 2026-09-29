@@ -1,0 +1,3050 @@
+{
+ "date": "2026-09-29",
+ "title": "AI functions review: build every AI function now, baseline then learn",
+ "question": "Product owner: data-driven AI must be built right now and get more accurate with time; customers must never see \"arrives later because you have no data\".",
+ "measure": {
+  "backendPerOperation": 2.1,
+  "screens": "package formula (tools/build-service-docs.py screen_raw, 1-2-3-5-8)",
+  "engineWork": "engineer-weeks converted at 48 points per week (Block A pace 9.6 points per developer-day); the per-operation measure prices endpoints, not engines",
+  "extraPoints": "Against the 29 September plan: package points for scope the plan moved past month 6 or never had, new or changed operations and screens, and engine weeks the plan does not carry"
+ },
+ "sprints": {
+  "S1": "5-23 Oct",
+  "S2": "26 Oct-13 Nov",
+  "S3": "16 Nov-4 Dec",
+  "S4": "7-25 Dec",
+  "S5": "28 Dec-15 Jan",
+  "S6": "18 Jan-5 Feb",
+  "S7": "8-26 Feb",
+  "S8": "1-19 Mar",
+  "S9": "22 Mar-2 Apr"
+ },
+ "capacity": {
+  "aiEngineerWeeksAvailableBlockB": 35,
+  "aiEngineerWeeksNeededBlockBNewApproach": 50,
+  "gap": 15,
+  "recommendation": "A third AI engineer from S4 (7 Dec) gives about 16 weeks. Without one, the learned producers (9 AI-weeks) finish in shadow around May-June 2027; no tenant could pass a promotion gate before then anyway.",
+  "blockANote": "Block A AI work (gateway, governance, concierge, Help me choose, translations, planner, evaluation harness) is about 13 AI-weeks against about 10 available; this is a pre-existing risk."
+ },
+ "totals": {
+  "extraPoints": 2221.1,
+  "packagePointsExtra": 229.1,
+  "aiEngineerWeeksExtra": 37.0,
+  "aiEngineerPointsExtra": 1776.0,
+  "backendWeeksExtra": 4.5,
+  "backendPointsExtra": 216.0,
+  "aiEngineerWeeksTotalNewApproach": 53.5,
+  "aiEngineerWeeksInPlanForTheseCapabilities": 16.5,
+  "aiOpsNotInBlockASlice": 94,
+  "developerPointsExtra": 445.1
+ },
+ "packageFindings": [
+  "requestSuggestion is in Block A and bound to Block A screens (BO-005 queueBalancing, GST-031 prepPlan/upsell), but refuses with 422 below each kind's minimum history.",
+  "runForecast, publishForecastVersion, createForecastScenario, decideOperationalRequirement, explainMetricChange and decideAiInsight are in the Block A slice while the plan defers their producers.",
+  "Translations and the planner agent are Block A in the plan but not in the slice; ai.yaml has no planner operation and GST-054 is a deferred screen.",
+  "BO-093 Map Import & Labelling is a Block A screen without proposeVenueLabels.",
+  "evaluateAiGovernance, getAiUsage and getAiPolicy are not in the slice though Block A AI needs the decision point and spend.",
+  "team.json still says Kalpita has \"no AI work in the first release\"; AI operations are assigned to Hrushikant and Sanket.",
+  "No operation exists to import a venue's historical sales or attendance, and AiForecastDefinition has no cold-start setting."
+ ],
+ "cannotShipBy2April": [
+  "A trained model live for a tenant: needs about a season of that tenant's data plus a 6-week shadow (or 12+ months of imported history). The code ships; promotion happens per tenant later.",
+  "Fraud classifier promotion: needs analyst-labelled confirmed cases; many tenants never reach it and stay on rules.",
+  "Learning-to-rank promotion: needs a controlled experiment with a minimum sample.",
+  "Price elasticity and AI-set prices: need observed price variation; L4 auto-optimisation stays off by governance for six months of L3 evidence.",
+  "AI dashboard and report generation (AIP-186/187): not data-dependent; an S9 stretch after the analytics assistant.",
+  "Not data questions, unchanged: external knowledge connectors (residency), partner cross-sell (integrations missing), location triggers (signals not governed), OTA/reseller recommendations (AI-D08), pooled cross-tenant models (AIP-149)."
+ ],
+ "assistantsDecision": {
+  "forMovingBack": [
+   "Not data-dependent (design 3.12); the deferral was capacity.",
+   "The configuration assistant was the client's first AI priority (14 and 17 August, CF-57).",
+   "It collects the venue priors that make every other capability useful on day one.",
+   "askReportingQuestion and explainMetricChange are already in the Block A slice.",
+   "The phase-2 message is marked \"to be told to the client\", so reversing it costs nothing with the client."
+  ],
+  "forKeepingDeferred": [
+   "About 640 extra points (configuration ~432, analytics ~208), plus seat-map ~161 and anomaly ~134.",
+   "validate-only in owning services is cross-team work.",
+   "AI engineer capacity is already short without it."
+  ],
+  "recommendation": "Bring both back into the six months: configuration assistant S3-S5 (seating and ticketing first), seat-map S6, analytics assistant S7. Keep AI dashboard/report generation as the only S9 stretch."
+ },
+ "capabilities": [
+  {
+   "id": "shared-baseline-then-learn",
+   "name": "Shared: the baseline-then-learn layer (built once, used by every data-driven capability)",
+   "designCapability": "C1, C8-C11, C13",
+   "whatItDoesForTheCustomer": "Makes every data-driven AI answer useful for a tenant with no history, and lets it improve without anyone changing a screen.",
+   "operations": {
+    "total": 0,
+    "inBlockASlice": [],
+    "notInBlockASlice": [],
+    "contractPointsNotInBlockA": 0
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [],
+    "countNotInBlockA": 0,
+    "pointsNotInBlockA": 0
+   },
+   "currentPlan": "Not in the plan. The design has the producer swap (SuggestionBasis, setSuggestionProvider, release pipeline) but no prior, no import and no maturity signal.",
+   "planStatus": "not in plan",
+   "whyLeftOut": {
+    "stated": "n/a (new)",
+    "reallyNoData": "n/a",
+    "assessment": "This is the missing piece. The contract today answers 422 InsufficientDataProblem below each kind's minimum history (8 weeks for demandForecast and anomaly, 90 days for upsell, segmentation, menuEngineering and sendTime). That 422 is exactly \"this arrives later because you have no data\"."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules and heuristics engine as the baseline behind the same contract",
+     "configurable venue priors entered at onboarding",
+     "import of the venue's own historical exports",
+     "TICVAI-shipped benchmark priors (synthetic or published, never other tenants' data)",
+     "weather and calendar signals",
+     "Bayesian shrinkage from prior to own data",
+     "shadow mode, confidence display, promotion to admin at a threshold"
+    ],
+    "howItWorks": "One Estimator interface per question (forecast subject, suggestion kind, risk score, recommendation rank) with three implementations: prior (venue profile + benchmark pack + calendar + weather), statistical (own data, shrunk toward the prior with weight n/(n+k), re-estimated nightly), learned (per-tenant model, shadow first). The routing already exists (setSuggestionProvider, forecast definition producer, release pointer). New: a venue AI profile (capacity, opening hours, typical weekday and weekend attendance, peak months, average spend, F&B attach, staff productivity), a historical import (CSV, POS and ticketing exports, 12-36 months where the venue has them), benchmark packs per venue type (water park, theme park, family entertainment centre, museum, arena, zoo/aquarium) with the UAE calendar (Sat-Sun weekend, public holidays, Ramadan and Eid by Hijri date, school holidays, summer heat for outdoor venues), and a maturity block on every answer. Packs are TICVAI-authored from published sources and synthetic curves; no tenant data is pooled (AIP-149, design 4.2). Nightly re-estimation is not the \"online learning\" design 3.5 forbids: no model switches itself; each re-estimate is a recorded producer version."
+   },
+   "maturityLadder": {
+    "day1": "Every capability answers from the prior; basis \"heuristic\", maturity \"Starting\", wide band.",
+    "week4": "Statistical producers carry most of the weight for day-of-week and short-horizon patterns; maturity \"Learning\"; measured accuracy appears.",
+    "month3": "Own level and trend dominate; the prior only fills gaps (holidays not yet seen); maturity \"Established\".",
+    "season": "Per-tenant learned producers trained weekly and run in shadow; promotion raised to the admin when the gate passes; maturity \"Trained on your data\" after promotion.",
+    "uiShows": "Every answer carries a basis chip (\"Based on: your venue profile, UAE calendar, weather, 23 days of your sales\") and a maturity badge (Starting, Learning, Established, Trained on your data). No bare percentages (design 5.6). A P08/P09 \"AI maturity\" page lists each capability, its stage, what it is based on and what the next stage needs.",
+    "switchCriteria": "Prior to statistical: automatic, continuous, recorded. Statistical to learned: per-capability gate (design 3.5), promotionReady alert, admin promotes (AI-D16)."
+   },
+   "build": {
+    "items": [
+     "Estimator interface and producer registry, routing requestSuggestion kinds, forecast definitions, risk and recommendation ranking; maturity block on every answer (1.5 AI-weeks)",
+     "Venue AI profile (priors) and its onboarding screen (0.5 AI-weeks + 2 ops + 1 screen)",
+     "Benchmark prior packs per venue type and the UAE calendar, versioned, TICVAI-authored (1.5 AI-weeks)",
+     "Historical import: mapping templates, validation, load into the AI snapshot tagged \"imported\", never into the ledger (1.5 back-end weeks + 3 ops + 1 screen)",
+     "Per-tenant training and backtest job, shadow runner, registry wiring (2.5 AI-weeks)",
+     "Promotion rule: gate evaluation to promotionReady alert to promoteAiRelease (0.5 AI-weeks)",
+     "Shared basis/maturity UI component wired into the AI screens (about 40 points) and an AI maturity overview screen"
+    ],
+    "newOrChangedOperations": [
+     "setAiVenuePriors",
+     "getAiVenuePriors",
+     "importHistoricalActuals",
+     "getHistoricalImport",
+     "listHistoricalImports",
+     "listAiBenchmarkPacks",
+     "listAiCapabilityMaturity (paged)",
+     "(names provisional; must pass the new-operation gates: permission vocabulary, config noun, paging)"
+    ],
+    "newOrChangedOpPoints": 14.7,
+    "newScreenPoints": 51,
+    "aiEngineerWeeksTotal": 8.0,
+    "aiEngineerWeeksInPlan": 1.5,
+    "aiEngineerWeeksExtra": 6.5,
+    "backendWeeksExtra": 1.5,
+    "note": "The feature pipeline (event consumers, feature library, snapshots) is already implied by the plan's B2 rules-first engines and is counted as in plan (1.5 AI-weeks).",
+    "aiEngineerPointsExtra": 312.0,
+    "backendPointsExtra": 72.0,
+    "packagePointsExtra": 65.7,
+    "extraPoints": 449.7
+   },
+   "sprint": "S2 (estimator, maturity block, minimal priors so Block A suggestion kinds stop refusing); S3 (benchmark packs, venue profile, import); S6 (training/backtest/shadow); S7 (promotion rule)",
+   "owners": {
+    "ai": "Second AI engineer (from 2 Nov) leads; Kalpita Mejari reviews",
+    "backend": "Deep (historical import), Hrushikant (contract change on requestSuggestion and forecast schemas)",
+    "frontend": "Venue Management setup owner (Surendra) for the profile and import screens"
+   },
+   "risks": [
+    "Benchmark packs are only as good as their sources; a wrong prior is visible for the first weeks. Mitigated by wide bands, the basis chip and approval on anything that acts.",
+    "Venues may not have clean exports; the import must accept partial data and say what it could not use.",
+    "The contract change touches ai.yaml, the derived artefacts and the mirrors (derive before check)."
+   ],
+   "customerSentence": "Every AI feature is on from your first day; it starts from your venue profile, the UAE calendar and patterns for venues like yours, and it learns your venue as you trade."
+  },
+  {
+   "id": "forecasting",
+   "name": "Forecasting (attendance, demand, revenue, pace, scenarios)",
+   "designCapability": "C8",
+   "whatItDoesForTheCustomer": "Tells managers how many guests, sales and how much revenue to expect by day, timeslot, product and channel, with a range, the drivers and a what-if simulator.",
+   "operations": {
+    "total": 12,
+    "inBlockASlice": [
+     "runForecast",
+     "publishForecastVersion",
+     "createForecastScenario"
+    ],
+    "notInBlockASlice": [
+     "listForecastDefinitions",
+     "setForecastDefinition",
+     "listForecastVersions",
+     "getForecast",
+     "compareForecastScenarios",
+     "getForecastAccuracy",
+     "listForecastSignals",
+     "configureForecastSignalSource",
+     "exportForecastVersion"
+    ],
+    "contractPointsNotInBlockA": 18.9
+   },
+   "screens": {
+    "inBlockA": [
+     "ADM-508",
+     "BO-919"
+    ],
+    "notInBlockA": [
+     {
+      "id": "ADM-499",
+      "platform": "P09",
+      "name": "Forecasting Command Center",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-500",
+      "platform": "P09",
+      "name": "Forecast Configuration & Forecasting Strategy",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-501",
+      "platform": "P09",
+      "name": "Forecast Data & Signal Configuration",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-502",
+      "platform": "P09",
+      "name": "Attendance & Visitation Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-503",
+      "platform": "P09",
+      "name": "Ticket, Product & Timeslot Demand Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-504",
+      "platform": "P09",
+      "name": "Channel & Booking Pace Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-505",
+      "platform": "P09",
+      "name": "Revenue & Commercial Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-506",
+      "platform": "P09",
+      "name": "Forecast Drivers, Confidence & Explainability",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-507",
+      "platform": "P09",
+      "name": "Forecast Scenario & What-If Simulator",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ANL-008",
+      "platform": "P16",
+      "name": "Demand Forecasting",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ANL-057",
+      "platform": "P16",
+      "name": "Forecasting & Predictive Analytics Studio",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "BO-926",
+      "platform": "P08",
+      "name": "Resource Demand Forecasting",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "BO-931",
+      "platform": "P08",
+      "name": "Operational Scenario Simulator & Digital Twin",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 13,
+    "pointsNotInBlockA": 34
+   },
+   "currentPlan": "B2 (4 Jan - 12 Feb 2027) \"AI rules-first forecasting\"; trained model after month 6. Three endpoints (runForecast, publishForecastVersion, createForecastScenario) are already in the Block A slice (SVC-AI-FORECAST-1, ADM-508, BO-919, BO-927) with no producer behind them.",
+   "planStatus": "in plan (B2), extended",
+   "whyLeftOut": {
+    "stated": "Six-month plan decision 2: \"Data-dependent AI waits: forecasting\". Earlier: 14 August minutes and the 17 August scope paper (\"needs at least one full season\").",
+    "source": "docs/active/six-month-plan-29-september.md; MoM 14 Aug; docs/active/ai-scope-for-confirmation.md s3",
+    "reallyNoData": "partly",
+    "assessment": "True for a trained model. Not true for a useful forecast: the client's own book (AI Forecasting p.27 \"New Venue / New Product Problem\") asks for similar-venue, category, business-provided and rules baselines with reduced confidence. The design's first-week producer needs 8 weeks of same-weekday history or a sister venue; a new single-venue tenant has neither."
+   },
+   "dayOne": {
+    "approaches": [
+     "venue priors",
+     "benchmark priors",
+     "historical import",
+     "weather and calendar signals",
+     "Bayesian shrinkage",
+     "bookings on hand (pace)",
+     "shadow and promotion"
+    ],
+    "howItWorks": "Expected attendance = typical weekday/weekend attendance from the venue profile x the venue-type month curve from the benchmark pack x UAE calendar effects (public holidays, Ramadan, Eid, school holidays, summer heat for outdoor) x weather adjustment; bookings on hand act as a floor and the pace curve lifts it. Revenue = attendance x average spend (profile). P10-P90 band wide (about +/-40%) until measured. With imported history, day one starts at \"Established\"."
+   },
+   "maturityLadder": {
+    "day1": "Prior forecast with a wide band; \"Starting\" badge; basis \"venue profile, UAE calendar, weather, bookings on hand\".",
+    "week4": "Own day-of-week pattern and pickup curve take over (k about 4 same weekdays); accuracy measured over 28 days and shown by horizon; band narrows.",
+    "month3": "Seasonal smoothing on own level and trend; holiday effects still from the prior until seen; drivers from decomposition.",
+    "season": "Per-tenant gradient-boosted model trained weekly, shadow at least 6 weeks, then raised to the admin.",
+    "uiShows": "Every answer carries a basis chip (\"Based on: your venue profile, UAE calendar, weather, 23 days of your sales\") and a maturity badge (Starting, Learning, Established, Trained on your data). No bare percentages (design 5.6). Measured accuracy labelled \"measured\"; \"Limited historical data\" shown while the prior weight is above 50% (book p.27).",
+    "switchCriteria": "Automatic inside the statistical producer (prior weight falls as own data grows; recorded as a new producer version, not a model switch). Trained model: shadow for at least 6 weeks; WAPE at least 10% better than the baseline at the 7-day horizon, bias within +/-3%, P10-P90 coverage 70-90% (design 3.5). Passing raises a promotionReady governance alert; an admin promotes (AI-D16). Never automatic."
+   },
+   "build": {
+    "items": [
+     "Prior producer and forecast definition cold-start settings (1 AI-week, extra)",
+     "Statistical producer with holiday, Ramadan and weather regressors, pace pickup, reconciliation, accuracy, scenarios (6 AI-weeks, in plan)",
+     "Learned producer (per-tenant GBM) in shadow (3 AI-weeks, extra)",
+     "Contract: coldStart on AiForecastDefinition, maturity on AiForecastVersion"
+    ],
+    "newOrChangedOperations": [
+     "setForecastDefinition (coldStart)",
+     "getForecast / listForecastVersions (maturity)"
+    ],
+    "newOrChangedOpPoints": 4.2,
+    "aiEngineerWeeksTotal": 10,
+    "aiEngineerWeeksInPlan": 6,
+    "aiEngineerWeeksExtra": 4,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 192,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 4.2,
+    "extraPoints": 196.2
+   },
+   "sprint": "S3 prior producer and signals; S4-S5 statistical; S6 accuracy and backtest; S8 learned producer in shadow",
+   "owners": {
+    "ai": "Second AI engineer",
+    "backend": "Pranay (remaining forecast operations), Hrushikant (Block A endpoints)",
+    "frontend": "P09 console owner in B3; ADM-508 already Block A (Pallavi)"
+   },
+   "risks": [
+    "A wrong venue profile gives a confidently wrong first month; the band and basis must be shown, and the venue must be able to correct its profile.",
+    "Weather API cost and availability (AI-D10)."
+   ],
+   "customerSentence": "Forecasts are available from day one based on your venue profile, the calendar and the weather; they tighten as your own sales come in, and the screen always shows the range and what it is based on."
+  },
+  {
+   "id": "operational-requirements",
+   "name": "Operational requirements and staffing (from the forecast)",
+   "designCapability": "C8",
+   "whatItDoesForTheCustomer": "Turns the forecast into staff per role, open tills and lanes, gates, F&B and stock needs, sent to the owning module as a recommendation a person accepts.",
+   "operations": {
+    "total": 2,
+    "inBlockASlice": [
+     "decideOperationalRequirement"
+    ],
+    "notInBlockASlice": [
+     "listOperationalRequirements"
+    ],
+    "contractPointsNotInBlockA": 2.1
+   },
+   "screens": {
+    "inBlockA": [
+     "BO-927"
+    ],
+    "notInBlockA": [
+     {
+      "id": "ADM-509",
+      "platform": "P09",
+      "name": "Operational Forecasting Command Center",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-510",
+      "platform": "P09",
+      "name": "Capacity & Occupancy Forecast",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-511",
+      "platform": "P09",
+      "name": "Attraction Utilization & Queue Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-512",
+      "platform": "P09",
+      "name": "Entry, Access & Guest Flow Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-513",
+      "platform": "P09",
+      "name": "Workforce Demand & Staffing Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-514",
+      "platform": "P09",
+      "name": "POS, Kiosk & Frontline Service Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-515",
+      "platform": "P09",
+      "name": "F&B, Retail & Inventory Demand Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-516",
+      "platform": "P09",
+      "name": "Resource, Equipment & Facility Requirement Forecast",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-517",
+      "platform": "P09",
+      "name": "Operational Scenario & Readiness Simulator",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-518",
+      "platform": "P09",
+      "name": "Operational Forecast Review, Recommendations & Handover",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "BO-925",
+      "platform": "P08",
+      "name": "AI Staff Recommendation & Workforce Matching",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 11,
+    "pointsNotInBlockA": 27
+   },
+   "currentPlan": "B2 with forecasting. decideOperationalRequirement is already in the Block A slice (BO-927, ADM-518).",
+   "planStatus": "in plan (B2), extended",
+   "whyLeftOut": {
+    "stated": "Follows forecasting (\"staffing: minimum 8 weeks of sales\").",
+    "source": "ai.yaml SuggestionKind",
+    "reallyNoData": "no",
+    "assessment": "Needs a forecast (available day one with priors) and productivity standards, which are configuration, not history."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules engine baseline",
+     "venue priors (productivity standards)",
+     "benchmark defaults per role",
+     "human approval"
+    ],
+    "howItWorks": "Forecast demand / the role's standard (covers per staff hour, transactions per till hour, scans per lane per hour), defaults from the benchmark pack, editable by the venue. Output is a recommendation at autonomy L2."
+   },
+   "maturityLadder": {
+    "day1": "Requirements from the prior forecast and default standards; \"Starting\".",
+    "week4": "Actual productivity from shifts, POS and scans replaces the defaults (shrinkage).",
+    "month3": "Requirements track the statistical forecast; accept/modify rates shown.",
+    "season": "Follows the forecast's promoted model; no separate model.",
+    "uiShows": "Every answer carries a basis chip (\"Based on: your venue profile, UAE calendar, weather, 23 days of your sales\") and a maturity badge (Starting, Learning, Established, Trained on your data). No bare percentages (design 5.6).",
+    "switchCriteria": "Follows the forecast. Standards move from default to measured automatically once 4 weeks of shifts exist; the venue can pin its own."
+   },
+   "build": {
+    "items": [
+     "Default productivity standards in the benchmark pack and their shrinkage to measured (0.5 AI-weeks, extra)",
+     "Derivation and handover to owning modules (1 AI-week and 1 back-end week, in plan)"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 1.5,
+    "aiEngineerWeeksInPlan": 1,
+    "aiEngineerWeeksExtra": 0.5,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 24.0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 24.0
+   },
+   "sprint": "S5",
+   "owners": {
+    "ai": "Second AI engineer",
+    "backend": "Tanmay (Workforce handover)"
+   },
+   "risks": [
+    "Defaults for a role the venue does not recognise; the venue must see and edit them."
+   ],
+   "customerSentence": "Staffing and resource suggestions start from standard productivity figures you can edit, and switch to your measured figures as shifts are recorded."
+  },
+  {
+   "id": "operational-suggestions",
+   "name": "Operational suggestions (the 16 requestSuggestion kinds: replenishment, requisition, prep plan, menu engineering, SLA target, waste risk and the rest)",
+   "designCapability": "C8/C9/C11 via requestSuggestion",
+   "whatItDoesForTheCustomer": "Short answers staff act on: what to reorder, what to prep, which items will waste, the SLA to set.",
+   "operations": {
+    "total": 4,
+    "inBlockASlice": [
+     "requestSuggestion",
+     "setSuggestionProvider"
+    ],
+    "notInBlockASlice": [
+     "recordSuggestionOutcome",
+     "getSuggestedRequisitions"
+    ],
+    "contractPointsNotInBlockA": 4.2
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "ANL-010",
+      "platform": "P16",
+      "name": "Suggestions & Advice",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ANL-006",
+      "platform": "P16",
+      "name": "Inventory & Waste Intelligence",
+      "points": 3,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 2,
+    "pointsNotInBlockA": 6
+   },
+   "currentPlan": "requestSuggestion is in the Block A slice and bound to Block A screens (BO-005 queueBalancing, GST-031 prepPlan/upsell, BO-115, BO-117, WEB-044). recordSuggestionOutcome is not.",
+   "planStatus": "in Block A slice, but refuses without history",
+   "whyLeftOut": {
+    "stated": "Each kind has a minimum history; below it the operation answers 422 InsufficientDataProblem (decided 28 September, audit R213).",
+    "source": "ai.yaml SuggestionKind",
+    "reallyNoData": "partly",
+    "assessment": "Only price needs no history today. Every other kind would refuse for 14 days to 12 months on a new tenant, including on Block A screens. That is the customer-facing \"arrives later\" message the product owner wants gone."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules engine baseline",
+     "venue priors",
+     "benchmark priors",
+     "Bayesian shrinkage",
+     "shadow and promotion"
+    ],
+    "howItWorks": "Each kind gets a prior answer: replenishment = par - on hand + prior forecast use x lead time; prepPlan = prior covers x menu mix (equal shares or category benchmark); menuEngineering = margin-only ranking with popularity marked \"learning\"; slaTarget = benchmark default; waitTime = people ahead / configured capacity per hour; upsell = relationship map; segmentation = what is known (member, first-time or returning, party type); anomaly = configured thresholds; sendTime = channel benchmark hour; wasteRisk = shelf life and par against the prior forecast. 422 stays only when an input the venue must configure is missing, and then it names the setting, not a date."
+   },
+   "maturityLadder": {
+    "day1": "Every kind answers; basis heuristic; confidence null (contract rule).",
+    "week4": "14-30 day kinds switch to own data (replenishment, requisition, SLA, waste risk).",
+    "month3": "90-day kinds switch (upsell affinity, menu engineering, segmentation, send time).",
+    "season": "Kinds with a model producer run it in shadow; promotion per setSuggestionProvider.",
+    "uiShows": "Every answer carries a basis chip (\"Based on: your venue profile, UAE calendar, weather, 23 days of your sales\") and a maturity badge (Starting, Learning, Established, Trained on your data). No bare percentages (design 5.6).",
+    "switchCriteria": "The existing minimum-history numbers become the point where the own-data weight passes 50%, not a refusal. Model producers per kind are promoted by an admin."
+   },
+   "build": {
+    "items": [
+     "Prior answers for all 16 kinds; remove the history refusal (1.5 AI-weeks, extra; 1 week of it in S2 for the kinds on Block A screens)",
+     "Contract change on requestSuggestion (maturity block, 422 only for missing configuration)"
+    ],
+    "newOrChangedOperations": [
+     "requestSuggestion (maturity block; InsufficientDataProblem narrowed to missing configuration)"
+    ],
+    "newOrChangedOpPoints": 2.1,
+    "aiEngineerWeeksTotal": 1.5,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 1.5,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 72.0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 2.1,
+    "extraPoints": 74.1
+   },
+   "sprint": "S2 (queueBalancing, prepPlan, upsell for Block A screens); S5 (the rest)",
+   "owners": {
+    "ai": "Second AI engineer",
+    "backend": "Hrushikant (contract)"
+   },
+   "risks": [
+    "Staff may over-trust an early suggestion; the basis chip and the \"never acts\" rule (proposals only) stay."
+   ],
+   "customerSentence": "Suggestions work from the first day using your settings and standard figures, and say so; they switch to your own history as it builds."
+  },
+  {
+   "id": "queue-wait-time",
+   "name": "Queue and wait-time prediction (waitTime, queueBalancing, F&B quoteWaitTime)",
+   "designCapability": "C8 (queue definition)",
+   "whatItDoesForTheCustomer": "Tells guests and staff how long the wait is, and how to spread guests across attractions and return slots.",
+   "operations": {
+    "total": 1,
+    "inBlockASlice": [],
+    "notInBlockASlice": [
+     "quoteWaitTime"
+    ],
+    "contractPointsNotInBlockA": 2.1
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [],
+    "countNotInBlockA": 0,
+    "pointsNotInBlockA": 0
+   },
+   "currentPlan": "getWaitTimes is in Block A (manual or feed). quoteWaitTime (fnb) is Staff App, Block B. The queue forecast rides on forecasting (B2).",
+   "planStatus": "partly in plan",
+   "whyLeftOut": {
+    "stated": "waitTime needs 30 minutes of throughput today; queueBalancing 14 days of queue readings.",
+    "source": "ai.yaml SuggestionKind; MoM 14 Aug (venues supply wait-time feeds)",
+    "reallyNoData": "no",
+    "assessment": "Configured capacity per hour and the live queue length give a usable answer in the first minutes of the first day."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules engine baseline",
+     "venue priors (ride capacity per hour, party service time)",
+     "Bayesian shrinkage of throughput"
+    ],
+    "howItWorks": "Wait = people ahead / throughput, with nominal capacity until 30 minutes of measured throughput exist; queueBalancing compares forecast wait to capacity from the prior forecast."
+   },
+   "maturityLadder": {
+    "day1": "Nominal-capacity wait; queue forecast from the prior.",
+    "week4": "Measured throughput by hour and attraction.",
+    "month3": "Queue forecast from the statistical forecast.",
+    "season": "Follows the forecast model.",
+    "uiShows": "Every answer carries a basis chip (\"Based on: your venue profile, UAE calendar, weather, 23 days of your sales\") and a maturity badge (Starting, Learning, Established, Trained on your data). No bare percentages (design 5.6).",
+    "switchCriteria": "Throughput weight moves to measured automatically within the day; the forecast part follows forecasting."
+   },
+   "build": {
+    "items": [
+     "Nominal-capacity prior and queue definition wiring (0.5 AI-weeks, extra)"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 0.5,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 0.5,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 24.0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 24.0
+   },
+   "sprint": "S5",
+   "owners": {
+    "ai": "Second AI engineer",
+    "backend": "Deep (queue and F&B feeds)"
+   },
+   "risks": [
+    "No sensor feed at a venue: the answer depends on staff entering queue length."
+   ],
+   "customerSentence": "Wait times show from opening on your first day using each attraction's capacity, and become more exact as the day's real throughput is measured."
+  },
+  {
+   "id": "anomaly-detection",
+   "name": "Anomaly detection (KPI anomalies and the insight lifecycle)",
+   "designCapability": "C9",
+   "whatItDoesForTheCustomer": "Flags a number that moved more than it should (refund rate, voids, attendance against expected), groups related alerts, and tracks what was done.",
+   "operations": {
+    "total": 4,
+    "inBlockASlice": [],
+    "notInBlockASlice": [
+     "configureAnomalyDetector",
+     "listAnomalyDetectors",
+     "listAiInsights",
+     "listAnalyticsAnomalies"
+    ],
+    "contractPointsNotInBlockA": 8.4
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "ANL-055",
+      "platform": "P16",
+      "name": "Anomaly Detection Center",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ANL-058",
+      "platform": "P16",
+      "name": "AI Recommendation & Next-Best-Action Center",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ANL-059",
+      "platform": "P16",
+      "name": "AI Insight History, Evidence & Explainability",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 3,
+    "pointsNotInBlockA": 6
+   },
+   "currentPlan": "After month 6 (plan decision 6). reporting.listAnalyticsAnomalies is in no block either.",
+   "planStatus": "moved past month 6",
+   "whyLeftOut": {
+    "stated": "\"Anomaly detection also starts after month 6.\"",
+    "source": "six-month plan decision 6; SuggestionKind anomaly \"8 weeks of the measure\"",
+    "reallyNoData": "partly",
+    "assessment": "A seasonal baseline needs weeks of data; configured thresholds and \"actual against forecast\" do not. The design's own day-one producer is configured thresholds."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules engine baseline (thresholds)",
+     "venue priors and benchmark bands",
+     "deviation from the (prior) forecast",
+     "Bayesian shrinkage to robust z-scores",
+     "human feedback via decideAiInsight"
+    ],
+    "howItWorks": "Default thresholds per KPI from the benchmark pack (refund rate, void rate, cash variance, attendance below the forecast P10); the venue edits them. Actual against forecast works from day one because the forecast does."
+   },
+   "maturityLadder": {
+    "day1": "Threshold and forecast-deviation alerts only; \"Starting\".",
+    "week4": "Median/MAD baseline per KPI and weekday, shrunk to the threshold.",
+    "month3": "Seasonal baseline; peer comparison across the tenant's own venues.",
+    "season": "A model only where a KPI's false-alarm rate warrants it (design 3.10).",
+    "uiShows": "Every answer carries a basis chip (\"Based on: your venue profile, UAE calendar, weather, 23 days of your sales\") and a maturity badge (Starting, Learning, Established, Trained on your data). No bare percentages (design 5.6). Each insight names its detector (threshold, baseline, forecast deviation).",
+    "switchCriteria": "Threshold to baseline: automatic once 4 same-weekday values exist. A threshold change suggested from dismissals is proposed and approved, never silent."
+   },
+   "build": {
+    "items": [
+     "Detectors, correlation, insight lifecycle and default thresholds (2.5 AI-weeks, extra)",
+     "3 ai ops + listAnalyticsAnomalies, 3 P16 screens (ANL-055, 058, 059)"
+    ],
+    "packageScopeIsExtra": true,
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 2.5,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 2.5,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 120.0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 14.4,
+    "extraPoints": 134.4
+   },
+   "sprint": "S6",
+   "owners": {
+    "ai": "Second AI engineer",
+    "backend": "Pranay (Reporting anomalies read)",
+    "frontend": "P16 owner in B3"
+   },
+   "risks": [
+    "Alert fatigue in the first weeks; start with few detectors switched on."
+   ],
+   "customerSentence": "Unusual movements are flagged from the first week against the limits you set and against the forecast; the system learns what is normal for your venue over the following weeks."
+  },
+  {
+   "id": "analytics-assistant",
+   "name": "Analytics assistant and metric explanation (Ask TICVAI, explainMetricChange, insights)",
+   "designCapability": "C6",
+   "whatItDoesForTheCustomer": "Managers ask questions in plain language (\"what was yesterday's ticket revenue?\") and ask why a number moved; answers come from the governed KPI layer with the query shown.",
+   "operations": {
+    "total": 3,
+    "inBlockASlice": [
+     "explainMetricChange",
+     "decideAiInsight",
+     "askReportingQuestion"
+    ],
+    "notInBlockASlice": [],
+    "contractPointsNotInBlockA": 0.0
+   },
+   "screens": {
+    "inBlockA": [
+     "ANL-019"
+    ],
+    "notInBlockA": [
+     {
+      "id": "ANL-009",
+      "platform": "P16",
+      "name": "AI Assistant & Action Center",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ANL-051",
+      "platform": "P16",
+      "name": "AI Analytics Command Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ANL-052",
+      "platform": "P16",
+      "name": "Ask TICVAI — Natural Language Analytics",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ANL-053",
+      "platform": "P16",
+      "name": "AI-Generated Dashboard Studio",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ANL-054",
+      "platform": "P16",
+      "name": "AI Report Generator",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ANL-056",
+      "platform": "P16",
+      "name": "Root-Cause Analysis Explorer",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 6,
+    "pointsNotInBlockA": 16
+   },
+   "currentPlan": "After month 6 (plan decision 6). But askReportingQuestion and explainMetricChange are already in the Block A slice (POS-008, BO-029, KIT-010, ANL-019).",
+   "planStatus": "moved past month 6",
+   "whyLeftOut": {
+    "stated": "Capacity: \"The platform runs without them.\"",
+    "source": "six-month plan decision 6",
+    "reallyNoData": "no",
+    "assessment": "Design 3.12 says assistants and analytics have full function in week one: they read the semantic layer, not history. The deferral was a capacity decision."
+   },
+   "dayOne": {
+    "approaches": [
+     "LLM writes a semantic query spec; Reporting compiles and runs it (the LLM never sees raw data, AI-D15)",
+     "deterministic contribution analysis for explainMetricChange, with figures bound into the text"
+    ],
+    "howItWorks": "Works on whatever data exists. With little history it compares with the previous 7 days instead of last year and says so; imported history enables year-on-year."
+   },
+   "maturityLadder": {
+    "day1": "Full function over the data that exists.",
+    "week4": "Week-on-week comparisons.",
+    "month3": "Month and quarter comparisons; seasonal context from anomaly baselines.",
+    "season": "Year-on-year. No per-tenant model; improves through golden sets and knowledge gaps.",
+    "uiShows": "Reliability category (grounded, partial, conflicting, insufficient evidence), data-as-of, the compiled query.",
+    "switchCriteria": "None; assistant releases go through the evaluation gate (groundedness >= 95%)."
+   },
+   "build": {
+    "items": [
+     "Semantic spec, follow-ups, explainMetricChange decomposition, narratives (3 AI-weeks, extra)",
+     "Reporting semantic-spec compile (1 back-end week, extra)",
+     "6 P16 screens (ANL-009, 051, 052, 053, 054, 056)"
+    ],
+    "packageScopeIsExtra": true,
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 3,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 3,
+    "backendWeeksExtra": 1,
+    "aiEngineerPointsExtra": 144,
+    "backendPointsExtra": 48,
+    "packagePointsExtra": 16.0,
+    "extraPoints": 208.0
+   },
+   "sprint": "S7 (AI dashboard and report generation, ANL-053/054, is an S9 stretch)",
+   "owners": {
+    "ai": "Kalpita Mejari",
+    "backend": "Hrushikant (Reporting compile)",
+    "frontend": "P16 owner in B3"
+   },
+   "risks": [
+    "Questions outside the semantic model get \"not available yet\" plus a knowledge gap; the semantic model must be wide enough at go-live.",
+    "ANL-053/054 (AI dashboards and reports, AIP-186/187) depend on the assistant being proven first."
+   ],
+   "customerSentence": "You can ask questions about your venue's numbers in plain language from the first day; every figure comes from your own reports, with the query shown."
+  },
+  {
+   "id": "fraud-risk",
+   "name": "Fraud and risk scoring, alerts and cases",
+   "designCapability": "C10",
+   "whatItDoesForTheCustomer": "Scores each payment attempt and each customer, device and card; raises alerts; lets an analyst investigate, link entities and propose a restrictive action.",
+   "operations": {
+    "total": 12,
+    "inBlockASlice": [],
+    "notInBlockASlice": [
+     "scoreTransactionRisk",
+     "getEntityRisk",
+     "configureRiskStrategy",
+     "backtestRiskStrategy",
+     "listRiskAlerts",
+     "decideRiskAlert",
+     "createRiskCase",
+     "getRiskCase",
+     "addRiskCaseEvidence",
+     "expandRiskNetwork",
+     "proposeRiskAction",
+     "closeRiskCase"
+    ],
+    "contractPointsNotInBlockA": 25.2
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "ADM-633",
+      "platform": "P09",
+      "name": "Fraud Alert, Investigation & Case Management\\t",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-637",
+      "platform": "P09",
+      "name": "AI Fraud, Anomaly & Payment Intelligence Center\\t",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-638",
+      "platform": "P09",
+      "name": "Payment Executive Intelligence, Risk Simulator & AI Advisor\\t",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "BO-1160",
+      "platform": "P08",
+      "name": "Fraud Alert & Investigation Case Management",
+      "points": 3,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 4,
+    "pointsNotInBlockA": 14
+   },
+   "currentPlan": "B2 \"rules-first fraud\"; Block A uses Orders' own rules; trained model after month 6. None of the 12 ai risk ops is in Block A.",
+   "planStatus": "in plan (B2), extended",
+   "whyLeftOut": {
+    "stated": "\"Trained fraud models wait\"; scope paper: \"without labelled fraud there is nothing to detect against\".",
+    "source": "six-month plan decision 2; ai-scope-for-confirmation s3",
+    "reallyNoData": "partly",
+    "assessment": "True for a classifier. Not for scoring: M21 describes a composite rule score (attempts, success ratio, cards per identity, refunds, expired-ticket reuse) that needs no history. The fraud book (Cold Start) lists deterministic rules, payment-provider signals, tenant rules, gradual learning and reduced confidence."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules engine baseline (tenant risk strategy templates by venue type and channel)",
+     "payment-provider risk signals",
+     "velocity counters",
+     "Bayesian entity baselines",
+     "analyst labels",
+     "shadow and promotion"
+    ],
+    "howItWorks": "A TICVAI-authored strategy template per venue type sets velocity limits and weights; the tenant adjusts it and can backtest it once it has a few weeks of its own transactions. Fail-open with holds (AI-D06). No cross-tenant data."
+   },
+   "maturityLadder": {
+    "day1": "Weighted rules plus velocity and provider signals; score 0-100 with band and reasons.",
+    "week4": "Entity baselines (normal behaviour per customer, device, cashier); backtestRiskStrategy on own history.",
+    "month3": "Graph features (shared device, token, account) and staff-leakage patterns.",
+    "season": "Classifier trained on analyst-labelled outcomes, in shadow; many tenants never get enough labels and stay on rules, which is acceptable.",
+    "uiShows": "Risk score and band, labelled \"risk score\", never a probability; the reasons; \"rules\" or \"rules + model\" as basis.",
+    "switchCriteria": "At the same review rate: recall at least equal to rules, precision at least 20% better, no segment (family, B2B, reseller) with a worse false-positive rate, over at least 6 weeks of shadow (design 3.5). Raised to admin; never automatic."
+   },
+   "build": {
+    "items": [
+     "Scoring runtime, entity risk, graph edges, alerts, cases (3 AI-weeks + owner-side events, in plan)",
+     "Strategy templates and provider-signal priors (0.5 AI-weeks, extra)",
+     "Classifier in shadow and label capture (3 AI-weeks, extra)"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 6.5,
+    "aiEngineerWeeksInPlan": 3,
+    "aiEngineerWeeksExtra": 3.5,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 168.0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 168.0
+   },
+   "sprint": "S4 scoring and templates; S6 entity, graph, alerts, cases; S8 classifier in shadow",
+   "owners": {
+    "ai": "Proposed third AI engineer (else second AI engineer)",
+    "backend": "Tanmay (Orders scoring call), Deep (the five new owner events)"
+   },
+   "risks": [
+    "The five owner events (payment.attemptFailed, identity.loginRecorded, order.cancelled/exchanged, entitlement.transferred, access.rejected) must exist or most signals are missing.",
+    "False positives hurt conversion; holds, not declines."
+   ],
+   "customerSentence": "Payments are risk-scored from the first transaction using proven fraud rules for venues like yours; the scoring learns what normal looks like for your customers, and a model is only switched on when your administrator approves it."
+  },
+  {
+   "id": "approval-scoring",
+   "name": "Approval-request scoring",
+   "designCapability": "C10 (context score) / Approvals",
+   "whatItDoesForTheCustomer": "Gives an approver a context score for a pending request (amount against limits, requester pattern, separation of duties).",
+   "operations": {
+    "total": 2,
+    "inBlockASlice": [],
+    "notInBlockASlice": [
+     "scoreApprovalRequest",
+     "getApprovalRequestScore"
+    ],
+    "contractPointsNotInBlockA": 4.2
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "ADM-366",
+      "platform": "P09",
+      "name": "AI Approval Intelligence Center",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 1,
+    "pointsNotInBlockA": 2
+   },
+   "currentPlan": "getApprovalRequestScore is a Venue Management task (VM-AI-RISK-1, B1); scoreApprovalRequest is not planned.",
+   "planStatus": "partly in plan (VM)",
+   "whyLeftOut": {
+    "stated": "None stated.",
+    "source": "tasks.csv",
+    "reallyNoData": "no",
+    "assessment": "Rules on configuration and the request itself work on day one."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules engine baseline",
+     "Bayesian requester baseline"
+    ],
+    "howItWorks": "Score from amount against threshold, deviation from policy, separation of duties, time of day, object sensitivity."
+   },
+   "maturityLadder": {
+    "day1": "Rules score with reasons.",
+    "week4": "Requester and approver baselines.",
+    "month3": "Stable baselines.",
+    "season": "A model only if override data justifies it; probably never needed.",
+    "uiShows": "Score and reasons; never blocks, only informs (L1).",
+    "switchCriteria": "Same as risk; raised to admin."
+   },
+   "build": {
+    "items": [
+     "Rules scorer and baseline (0.5 AI-weeks, extra)"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 0.5,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 0.5,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 24.0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 24.0
+   },
+   "sprint": "S7",
+   "owners": {
+    "ai": "Proposed third AI engineer",
+    "backend": "Chinmay Patkar (VM-AI-RISK-1)"
+   },
+   "risks": [
+    "Low risk."
+   ],
+   "customerSentence": "Approvers see why a request looks unusual from the first request, based on your approval rules."
+  },
+  {
+   "id": "recommendations",
+   "name": "Recommendations and personalisation (upsell, cross-sell, upgrades, next best offer)",
+   "designCapability": "C11",
+   "whatItDoesForTheCustomer": "Fills the \"extras\" step and other placements with the right add-ons and upgrades, never against business rules, with reasons from templates.",
+   "operations": {
+    "total": 5,
+    "inBlockASlice": [
+     "decideRecommendations",
+     "recordRecommendationEvents"
+    ],
+    "notInBlockASlice": [
+     "explainRecommendationDecision",
+     "getCustomerRecommendationProfile",
+     "simulateRecommendationDecision"
+    ],
+    "contractPointsNotInBlockA": 6.3
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "ADM-639",
+      "platform": "P09",
+      "name": "Recommendation Command Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-640",
+      "platform": "P09",
+      "name": "Recommendation Strategy Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-641",
+      "platform": "P09",
+      "name": "Recommendation Objective & KPI Configuration",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-642",
+      "platform": "P09",
+      "name": "Recommendation Type & Product Relationship Manager",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-643",
+      "platform": "P09",
+      "name": "Recommendation Placement & Touchpoint Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-644",
+      "platform": "P09",
+      "name": "Channel & Journey Strategy Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-645",
+      "platform": "P09",
+      "name": "Recommendation Priority, Ranking & Suppression Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-646",
+      "platform": "P09",
+      "name": "Recommendation Guardrails & Business Controls",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-647",
+      "platform": "P09",
+      "name": "Recommendation Policy, AI Control & Governance",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-648",
+      "platform": "P09",
+      "name": "Recommendation Strategy Simulator & AI Advisor",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-649",
+      "platform": "P09",
+      "name": "Upsell & Upgrade Command Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-650",
+      "platform": "P09",
+      "name": "Upgrade Path & Product Ladder Builder",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-651",
+      "platform": "P09",
+      "name": "Upsell Eligibility & Qualification Rules",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-652",
+      "platform": "P09",
+      "name": "Upgrade Price Difference & Value Proposition Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-653",
+      "platform": "P09",
+      "name": "Ticket, Experience & Bundle Upgrade Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-654",
+      "platform": "P09",
+      "name": "Membership & Pass Upgrade Engine",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-655",
+      "platform": "P09",
+      "name": "Pre-Purchase, Cart & Checkout Upsell Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-656",
+      "platform": "P09",
+      "name": "Post-Purchase & In-Journey Upgrade Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-657",
+      "platform": "P09",
+      "name": "Upsell Ranking, Propensity & AI Opportunity Engine",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-658",
+      "platform": "P09",
+      "name": "Upgrade Simulator, Comparison & AI Advisor",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-659",
+      "platform": "P09",
+      "name": "Cross-Sell Command Center",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-660",
+      "platform": "P09",
+      "name": "Cross-Sell Relationship Builder",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-661",
+      "platform": "P09",
+      "name": "Product Affinity Matrix & Relationship Map",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-662",
+      "platform": "P09",
+      "name": "Frequently Bought Together & Basket Pattern Engine",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-663",
+      "platform": "P09",
+      "name": "Cross-Category Recommendation Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-664",
+      "platform": "P09",
+      "name": "Multi-Attraction, Destination & Partner Cross-Sell",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-665",
+      "platform": "P09",
+      "name": "Basket-Aware Cross-Sell & Duplicate Prevention",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-666",
+      "platform": "P09",
+      "name": "Availability, Inventory & Capacity-Aware Cross-Sell",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-667",
+      "platform": "P09",
+      "name": "AI Cross-Sell Discovery, Scoring & Ranking Engine",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-668",
+      "platform": "P09",
+      "name": "Cross-Sell Simulator & AI Opportunity Advisor",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-669",
+      "platform": "P09",
+      "name": "Journey & Context Command Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-670",
+      "platform": "P09",
+      "name": "Customer Journey Map & Touchpoint Designer",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-671",
+      "platform": "P09",
+      "name": "Real-Time Context Rule Engine",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-672",
+      "platform": "P09",
+      "name": "Pre-Purchase & Booking Journey Recommendation Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-673",
+      "platform": "P09",
+      "name": "Post-Purchase & Pre-Visit Recommendation Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-674",
+      "platform": "P09",
+      "name": "In-Venue & Location-Aware Recommendation Engine",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-675",
+      "platform": "P09",
+      "name": "Visit State, Itinerary & Time-Aware Recommendation",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-676",
+      "platform": "P09",
+      "name": "Omnichannel Recommendation Synchronization",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-677",
+      "platform": "P09",
+      "name": "Contextual Trigger, Frequency & Experience Controls",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-678",
+      "platform": "P09",
+      "name": "Journey Simulator, Decision Trace & AI Optimization",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-679",
+      "platform": "P09",
+      "name": "Personalization & NBO Command Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-680",
+      "platform": "P09",
+      "name": "Customer Recommendation Profile",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-681",
+      "platform": "P09",
+      "name": "Customer Feature & Signal Configuration",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-682",
+      "platform": "P09",
+      "name": "Propensity Model & Customer Intent Manager",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-683",
+      "platform": "P09",
+      "name": "Next-Best-Offer Decision Studio",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-684",
+      "platform": "P09",
+      "name": "Personalized Ranking & Decision Policy Builder",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-685",
+      "platform": "P09",
+      "name": "Customer Preference, Fatigue & Suppression Intelligence",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-686",
+      "platform": "P09",
+      "name": "Anonymous, Known & Identity-Transition Personalization",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-687",
+      "platform": "P09",
+      "name": "AI Explainability, Confidence & Model Governance",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-688",
+      "platform": "P09",
+      "name": "Personalization Simulator & Next-Best-Offer Lab",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-689",
+      "platform": "P09",
+      "name": "Recommendation Performance Command Center",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-690",
+      "platform": "P09",
+      "name": "Recommendation Strategy & Placement Analytics",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-691",
+      "platform": "P09",
+      "name": "Recommendation Experiment & A/B Test Studio",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-692",
+      "platform": "P09",
+      "name": "Experiment Results & Winner Decision Workspace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-693",
+      "platform": "P09",
+      "name": "Recommendation Attribution & Incrementality Analytics",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-694",
+      "platform": "P09",
+      "name": "AI Model Performance & Drift Monitor",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-695",
+      "platform": "P09",
+      "name": "Recommendation Governance & Deployment Control",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-696",
+      "platform": "P09",
+      "name": "AI Risk, Fairness, Explainability & Safety Center",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-697",
+      "platform": "P09",
+      "name": "Recommendation Audit, Decision Trace & Investigation",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-698",
+      "platform": "P09",
+      "name": "AI Optimization & Recommendation Intelligence Lab",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 60,
+    "pointsNotInBlockA": 135
+   },
+   "currentPlan": "decideRecommendations and recordRecommendationEvents are in Block A (rules: Promotions relationship map). Explanation, profile and simulation in B2; learning-to-rank after month 6. The 60 P09 recommendation boards (ADM-639..698) sit in the console blocks.",
+   "planStatus": "in plan (B2), extended",
+   "whyLeftOut": {
+    "stated": "\"Trained recommendation models wait\"; scope paper: \"purchase and attendance history per guest\".",
+    "source": "six-month plan decision 2",
+    "reallyNoData": "partly",
+    "assessment": "Rules and context work on day one (M21: family ticket when 2 adults + 2 children are in the cart; a member is never offered a membership). The R&P book's Cold Start screen and the Upsell book's four-phase cold-start strategy say exactly this."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules engine baseline (relationship map, eligibility, business priority)",
+     "context signals (party, time, weather, capacity)",
+     "Beta priors on attach rates from relationship strength",
+     "controlled experiment and promotion"
+    ],
+    "howItWorks": "Candidates from the relationship map; eligibility and suppression; rank by business priority and context; attach-rate priors from the configured relationship strength, updated with each shown/accepted event."
+   },
+   "maturityLadder": {
+    "day1": "Rules and context; contextual (not personal) mode.",
+    "week4": "Popularity by daypart and segment; attach rates on own data.",
+    "month3": "Co-purchase affinity past the minimum-support thresholds (Upsell book p.70).",
+    "season": "Learning-to-rank in shadow; controlled experiment against rules.",
+    "uiShows": "High/medium/low band for staff; guests see template reasons only; \"rules\" or \"rules + model\" in the admin trace.",
+    "switchCriteria": "Controlled experiment with a minimum sample, guardrails on refunds, abandonment and checkout time (AIR-145..147); raised to admin."
+   },
+   "build": {
+    "items": [
+     "Runtime, decline store, attribution, experiments, POS bundle list (3 AI-weeks + back-end, in plan)",
+     "Attach-rate priors and context features (0.5 AI-weeks, extra)",
+     "Learning-to-rank in shadow (3 AI-weeks, extra)"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 6.5,
+    "aiEngineerWeeksInPlan": 3,
+    "aiEngineerWeeksExtra": 3.5,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 168.0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 168.0
+   },
+   "sprint": "S5 runtime; S6 affinity; S7 experiments; S8 learning-to-rank in shadow",
+   "owners": {
+    "ai": "Proposed third AI engineer",
+    "backend": "Pranay (Promotions forwarding), Hrushikant (AI runtime ops)"
+   },
+   "risks": [
+    "A model needs enough traffic for an experiment; small venues may stay on rules, which is fine."
+   ],
+   "customerSentence": "Offers at checkout follow your own product rules from day one and learn which add-ons your guests actually take."
+  },
+  {
+   "id": "marketing-ai",
+   "name": "Marketing recommendations, lookalike segments and send time",
+   "designCapability": "C11 / C6",
+   "whatItDoesForTheCustomer": "Suggests campaigns and journeys, proposes lookalike audiences from a seed, and picks the best send hour per recipient.",
+   "operations": {
+    "total": 3,
+    "inBlockASlice": [
+     "proposeMarketingContent"
+    ],
+    "notInBlockASlice": [
+     "listMarketingRecommendations",
+     "proposeLookalikeSegment"
+    ],
+    "contractPointsNotInBlockA": 4.2
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "BO-761",
+      "platform": "P08",
+      "name": "AI Audience Discovery",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "BO-762",
+      "platform": "P08",
+      "name": "Predictive Audiences",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "BO-764",
+      "platform": "P08",
+      "name": "Campaign Command Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "BO-772",
+      "platform": "P08",
+      "name": "A/B & AI Optimization",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "BO-782",
+      "platform": "P08",
+      "name": "AI Journey Optimization",
+      "points": 3,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 5,
+    "pointsNotInBlockA": 13
+   },
+   "currentPlan": "Screens BO-761, 762, 764, 772, 782 sit with marketing in Block B by the per-operation measure; the plan names no AI work for them. proposeMarketingContent is in Block A.",
+   "planStatus": "screens in plan, AI not named",
+   "whyLeftOut": {
+    "stated": "segmentation and sendTime need 90 days.",
+    "source": "ai.yaml SuggestionKind",
+    "reallyNoData": "partly",
+    "assessment": "Lookalike on known attributes and rule playbooks work on day one; propensity needs history."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules playbook",
+     "attribute similarity",
+     "benchmark send hours by channel",
+     "forecast-driven triggers",
+     "shadow and promotion"
+    ],
+    "howItWorks": "Playbooks (abandoned cart, membership expiring, low-forecast day: promote) from the prior forecast; lookalike by segmentable attributes; send time from the channel benchmark until a recipient has three touches."
+   },
+   "maturityLadder": {
+    "day1": "Playbooks and attribute lookalikes.",
+    "week4": "Campaign performance feeds the ranking.",
+    "month3": "RFM segments; send time per recipient.",
+    "season": "Propensity model in shadow.",
+    "uiShows": "Every answer carries a basis chip (\"Based on: your venue profile, UAE calendar, weather, 23 days of your sales\") and a maturity badge (Starting, Learning, Established, Trained on your data). No bare percentages (design 5.6).",
+    "switchCriteria": "Propensity model promoted by admin after an A/B test against the playbook."
+   },
+   "build": {
+    "items": [
+     "Playbooks, lookalike rules, send-time priors (1.5 AI-weeks, extra)"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 1.5,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 1.5,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 72.0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 72.0
+   },
+   "sprint": "S7",
+   "owners": {
+    "ai": "Second AI engineer",
+    "backend": "Marketing service owner"
+   },
+   "risks": [
+    "Consent: marketing to guest-checkout profiles was left open on 18 September."
+   ],
+   "customerSentence": "Campaign and audience suggestions start from proven playbooks and your guests' known attributes, and sharpen as campaign results come in."
+  },
+  {
+   "id": "dynamic-pricing-ai",
+   "name": "Dynamic pricing suggestions (AI on top of the rules-based pricing engine)",
+   "designCapability": "C8 input to Catalogue pricing (autonomy L2)",
+   "whatItDoesForTheCustomer": "Proposes a price step up or a promotion when demand runs ahead of or behind the forecast, inside the bands the venue configured; a person approves.",
+   "operations": {
+    "total": 0,
+    "inBlockASlice": [],
+    "notInBlockASlice": [],
+    "contractPointsNotInBlockA": 0.0
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "BO-528",
+      "platform": "P08",
+      "name": "Dynamic Pricing & AI Recommendation",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "BO-1044",
+      "platform": "P08",
+      "name": "Dynamic Seat Pricing",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 2,
+    "pointsNotInBlockA": 4
+   },
+   "currentPlan": "Rules-based dynamic pricing is Catalogue scope (ADM-088/089, BO-528, BO-1044) in Block B; \"AI/factor-based later\" (MoM 19 Aug). requestSuggestion kind price (cost + margin) already needs no history.",
+   "planStatus": "not in plan",
+   "whyLeftOut": {
+    "stated": "\"The AI/factor-based component depends on forecasting mechanisms.\"",
+    "source": "MoM 19 Aug 2026; scope paper (46 requirements deferred)",
+    "reallyNoData": "partly",
+    "assessment": "With a day-one forecast the pace-against-forecast rule works immediately. Price elasticity cannot be learned until prices have varied, so AI never sets the price by itself (L2)."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules engine baseline",
+     "forecast and pace",
+     "human approval (price changes are high risk, M18)"
+    ],
+    "howItWorks": "Pace above the forecast P90 suggests a step up within the band; below P10 suggests a promotion. Each suggestion goes through governance and approval."
+   },
+   "maturityLadder": {
+    "day1": "Pace-against-prior-forecast suggestions.",
+    "week4": "Against the statistical forecast.",
+    "month3": "Acceptance and outcome tracked (did revenue rise?).",
+    "season": "Elasticity estimate in shadow, only after enough price variation.",
+    "uiShows": "Every answer carries a basis chip (\"Based on: your venue profile, UAE calendar, weather, 23 days of your sales\") and a maturity badge (Starting, Learning, Established, Trained on your data). No bare percentages (design 5.6). Current against proposed price, impact, affected channels (M18 4.2).",
+    "switchCriteria": "Elasticity model promoted by admin; L4 auto-pricing stays off until six months of clean L3 evidence (design 6)."
+   },
+   "build": {
+    "items": [
+     "Pace-against-forecast suggestion kind and governance wiring (1 AI-week, extra)"
+    ],
+    "newOrChangedOperations": [
+     "requestSuggestion kind for demand-based price (contract change)"
+    ],
+    "newOrChangedOpPoints": 2.1,
+    "aiEngineerWeeksTotal": 1,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 1,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 48,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 2.1,
+    "extraPoints": 50.1
+   },
+   "sprint": "S7",
+   "owners": {
+    "ai": "Proposed third AI engineer",
+    "backend": "Catalogue pricing owner"
+   },
+   "risks": [
+    "Commercial willingness to let price move (scope paper s3)."
+   ],
+   "customerSentence": "Price suggestions start from day one by comparing bookings with the forecast, always inside your price bands and always approved by a person."
+  },
+  {
+   "id": "configuration-assistant",
+   "name": "Configuration assistant (discovery, blueprint, build plan, change and rollback)",
+   "designCapability": "C7",
+   "whatItDoesForTheCustomer": "An admin says \"I want to create a product\" and the assistant asks the missing questions, builds a blueprint with a dependency map, and applies an approved plan through the owning modules.",
+   "operations": {
+    "total": 11,
+    "inBlockASlice": [
+     "suggestGuidedChoice",
+     "getGuidedChoiceSuggestion"
+    ],
+    "notInBlockASlice": [
+     "startConfigurationSession",
+     "answerConfigurationQuestion",
+     "attachConfigurationSource",
+     "listConfigurationSources",
+     "getConfigurationBlueprint",
+     "decideBlueprintRecommendation",
+     "buildConfigurationPlan",
+     "listConfigurationSessions",
+     "generateConfiguration"
+    ],
+    "contractPointsNotInBlockA": 18.9
+   },
+   "screens": {
+    "inBlockA": [
+     "BO-117"
+    ],
+    "notInBlockA": [
+     {
+      "id": "ADM-469",
+      "platform": "P09",
+      "name": "AI Configuration Home & Start",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-470",
+      "platform": "P09",
+      "name": "Setup Type & Business Intent Discovery",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-471",
+      "platform": "P09",
+      "name": "Venue & Business Model Discovery",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-472",
+      "platform": "P09",
+      "name": "Guided Question & Answer Workspace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-473",
+      "platform": "P09",
+      "name": "Product & Admission Model Discovery",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-474",
+      "platform": "P09",
+      "name": "Operational Requirement Discovery",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-475",
+      "platform": "P09",
+      "name": "Commercial Requirement Discovery",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-476",
+      "platform": "P09",
+      "name": "Required, Recommended & Optional Decisions",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-477",
+      "platform": "P09",
+      "name": "Missing Information & Clarification Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-478",
+      "platform": "P09",
+      "name": "Configuration Blueprint & Dependency Map",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-479",
+      "platform": "P09",
+      "name": "AI Configuration Build Command Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-480",
+      "platform": "P09",
+      "name": "Venue & Organization Configuration",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-481",
+      "platform": "P09",
+      "name": "Product Configuration Assistant",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-482",
+      "platform": "P09",
+      "name": "Schedule, Capacity & Availability Configuration",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-483",
+      "platform": "P09",
+      "name": "Pricing & Commercial Configuration",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-484",
+      "platform": "P09",
+      "name": "Promotion, Bundle & Upsell Configuration",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-485",
+      "platform": "P09",
+      "name": "Seating, Access & Operational Configuration",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-486",
+      "platform": "P09",
+      "name": "Channel, Media & Fulfillment Configuration",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-487",
+      "platform": "P09",
+      "name": "Cross-Module Conflict & Dependency Validation",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-488",
+      "platform": "P09",
+      "name": "Configuration Preview & Impact Analysis",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-489",
+      "platform": "P09",
+      "name": "AI Configuration Readiness Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-490",
+      "platform": "P09",
+      "name": "Configuration Validation Results",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-491",
+      "platform": "P09",
+      "name": "AI Recommendations & Best-Practice Review",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-492",
+      "platform": "P09",
+      "name": "Configuration Approval Workflow",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-493",
+      "platform": "P09",
+      "name": "AI Configuration Execution Center",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-494",
+      "platform": "P09",
+      "name": "Execution Progress & Dependency Monitor",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-495",
+      "platform": "P09",
+      "name": "Configuration Results & Object Mapping",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-496",
+      "platform": "P09",
+      "name": "Configuration Change & Modification Assistant",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-497",
+      "platform": "P09",
+      "name": "Configuration History, Versions & Rollback",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-498",
+      "platform": "P09",
+      "name": "AI Configuration Audit & Governance",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "BO-597",
+      "platform": "P08",
+      "name": "AI Configuration Workspace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "BO-598",
+      "platform": "P08",
+      "name": "AI Draft Review & Approval",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 32,
+    "pointsNotInBlockA": 77
+   },
+   "currentPlan": "After month 6 (plan decision 6). Only the Help me choose suggestion (suggestGuidedChoice, getGuidedChoiceSuggestion) and BO-117 are in Block A.",
+   "planStatus": "moved past month 6",
+   "whyLeftOut": {
+    "stated": "Capacity: \"The platform runs without them.\" To be told to the client.",
+    "source": "six-month plan decision 6",
+    "reallyNoData": "no",
+    "assessment": "Needs no history at all (design 3.12). And it was the client's stated first AI priority: MoM 14 Aug (\"the priority AI use case for phase one is a configuration assistant\"), Qossai on 17 Aug (\"seating maps and the ticket configuration\"), CF-57. It is also the natural way to collect the venue priors every other capability now needs."
+   },
+   "dayOne": {
+    "approaches": [
+     "configuration knowledge model (rules) picks questions; the LLM only extracts answers against a schema",
+     "plan, validate, simulate, approve, execute through owning APIs"
+    ],
+    "howItWorks": "Full function on day one. Collects the venue AI profile (capacity, hours, typical attendance) during discovery."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "n/a (no tenant training).",
+    "month3": "n/a.",
+    "season": "Improves through golden sets and knowledge gaps, not tenant data.",
+    "uiShows": "Provenance per value (confirmed, AI-recommended, inferred, unknown); no confidence number (design 5.6).",
+    "switchCriteria": "Release gate: plan validation pass rate >= 90% on the golden set, zero unsafe steps."
+   },
+   "build": {
+    "items": [
+     "Discovery, blueprint, plan (5 AI-weeks, extra)",
+     "validate-only on the first 15 tool operations in owning services (2 back-end weeks, extra)",
+     "9 ops, 32 screens (ADM-469..498, BO-597, BO-598)"
+    ],
+    "packageScopeIsExtra": true,
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 5,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 5,
+    "backendWeeksExtra": 2,
+    "aiEngineerPointsExtra": 240,
+    "backendPointsExtra": 96,
+    "packagePointsExtra": 95.9,
+    "extraPoints": 431.9
+   },
+   "sprint": "S3-S5 (seating and ticketing products first, the other modules in S8); needs the action pipeline (B1) before its execute step",
+   "owners": {
+    "ai": "Kalpita Mejari",
+    "backend": "Hrushikant and Deep (validate-only in owning services)",
+    "frontend": "P09 console owner; start with the ADM-469..478 discovery screens"
+   },
+   "risks": [
+    "Cross-module validate-only is owner-side work, the real cost.",
+    "A half-applied plan: the executor compensates or pauses; nothing is applied without approval."
+   ],
+   "customerSentence": "You can set up venues and products by describing what you want; the assistant asks what is missing and nothing is applied until you approve it."
+  },
+  {
+   "id": "seat-map-layout",
+   "name": "Seat-map and venue-layout generation (generateVenueLayout, proposeSeatMapChanges, proposeVenueLabels, proposeWalkways)",
+   "designCapability": "C7",
+   "whatItDoesForTheCustomer": "From an uploaded plan, proposes the seat map, labels, walkways and changes to an existing map, as a plan a person approves.",
+   "operations": {
+    "total": 4,
+    "inBlockASlice": [],
+    "notInBlockASlice": [
+     "generateVenueLayout",
+     "proposeSeatMapChanges",
+     "proposeVenueLabels",
+     "proposeWalkways"
+    ],
+    "contractPointsNotInBlockA": 8.4
+   },
+   "screens": {
+    "inBlockA": [
+     "BO-093"
+    ],
+    "notInBlockA": [
+     {
+      "id": "BO-959",
+      "platform": "P08",
+      "name": "Stage & Focal Point",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "BO-970",
+      "platform": "P08",
+      "name": "AI Numbering & Labeling",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "BO-975",
+      "platform": "P08",
+      "name": "Event-Specific Layout",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "BO-982",
+      "platform": "P08",
+      "name": "Approval, Publish & Rollback",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 4,
+    "pointsNotInBlockA": 9
+   },
+   "currentPlan": "proposeSeatMapChanges after month 6 (decision 6); the other three are in no block. BO-093 Map Import & Labelling is a Block A screen without its AI operation.",
+   "planStatus": "moved past month 6 / not planned",
+   "whyLeftOut": {
+    "stated": "Grouped with the configuration assistant.",
+    "source": "six-month plan decision 6",
+    "reallyNoData": "no",
+    "assessment": "Needs no history. Named as feasible near-term on 14 Aug and as the priority on 17 Aug; the 21 Aug minutes decided AI-assisted import (PDF/image + Excel/CSV)."
+   },
+   "dayOne": {
+    "approaches": [
+     "document and image extraction, then rules; always previewed and approved"
+    ],
+    "howItWorks": "Full function on day one; accuracy depends on drawing quality."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "n/a.",
+    "month3": "n/a.",
+    "season": "Improves through TICVAI's own evaluation drawings, not tenant plans.",
+    "uiShows": "What the assistant had to guess, highlighted for review.",
+    "switchCriteria": "Release gate on the evaluation set."
+   },
+   "build": {
+    "items": [
+     "Extraction, labelling, walkways, change proposals (3 AI-weeks, extra)",
+     "4 ops, 4 screens"
+    ],
+    "packageScopeIsExtra": true,
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 3,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 3,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 144,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 17.4,
+    "extraPoints": 161.4
+   },
+   "sprint": "S6",
+   "owners": {
+    "ai": "Kalpita Mejari",
+    "backend": "Seating owner",
+    "frontend": "Seat-map screen owner"
+   },
+   "risks": [
+    "Poor-quality drawings; the preview step exists because a manifest is always wrong the first time (scope paper s6)."
+   ],
+   "customerSentence": "Upload your venue plan and get a proposed seat map to correct and approve, instead of drawing it by hand."
+  },
+  {
+   "id": "content-translation",
+   "name": "Translations (proposeTranslations)",
+   "designCapability": "C5 / generate",
+   "whatItDoesForTheCustomer": "Fills translation gaps with a first pass for a person to edit.",
+   "operations": {
+    "total": 1,
+    "inBlockASlice": [],
+    "notInBlockASlice": [
+     "proposeTranslations"
+    ],
+    "contractPointsNotInBlockA": 2.1
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "BO-793",
+      "platform": "P08",
+      "name": "AI Content, Translation & Audit",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 1,
+    "pointsNotInBlockA": 2
+   },
+   "currentPlan": "Plan decision 2 puts translations in Block A, but proposeTranslations is not in the Block A slice or the task sheet (BO-793 is Block B).",
+   "planStatus": "in plan, missing from the package",
+   "whyLeftOut": {
+    "stated": "None: the plan includes it.",
+    "source": "six-month plan decision 2; delivery-slice.json",
+    "reallyNoData": "no",
+    "assessment": "A package gap, not a data question."
+   },
+   "dayOne": {
+    "approaches": [
+     "LLM first pass, human edit, tenant glossary"
+    ],
+    "howItWorks": "Full function on day one."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "Tenant glossary grows from edits.",
+    "month3": "n/a.",
+    "season": "n/a.",
+    "uiShows": "Marked \"AI draft\" until a person saves.",
+    "switchCriteria": "n/a"
+   },
+   "build": {
+    "items": [
+     "Add proposeTranslations to the Block A slice (0.5 AI-weeks, Block A)"
+    ],
+    "packageScopeIsExtra": true,
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 0.5,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 0.5,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 24.0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 4.1,
+    "extraPoints": 28.1
+   },
+   "sprint": "S2 (Block A)",
+   "owners": {
+    "ai": "Kalpita Mejari",
+    "backend": "Sanket"
+   },
+   "risks": [
+    "Arabic quality; always a human edit."
+   ],
+   "customerSentence": "Missing translations get a first draft you edit and approve."
+  },
+  {
+   "id": "planner-agent",
+   "name": "Guest planner agent (Plan tab, AI optimised itinerary)",
+   "designCapability": "C5 profile",
+   "whatItDoesForTheCustomer": "Plans a guest's day: shows, rides, meals, around wait times and show times.",
+   "operations": {
+    "total": 0,
+    "inBlockASlice": [],
+    "notInBlockASlice": [],
+    "contractPointsNotInBlockA": 0.0
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "GST-054",
+      "platform": "P02",
+      "name": "AI Optimized Itinerary",
+      "points": 3,
+      "where": "deferred"
+     }
+    ],
+    "countNotInBlockA": 1,
+    "pointsNotInBlockA": 3
+   },
+   "currentPlan": "Plan decision 3 puts a rules-based Plan tab with the AI planner agent in Block A. But ai.yaml has no planner operation (\"the itinerary planner is deferred\"), and GST-054 AI Optimized Itinerary is on the slice's deferred-screens list.",
+   "planStatus": "in plan, missing from the package",
+   "whyLeftOut": {
+    "stated": "Deferred 28 September (R187, R209); re-included 29 September.",
+    "source": "ai.yaml requestSuggestion note; delivery-slice deferredScreens",
+    "reallyNoData": "no",
+    "assessment": "A package gap: the plan and the package disagree."
+   },
+   "dayOne": {
+    "approaches": [
+     "rules (catalogue, schedule, wait times) with an LLM agent on top"
+    ],
+    "howItWorks": "Full function on day one; wait times from the venue feed or configured capacity."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "Uses measured wait times.",
+    "month3": "n/a.",
+    "season": "n/a.",
+    "uiShows": "Plan items with times and why.",
+    "switchCriteria": "n/a"
+   },
+   "build": {
+    "items": [
+     "Add a guest-allowed planner operation (2 ops) and GST-054 to Block A"
+    ],
+    "packageScopeIsExtra": true,
+    "newOrChangedOperations": [
+     "planGuestItinerary",
+     "getGuestItinerary (names provisional)"
+    ],
+    "newOrChangedOpPoints": 4.2,
+    "aiEngineerWeeksTotal": 2,
+    "aiEngineerWeeksInPlan": 2,
+    "aiEngineerWeeksExtra": 0,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 7.2,
+    "extraPoints": 7.2
+   },
+   "sprint": "S2 (Block A)",
+   "owners": {
+    "ai": "Kalpita Mejari",
+    "frontend": "Chitrangi Mestry (mobile)"
+   },
+   "risks": [
+    "Block A AI load is already above the two engineers' Block A time."
+   ],
+   "customerSentence": "The Plan tab builds your day around show times and waits."
+  },
+  {
+   "id": "action-pipeline",
+   "name": "Action pipeline and human oversight (plans, simulate, pause, retry, rollback, override)",
+   "designCapability": "C3",
+   "whatItDoesForTheCustomer": "Platform function; no customer-facing prediction.",
+   "operations": {
+    "total": 12,
+    "inBlockASlice": [
+     "decideProposedAction"
+    ],
+    "notInBlockASlice": [
+     "getActionPlan",
+     "simulateActionPlan",
+     "pauseActionPlan",
+     "resumeActionPlan",
+     "cancelActionPlan",
+     "retryActionStep",
+     "rollbackActionPlan",
+     "overrideAiDecision",
+     "listAiTools",
+     "setAiTool",
+     "listProposedActions"
+    ],
+    "contractPointsNotInBlockA": 23.1
+   },
+   "screens": {
+    "inBlockA": [
+     "ADM-536"
+    ],
+    "notInBlockA": [
+     {
+      "id": "ADM-529",
+      "platform": "P09",
+      "name": "AI Human Oversight Command Center",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-530",
+      "platform": "P09",
+      "name": "AI Approval Requirement & Routing Configuration",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-531",
+      "platform": "P09",
+      "name": "AI Approval Review Workspace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-532",
+      "platform": "P09",
+      "name": "Conditional Approval & Approval Conditions",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-533",
+      "platform": "P09",
+      "name": "Human Review, Challenge & AI Clarification Workspace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-534",
+      "platform": "P09",
+      "name": "Escalation, Delegation & Approval SLA Management",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-535",
+      "platform": "P09",
+      "name": "Live AI Execution Oversight & Human Intervention",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-537",
+      "platform": "P09",
+      "name": "Approval & Intervention History / Decision Timeline",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-538",
+      "platform": "P09",
+      "name": "Human Oversight Workflow Simulator & Readiness Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "BO-928",
+      "platform": "P08",
+      "name": "AI Conflict Resolution Assistant",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "BO-929",
+      "platform": "P08",
+      "name": "Automatic Schedule Optimization",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 11,
+    "pointsNotInBlockA": 28
+   },
+   "currentPlan": "B1 (plan)",
+   "planStatus": "in plan (sequence change only)",
+   "whyLeftOut": {
+    "stated": "Sequencing: the AI console is B3.",
+    "source": "six-month plan timeline",
+    "reallyNoData": "no",
+    "assessment": "Not data-dependent. Some pieces are the backbone of learn-then-promote and must land earlier than B3."
+   },
+   "dayOne": {
+    "approaches": [
+     "not applicable"
+    ],
+    "howItWorks": "Full function on day one."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "n/a",
+    "month3": "n/a",
+    "season": "n/a",
+    "uiShows": "n/a",
+    "switchCriteria": "n/a"
+   },
+   "build": {
+    "items": [
+     "Build as planned; sequence as stated"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 0,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 0,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 0
+   },
+   "sprint": "S3-S4 (before the configuration assistant's execute step)",
+   "owners": {
+    "backend": "Hrushikant, Pranay"
+   },
+   "risks": [
+    "If left to the end of B3, no model can be promoted and no maturity can be shown before 2 April."
+   ],
+   "customerSentence": "Every AI decision is recorded, explainable and reversible from day one."
+  },
+  {
+   "id": "knowledge-admin",
+   "name": "Knowledge and retrieval administration (index sources, jobs, failures, gaps, assistant profiles list)",
+   "designCapability": "C4",
+   "whatItDoesForTheCustomer": "Platform function; no customer-facing prediction.",
+   "operations": {
+    "total": 7,
+    "inBlockASlice": [],
+    "notInBlockASlice": [
+     "listIndexFailures",
+     "listIndexJobs",
+     "listIndexSources",
+     "listKnowledgeCollections",
+     "removeIndexEntry",
+     "listAssistantProfiles",
+     "listKnowledgeGaps"
+    ],
+    "contractPointsNotInBlockA": 14.7
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "BO-798",
+      "platform": "P08",
+      "name": "Intent & Knowledge Management",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "SUP-006",
+      "platform": "P12",
+      "name": "Knowledge Base Search",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "SUP-018",
+      "platform": "P12",
+      "name": "AI Customer Service Copilot & Knowledge Workspace",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 3,
+    "pointsNotInBlockA": 6
+   },
+   "currentPlan": "Block B (console, Support)",
+   "planStatus": "in plan (sequence change only)",
+   "whyLeftOut": {
+    "stated": "Sequencing: the AI console is B3.",
+    "source": "six-month plan timeline",
+    "reallyNoData": "no",
+    "assessment": "Not data-dependent. Some pieces are the backbone of learn-then-promote and must land earlier than B3."
+   },
+   "dayOne": {
+    "approaches": [
+     "not applicable"
+    ],
+    "howItWorks": "Full function on day one."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "n/a",
+    "month3": "n/a",
+    "season": "n/a",
+    "uiShows": "n/a",
+    "switchCriteria": "n/a"
+   },
+   "build": {
+    "items": [
+     "Build as planned; sequence as stated"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 0,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 0,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 0
+   },
+   "sprint": "S5",
+   "owners": {
+    "backend": "Deep"
+   },
+   "risks": [
+    "If left to the end of B3, no model can be promoted and no maturity can be shown before 2 April."
+   ],
+   "customerSentence": "Every AI decision is recorded, explainable and reversible from day one."
+  },
+  {
+   "id": "governance-gateway",
+   "name": "Governance and gateway remainder (decision point, effective policy, usage, exceptions, pause, providers list)",
+   "designCapability": "C1, C2",
+   "whatItDoesForTheCustomer": "Platform function; no customer-facing prediction.",
+   "operations": {
+    "total": 13,
+    "inBlockASlice": [],
+    "notInBlockASlice": [
+     "createAiPolicyException",
+     "evaluateAiGovernance",
+     "getAiUsage",
+     "getEffectiveAiPolicy",
+     "listAiCapabilities",
+     "listAiGovernancePolicyVersions",
+     "listAiInteractions",
+     "pauseAiCapability",
+     "revokeAiPolicyException",
+     "getAiByokEnablement",
+     "getAiPolicy",
+     "listAiProviders",
+     "testAiProvider"
+    ],
+    "contractPointsNotInBlockA": 27.3
+   },
+   "screens": {
+    "inBlockA": [
+     "ADM-520",
+     "ADM-523",
+     "ADM-527",
+     "ADM-528"
+    ],
+    "notInBlockA": [
+     {
+      "id": "ADM-519",
+      "platform": "P09",
+      "name": "AI Governance Command Center",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-521",
+      "platform": "P09",
+      "name": "AI Risk Classification & Assessment",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-522",
+      "platform": "P09",
+      "name": "AI Autonomy Level Configuration",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-524",
+      "platform": "P09",
+      "name": "AI Data Access & Usage Policy",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-525",
+      "platform": "P09",
+      "name": "Environment, Tenant & Scope Governance",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-526",
+      "platform": "P09",
+      "name": "AI Policy Conflict, Exception & Override Management",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ANL-060",
+      "platform": "P16",
+      "name": "AI Analytics Governance & Model Control",
+      "points": 3,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 7,
+    "pointsNotInBlockA": 21
+   },
+   "currentPlan": "B3 console; but evaluateAiGovernance and getAiUsage are needed by Block A",
+   "planStatus": "in plan (sequence change only)",
+   "whyLeftOut": {
+    "stated": "Sequencing: the AI console is B3.",
+    "source": "six-month plan timeline",
+    "reallyNoData": "no",
+    "assessment": "Not data-dependent. Some pieces are the backbone of learn-then-promote and must land earlier than B3."
+   },
+   "dayOne": {
+    "approaches": [
+     "not applicable"
+    ],
+    "howItWorks": "Full function on day one."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "n/a",
+    "month3": "n/a",
+    "season": "n/a",
+    "uiShows": "n/a",
+    "switchCriteria": "n/a"
+   },
+   "build": {
+    "items": [
+     "Build as planned; sequence as stated"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 0,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 0,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 0
+   },
+   "sprint": "S2 for evaluateAiGovernance, getAiUsage, getAiPolicy (move into Block A); rest B3",
+   "owners": {
+    "backend": "Hrushikant"
+   },
+   "risks": [
+    "If left to the end of B3, no model can be promoted and no maturity can be shown before 2 April."
+   ],
+   "customerSentence": "Every AI decision is recorded, explainable and reversible from day one."
+  },
+  {
+   "id": "models-evaluation",
+   "name": "Models, prompts and evaluation lists (and the release pointer)",
+   "designCapability": "C13",
+   "whatItDoesForTheCustomer": "Platform function; no customer-facing prediction.",
+   "operations": {
+    "total": 6,
+    "inBlockASlice": [
+     "runAiEvaluation",
+     "promoteAiRelease",
+     "rollbackAiRelease"
+    ],
+    "notInBlockASlice": [
+     "listAiEvaluations",
+     "listAiModels",
+     "listPromptTemplates"
+    ],
+    "contractPointsNotInBlockA": 6.3
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [],
+    "countNotInBlockA": 0,
+    "pointsNotInBlockA": 0
+   },
+   "currentPlan": "B3 console",
+   "planStatus": "in plan (sequence change only)",
+   "whyLeftOut": {
+    "stated": "Sequencing: the AI console is B3.",
+    "source": "six-month plan timeline",
+    "reallyNoData": "no",
+    "assessment": "Not data-dependent. Some pieces are the backbone of learn-then-promote and must land earlier than B3."
+   },
+   "dayOne": {
+    "approaches": [
+     "not applicable"
+    ],
+    "howItWorks": "Full function on day one."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "n/a",
+    "month3": "n/a",
+    "season": "n/a",
+    "uiShows": "n/a",
+    "switchCriteria": "n/a"
+   },
+   "build": {
+    "items": [
+     "Build as planned; sequence as stated"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 0,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 0,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 0
+   },
+   "sprint": "S6 (the promotion path must work before S8)",
+   "owners": {
+    "backend": "Hrushikant"
+   },
+   "risks": [
+    "If left to the end of B3, no model can be promoted and no maturity can be shown before 2 April."
+   ],
+   "customerSentence": "Every AI decision is recorded, explainable and reversible from day one."
+  },
+  {
+   "id": "monitoring",
+   "name": "Governance monitoring (alerts incl. promotionReady, incidents, controls, risk register)",
+   "designCapability": "C13",
+   "whatItDoesForTheCustomer": "Platform function; no customer-facing prediction.",
+   "operations": {
+    "total": 10,
+    "inBlockASlice": [
+     "containAiIncident"
+    ],
+    "notInBlockASlice": [
+     "closeAiIncident",
+     "decideAiGovernanceAlert",
+     "listAiControls",
+     "listAiGovernanceAlerts",
+     "listAiIncidents",
+     "listAiRiskRegister",
+     "openAiIncident",
+     "runAiControlTest",
+     "setAiRiskRegisterEntry"
+    ],
+    "contractPointsNotInBlockA": 18.9
+   },
+   "screens": {
+    "inBlockA": [
+     "ADM-554",
+     "ADM-556"
+    ],
+    "notInBlockA": [
+     {
+      "id": "ADM-549",
+      "platform": "P09",
+      "name": "AI Governance Monitoring Command Center",
+      "points": 5,
+      "where": "B"
+     },
+     {
+      "id": "ADM-550",
+      "platform": "P09",
+      "name": "AI Risk Register & Risk Exposure Management",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-551",
+      "platform": "P09",
+      "name": "AI Governance Control Library & Control Effectiveness",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-552",
+      "platform": "P09",
+      "name": "AI Policy Compliance & Violation Monitoring",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-553",
+      "platform": "P09",
+      "name": "AI Data, Privacy & Usage Compliance Monitoring",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-555",
+      "platform": "P09",
+      "name": "AI Governance Alert & Detection Center",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-557",
+      "platform": "P09",
+      "name": "AI Compliance, Assurance & Governance Reporting",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-558",
+      "platform": "P09",
+      "name": "AI Governance Review, Action Plan & Continuous Improvement",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 8,
+    "pointsNotInBlockA": 23
+   },
+   "currentPlan": "B3 console",
+   "planStatus": "in plan (sequence change only)",
+   "whyLeftOut": {
+    "stated": "Sequencing: the AI console is B3.",
+    "source": "six-month plan timeline",
+    "reallyNoData": "no",
+    "assessment": "Not data-dependent. Some pieces are the backbone of learn-then-promote and must land earlier than B3."
+   },
+   "dayOne": {
+    "approaches": [
+     "not applicable"
+    ],
+    "howItWorks": "Full function on day one."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "n/a",
+    "month3": "n/a",
+    "season": "n/a",
+    "uiShows": "n/a",
+    "switchCriteria": "n/a"
+   },
+   "build": {
+    "items": [
+     "Build as planned; sequence as stated"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 0,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 0,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 0
+   },
+   "sprint": "S6-S7 for alerts (promotionReady); rest B3",
+   "owners": {
+    "backend": "Tanmay"
+   },
+   "risks": [
+    "If left to the end of B3, no model can be promoted and no maturity can be shown before 2 April."
+   ],
+   "customerSentence": "Every AI decision is recorded, explainable and reversible from day one."
+  },
+  {
+   "id": "audit",
+   "name": "Decision records, trace, evidence export, replay",
+   "designCapability": "C12",
+   "whatItDoesForTheCustomer": "Platform function; no customer-facing prediction.",
+   "operations": {
+    "total": 4,
+    "inBlockASlice": [],
+    "notInBlockASlice": [
+     "searchAiDecisions",
+     "getAiDecisionTrace",
+     "exportAiEvidencePackage",
+     "replayAiDecision"
+    ],
+    "contractPointsNotInBlockA": 8.4
+   },
+   "screens": {
+    "inBlockA": [],
+    "notInBlockA": [
+     {
+      "id": "ADM-539",
+      "platform": "P09",
+      "name": "AI Explainability & Audit Command Center",
+      "points": 3,
+      "where": "B"
+     },
+     {
+      "id": "ADM-540",
+      "platform": "P09",
+      "name": "AI Decision Explorer & Search",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-541",
+      "platform": "P09",
+      "name": "AI Decision Explanation Workspace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-542",
+      "platform": "P09",
+      "name": "Data, Feature & Evidence Provenance",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-543",
+      "platform": "P09",
+      "name": "Candidate, Rule & Decision Path Trace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-544",
+      "platform": "P09",
+      "name": "Model, Provider & AI Runtime Trace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-545",
+      "platform": "P09",
+      "name": "Governance, Approval & Human Decision Trace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-546",
+      "platform": "P09",
+      "name": "Execution & Business Outcome Trace",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-547",
+      "platform": "P09",
+      "name": "AI Audit Record & Evidence Package",
+      "points": 2,
+      "where": "B"
+     },
+     {
+      "id": "ADM-548",
+      "platform": "P09",
+      "name": "AI Trace Investigation & Replay Simulator",
+      "points": 2,
+      "where": "B"
+     }
+    ],
+    "countNotInBlockA": 10,
+    "pointsNotInBlockA": 21
+   },
+   "currentPlan": "B3 console",
+   "planStatus": "in plan (sequence change only)",
+   "whyLeftOut": {
+    "stated": "Sequencing: the AI console is B3.",
+    "source": "six-month plan timeline",
+    "reallyNoData": "no",
+    "assessment": "Not data-dependent. Some pieces are the backbone of learn-then-promote and must land earlier than B3."
+   },
+   "dayOne": {
+    "approaches": [
+     "not applicable"
+    ],
+    "howItWorks": "Full function on day one."
+   },
+   "maturityLadder": {
+    "day1": "Full function.",
+    "week4": "n/a",
+    "month3": "n/a",
+    "season": "n/a",
+    "uiShows": "n/a",
+    "switchCriteria": "n/a"
+   },
+   "build": {
+    "items": [
+     "Build as planned; sequence as stated"
+    ],
+    "newOrChangedOperations": [],
+    "newOrChangedOpPoints": 0,
+    "aiEngineerWeeksTotal": 0,
+    "aiEngineerWeeksInPlan": 0,
+    "aiEngineerWeeksExtra": 0,
+    "backendWeeksExtra": 0,
+    "aiEngineerPointsExtra": 0,
+    "backendPointsExtra": 0,
+    "packagePointsExtra": 0,
+    "extraPoints": 0
+   },
+   "sprint": "S6 (the basis and maturity of every answer are read from decision records)",
+   "owners": {
+    "backend": "Pranay"
+   },
+   "risks": [
+    "If left to the end of B3, no model can be promoted and no maturity can be shown before 2 April."
+   ],
+   "customerSentence": "Every AI decision is recorded, explainable and reversible from day one."
+  }
+ ]
+}

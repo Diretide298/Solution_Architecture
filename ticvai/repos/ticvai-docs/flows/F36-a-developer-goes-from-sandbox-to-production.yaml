@@ -1,0 +1,143 @@
+# F36 — A developer goes from sandbox to production
+#
+# **Added 30 September for the 17 September minutes (M17-06): production API keys are issued only
+# after certification.** F27 tells the whole integration story; this flow is the one gate F27 used
+# to leave open, where a developer could reach production without certification. The order is
+# sandbox, then certification, then a production client TICVAI issues. A sandbox key is never
+# promoted.
+#
+# **Wave 3**, because certification is submitted from DEV-007, which is wave 3; a journey is only
+# as early as its latest screen.
+
+$schema: ./_schema.yaml
+id: F36
+name: A developer goes from sandbox to production
+actor: partner
+capability: Public API and developer access
+wave: 3
+frequency: rare
+criticality: compliance
+primaryContract: public-api
+contracts:
+- public-api
+platforms:
+- P14
+trigger:
+  description: 'A developer has an integration working against the sandbox and wants to call a live
+    venue. They hold a sandbox client only; nothing they have can reach production.
+
+    '
+  entryScreen: DEV-004
+offlineBehaviour: '**Not offline-capable, and it should not be.** Every step is a decision recorded by
+  the platform, made at a desk with a connection.
+
+  '
+steps:
+- step: 1
+  screen: DEV-004
+  action: They build and test against a sandbox with synthetic data.
+  operations:
+  - createSandbox
+  outcome: '**Synthetic data only**: nothing here can touch a live venue, so this is where every
+    mistake is cheap. Their sandbox client carries module scopes (M17-05) and nothing else.
+
+    '
+- step: 2
+  screen: DEV-007
+  action: They submit the integration for certification.
+  operations:
+  - submitIntegrationListing
+  outcome: '**Submitted for review, with visibility public or private** (M17-06): a private listing is
+    certified for the tenants it serves and never appears in the marketplace.
+
+    '
+- step: 3
+  screen: DEV-008
+  action: TICVAI reviews the integration and certifies it.
+  operations:
+  - certifyIntegration
+  outcome: '**Certification is a TICVAI act, not the developer''s**, and it has an end date
+    (`certifiedUntil`). The listing moves to `certified`.
+
+    '
+- step: 4
+  screen: DEV-003
+  action: They request production access for the certified integration.
+  operations:
+  - requestProductionAccess
+  outcome: '**The request names the certified listing, the tenants, the scopes and an IP allow-list**
+    (at least one address, M17-07). The sandbox client stays a sandbox client.
+
+    '
+- step: 5
+  screen: DEV-008
+  action: TICVAI decides the request.
+  operations:
+  - decideProductionAccess
+  outcome: '**Approval issues a new production client** (`issuedBy: ticvai`, bound to the certified
+    listing, with its own expiry). Nothing is promoted; the decision and who made it are recorded.
+
+    '
+- step: 6
+  screen: DEV-003
+  action: They take the production secret once, with Rotate.
+  operations:
+  - rotateApiCredential
+  outcome: '**The secret is shown once and never again.** From here their production calls are
+    watched by the anomaly rules (M17-07) and limited by the quota.
+
+    '
+branches:
+- at: 3
+  condition: Certification is refused.
+  behaviour: '**Sandbox access is unaffected; production stays closed.** The refusal gives the reason,
+    and the developer resubmits from DEV-007 once it is fixed.
+
+    '
+  severity: recoverable
+  resolvedBy: submitIntegrationListing
+- at: 4
+  condition: The integration named is not certified, or its certification has lapsed.
+  behaviour: '**Refused 409 `certification-required`.** There is no route to production that skips
+    certification, including creating a production client directly (createApiClient refuses it the
+    same way unless TICVAI staff issue it against a certified listing).
+
+    '
+  severity: recoverable
+  resolvedBy: DEV-007
+- at: 4
+  condition: The request has no IP allow-list, or asks for a scope that does not exist.
+  behaviour: 'Refused 422 (`ip-allow-list-required`, `unknown-scope`) naming the field, before anyone
+    at TICVAI has to look at it. No scope opens a catalogue write (M17-04).
+
+    '
+  severity: recoverable
+  resolvedBy: DEV-003
+- at: 5
+  condition: TICVAI rejects the request.
+  behaviour: 'The rejection carries the reason. The sandbox client and the certification stand; the
+    developer corrects the request and asks again.
+
+    '
+  severity: recoverable
+  resolvedBy: requestProductionAccess
+- at: 6
+  condition: The certification lapses or is withdrawn while the production client is live.
+  behaviour: '**The production clients bound to it are suspended**, and the developer and the tenants
+    they serve are told; recertifying restores them. A lapsed certification never leaves a live key
+    running unreviewed.
+
+    '
+  severity: requiresStaff
+  resolvedBy: certifyIntegration
+exitStates:
+- state: completed
+  description: A production client issued by TICVAI against a certified integration, secret taken once.
+- state: abandoned
+  description: Certified or not, the developer never asked for production; the sandbox keeps working.
+- state: failed
+  description: Certification or the production request refused, with the reason recorded.
+notes: '**Replaces F27''s open question** ("whether a developer may reach production without
+  certification"), answered by the 17 September minutes (M17-06, decided again 29 September): no.
+
+  '

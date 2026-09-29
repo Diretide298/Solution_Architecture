@@ -1,0 +1,32 @@
+# wallet.credited v1 — published by wallet
+# Added 29 September (system-design review SD-033, SD-027).
+
+name: wallet.credited
+version: 1
+publisher: wallet
+description: Money reached a wallet's available balance (top-up, refund, adjustment, a released hold).
+aggregate: wallet
+emittedWhen: topUpWallet, adjustWallet, releaseWalletHold or a refund to wallet moves the balance up
+emittedBy:
+- wallet.topUpWallet
+- wallet.adjustWallet
+- wallet.releaseWalletHold
+payload:
+- field: walletId
+  type: uuid
+- field: walletTransactionId
+  type: string
+- field: amount
+  type: Money
+- field: availableAfter
+  type: Money
+- field: kind
+  type: string
+consumers:
+- context: ledger
+  purpose: Increase the stored-value liability for a funded top-up
+  idempotencyKey: walletTransactionId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: No state model emits this.

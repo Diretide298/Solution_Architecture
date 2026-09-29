@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `wallet` |
 | Schemas owned | `wallet` |
-| Operations in the slice | 14 of 63 |
+| Operations in the slice | 17 of 66 |
 | Scale | Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. Latency-critical in a way LedgerService is not, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither. |
 | If it is down | It holds a liability owed to a customer. A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller. |
 
@@ -34,10 +34,13 @@
 | retail | [`setWalletAutoReloadSetting`](#setwalletautoreloadsetting) | PUT | `/wallets/{walletId}/auto-reload` | core | 2 | BO-416, GST-011, WEB-021 |
 | retail | [`settleWalletAtExit`](#settlewalletatexit) | POST | `/wallets/{walletId}/exit-settlement` | core | 2 | BO-416, BO-487, GST-011, WEB-021 |
 | retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 2 | BO-1116, BO-1121, GST-071, WEB-021 |
+| wallet | [`captureWalletHold`](#capturewallethold) | POST | `/wallet-holds/{walletHoldId}/capture` | setup | 2 |  |
 | wallet | [`expireCreditLots`](#expirecreditlots) | POST | `/credit-lots/expire` | setup | 1 | BO-1111, BO-1130 |
 | wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 2 | BO-1086, BO-414, BO-416, BO-448, BO-487, GST-011 … |
+| wallet | [`holdWalletFunds`](#holdwalletfunds) | POST | `/wallets/{walletId}/holds` | setup | 2 |  |
 | wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 2 | BO-1093, BO-1102, BO-1142, BO-1143, BO-414, BO-423 … |
 | wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 2 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
+| wallet | [`releaseWalletHold`](#releasewallethold) | POST | `/wallet-holds/{walletHoldId}/release` | setup | 2 |  |
 | wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 2 | BO-1162 |
 | wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 2 | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099 … |
 | wallet | [`setWalletRefundPolicy`](#setwalletrefundpolicy) | PUT | `/wallet-refund-policy` | setup | 2 | ADM-612, BO-1146, BO-1147 |
@@ -60,6 +63,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Lock | rowExclusive |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `games.card`, `wallet.credit_lot`, `wallet.wallet` |
 | Writes | `cache:idempotency`, `games.card` |
@@ -319,6 +323,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | walletId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `WalletAutoReloadSetting`
@@ -367,6 +372,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The venue has auto-reload disabled for this wallet type, or the wallet is suspended or closed. |
@@ -386,6 +392,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Lock | rowExclusive |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `payments.stored_forward`, `wallet.balance`, `wallet.credit_lot`, `wallet.exit_settlement`, `wallet.refund_policy`, `wallet.wallet` |
 | Writes | `cache:idempotency`, `orders.payment`, `orders.refund`, `platform.outbox`, `wallet.exit_settlement`, `wallet.wallet`, `wallet.wallet_transaction` |
@@ -457,6 +464,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Lock | rowExclusive |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `pii.subject`, `wallet.wallet`, `wallet.wallet_transaction` |
 | Writes | `cache:idempotency`, `wallet.wallet`, `wallet.wallet_transaction` |
@@ -486,6 +494,8 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string | yes |  |
+| walletId | string (uuid) |  | The wallet this movement is on (SD-027, 29 September). |
+| walletHoldId | string (uuid) |  | The hold a spend settled, where it came through holdWalletFunds. (nullable) |
 | kind | WalletTransactionKind: enum (topUp, spend, refund, adjustment, bonus, expiry, transfer) | yes |  |
 | amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -511,6 +521,64 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 
 ## Group: wallet
 
+### captureWalletHold
+
+**`POST /wallet-holds/{walletHoldId}/capture`**: Debit a held amount
+
+Turns a `held` hold into a debit (SD-027): under the same balance row lock the held amount leaves `hold_balance` and `balance_amount`, the hold is `captured` and the pending transaction settles with `balanceAfter`. An amount below the hold captures that much and returns the rest to available. **Refused `409` unless the hold is `held`** (`hold-not-held`).
+
+|  |  |
+|---|---|
+| Permission | `WALLET_OPERATE` |
+| Scope level | venue |
+| Part of slice | setup, makes `wallet.balance` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Lock | rowExclusive |
+| Reads | `wallet.balance`, `wallet.hold` |
+| Writes | `platform.idempotency_record`, `platform.outbox`, `wallet.balance`, `wallet.hold`, `wallet.wallet_transaction` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| walletHoldId | path | yes | string (uuid) |  |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| amount | Money |  | On the wire this is three fields; in the database it is one column. |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Response**: `WalletHold`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| walletHoldId | string (uuid) | yes |  |
+| walletId | string (uuid) | yes |  |
+| orderId | string (uuid) |  | (nullable) |
+| paymentId | string (uuid) |  | (nullable) |
+| walletHoldAmount | number | yes |  |
+| currencyCode | string | yes | (max length 10) |
+| walletHoldStatus | string | yes | (max length 20) |
+| expiresAt | string (date-time) | yes |  |
+| createdAt | string (date-time) | yes |  |
+| capturedAt | string (date-time) |  | (nullable) |
+| releasedAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The hold |
+| 409 |  | The hold is not held (already captured, released or expired) (hold-not-held). |
+
 ### expireCreditLots
 
 **`POST /credit-lots/expire`**: Expire, extend or forfeit credit that has run out of time
@@ -525,6 +593,7 @@ Extension exists because a venue will want it: a goodwill gesture, a closure, a 
 | Part of slice | setup, makes `wallet.credit_lot` non-empty |
 | Wave | 1 |
 | Offline | no |
+| Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.credit_lot`, `wallet.credit_type`, `wallet.wallet` |
 | Writes | `cache:idempotency`, `wallet.adjustment`, `wallet.credit_lot`, `wallet.wallet`, `wallet.wallet_transaction` |
 | Called by | BO-1111, BO-1130 |
@@ -593,6 +662,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
+| X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 
 **Response**: `Wallet`
 
@@ -630,6 +700,67 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | 200 |  | Wallet |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
+### holdWalletFunds
+
+**`POST /wallets/{walletId}/holds`**: Hold wallet funds for a spend in progress
+
+**The only way wallet money is reserved** (system-design review SD-027, 29 September). A guarded decrement of the locked `wallet.balance` row moves the amount from available to held and writes a `wallet.hold` and a `wallet.wallet_transaction` (kind `spend`, pending) in one transaction; two spends racing for the same money cannot both succeed. Called by the order service for a `wallet` tender (`orders.authoriseStoredValue`, `orders.createPayment`) and by the cross-region wallet authorisation, which keeps only a reference to this hold. **Refused `409` when the available balance is short** (`insufficient-funds`).
+
+|  |  |
+|---|---|
+| Permission | `WALLET_OPERATE` |
+| Scope level | venue |
+| Part of slice | setup, makes `wallet.balance` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Lock | rowExclusive |
+| Reads | `wallet.balance`, `wallet.hold`, `wallet.wallet` |
+| Writes | `platform.idempotency_record`, `platform.outbox`, `wallet.balance`, `wallet.hold`, `wallet.wallet_transaction` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| walletId | path | yes | string (uuid) |  |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| orderId | string |  | (nullable) |
+| paymentId | string |  | (nullable) |
+| expiresInSeconds | integer |  | (min 30; max 3600; default 900) |
+
+**Response**: `WalletHold`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| walletHoldId | string (uuid) | yes |  |
+| walletId | string (uuid) | yes |  |
+| orderId | string (uuid) |  | (nullable) |
+| paymentId | string (uuid) |  | (nullable) |
+| walletHoldAmount | number | yes |  |
+| currencyCode | string | yes | (max length 10) |
+| walletHoldStatus | string | yes | (max length 20) |
+| expiresAt | string (date-time) | yes |  |
+| createdAt | string (date-time) | yes |  |
+| capturedAt | string (date-time) |  | (nullable) |
+| releasedAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | The hold |
+| 409 |  | The available balance is less than the amount (insufficient-funds), or the wallet is suspended or closed (wallet-not-active). |
+
 ### listWalletTransactions
 
 **`GET /wallets/{subjectId}/transactions`**: Wallet transaction history
@@ -655,6 +786,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
+| X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -664,6 +796,8 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 |---|---|---|---|
 | items | array of WalletTransaction | yes |  |
 | items[].id | string | yes |  |
+| items[].walletId | string (uuid) |  | The wallet this movement is on (SD-027, 29 September). |
+| items[].walletHoldId | string (uuid) |  | The hold a spend settled, where it came through holdWalletFunds. (nullable) |
 | items[].kind | WalletTransactionKind: enum (topUp, spend, refund, adjustment, bonus, expiry, transfer) | yes |  |
 | items[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -703,6 +837,7 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 | Wave | 2 |
 | Offline | no |
 | Config scope | tenant |
+| Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `wallet.accounting_mapping`, `wallet.authentication_policy`, `wallet.channel_rules`, `wallet.configuration_version`, `wallet.consumption_policy`, `wallet.credit_type`, `wallet.funding_rules`, `wallet.integration_mapping`, `wallet.reconciliation_source`, `wallet.refund_policy`, `wallet.risk_rules`, `wallet.transfer_rules`, `wallet.wallet_type` |
 | Writes | `cache:idempotency`, `wallet.configuration_version`, `wallet.configuration_version_snapshot` |
 | Called by | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180, BO-1181 |
@@ -739,6 +874,55 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Findings, and the version if published |
+
+### releaseWalletHold
+
+**`POST /wallet-holds/{walletHoldId}/release`**: Give held wallet funds back
+
+Returns a `held` hold to available under the balance row lock (SD-027); the sweeper does the same for a hold past `expiresAt`. **Refused `409` unless the hold is `held`** (`hold-not-held`).
+
+|  |  |
+|---|---|
+| Permission | `WALLET_OPERATE` |
+| Scope level | venue |
+| Part of slice | setup, makes `wallet.balance` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Lock | rowExclusive |
+| Reads | `wallet.balance`, `wallet.hold` |
+| Writes | `platform.idempotency_record`, `platform.outbox`, `wallet.balance`, `wallet.hold`, `wallet.wallet_transaction` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| walletHoldId | path | yes | string (uuid) |  |
+
+**Response**: `WalletHold`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| walletHoldId | string (uuid) | yes |  |
+| walletId | string (uuid) | yes |  |
+| orderId | string (uuid) |  | (nullable) |
+| paymentId | string (uuid) |  | (nullable) |
+| walletHoldAmount | number | yes |  |
+| currencyCode | string | yes | (max length 10) |
+| walletHoldStatus | string | yes | (max length 20) |
+| expiresAt | string (date-time) | yes |  |
+| createdAt | string (date-time) | yes |  |
+| capturedAt | string (date-time) |  | (nullable) |
+| releasedAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The hold |
+| 409 |  | The hold is not held (already captured, released or expired) (hold-not-held). |
 
 ### restoreWalletConfigurationVersion
 
@@ -810,6 +994,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | Wave | 2 |
 | Offline | no |
 | Config scope | venue |
+| Conflict policy | serverWins |
 | Reads | `wallet.funding_rules` |
 | Writes | `wallet.funding_rules` |
 | Called by | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418 |
@@ -818,6 +1003,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `WalletFundingRules`
@@ -962,6 +1148,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 
 ### setWalletRefundPolicy
@@ -979,6 +1166,7 @@ Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different 
 | Wave | 2 |
 | Offline | no |
 | Config scope | venue |
+| Conflict policy | serverWins |
 | Reads | `wallet.refund_policy` |
 | Writes | `wallet.refund_policy` |
 | Called by | ADM-612, BO-1146, BO-1147 |
@@ -987,6 +1175,7 @@ Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `WalletRefundPolicy`
@@ -1015,6 +1204,7 @@ Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 
 ## Tables
@@ -1217,6 +1407,23 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | Synthesised key. |
 | subject_id | uuid | yes | Points at pii.subject. |
 
+### `wallet.hold`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| wallet_hold_id | uuid | yes |  |
+| wallet_id | uuid | yes |  |
+| order_id | text | no |  |
+| payment_id | uuid | no |  |
+| wallet_hold_amount | numeric | yes |  |
+| currency_code | text | yes |  |
+| wallet_hold_status | text | yes |  |
+| expires_at | timestamptz | yes |  |
+| created_at | timestamptz | yes |  |
+| captured_at | timestamptz | no |  |
+| released_at | timestamptz | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `wallet.integration_mapping`
 
 | Column | Type | Required | Notes |
@@ -1286,6 +1493,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | text | yes |  |
+| wallet_id | uuid | no | The wallet this movement is on (SD-027, 29 September). |
+| wallet_hold_id | uuid | no | The hold a spend settled, where it came through holdWalletFunds. |
 | kind | text | yes |  |
 | amount | numeric(18,4) | yes |  |
 | balance_after | numeric(18,4) | yes |  |

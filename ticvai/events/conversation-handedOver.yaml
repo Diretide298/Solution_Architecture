@@ -7,6 +7,8 @@ publisher: marketing
 description: An assistant conversation was passed to a human agent.
 aggregate: conversation
 emittedWhen: ConversationState withAssistant to queued
+emittedBy:
+- handoverToAgent
 payload:
 - field: conversationId
   type: uuid

@@ -4,17 +4,17 @@
 
 | | |
 |---|---|
-| Screens | 100 |
-| Operations | 156 |
+| Screens | 103 |
+| Operations | 176 |
 | Contracts | 10 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 115 |
-| Waves | wave2 20 · wave3 80 |
+| Operations with no screen | 114 |
+| Waves | wave1 3 · wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 115 operations with no screen here
+### 114 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,13 @@
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
-| … | | | 75 more |
+| … | | | 74 more |
+
+### 1 modules split across waves
+
+**A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
+
+- **White Label** — waves 1, 2
 
 ## Modules
 
@@ -68,7 +74,7 @@
 |---|---|---|
 | Policy | 40 | 3 |
 | Media Library | 40 | 3 |
-| White Label | 20 | 2 |
+| White Label | 23 | 1, 2 |
 
 ## Screens
 
@@ -82,14 +88,14 @@
 | `CMS-006` | Component Preview | White Label | 2 | 5 | yes |
 | `CMS-007` | Page Builder | White Label | 2 | 11 | yes |
 | `CMS-008` | Content Blocks | White Label | 2 | 10 | yes |
-| `CMS-009` | Navigation & Menus | White Label | 2 | 6 | yes |
+| `CMS-009` | Navigation & Menus | White Label | 2 | 7 | yes |
 | `CMS-010` | Media Library | White Label | 2 | 13 | yes |
 | `CMS-011` | Translations | White Label | 2 | 1 | yes |
 | `CMS-012` | RTL Preview | White Label | 2 | 2 | yes |
 | `CMS-013` | SEO & Metadata | White Label | 2 | 1 | yes |
-| `CMS-014` | Publishing Workflow | White Label | 2 | 3 | yes |
+| `CMS-014` | Publishing Workflow | White Label | 2 | 4 | yes |
 | `CMS-015` | Version History | White Label | 2 | 3 | yes |
-| `CMS-016` | Site Settings | White Label | 2 | 7 | yes |
+| `CMS-016` | Site Settings | White Label | 2 | 6 | yes |
 | `CMS-017` | Domain & Certificate | White Label | 2 | 4 | yes |
 | `CMS-018` | Consent & Legal | White Label | 2 | 8 | yes |
 | `CMS-019` | User Access | White Label | 2 | 2 | yes |
@@ -173,5 +179,8 @@
 | `CMS-098` | Delivery Monitoring & Integration Health | Media Library | 3 | 1 | yes |
 | `CMS-099` | Asset Usage & Performance Analytics | Media Library | 3 | 1 | yes |
 | `CMS-100` | Distribution Intelligence, AI Insights & Optimization | Media Library | 3 | 1 | yes |
-| `CMS-101` | Help Me Choose | White Label | 2 | 11 | yes |
+| `CMS-101` | Help Me Choose | White Label | 2 | 12 | yes |
+| `CMS-102` | Site Builder | White Label | 1 | 7 | yes |
+| `CMS-103` | Booking Flows | White Label | 1 | 14 | yes |
+| `CMS-104` | App Build & Store Publishing | White Label | 1 | 7 | yes |
 

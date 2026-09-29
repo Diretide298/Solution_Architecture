@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Inventory & Procurement
   version: 0.1.0
-  x-ticvai-screen-count: 55
+  x-ticvai-screen-count: 58
   x-ticvai-tier: satellite
   x-ticvai-module: 15 — Inventory Management
   x-ticvai-requirements: 98
@@ -2879,6 +2879,9 @@ paths:
   /stock-reservations:
     get:
       operationId: listStockReservations
+      x-ticvai-consumed-by:
+        - "P06 EMP-005 Task detail"
+        - "P08 BO-579 Parts, Cost & Maintenance Expense Tracking"
       summary: Soft holds on stock
       description: >
         **A reservation is not a batch and not a movement.** `rental.agreement_item` points here:
@@ -2894,6 +2897,16 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
       parameters:
+      - name: sourceType
+        in: query
+        schema:
+          $ref: '#/components/schemas/StockReservationSourceType'
+      - name: sourceId
+        in: query
+        description: The work order, rental agreement or order the reservation is for (M17-02).
+        schema:
+          type: string
+          maxLength: 64
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -2910,6 +2923,115 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/InventoryStockReservation'
+    post:
+      operationId: createStockReservation
+      x-ticvai-consumed-by:
+        - "P06 EMP-005 Task detail"
+        - "P08 BO-579 Parts, Cost & Maintenance Expense Tracking"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: M17-02 (MoM 17 September): maintenance reserves parts in the general inventory, not its own'
+      summary: Reserve stock for a work order or another need
+      description: '**Maintenance reserves parts here, in the one inventory** (decided 17 September, M17-02):
+        a technician reserves the parts a work order needs (`sourceType: workOrder`, `sourceId` the work order
+        id), and `maintenance.recordWorkOrderParts` issues them from the reservation. Reserved stock is not
+        free to another reservation or a transfer, and is not issued: the movement ledger moves only at issue.
+        **Refused `409` when free stock at the location** (on hand from the movement ledger less active
+        reservations) **is less than the quantity.** `expiresAt` defaults to the work order''s due time plus a
+        day, and an expired reservation frees its stock.
+
+        '
+      tags:
+      - inventory
+      x-ticvai-permission: PROCUREMENT_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryStockReservation'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Reserved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStockReservation'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: Not enough free stock at the location.
+          x-ticvai-problem-types:
+          - insufficient-stock
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /stock-reservations/{stockReservationId}/release:
+    parameters:
+    - name: stockReservationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: releaseStockReservation
+      x-ticvai-consumed-by:
+        - "P06 EMP-005 Task detail"
+        - "P08 BO-579 Parts, Cost & Maintenance Expense Tracking"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: M17-02 (MoM 17 September): maintenance reserves parts in the general inventory, not its own'
+      summary: Give reserved stock back
+      description: 'Frees what is left of a reservation, e.g. a work order cancelled or finished with parts
+        unused. A reservation already `released`, `consumed` or `expired` is refused `409`.
+
+        '
+      tags:
+      - inventory
+      x-ticvai-permission: PROCUREMENT_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 300
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Released
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStockReservation'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The reservation is not `active`.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /supplier-contracts:
     get:
       operationId: listSupplierContracts
@@ -3290,15 +3412,22 @@ components:
           format: uuid
         quantity:
           type: number
+          exclusiveMinimum: 0
         sourceType:
-          type: string
-          maxLength: 50
+          $ref: '#/components/schemas/StockReservationSourceType'
         sourceId:
           type: string
-          format: uuid
+          maxLength: 64
+          description: 'The id of what the stock is reserved for: a work order id (a ULID), a rental agreement
+            or an order (a uuid). Text since 29 September because a work order id is not a uuid (M17-02).'
         status:
           type: string
-          maxLength: 30
+          enum:
+          - active
+          - consumed
+          - released
+          - expired
+          readOnly: true
         expiresAt:
           type: string
           format: date-time
@@ -3306,10 +3435,21 @@ components:
         createdAt:
           type: string
           format: date-time
+          readOnly: true
         releasedAt:
           type: string
           format: date-time
           nullable: true
+    StockReservationSourceType:
+      type: string
+      enum:
+      - workOrder
+      - rentalAgreement
+      - order
+      - transfer
+      - other
+      description: What a stock reservation is for (decided 17 September, M17-02; `rentalAgreement` is the
+        existing use from `rental.agreement_item`).
     InventorySupplierContract:
       type: object
       x-ticvai-persistence: inventory.supplier_contract

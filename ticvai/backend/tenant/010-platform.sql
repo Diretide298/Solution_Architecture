@@ -1,4 +1,4 @@
--- platform — 25 tables
+-- platform — 26 tables
 -- **Derived. Do not hand-edit.**
 
 -- PII reads only, written by the platform. Who looked at a passport number is the question a
@@ -179,6 +179,22 @@ CREATE TABLE IF NOT EXISTS platform.guest_link (
     revoked_at                        timestamptz
 );
 
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS platform.idempotency_record (
+    id                                uuid PRIMARY KEY NOT NULL,
+    idempotency_key                   text NOT NULL CONSTRAINT idempotency_record_idempotency_key_chk CHECK (char_length(idempotency_key) <= 26),
+    operation_id                      text NOT NULL CONSTRAINT idempotency_record_operation_id_chk CHECK (char_length(operation_id) <= 100),
+    request_hash                      text NOT NULL CONSTRAINT idempotency_record_request_hash_chk CHECK (char_length(request_hash) <= 64),
+    status                            text NOT NULL CONSTRAINT idempotency_record_status_chk CHECK (status IN ('inProgress', 'completed')),
+    response_status                   integer,
+    response_body                     jsonb,
+    principal_id                      uuid,
+    created_at                        timestamptz NOT NULL,
+    expires_at                        timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
+);
+
 -- What a workstation may do with no network, and for how long (Board 5). A till three days offline
 -- holding 900 unsynced sales is a reconciliation nobody can do. Hangs off: reaches platform.scope
 -- through its keys. Reached by: 2 operations read it and 1 write it.
@@ -195,16 +211,20 @@ CREATE TABLE IF NOT EXISTS platform.offline_policy (
 
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
 -- is what makes it exactly-once Hangs off: reaches platform.scope through its keys. Reached by: 3
--- operations read it and 94 write it; 1 tables reference it; written by 21 contracts — access,
--- accreditation, ai, approvals.
+-- operations read it and 97 write it; 1 tables reference it; written by 20 contracts — access,
+-- accreditation, approvals, catalogue.
 CREATE TABLE IF NOT EXISTS platform.outbox (
     id                                uuid PRIMARY KEY NOT NULL,
+    event_id                          text NOT NULL,
     event_name                        text NOT NULL,
-    aggregate_type                    text,
-    aggregate_id                      uuid,
+    event_version                     integer,
+    tenant_id                         uuid NOT NULL,
+    aggregate_type                    text NOT NULL,
+    aggregate_id                      text NOT NULL CONSTRAINT outbox_aggregate_id_chk CHECK (char_length(aggregate_id) <= 64),
     payload                           jsonb NOT NULL,
     scope_path                        ltree NOT NULL,
-    sequence                          integer,
+    sequence                          integer NOT NULL,
+    trace_id                          text CONSTRAINT outbox_trace_id_chk CHECK (char_length(trace_id) <= 64),
     published_at                      timestamptz,
     attempts                          integer DEFAULT 0,
     last_error                        text,
@@ -302,7 +322,7 @@ CREATE TABLE IF NOT EXISTS platform.scope (
 );
 
 -- read-only projection of control.tenant, outside every cell Hangs off: reaches platform.scope
--- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 18
+-- through its keys; references platform.scope. Reached by: 2 operations read it and 0 write it; 19
 -- tables reference it.
 CREATE TABLE IF NOT EXISTS platform.tenant (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -314,6 +334,7 @@ CREATE TABLE IF NOT EXISTS platform.tenant (
 CREATE TABLE IF NOT EXISTS platform.venue_settings (
     id                                uuid PRIMARY KEY,
     venue_id                          uuid,
+    calendar_day_start_hour           integer DEFAULT 6,
     currency_code                     text,
     currency_scale                    integer,
     support_hours                     jsonb,
@@ -360,6 +381,7 @@ CREATE TABLE IF NOT EXISTS platform.wallet_authorisation (
     home_cell_name                    text,
     consuming_cell_name               text,
     order_id                          text,
+    wallet_hold_id                    uuid,
     created_at                        timestamptz NOT NULL,
     expires_at                        timestamptz NOT NULL,
     home_currency                     text,

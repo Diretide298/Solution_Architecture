@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Maintenance & Safety
   version: 0.1.0
-  x-ticvai-screen-count: 36
+  x-ticvai-screen-count: 42
   x-ticvai-tier: satellite
   x-ticvai-module: "17 — Maintenance & Safety Management"
   x-ticvai-requirements: 50
@@ -245,6 +245,11 @@ paths:
                 categoryId: { type: string, format: uuid }
                 warrantyExpiresAt: { type: string, format: date }
                 supplierId: { type: string, format: uuid }
+                priorityOverride:
+                  allOf:
+                    - $ref: '#/components/schemas/WorkOrderPriority'
+                  nullable: true
+                  description: See `Asset.priorityOverride` (M17-01, 29 September). Null clears it.
                 documents:
                   type: array
                   description: Replaces the asset's documents. One `asset_document` row each.
@@ -411,6 +416,7 @@ paths:
         - "P08 BO-108 Venue Operations"
         - "P08 BO-574 Maintenance Command Center"
         - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-agreed: '29 September: 17 September minutes M17-03 (calendar views: day/week/month/agenda, category filter, venue day start)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List work orders
@@ -437,6 +443,21 @@ paths:
         - name: overdueOnly
           in: query
           schema: { type: boolean, default: false }
+        - name: from
+          in: query
+          description: 'Calendar window start (M17-03): only work orders whose `dueAt` is at or after this
+            instant. With `to`, what the day, week and month calendar views ask for; a work order with no
+            `dueAt` is left out when either bound is sent.'
+          schema: { type: string, format: date-time }
+        - name: to
+          in: query
+          description: Calendar window end (M17-03), exclusive, on `dueAt`.
+          schema: { type: string, format: date-time }
+        - name: categoryId
+          in: query
+          description: 'Only work orders in this category (`WorkOrder.categoryId`), the calendar''s category
+            filter (M17-03).'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
@@ -474,6 +495,11 @@ paths:
 
         Offline-capable: a fault found in a plant room is recorded there, not remembered
         until the technician finds signal.
+
+        **Priority is derived unless sent** (decided 17 September, M17-01): the asset's
+        `priorityOverride`, else the venue's `WorkOrderPriorityPolicy` score of `faultAssessment`.
+        Offline, the device scores with the policy it last synced; the server keeps what was sent.
+      x-ticvai-agreed: '29 September: M17-01 (priority scoring) and M17-13 (required skills)'
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_MANAGE
       x-ticvai-scope-level: venue
@@ -553,8 +579,15 @@ paths:
               type: object
               minProperties: 1
               properties:
-                assignedToPrincipalId: { type: string, format: uuid }
+                assignedToPrincipalId:
+                  type: string
+                  format: uuid
+                  description: How the maintenance head confirms a `suggestWorkOrderAssignee` candidate (M17-13).
                 priority: { $ref: '#/components/schemas/WorkOrderPriority' }
+                requiredQualificationCodes:
+                  type: array
+                  maxItems: 10
+                  items: { type: string }
                 dueAt: { type: string, format: date-time }
                 description: { type: string, maxLength: 5000 }
                 categoryId: { type: string, format: uuid }
@@ -654,6 +687,10 @@ paths:
       description: >
         Issues stock through the inventory movement ledger — one ledger, not a second parts
         count maintained by maintenance.
+
+        **A reservation is consumed first** (decided 17 September, M17-02): parts reserved for this
+        work order (`inventory.createStockReservation`, `sourceType: workOrder`) are issued from the
+        reservation and it is marked consumed; only the quantity beyond it draws on free stock.
 
         **Not offline-capable**, for the same reason retail is not: stock depletes in real
         time. Parts used offline are recorded on reconnect and may fail if stock has gone.
@@ -1228,6 +1265,249 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrderAttachment' }
 
+  /work-order-priority-policy:
+    get:
+      operationId: getWorkOrderPriorityPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: M17-01 (MoM 17 September): weighted priority scoring with a per-asset override'
+      summary: Read how a fault's priority is scored
+      description: >
+        The venue's weights and bands. **A venue that has set none reads the defaults** (proposed:
+        safety 40, guest operations 30, revenue 20, asset criticality 10; bands 80 and above
+        `emergency`, 60 `urgent`, 40 `high`, 20 `normal`, else `low`; client to correct), never a
+        `404`.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The policy in force
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrderPriorityPolicy' }
+    put:
+      operationId: setWorkOrderPriorityPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: venue
+      x-ticvai-agreed: '29 September: M17-01 (MoM 17 September): weighted priority scoring with a per-asset override'
+      summary: Set how a fault's priority is scored
+      description: >
+        **Configurable weights instead of hand-set priorities** (decided 17 September, M17-01). The
+        weights must sum to 100 and the bands must descend, else `400`. Applies to work orders raised
+        after the change; a raised work order keeps the score it was raised with.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WorkOrderPriorityPolicy' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WorkOrderPriorityPolicy' }
+        '400':
+          description: Weights that do not sum to 100, or bands that do not descend.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /work-orders/{workOrderId}/assignee-suggestions:
+    parameters:
+      - name: workOrderId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: suggestWorkOrderAssignee
+      x-ticvai-consumed-by:
+        - "P08 BO-070 Work Orders"
+        - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): smart assignment by skill, confirmed by the maintenance head'
+      summary: Who should take this work order, ranked
+      description: >
+        **Smart assignment, and a person decides** (decided 17 September, M17-13). Ranks the venue's
+        technicians for the work order: those holding every code in `requiredQualificationCodes`
+        (unexpired, `resources.qualification` of their staff resource) first, then those on shift now
+        or before `dueAt` (`workforce.shift`), then the fewest open work orders. Rules, not a model: it
+        works with no AI configured. **Assigns nothing** — the maintenance head confirms by sending the
+        chosen `assignedToPrincipalId` with `updateWorkOrder`.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Candidates, best first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/WorkOrderAssigneeSuggestion' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /vendor-service-requests:
+    get:
+      operationId: listVendorServiceRequests
+      x-ticvai-consumed-by:
+        - "P08 BO-070 Work Orders"
+        - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): external vendors engaged through vendor service requests'
+      summary: Requests sent to outside vendors
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: workOrderId
+          in: query
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - name: supplierId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/VendorServiceRequestStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Vendor service requests
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/VendorServiceRequest' }
+    post:
+      operationId: createVendorServiceRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-070 Work Orders"
+        - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-audience: [staff]
+      x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): external vendors engaged through vendor service requests'
+      summary: Engage an outside vendor on a work order
+      description: >
+        Linked to one work order and one supplier (`inventory.supplier`). The work order stays the
+        record of the fault; the request records what was asked of the vendor, when, and at what
+        quoted cost. A closed or cancelled work order is refused `409`.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VendorServiceRequest' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Raised
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VendorServiceRequest' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          description: The work order is closed or cancelled.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /vendor-service-requests/{vendorServiceRequestId}:
+    parameters:
+      - name: vendorServiceRequestId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    patch:
+      operationId: updateVendorServiceRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-070 Work Orders"
+        - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-audience: [staff]
+      x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): external vendors engaged through vendor service requests'
+      summary: Move a vendor request along
+      description: >
+        Status, the vendor's reference, the quoted and final cost, the visit time and a note.
+        `completed` and `cancelled` are final; a change to a final request is refused `409`.
+      tags: [workOrder]
+      x-ticvai-permission: WORK_ORDER_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                status: { $ref: '#/components/schemas/VendorServiceRequestStatus' }
+                vendorReference: { type: string, maxLength: 100 }
+                quotedCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                finalCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                scheduledVisitAt: { type: string, format: date-time }
+                note: { type: string, maxLength: 1000 }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VendorServiceRequest' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: The request is already `completed` or `cancelled`.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
   /maintenance-plans:
     get:
       operationId: listMaintenancePlans
@@ -1349,6 +1629,7 @@ paths:
         - "P08 BO-576 Maintenance Calendar & Scheduling"
         - "P08 BO-583 Maintenance Intelligence & Predictive AI"
         - "P08 BO-910 Maintenance & Resource Blocking"
+      x-ticvai-agreed: '29 September: 17 September minutes M17-03 (calendar views: day/week/month/agenda, category filter, venue day start)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Planned tasks due or overdue
@@ -1366,7 +1647,22 @@ paths:
           schema: { type: string, format: uuid }
         - name: withinDays
           in: query
+          description: Used when no `from`/`to` window is sent.
           schema: { type: integer, default: 14 }
+        - name: from
+          in: query
+          description: 'Calendar window start (M17-03): tasks falling due at or after this instant. With `to`
+            it replaces `withinDays`, so the maintenance calendar can page a month ahead or look back.'
+          schema: { type: string, format: date-time }
+        - name: to
+          in: query
+          description: Calendar window end (M17-03), exclusive.
+          schema: { type: string, format: date-time }
+        - name: categoryId
+          in: query
+          description: 'Only tasks for assets in this asset category (the plan''s `assetCategoryId` or the
+            asset''s own category), the calendar''s category filter (M17-03).'
+          schema: { type: string, format: uuid }
       responses:
         '200':
           description: Due tasks
@@ -1867,6 +2163,14 @@ components:
         categoryId: { type: string, format: uuid }
         locationDescription: { type: string, maxLength: 500 }
         criticality: { $ref: '#/components/schemas/AssetCriticality' }
+        priorityOverride:
+          allOf:
+            - $ref: '#/components/schemas/WorkOrderPriority'
+          nullable: true
+          description: >
+            **"If this device goes down, raise this priority"** (decided 17 September, M17-01). A
+            corrective work order raised on this asset takes this priority instead of the score. Null
+            means the score decides.
         manufacturer: { type: string, maxLength: 200 }
         model: { type: string, maxLength: 200 }
         serialNumber: { type: string, maxLength: 128 }
@@ -2184,7 +2488,7 @@ components:
     CreateWorkOrderRequest:
       x-ticvai-persistence: "none — request only"
       type: object
-      required: [id, title, venueId, priority, recordedAt]
+      required: [id, title, venueId, recordedAt]
       properties:
         id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
         title: { type: string, maxLength: 200 }
@@ -2196,7 +2500,19 @@ components:
           allOf:
             - $ref: '#/components/schemas/WorkOrderKind'
           default: corrective
-        priority: { $ref: '#/components/schemas/WorkOrderPriority' }
+        priority:
+          allOf:
+            - $ref: '#/components/schemas/WorkOrderPriority'
+          description: >
+            **Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's
+            `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the
+            fault.
+        faultAssessment: { $ref: '#/components/schemas/WorkOrderFaultAssessment' }
+        requiredQualificationCodes:
+          type: array
+          maxItems: 10
+          items: { type: string }
+          description: Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13).
         categoryId: { type: string, format: uuid }
         assignedToPrincipalId: { type: string, format: uuid }
         dueAt: { type: string, format: date-time }
@@ -2292,6 +2608,23 @@ components:
             updated when the asset is later renamed — the record reads as it was raised.
         status: { $ref: '#/components/schemas/WorkOrderStatus' }
         priority: { $ref: '#/components/schemas/WorkOrderPriority' }
+        priorityScore:
+          type: integer
+          minimum: 0
+          maximum: 100
+          nullable: true
+          readOnly: true
+          description: The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01).
+        prioritySource:
+          type: string
+          enum: [scored, assetOverride, manual]
+          readOnly: true
+          description: Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`.
+        faultAssessment: { $ref: '#/components/schemas/WorkOrderFaultAssessment' }
+        requiredQualificationCodes:
+          type: array
+          items: { type: string }
+          description: Skills the job needs (M17-13).
         kind: { $ref: '#/components/schemas/WorkOrderKind' }
         assignedToPrincipalId: { type: string, format: uuid, nullable: true }
         raisedByPrincipalId: { type: string, format: uuid }
@@ -2373,6 +2706,9 @@ components:
                   inventoryItemId: { type: string, format: uuid }
                   itemName: { type: string }
                   quantity: { type: number }
+                  reservedQuantity:
+                    type: number
+                    description: Still reserved for this work order and not yet issued (M17-02).
                   cost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
             labourCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
             partsCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
@@ -2424,6 +2760,95 @@ components:
               description: Set by `closeWorkOrder` where the outcome is `duplicate`.
             closedAt: { type: string, format: date-time, nullable: true }
             closedByPrincipalId: { type: string, format: uuid, nullable: true }
+
+    WorkOrderPriorityPolicy:
+      x-ticvai-persistence: "maintenance.priority_scoring_model"
+      type: object
+      description: >
+        **How a corrective fault's priority is scored** (decided 17 September, M17-01). One per venue.
+        The score is 0 to 100: each weight times its factor, where safety is the fault's
+        `faultAssessment.safetyRisk`, guest operations is `faultAssessment.guestImpact` (and whether the
+        asset has a linked access point), revenue is whether the asset has linked products, and
+        criticality is the asset's `criticality`. The band the score falls in is the priority. **An
+        asset's `priorityOverride` wins over the score**, and a priority a person sets wins over both.
+      required: [weights, bands]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        venueId: { type: string, format: uuid, readOnly: true }
+        weights:
+          type: object
+          required: [safety, guestOperations, revenue, criticality]
+          properties:
+            safety: { type: integer, minimum: 0, maximum: 100 }
+            guestOperations: { type: integer, minimum: 0, maximum: 100 }
+            revenue: { type: integer, minimum: 0, maximum: 100 }
+            criticality: { type: integer, minimum: 0, maximum: 100 }
+        bands:
+          type: array
+          minItems: 1
+          maxItems: 5
+          description: Highest first. A score at or above `minScore` takes `priority`.
+          items:
+            type: object
+            required: [minScore, priority]
+            properties:
+              minScore: { type: integer, minimum: 0, maximum: 100 }
+              priority: { $ref: '#/components/schemas/WorkOrderPriority' }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+        updatedByPrincipalId: { type: string, format: uuid, readOnly: true, nullable: true }
+
+    WorkOrderFaultAssessment:
+      x-ticvai-persistence: "none — columns on maintenance.work_order"
+      type: object
+      description: What the person raising a fault says about it, which the priority score reads (M17-01).
+      properties:
+        safetyRisk: { type: boolean, default: false }
+        guestImpact: { type: string, enum: [none, degraded, closed], default: none }
+
+    WorkOrderAssigneeSuggestion:
+      x-ticvai-persistence: "none — computed on read"
+      type: object
+      required: [principalId, rank]
+      properties:
+        principalId: { type: string, format: uuid }
+        name: { type: string }
+        rank: { type: integer, minimum: 1 }
+        hasAllQualifications: { type: boolean }
+        missingQualificationCodes:
+          type: array
+          items: { type: string }
+        onShift: { type: boolean, description: On shift now or before the work order is due. }
+        openWorkOrderCount: { type: integer }
+
+    VendorServiceRequestStatus:
+      type: string
+      enum: [draft, sent, accepted, scheduled, completed, cancelled]
+
+    VendorServiceRequest:
+      x-ticvai-persistence: "maintenance.vendor_service_request"
+      type: object
+      description: >
+        **An outside vendor engaged on a work order** (decided 17 September, M17-13). The supplier is an
+        `inventory.supplier`.
+      required: [workOrderId, supplierId, scope]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        venueId: { type: string, format: uuid, readOnly: true }
+        workOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        supplierId: { type: string, format: uuid }
+        scope: { type: string, maxLength: 2000, description: What the vendor is asked to do. }
+        status:
+          allOf:
+            - $ref: '#/components/schemas/VendorServiceRequestStatus'
+          default: draft
+        vendorReference: { type: string, maxLength: 100, nullable: true }
+        quotedCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        finalCost: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        scheduledVisitAt: { type: string, format: date-time, nullable: true }
+        note: { type: string, maxLength: 1000, nullable: true }
+        raisedByPrincipalId: { type: string, format: uuid, readOnly: true }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
     MaintenancePlan:
       x-ticvai-persistence: "maintenance.preventive_plan"

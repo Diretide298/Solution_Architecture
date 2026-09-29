@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS identity.access_policy_version (
 );
 
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 2 write it; 1 tables reference it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.access_review_campaign (
     id                                uuid PRIMARY KEY,
     name                              text NOT NULL CONSTRAINT access_review_campaign_name_chk CHECK (char_length(name) <= 200),
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS identity.access_review_campaign (
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 2 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.access_review_item (
     id                                uuid PRIMARY KEY,
     campaign_id                       uuid NOT NULL,
@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 2 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.guest_identity_verification (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS identity.guest_identity_verification (
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS identity.guest_verification_policy (
     id                                uuid PRIMARY KEY,
     scope_path                        ltree NOT NULL,

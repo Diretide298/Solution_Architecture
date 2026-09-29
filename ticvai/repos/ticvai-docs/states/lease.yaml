@@ -14,6 +14,7 @@ terminal:
 - expired
 - released
 - forceReleased
+- converted
 transitions:
 - from: active
   to: released
@@ -32,6 +33,12 @@ transitions:
   guard: A supervisor reclaimed it from an unreachable terminal. Recorded separately because it may
     double-sell what the terminal already sold offline
   requiresApproval: true
+- from: active
+  to: converted
+  operation: convertInventoryHold
+  trigger: operation
+  guard: The order was paid. **The held units become sold** and never return to availability; a hold
+    that merely expired after payment would have oversold (system-design review SD-023, 30 September)
 notes: '`forceReleased` is deliberately distinct from `released`. One is a terminal reporting; the other
   is a human overriding a terminal that cannot report, and the reconciliation afterwards is different.'
 offlineReachable:

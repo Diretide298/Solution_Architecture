@@ -1,5 +1,5 @@
 id: LLD-P13
-title: P13 Venue CMS — White Label — 100 screens
+title: P13 Venue CMS — White Label — 103 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -20,34 +20,34 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 98
+  screens: 101
 - module: fnb
   screens: 1
 - module: ticketing
   screens: 1
 servicesCalled:
+- service: WhiteLabelService
+  operationCalls: 92
 - service: VenueOpsService
   operationCalls: 71
-- service: WhiteLabelService
-  operationCalls: 68
 - service: MarketingService
   operationCalls: 60
 - service: AiService
-  operationCalls: 8
+  operationCalls: 10
+- service: CatalogueService
+  operationCalls: 7
 - service: FnbService
   operationCalls: 5
 - service: IdentityService
   operationCalls: 4
-- service: CatalogueService
-  operationCalls: 3
 - service: OrderService
   operationCalls: 2
 - service: TenancyService
   operationCalls: 1
 coverage:
-  screens: 100
+  screens: 103
   inAFlow: 89
-  drawn: 100
+  drawn: 103
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -91,6 +91,7 @@ screens:
   - CMS-071
   - CMS-081
   - CMS-091
+  - CMS-102
   boardFrames:
   - Marketing Board 7.dc.html#crm-7f
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-001
@@ -318,6 +319,7 @@ screens:
   operations:
   - createMenu
   - getMenu
+  - getNavigation
   - listMenus
   - setMenuSections
   - setNavigation
@@ -453,6 +455,7 @@ screens:
   density: compact
   operations:
   - getTenantAppStatus
+  - listBookingFlows
   - publishTenantConfig
   - validateTenantConfig
   states:
@@ -461,12 +464,16 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - venueId<-session
   goesTo:
   - CMS-001
   - CMS-002
   - CMS-003
   - CMS-015
+  - CMS-102
+  - CMS-103
+  - CMS-104
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-014
   inFlows:
@@ -509,7 +516,6 @@ screens:
   - getBookingFlowConfig
   - getTenantConfig
   - listAnalyticsProviders
-  - listConsentQuestions
   - listOrgUnits
   - setAnalyticsProvider
   - setBookingFlowConfig
@@ -529,6 +535,7 @@ screens:
   - CMS-017
   - CMS-018
   - CMS-101
+  - CMS-103
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-016
   inFlows: null
@@ -2507,6 +2514,7 @@ screens:
   - createGuidedChoice
   - deleteGuidedChoice
   - getGuidedChoiceSuggestion
+  - listBookingFlows
   - listEvents
   - listGuidedChoices
   - listProductCategories
@@ -2528,6 +2536,120 @@ screens:
   - suggestionId<-navigation
   goesTo:
   - CMS-016
+  - CMS-102
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-101
+  inFlows: null
+- screen: CMS-102
+  name: Site Builder
+  module: White Label
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createBookingFlowDefinition
+  - getSiteSetupProgress
+  - getTenantAppStatus
+  - listBookingFlowTypes
+  - listBookingFlows
+  - setSiteSetupProgress
+  - validateTenantConfig
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  goesTo:
+  - CMS-001
+  - CMS-002
+  - CMS-003
+  - CMS-004
+  - CMS-005
+  - CMS-006
+  - CMS-007
+  - CMS-008
+  - CMS-009
+  - CMS-012
+  - CMS-014
+  - CMS-015
+  - CMS-101
+  - CMS-103
+  - CMS-104
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-102
+  inFlows: null
+- screen: CMS-103
+  name: Booking Flows
+  module: White Label
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createBookingFlowDefinition
+  - deleteBookingFlow
+  - getBookingFlow
+  - getPublishedBookingFlow
+  - listBookingFlowTypes
+  - listBookingFlows
+  - listConsentQuestions
+  - listProductCategories
+  - listProducts
+  - publishTenantConfig
+  - setProductCategories
+  - updateBookingFlowDefinition
+  - updateProduct
+  - validateBookingFlow
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - bookingFlowId<-CMS-102
+  - productId<-navigation
+  goesTo:
+  - CMS-014
+  - CMS-016
+  - CMS-101
+  - CMS-102
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-103
+  inFlows: null
+- screen: CMS-104
+  name: App Build & Store Publishing
+  module: White Label
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - createAiConversation
+  - getAppBuild
+  - getStoreAccounts
+  - listAppBuilds
+  - requestAppBuild
+  - sendAiMessage
+  - setStoreAccounts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - appBuildId<-navigation
+  - conversationId<-navigation
+  goesTo:
+  - CMS-004
+  - CMS-014
+  - CMS-102
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-104
   inFlows: null

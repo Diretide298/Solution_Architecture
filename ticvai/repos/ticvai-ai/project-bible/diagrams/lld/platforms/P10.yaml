@@ -27,9 +27,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 85
 - service: PlatformService
-  operationCalls: 59
+  operationCalls: 62
 - service: CatalogueService
-  operationCalls: 33
+  operationCalls: 21
 - service: IdentityService
   operationCalls: 16
 - service: MarketingService
@@ -205,7 +205,6 @@ screens:
   density: compact
   operations:
   - applyManualDiscount
-  - createChannelCapacity
   - createOrder
   - exchangeOrderLines
   - getChannelAllocations
@@ -220,8 +219,6 @@ screens:
   - reprintOrder
   - rescheduleOrder
   - resumeOrder
-  - setChannelAllocations
-  - updateChannelCapacity
   - voidOrder
   states:
   - emptyFirstRun
@@ -248,9 +245,6 @@ screens:
   wave: 2
   density: compact
   operations:
-  - copyPriceList
-  - createPriceList
-  - createProduct
   - getPriceList
   - getProduct
   - listAlternativeCodes
@@ -259,12 +253,6 @@ screens:
   - listProductVariants
   - listProducts
   - resolveProductByCode
-  - setAlternativeCodes
-  - setPrices
-  - setProductAttributes
-  - transitionProductLifecycle
-  - updatePriceList
-  - updateProduct
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -639,6 +627,9 @@ screens:
   operations:
   - createApiClient
   - listApiClients
+  - listApiScopes
+  - listProductionAccessRequests
+  - requestProductionAccess
   - revokeApiCredential
   - rotateApiCredential
   states:

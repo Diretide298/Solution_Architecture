@@ -572,7 +572,8 @@
   "who": "Client product",
   "default": "Defer it to a later release and take the five screens out of Block A, since nothing exists to build them against.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "Superseded 29 September (MOB-6, the Block A re-plan, Chinmay): the itinerary planner ships in Block A, a rules-based planner with the AI planner agent on top. GST-051..054 and GST-059 lost their deferred block and are wave 1 with their Mobile v4 roles; WEB-050 Plan Your Visit is the web planner; venue-map generateVisitPlan, getVisitPlan, updateVisitPlan, listVisitPlanAlternatives and bookVisitPlan (tables venuemap.visit_plan, venuemap.visit_plan_item) are the operations; flow F49 is wave 1."
  },
  {
   "id": "R191",
@@ -650,7 +651,8 @@
   "who": "Client product",
   "default": "Follow R187: if the planner is deferred, remove the itinerary suggestion from those screens. If it ships, add a guest-allowed itinerary kind.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "The deferral half superseded 29 September (MOB-6): the planner ships, so the other branch of this decision applies. requestSuggestion has a guest-allowed kind `itinerary`, used by GST-054 AI Planner to refine a rules plan; F49 no longer uses kind scenario."
  },
  {
   "id": "R210",
@@ -676,7 +678,8 @@
   "who": "Client product",
   "default": "(1) We draft a one-line rule and a minimum history per kind for you to correct. (2) Proposed: 7 days; approved but not applied: 24 hours. (3) Anything touching prices or permissions needs a manager; everything else needs the requester's own approval.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "Part (1) re-read 29 September (AI2 baseline; AI-D17, 30 September): the minimum history per kind is the point where the tenant's own data takes over from the day-one baseline, not a refusal. requestSuggestion answers from day one with its maturity stated (Suggestion.maturity) and no longer answers 422 insufficient-data. Parts (2) and (3) stand."
  },
  {
   "id": "R214",
@@ -1003,5 +1006,18 @@
   "default": "Reactivation within the paid period is allowed on the same record; after the period ends the subscription expires and a new one is required.",
   "decision": "adopted: our recommendation, 28 September 2026",
   "applied": "applied 28 September"
+ },
+ {
+  "id": "R-M18-15",
+  "theme": "Marketing opt-in at guest checkout",
+  "question": "May a guest who checks out without an account opt in to marketing at checkout, and does that opt-in, given against a verified contact, count as marketing consent?",
+  "why": "The 18 September minutes (M18-15) asked for the opt-in beside the terms at checkout. The package recorded marketing consent only against a guest profile, so a guest-checkout opt-in had nowhere to go, and a pre-ticked or inferred consent is what PDPL forbids.",
+  "blocks": "WEB-012, GST-009, orders checkoutCart, marketing consent records.",
+  "affects": "Guest web and app checkout, OrderService, MarketingService",
+  "first_release": "Yes: WEB-012, GST-009",
+  "who": "Client legal / DPO",
+  "default": "An unticked opt-in beside the terms, one per channel and purpose; checkoutCart carries marketingConsents[] (never defaulted to granted), bound to the order and the verified contact; marketing recordCheckoutConsents writes each ticked entry as a consent record with source checkout and attaches it to the profile when the contact matches one. Nothing is sent without it. Kept make-or-break on whether a guest-checkout opt-in is sufficient consent under PDPL.",
+  "decision": "adopted: our recommendation, 29 September 2026 (M18-15); make-or-break kept open for the client",
+  "applied": "applied 30 September"
  }
 ]

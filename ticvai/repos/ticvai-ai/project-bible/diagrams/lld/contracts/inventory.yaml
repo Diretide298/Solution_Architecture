@@ -1,5 +1,5 @@
 id: LLD-inventory
-title: inventory — 56 operations
+title: inventory — 58 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -232,6 +232,23 @@ operations:
   writes:
   - cache:idempotency
   - inventory.movement
+- operation: createStockReservation
+  verb: POST
+  path: /stock-reservations
+  scope: venue
+  permission: PROCUREMENT_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.item
+  - inventory.location
+  - inventory.movement
+  - inventory.stock_reservation
+  writes:
+  - cache:idempotency
+  - inventory.stock_reservation
 - operation: createStockTransfer
   verb: POST
   path: /stock-transfers
@@ -633,6 +650,20 @@ operations:
   writes:
   - cache:idempotency
   - inventory.requisition
+- operation: releaseStockReservation
+  verb: POST
+  path: /stock-reservations/{stockReservationId}/release
+  scope: venue
+  permission: PROCUREMENT_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - inventory.stock_reservation
+  writes:
+  - cache:idempotency
+  - inventory.stock_reservation
 - operation: returnRequisition
   verb: POST
   path: /requisitions/{requisitionId}/return

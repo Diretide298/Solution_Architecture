@@ -7,18 +7,18 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 49,
-  "operations": 208,
+  "screens": 50,
+  "operations": 214,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
   "operationsWithNoScreen": 19
  },
  "waves": {
-  "wave1": 21,
+  "wave1": 22,
   "wave2": 21,
   "wave3": 7
  },
@@ -49,6 +49,13 @@
    ]
   },
   {
+   "module": "Discovery & Browse",
+   "screens": 5,
+   "waves": [
+    1
+   ]
+  },
+  {
    "module": "Cart & Checkout",
    "screens": 5,
    "waves": [
@@ -68,13 +75,6 @@
    "waves": [
     2,
     3
-   ]
-  },
-  {
-   "module": "Discovery & Browse",
-   "screens": 4,
-   "waves": [
-    1
    ]
   },
   {
@@ -159,11 +159,19 @@
    "operations": 9
   },
   {
-   "contract": "wallet",
+   "contract": "venue-map",
    "operations": 8
   },
   {
    "contract": "white-label",
+   "operations": 8
+  },
+  {
+   "contract": "wallet",
+   "operations": 8
+  },
+  {
+   "contract": "resources",
    "operations": 7
   },
   {
@@ -171,32 +179,24 @@
    "operations": 7
   },
   {
-   "contract": "resources",
-   "operations": 7
-  },
-  {
    "contract": "finance",
    "operations": 6
-  },
-  {
-   "contract": "promotions",
-   "operations": 5
   },
   {
    "contract": "queue",
    "operations": 5
   },
   {
-   "contract": "payments",
-   "operations": 4
+   "contract": "promotions",
+   "operations": 5
   },
   {
    "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "venue-map",
-   "operations": 3
+   "contract": "payments",
+   "operations": 4
   },
   {
    "contract": "retail",
@@ -223,7 +223,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/discovery-and-browse/event-and-attraction-listing",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -250,7 +250,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/ticket-type-selection",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -259,7 +259,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/date-and-session-selection",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -268,7 +268,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/booking-and-selection/seat-map-selection",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -277,7 +277,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/booking-and-selection/add-ons-and-upsell",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -295,7 +295,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/shopping-cart",
-   "operations": 13,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -304,7 +304,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/guest-details-and-attendee-forms",
-   "operations": 13,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -313,7 +313,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/checkout-payment",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -647,6 +647,15 @@
    "wave": 3,
    "route": "/transport/route-and-schedule",
    "operations": 13,
+   "drawn": true
+  },
+  {
+   "id": "WEB-050",
+   "name": "Plan Your Visit",
+   "module": "Discovery & Browse",
+   "wave": 1,
+   "route": "/plan-your-visit",
+   "operations": 6,
    "drawn": true
   }
  ],

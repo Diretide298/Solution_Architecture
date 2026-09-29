@@ -7,6 +7,8 @@ publisher: whitelabel
 description: A tenant published content to their guest surfaces — a page, a banner, an FAQ or a policy.
 aggregate: tenantConfig
 emittedWhen: ContentStatus draft to published
+emittedBy:
+- publishTenantConfig
 payload:
 - field: tenantId
   type: uuid

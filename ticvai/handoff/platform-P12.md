@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 84 |
+| Operations with no screen | 83 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 84 operations with no screen here
+### 83 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
 | `getLocalizationBrandingCustomer` | marketing-crm | GET | Load a waiver version's languages, branding and channels |
 | `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
-| … | | | 44 more |
+| … | | | 43 more |
 
 ## Modules
 

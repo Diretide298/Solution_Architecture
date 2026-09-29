@@ -1,0 +1,36 @@
+# inventoryHold.expired v1 — published by catalogue
+# Added 29 September (system-design review SD-033, SD-023).
+
+name: inventoryHold.expired
+version: 1
+publisher: catalogue
+description: An active inventory hold passed its expiry and its units went back to remaining.
+aggregate: inventoryHold
+emittedWhen: The expiry sweeper (states/lease.yaml timer) returns an active hold's units
+payload:
+- field: inventoryHoldId
+  type: string
+- field: holderKind
+  type: string
+  notes: workstation or cart
+- field: holderId
+  type: string
+- field: channelCapacityId
+  type: uuid
+- field: units
+  type: integer
+- field: expiredAt
+  type: timestamp
+consumers:
+- context: orders
+  purpose: Mark the cart lines that held the units unavailable, so the guest sees it before checkout
+  idempotencyKey: inventoryHoldId
+  onFailure: retry
+  isCritical: false
+- context: reporting
+  purpose: Hold expiry rate per channel and performance
+  idempotencyKey: inventoryHoldId
+  onFailure: retry
+  isCritical: false
+retention: 7 days after publication
+notes: No state model emits this directly; the sweeper's timer transition on the lease model does.

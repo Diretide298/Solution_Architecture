@@ -5,7 +5,10 @@
   "path": "/products",
   "reads": [
    "catalogue.product",
-   "catalogue.product_media"
+   "catalogue.product_category",
+   "catalogue.product_eligibility_rule",
+   "catalogue.product_media",
+   "whitelabel.guided_choice_answer"
   ],
   "writes": [],
   "routing": "replica",
@@ -13,7 +16,7 @@
   "perm": "PRODUCT_VIEW",
   "offline": true,
   "summary": "List products",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "stores": [
    "postgres"
@@ -22,7 +25,8 @@
    "staff",
    "guest",
    "partner"
-  ]
+  ],
+  "note": "guidedAnswerIds (W4)"
  },
  "createProduct": {
   "contract": "catalogue",
@@ -31,7 +35,8 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
-   "catalogue.product_media"
+   "catalogue.product_media",
+   "whitelabel.booking_flow"
   ],
   "writes": [
    "cache:idempotency",
@@ -43,7 +48,7 @@
   "perm": "PRODUCT_CONFIGURE",
   "offline": false,
   "summary": "Create a product",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -52,7 +57,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "note": "bookingFlowId validated against the venue's flows"
  },
  "getProduct": {
   "contract": "catalogue",
@@ -86,7 +92,8 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
-   "catalogue.product_media"
+   "catalogue.product_media",
+   "whitelabel.booking_flow"
   ],
   "writes": [
    "cache:idempotency",
@@ -98,7 +105,7 @@
   "perm": "PRODUCT_CONFIGURE",
   "offline": false,
   "summary": "Update a product",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -107,7 +114,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "note": "bookingFlowId validated"
  },
  "setProductAttributes": {
   "contract": "catalogue",
@@ -322,7 +330,9 @@
   "verb": "GET",
   "path": "/events/{eventId}/performances",
   "reads": [
-   "catalogue.performance"
+   "catalogue.performance",
+   "catalogue.product",
+   "catalogue.product_category"
   ],
   "writes": [],
   "routing": "replica",
@@ -330,7 +340,7 @@
   "perm": "PRODUCT_VIEW",
   "offline": true,
   "summary": "List performances of an event",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "stores": [
    "postgres"
@@ -338,7 +348,8 @@
   "audience": [
    "staff",
    "guest"
-  ]
+  ],
+  "note": "categoryId filter joins the performance's product to its categories."
  },
  "createPerformances": {
   "contract": "catalogue",
@@ -597,12 +608,15 @@
   "path": "/inventory-holds",
   "reads": [
    "cache:idempotency",
+   "catalogue.channel_allocation",
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
    "platform.workstation"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.channel_allocation",
+   "catalogue.channel_capacity",
    "catalogue.inventory_hold"
   ],
   "routing": "",
@@ -610,7 +624,7 @@
   "perm": "ORDER_CREATE",
   "offline": false,
   "summary": "Acquire an inventory lease",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "storedProcedure": "catalogue.sp_acquire_lease",
   "stores": [
@@ -620,7 +634,8 @@
   "audience": [
    "staff",
    "guest"
-  ]
+  ],
+  "note": "the guarded decrement now writes channel_capacity; platform.workstation read outside the lock and only for workstation holds"
  },
  "renewInventoryHold": {
   "contract": "catalogue",
@@ -628,10 +643,12 @@
   "path": "/inventory-holds/{inventoryHoldId}/renew",
   "reads": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.inventory_hold"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.inventory_hold"
   ],
   "routing": "",
@@ -639,7 +656,7 @@
   "perm": "ORDER_CREATE",
   "offline": false,
   "summary": "Extend a lease TTL",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -647,7 +664,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "SD-023"
  },
  "forceReleaseInventoryHold": {
   "contract": "catalogue",
@@ -655,10 +673,12 @@
   "path": "/inventory-holds/{inventoryHoldId}/force-release",
   "reads": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.inventory_hold"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.inventory_hold"
   ],
   "routing": "",
@@ -666,7 +686,7 @@
   "perm": "CAPACITY_CONFIGURE",
   "offline": false,
   "summary": "Reclaim a stranded lease",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -674,7 +694,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "SD-023"
  },
  "getAvailability": {
   "contract": "catalogue",
@@ -1618,17 +1639,14 @@
   "path": "/orders",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_event",
    "orders.order_line",
    "orders.payment",
@@ -1658,9 +1676,8 @@
   "verb": "GET",
   "path": "/orders/{orderId}",
   "reads": [
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
@@ -1688,9 +1705,8 @@
   "path": "/orders/{orderId}/hold",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
@@ -1725,9 +1741,8 @@
   "path": "/orders/{orderId}/resume",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
@@ -1762,9 +1777,8 @@
   "path": "/orders/{orderId}/discounts",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
@@ -1797,9 +1811,8 @@
   "path": "/orders/{orderId}/voids",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
@@ -2040,19 +2053,23 @@
   "verb": "POST",
   "path": "/payments",
   "reads": [
-   "cache:idempotency",
+   "catalogue.inventory_hold",
    "ledger.fx_rate",
+   "orders.order_line",
    "orders.payment",
    "orders.sales_order",
    "payments.provider_connection"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
    "ledger.journal_entry",
-   "ledger.posting",
+   "ledger.journal_line",
    "orders.order_event",
    "orders.payment",
    "payments.payment_attempt",
+   "platform.idempotency_record",
    "platform.outbox"
   ],
   "routing": "",
@@ -2060,7 +2077,7 @@
   "perm": "ORDER_CREATE",
   "offline": true,
   "summary": "Take a payment against an order",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "OrderService",
   "storedProcedure": "orders.sp_capture_payment",
   "stores": [
@@ -2072,7 +2089,8 @@
    "guest",
    "partner"
   ],
-  "lineageNote": "one payment_attempt row per provider call (after-close-out DM6); order_event writer"
+  "lineageNote": "one payment_attempt row per provider call (after-close-out DM6); order_event writer",
+  "note": "cash-receipt entry only; hold conversion via catalogue.convertInventoryHold (re-acquire via acquireInventoryHold on 409 hold-not-active); no access.entitlement, no wallet table"
  },
  "inquirePaymentStatus": {
   "contract": "orders",
@@ -2137,16 +2155,20 @@
   "verb": "POST",
   "path": "/payments/{paymentId}/capture",
   "reads": [
-   "cache:idempotency",
    "ledger.fx_rate",
    "orders.payment",
    "payments.provider_connection"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
+   "ledger.journal_entry",
+   "ledger.journal_line",
    "orders.order_event",
    "orders.payment",
    "payments.payment_attempt",
+   "platform.idempotency_record",
    "platform.outbox"
   ],
   "routing": "",
@@ -2154,7 +2176,7 @@
   "perm": "ORDER_CREATE",
   "offline": false,
   "summary": "Capture a previously authorised payment",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "OrderService",
   "stores": [
    "postgres",
@@ -2164,7 +2186,8 @@
    "staff",
    "partner"
   ],
-  "lineageNote": "one payment_attempt row for the capture call (after-close-out DM6); order_event writer"
+  "lineageNote": "one payment_attempt row for the capture call (after-close-out DM6); order_event writer",
+  "note": "as createPayment"
  },
  "convertReservation": {
   "contract": "orders",
@@ -2172,9 +2195,8 @@
   "path": "/reservations/{reservationId}/convert",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
@@ -2208,26 +2230,37 @@
   "verb": "POST",
   "path": "/sync/orders",
   "reads": [
+   "catalogue.inventory_hold",
+   "catalogue.price_list",
+   "catalogue.variant",
    "orders.sales_order"
   ],
   "writes": [
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
-   "orders.sales_order"
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
+   "ledger.price_variance",
+   "orders.order_line",
+   "orders.order_line_discount",
+   "orders.payment",
+   "orders.sales_order",
+   "platform.idempotency_record",
+   "platform.outbox",
+   "sync.rejection"
   ],
   "routing": "",
   "scope": "workstation",
   "perm": "ORDER_CREATE",
   "offline": false,
   "summary": "Replay orders recorded offline",
-  "source": "path-inferred",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "OrderService",
   "stores": [
    "postgres"
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "ledger.price_variance is the variance account posting as named in the lineage elsewhere; if absent, ledger.journal_line"
  },
  "listSyncRejections": {
   "contract": "orders",
@@ -2257,17 +2290,14 @@
   "path": "/orders/{orderId}/modify",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_event",
    "orders.order_line",
    "orders.payment",
@@ -2323,9 +2353,8 @@
   "reads": [
    "access.entitlement",
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
@@ -2362,8 +2391,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_event",
    "orders.sales_order",
    "platform.outbox"
@@ -2535,8 +2562,6 @@
   "verb": "GET",
   "path": "/reservations",
   "reads": [
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
   ],
@@ -2562,15 +2587,11 @@
   "path": "/reservations",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_event",
    "orders.reservation",
    "orders.reservation_line"
@@ -2596,8 +2617,6 @@
   "verb": "GET",
   "path": "/reservations/{reservationId}",
   "reads": [
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
   ],
@@ -2653,8 +2672,6 @@
   "path": "/reservations/{reservationId}/extend",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
   ],
@@ -2914,22 +2931,16 @@
    "access.accreditation_credential",
    "access.admission_rules",
    "access.blacklist",
-   "cache:resolution",
-   "catalogue.entitlement_template",
-   "identity.principal",
-   "venuemap.map",
-   "venuemap.path",
-   "venuemap.point"
+   "access.dynamic_policy",
+   "access.entitlement"
   ],
-  "writes": [
-   "cache:resolution"
-  ],
+  "writes": [],
   "routing": "replica",
   "scope": "workstation",
   "perm": "ACCESS_VALIDATE",
   "offline": false,
   "summary": "Entitlement and rule set for offline validation",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "AccessService",
   "stores": [
    "postgres",
@@ -2937,7 +2948,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "SD-052"
  },
  "setTurnstileMode": {
   "contract": "access",
@@ -4111,13 +4123,13 @@
   "path": "/auth/refresh",
   "reads": [
    "cache:idempotency",
-   "identity.session",
-   "identity.refresh_token"
+   "identity.refresh_token",
+   "identity.session"
   ],
   "writes": [
    "cache:idempotency",
-   "identity.session",
-   "identity.refresh_token"
+   "identity.refresh_token",
+   "identity.session"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4145,8 +4157,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.session",
-   "identity.refresh_token"
+   "identity.refresh_token",
+   "identity.session"
   ],
   "routing": "",
   "scope": "workstation",
@@ -5539,8 +5551,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.posting",
-   "ledger.journal_entry"
+   "ledger.journal_entry",
+   "ledger.posting"
   ],
   "routing": "",
   "scope": "region",
@@ -5827,8 +5839,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.posting",
-   "ledger.journal_entry"
+   "ledger.journal_entry",
+   "ledger.posting"
   ],
   "routing": "",
   "scope": "region",
@@ -5873,9 +5885,9 @@
   "path": "/ledger/trial-balance",
   "reads": [
    "ledger.account",
-   "ledger.posting",
    "ledger.event_budget",
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.posting"
   ],
   "writes": [],
   "routing": "analytical",
@@ -6260,9 +6272,9 @@
   "path": "/reports/financial",
   "reads": [
    "ledger.account",
-   "ledger.posting",
    "ledger.event_budget",
-   "ledger.fiscal_period"
+   "ledger.fiscal_period",
+   "ledger.posting"
   ],
   "writes": [],
   "routing": "analytical",
@@ -6918,8 +6930,8 @@
   "writes": [
    "cache:idempotency",
    "marketing.campaign",
-   "marketing.segment_criterion",
-   "marketing.campaign_target"
+   "marketing.campaign_target",
+   "marketing.segment_criterion"
   ],
   "routing": "",
   "scope": "venue",
@@ -7645,9 +7657,9 @@
   "path": "/tenants/{tenantId}",
   "reads": [
    "control.cell",
-   "subscription.contract",
+   "control.cell_tenant",
    "control.tenant",
-   "control.cell_tenant"
+   "subscription.contract"
   ],
   "writes": [],
   "routing": "replica",
@@ -7752,13 +7764,13 @@
   "path": "/tenants/{tenantId}/terminate",
   "reads": [
    "cache:idempotency",
-   "subscription.contract",
-   "control.tenant"
+   "control.tenant",
+   "subscription.contract"
   ],
   "writes": [
    "cache:idempotency",
-   "subscription.contract",
-   "control.tenant"
+   "control.tenant",
+   "subscription.contract"
   ],
   "routing": "",
   "scope": "tenant",
@@ -7944,9 +7956,9 @@
   "path": "/tenants/{tenantId}/subscription/preview",
   "reads": [
    "cache:idempotency",
-   "subscription.plan",
+   "platform.tenant",
    "subscription.contract",
-   "platform.tenant"
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency"
@@ -7973,8 +7985,8 @@
   "path": "/tenants/{tenantId}/licences",
   "reads": [
    "control.licence_add_on",
-   "subscription.plan",
-   "subscription.contract"
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [],
   "routing": "primary",
@@ -8128,8 +8140,8 @@
   "path": "/cells/{cellId}",
   "reads": [
    "control.cell",
-   "control.cell_job",
    "control.cell_instance",
+   "control.cell_job",
    "control.cell_tenant"
   ],
   "writes": [],
@@ -8452,8 +8464,8 @@
   "verb": "GET",
   "path": "/tenants/{tenantId}/usage",
   "reads": [
-   "subscription.contract",
-   "control.usage_record"
+   "control.usage_record",
+   "subscription.contract"
   ],
   "writes": [],
   "routing": "analytical",
@@ -8672,8 +8684,8 @@
   "verb": "GET",
   "path": "/venues/{venueId}/dining",
   "reads": [
-   "fnb.service_order",
    "fnb.menu",
+   "fnb.service_order",
    "platform.outlet"
   ],
   "writes": [],
@@ -8771,8 +8783,8 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.service_order",
-   "fnb.delivery_location_outlet"
+   "fnb.delivery_location_outlet",
+   "fnb.service_order"
   ],
   "writes": [
    "cache:idempotency",
@@ -8826,11 +8838,11 @@
   "path": "/guest-orders",
   "reads": [
    "cache:idempotency",
+   "fnb.delivery_policy",
    "fnb.location_session",
    "fnb.menu_item",
-   "inventory.stock_level",
-   "fnb.delivery_policy",
-   "fnb.menu_item_modifier"
+   "fnb.menu_item_modifier",
+   "inventory.stock_level"
   ],
   "writes": [
    "cache:idempotency",
@@ -8860,8 +8872,8 @@
   "path": "/guest-orders/{orderId}",
   "reads": [
    "fnb.delivery_location",
-   "fnb.service_order",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "writes": [],
   "routing": "primary",
@@ -9128,6 +9140,8 @@
   "verb": "GET",
   "path": "/fnb-orders",
   "reads": [
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line"
   ],
@@ -9151,21 +9165,27 @@
   "verb": "POST",
   "path": "/fnb-orders",
   "reads": [
-   "cache:idempotency",
+   "fnb.kitchen_station",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
+   "fnb.menu_item",
    "fnb.service_order",
    "fnb.service_order_line"
   ],
   "writes": [
-   "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
-   "fnb.service_order_line"
+   "fnb.service_order_line",
+   "platform.idempotency_record",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "workstation",
   "perm": "ORDER_CREATE",
   "offline": true,
   "summary": "Place an F&B order",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "FnbService",
   "stores": [
    "postgres",
@@ -9173,7 +9193,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "Unchanged tables; fnb.service_order_line gains redeem_entitlement_id. A redemption line calls access.validateAccess (AccessService writes access.entitlement / access.scan), not this operation."
  },
  "acceptFnbOrder": {
   "contract": "fnb",
@@ -9181,6 +9202,8 @@
   "path": "/fnb-orders/{orderId}/accept",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line"
   ],
@@ -9209,6 +9232,8 @@
   "path": "/fnb-orders/{orderId}/cancel",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line"
   ],
@@ -9236,6 +9261,8 @@
   "verb": "GET",
   "path": "/fnb-orders/{orderId}",
   "reads": [
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line"
   ],
@@ -9260,6 +9287,8 @@
   "path": "/fnb-orders/{orderId}",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line"
   ],
@@ -9337,6 +9366,8 @@
   "path": "/table-visits",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit"
@@ -9366,6 +9397,8 @@
   "verb": "GET",
   "path": "/table-visits/{visitId}",
   "reads": [
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit"
@@ -9391,6 +9424,8 @@
   "path": "/table-visits/{visitId}",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit"
@@ -9421,6 +9456,8 @@
   "path": "/table-visits/{visitId}/merge",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit"
@@ -9503,6 +9540,8 @@
   "path": "/table-visits/{visitId}/close",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit"
@@ -12472,6 +12511,8 @@
   "path": "/work-orders",
   "reads": [
    "cache:idempotency",
+   "maintenance.asset",
+   "maintenance.priority_scoring_model",
    "maintenance.work_order"
   ],
   "writes": [
@@ -12483,7 +12524,7 @@
   "perm": "WORK_ORDER_MANAGE",
   "offline": true,
   "summary": "Raise a work order",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "VenueOpsService",
   "stores": [
    "postgres",
@@ -12491,7 +12532,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "priority derived (M17-01)"
  },
  "getWorkOrder": {
   "contract": "maintenance",
@@ -12575,10 +12617,13 @@
   "path": "/work-orders/{workOrderId}/parts",
   "reads": [
    "cache:idempotency",
+   "inventory.stock_reservation",
    "maintenance.work_order"
   ],
   "writes": [
    "cache:idempotency",
+   "inventory.movement",
+   "inventory.stock_reservation",
    "maintenance.work_order"
   ],
   "routing": "",
@@ -12586,7 +12631,7 @@
   "perm": "WORK_ORDER_MANAGE",
   "offline": false,
   "summary": "Record parts consumed",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "VenueOpsService",
   "stores": [
    "postgres",
@@ -12594,7 +12639,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "issues through the inventory ledger, reservation first"
  },
  "cancelWorkOrder": {
   "contract": "maintenance",
@@ -13229,8 +13275,8 @@
   ],
   "writes": [
    "assets.media_collection",
-   "cache:idempotency",
-   "assets.media_collection_member"
+   "assets.media_collection_member",
+   "cache:idempotency"
   ],
   "routing": "",
   "scope": "venue",
@@ -13310,9 +13356,9 @@
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_definition",
+   "reporting.report_definition_version",
    "reporting.report_filter",
-   "reporting.report_parameter",
-   "reporting.report_definition_version"
+   "reporting.report_parameter"
   ],
   "routing": "",
   "scope": "venue",
@@ -13337,9 +13383,9 @@
   "reads": [
    "reporting.report_column",
    "reporting.report_definition",
+   "reporting.report_definition_version",
    "reporting.report_filter",
-   "reporting.report_parameter",
-   "reporting.report_definition_version"
+   "reporting.report_parameter"
   ],
   "writes": [],
   "routing": "analytical",
@@ -13372,9 +13418,9 @@
    "cache:idempotency",
    "reporting.report_column",
    "reporting.report_definition",
+   "reporting.report_definition_version",
    "reporting.report_filter",
-   "reporting.report_parameter",
-   "reporting.report_definition_version"
+   "reporting.report_parameter"
   ],
   "routing": "",
   "scope": "venue",
@@ -13881,11 +13927,11 @@
   "writes": [
    "ai.activity",
    "cache:idempotency",
+   "reporting.natural_language_query",
    "reporting.report_column",
    "reporting.report_definition",
    "reporting.report_filter",
-   "reporting.report_parameter",
-   "reporting.natural_language_query"
+   "reporting.report_parameter"
   ],
   "routing": "",
   "scope": "venue",
@@ -15099,6 +15145,7 @@
   "path": "/bundles",
   "reads": [
    "cache:idempotency",
+   "fnb.menu_item",
    "promotions.allocation_component",
    "promotions.bundle",
    "promotions.bundle_choice_group",
@@ -15119,7 +15166,7 @@
   "perm": "PRODUCT_CONFIGURE",
   "offline": false,
   "summary": "Create a bundle",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -15128,7 +15175,8 @@
   "audience": [
    "staff"
   ],
-  "lineageNote": "audit bundle created. Existing lineage entry: derive-lineage --apply is additive-only, so the coordinator must update this entry in handoff/api-data-lineage.json by hand."
+  "lineageNote": "audit bundle created. Existing lineage entry: derive-lineage --apply is additive-only, so the coordinator must update this entry in handoff/api-data-lineage.json by hand.",
+  "note": "menu item validated (MOB-4)"
  },
  "getBundle": {
   "contract": "promotions",
@@ -16792,7 +16840,8 @@
   "verb": "GET",
   "path": "/tenant-config",
   "reads": [
-   "cache:resolution",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step",
    "whitelabel.feature_toggle",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -16802,15 +16851,13 @@
    "whitelabel.navigation_item",
    "whitelabel.tenant_config"
   ],
-  "writes": [
-   "cache:resolution"
-  ],
+  "writes": [],
   "routing": "replica",
   "scope": "tenant",
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Full working configuration",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -16819,7 +16866,8 @@
   "audience": [
    "staff",
    "guest"
-  ]
+  ],
+  "note": "bookingFlows onRead."
  },
  "getTenantAppStatus": {
   "contract": "white-label",
@@ -17788,19 +17836,19 @@
   "verb": "POST",
   "path": "/tenant-config/validate",
   "reads": [
-   "cache:idempotency",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step",
    "whitelabel.tenant_config"
   ],
   "writes": [
-   "cache:idempotency",
-   "whitelabel.tenant_config"
+   "cache:idempotency"
   ],
   "routing": "",
   "scope": "tenant",
   "perm": "TENANT_CONFIGURE",
   "offline": false,
   "summary": "Validate the working draft",
-  "source": "path-inferred",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -17815,13 +17863,13 @@
   "verb": "POST",
   "path": "/tenant-config/publish",
   "reads": [
-   "cache:idempotency",
-   "whitelabel.config_version"
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step",
+   "whitelabel.config_version",
+   "whitelabel.tenant_config"
   ],
   "writes": [
    "cache:idempotency",
-   "cache:resolution",
-   "platform.outbox",
    "whitelabel.config_version"
   ],
   "routing": "",
@@ -17829,7 +17877,7 @@
   "perm": "TENANT_PUBLISH",
   "offline": false,
   "summary": "Publish the working draft",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "WhiteLabelService",
   "stores": [
    "postgres",
@@ -17837,7 +17885,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "Now snapshots booking flows."
  },
  "listConfigVersions": {
   "contract": "white-label",
@@ -17867,6 +17916,8 @@
   "path": "/tenant-config/versions/{version}/restore",
   "reads": [
    "cache:idempotency",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step",
    "whitelabel.feature_toggle",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -18942,8 +18993,6 @@
   "path": "/carts",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -18978,8 +19027,6 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -19035,31 +19082,25 @@
   "verb": "POST",
   "path": "/carts/{cartId}/lines",
   "reads": [
-   "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.variant",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line"
   ],
   "writes": [
-   "cache:idempotency",
-   "catalogue.inventory_hold",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.cart",
-   "orders.cart_line"
+   "orders.cart_line",
+   "platform.idempotency_record"
   ],
   "routing": "",
   "scope": "venue",
   "perm": null,
   "offline": false,
   "summary": "Add something",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "OrderService",
   "stores": [
    "postgres",
@@ -19068,7 +19109,8 @@
   "audience": [
    "guest",
    "partner"
-  ]
+  ],
+  "note": "the hold is written by catalogue.acquireInventoryHold, not here"
  },
  "updateCartLine": {
   "contract": "orders",
@@ -19077,8 +19119,6 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -19111,8 +19151,6 @@
   "path": "/carts/{cartId}/lines/{lineId}",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -19146,8 +19184,6 @@
   "reads": [
    "cache:idempotency",
    "catalogue.inventory_hold",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -19179,8 +19215,6 @@
   "path": "/carts/{cartId}/claim",
   "reads": [
    "cache:idempotency",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
@@ -19212,30 +19246,33 @@
   "verb": "POST",
   "path": "/carts/{cartId}/checkout",
   "reads": [
-   "cache:idempotency",
    "catalogue.inventory_hold",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "marketing.consent_question",
    "orders.cart",
    "orders.cart_line",
    "orders.fraud_rule",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
   ],
   "writes": [
-   "cache:idempotency",
+   "marketing.consent_record",
    "orders.cart",
    "orders.order_line",
-   "orders.sales_order"
+   "orders.order_line_discount",
+   "orders.order_line_eligibility",
+   "orders.sales_order",
+   "platform.idempotency_record",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "venue",
   "perm": null,
   "offline": false,
   "summary": "Turn the cart into an order",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "OrderService",
   "stores": [
    "postgres",
@@ -19245,7 +19282,8 @@
    "guest",
    "partner"
   ],
-  "lineageNote": "copies cart_line.recommendation_id to order_line.recommendation_id; reads orders.fraud_rule (charge rules) then calls ai scoreTransactionRisk (service call, no table); existing embedded attributes/window entries unchanged"
+  "lineageNote": "copies cart_line.recommendation_id to order_line.recommendation_id; reads orders.fraud_rule (charge rules) then calls ai scoreTransactionRisk (service call, no table); existing embedded attributes/window entries unchanged",
+  "note": "emits order.created; re-acquires a lapsed hold via catalogue.acquireInventoryHold; converts via catalogue.convertInventoryHold only when fully paid at checkout; marketingConsents recorded through marketing"
  },
  "listAbandonedCarts": {
   "contract": "orders",
@@ -19463,8 +19501,7 @@
   "reads": [
    "fnb.dining_table",
    "fnb.reservation_table",
-   "fnb.table_reservation",
-   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
+   "fnb.table_reservation"
   ],
   "writes": [],
   "routing": "primary",
@@ -19489,14 +19526,12 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.reservation_table",
-   "fnb.table_reservation",
-   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
+   "fnb.table_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "fnb.reservation_table",
-   "fnb.table_reservation",
-   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
+   "fnb.table_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -19520,14 +19555,12 @@
   "reads": [
    "cache:idempotency",
    "fnb.reservation_table",
-   "fnb.table_reservation",
-   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
+   "fnb.table_reservation"
   ],
   "writes": [
    "cache:idempotency",
    "fnb.reservation_table",
-   "fnb.table_reservation",
-   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
+   "fnb.table_reservation"
   ],
   "routing": "",
   "scope": "venue",
@@ -19552,8 +19585,7 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.reservation_table",
-   "fnb.table_reservation",
-   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
+   "fnb.table_reservation"
   ],
   "writes": [
    "cache:idempotency",
@@ -19844,8 +19876,10 @@
   "reads": [
    "catalogue.event",
    "catalogue.product",
+   "catalogue.product_eligibility_rule",
    "catalogue.product_media",
-   "catalogue.variant"
+   "catalogue.variant",
+   "whitelabel.guided_choice_answer"
   ],
   "writes": [],
   "routing": "replica",
@@ -19853,14 +19887,15 @@
   "perm": null,
   "offline": true,
   "summary": "Find something by name",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "stores": [
    "postgres"
   ],
   "audience": [
    "guest"
-  ]
+  ],
+  "note": "guidedAnswerIds (W4)"
  },
  "voidPayment": {
   "contract": "orders",
@@ -19902,8 +19937,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "ledger.posting",
-   "ledger.inter_entity_obligation"
+   "ledger.inter_entity_obligation",
+   "ledger.posting"
   ],
   "routing": "",
   "scope": "tenant",
@@ -20002,8 +20037,8 @@
   "path": "/subscriptions/{subscriptionId}/cancel",
   "reads": [
    "cache:idempotency",
-   "subscription.contract",
-   "control.tenant"
+   "control.tenant",
+   "subscription.contract"
   ],
   "writes": [
    "cache:idempotency",
@@ -20030,6 +20065,8 @@
   "path": "/table-visits/{visitId}/request-bill",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit"
@@ -20488,8 +20525,8 @@
    "ai.activity",
    "ai.policy",
    "cache:idempotency",
-   "subscription.plan",
-   "subscription.contract"
+   "subscription.contract",
+   "subscription.plan"
   ],
   "writes": [
    "cache:idempotency",
@@ -21813,9 +21850,11 @@
   "path": "/venue-maps/{mapId}/points",
   "reads": [
    "access.access_point",
+   "assets.media_asset",
    "cache:idempotency",
    "catalogue.product",
    "platform.outlet",
+   "promotions.bundle",
    "venuemap.map",
    "venuemap.point"
   ],
@@ -21828,7 +21867,7 @@
   "perm": "VENUE_MAP_MANAGE",
   "offline": false,
   "summary": "Place or amend a point of interest",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "VenueOpsService",
   "stores": [
    "postgres",
@@ -21836,7 +21875,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "new VenuePoint columns; featuredOffer validated against catalogue.product or promotions.bundle, media against assets"
  },
  "publishVenueMap": {
   "contract": "venue-map",
@@ -22152,7 +22192,6 @@
   "path": "/resources",
   "reads": [
    "cache:idempotency",
-   "platform.scope",
    "resources.resource"
   ],
   "writes": [
@@ -22164,7 +22203,7 @@
   "perm": "RESOURCE_MANAGE",
   "offline": false,
   "summary": "Define a bookable resource",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "VenueOpsService",
   "stores": [
    "postgres",
@@ -22172,7 +22211,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "cleaning_policy columns"
  },
  "getResourceAvailability": {
   "contract": "resources",
@@ -22181,7 +22221,9 @@
   "reads": [
    "maintenance.work_order",
    "resources.booking",
-   "resources.resource"
+   "resources.resource",
+   "resources.resource_block",
+   "resources.resource_hold"
   ],
   "writes": [],
   "routing": "replica",
@@ -22189,7 +22231,7 @@
   "perm": "RESOURCE_VIEW",
   "offline": false,
   "summary": "When it is free, with conflicts already resolved",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "VenueOpsService",
   "stores": [
    "postgres"
@@ -22198,7 +22240,8 @@
    "staff",
    "guest"
   ],
-  "guestCallable": true
+  "guestCallable": true,
+  "note": "cleanings computed on read from resources.resource.cleaning_policy"
  },
  "bookResource": {
   "contract": "resources",
@@ -22776,8 +22819,8 @@
   "reads": [
    "cache:idempotency",
    "control.partner_agreement",
-   "ledger.posting",
    "ledger.legal_entity",
+   "ledger.posting",
    "orders.sales_order"
   ],
   "writes": [
@@ -23160,6 +23203,8 @@
   "path": "/table-visits/{visitId}/transfer",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit",
@@ -24286,7 +24331,8 @@
    "cache:idempotency",
    "control.api_client",
    "control.api_licence",
-   "control.developer_account"
+   "control.developer_account",
+   "control.integration_listing"
   ],
   "writes": [
    "cache:idempotency",
@@ -24297,7 +24343,7 @@
   "perm": "DEVELOPER_MANAGE",
   "offline": false,
   "summary": "Create a client with scopes and an environment",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "PlatformService",
   "stores": [
    "postgres",
@@ -24306,7 +24352,8 @@
   "audience": [
    "staff",
    "partner"
-  ]
+  ],
+  "note": "certification check adds control.integration_listing"
  },
  "rotateApiCredential": {
   "contract": "public-api",
@@ -24854,9 +24901,8 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
@@ -25250,9 +25296,8 @@
   "verb": "GET",
   "path": "/payment-links/{token}",
   "reads": [
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment_link",
    "orders.reservation",
@@ -25283,9 +25328,9 @@
   "reads": [
    "cache:idempotency",
    "orders.payment_link",
-   "payments.provider",
    "orders.reservation",
-   "orders.sales_order"
+   "orders.sales_order",
+   "payments.provider"
   ],
   "writes": [
    "access.entitlement",
@@ -25534,11 +25579,12 @@
   "path": "/product-categories",
   "reads": [
    "cache:idempotency",
-   "catalogue.product_category"
+   "catalogue.product",
+   "catalogue.product_category",
+   "whitelabel.booking_flow"
   ],
   "writes": [
    "cache:idempotency",
-   "cache:resolution",
    "catalogue.product_category"
   ],
   "routing": "",
@@ -25546,7 +25592,7 @@
   "perm": "PRODUCT_CONFIGURE",
   "offline": false,
   "summary": "",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "CatalogueService",
   "stores": [
    "postgres",
@@ -25554,7 +25600,8 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "note": "bookingFlowId validated"
  },
  "listFraudRules": {
   "contract": "orders",
@@ -25774,6 +25821,7 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit"
@@ -25804,6 +25852,8 @@
   "path": "/table-visits/{visitId}/server",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit",
@@ -25834,6 +25884,8 @@
   "path": "/table-visits/{visitId}/comp",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit",
@@ -26231,6 +26283,8 @@
   "path": "/table-visits/{visitId}/stage",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit"
@@ -26288,6 +26342,8 @@
   "path": "/table-visits/{visitId}/transfer-items",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line",
    "fnb.table_visit",
@@ -26427,8 +26483,8 @@
   "verb": "GET",
   "path": "/outlets/{outletId}/86-events",
   "reads": [
-   "fnb.sold_out_item",
-   "fnb.menu_item"
+   "fnb.menu_item",
+   "fnb.sold_out_item"
   ],
   "writes": [],
   "routing": "replica",
@@ -26452,13 +26508,14 @@
   "reads": [
    "cache:idempotency",
    "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
    "fnb.service_order_line"
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.service_order",
-   "fnb.kitchen_ticket"
+   "fnb.kitchen_ticket",
+   "fnb.service_order"
   ],
   "routing": "",
   "scope": "venue",
@@ -26480,8 +26537,10 @@
   "verb": "POST",
   "path": "/ai/suggestions",
   "reads": [
+   "ai.capability_maturity",
    "ai.forecast_point",
    "ai.forecast_version",
+   "ai.history_observation",
    "ai.insight",
    "ai.operational_requirement",
    "ai.policy",
@@ -26489,6 +26548,7 @@
    "ai.rec_decline",
    "ai.release",
    "ai.suggestion",
+   "ai.venue_settings",
    "cache:idempotency",
    "cache:rec-candidates",
    "fnb.production_plan",
@@ -26497,7 +26557,10 @@
    "marketing.attribution_touch",
    "marketing.segment",
    "queue.queue",
-   "queue.reading"
+   "queue.reading",
+   "venuemap.point",
+   "venuemap.visit_plan",
+   "venuemap.visit_plan_item"
   ],
   "writes": [
    "ai.activity",
@@ -26509,7 +26572,7 @@
   "perm": "AI_USE",
   "offline": false,
   "summary": "",
-  "source": "hand-mapped",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "service": "AiService",
   "stores": [
    "postgres",
@@ -26521,7 +26584,8 @@
    "guest"
   ],
   "guestCallable": true,
-  "lineageNote": "sendTime, wasteRisk and queueBalancing read the owners' tables on the analytical replica as the caller."
+  "lineageNote": "sendTime, wasteRisk and queueBalancing read the owners' tables on the analytical replica as the caller.",
+  "note": "adds the baseline inputs and, for itinerary, the guest's plan (read only); ADR-0020 holds"
  },
  "recordSuggestionOutcome": {
   "contract": "ai",
@@ -27202,10 +27266,10 @@
    "ai.suggestion",
    "cache:idempotency",
    "fnb.menu_item",
+   "fnb.menu_item_modifier",
    "fnb.production_plan",
    "fnb.production_plan_line",
-   "fnb.recipe",
-   "fnb.menu_item_modifier"
+   "fnb.recipe"
   ],
   "writes": [
    "cache:idempotency",
@@ -27328,8 +27392,8 @@
    "cache:idempotency",
    "cache:resolution",
    "inventory.supplier",
-   "platform.audit_record",
-   "inventory.supplier_contract"
+   "inventory.supplier_contract",
+   "platform.audit_record"
   ],
   "routing": "",
   "scope": "tenant",
@@ -27534,9 +27598,8 @@
   "verb": "GET",
   "path": "/my/orders",
   "reads": [
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order",
@@ -29226,8 +29289,7 @@
   "verb": "PUT",
   "path": "/waiver-testing",
   "reads": [
-   "marketing.waiver_version_control",
-   "marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)"
+   "marketing.waiver_version_control"
   ],
   "writes": [],
   "routing": "primary",
@@ -43739,12 +43801,10 @@
   "verb": "PUT",
   "path": "/signatory-signature-guardian",
   "reads": [
-   "marketing.waiver_signatory_rule",
-   "marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)"
+   "marketing.waiver_signatory_rule"
   ],
   "writes": [
-   "marketing.waiver_signatory_rule",
-   "marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)"
+   "marketing.waiver_signatory_rule"
   ],
   "routing": "primary",
   "scope": "venue",
@@ -44635,15 +44695,19 @@
   "verb": "DELETE",
   "path": "/inventory-holds/{inventoryHoldId}",
   "reads": [
+   "catalogue.channel_capacity",
    "catalogue.inventory_hold"
   ],
-  "writes": [],
+  "writes": [
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold"
+  ],
   "routing": null,
   "scope": "workstation",
   "perm": "ORDER_CREATE",
   "offline": false,
   "summary": "Return unsold units",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -44651,7 +44715,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "note": "SD-023 (lineage had writes: [])"
  },
  "relinquishSeatBlock": {
   "contract": "seating",
@@ -44742,13 +44807,15 @@
   "reads": [
    "platform.wallet_authorisation"
   ],
-  "writes": [],
+  "writes": [
+   "platform.wallet_authorisation"
+  ],
   "routing": null,
   "scope": "workstation",
   "perm": "ORDER_CREATE",
   "offline": false,
   "summary": "Release a hold without capturing",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -44756,7 +44823,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "note": "Was writes []: it marks the authorisation released. Calls wallet.releaseWalletHold."
  },
  "listStepUpPolicies": {
   "contract": "approvals",
@@ -55608,8 +55676,8 @@
   "path": "/billing-statements",
   "reads": [
    "orders.payment",
-   "payments.dunning_case",
-   "orders.sales_order"
+   "orders.sales_order",
+   "payments.dunning_case"
   ],
   "writes": [],
   "routing": "replica",
@@ -56135,9 +56203,9 @@
   "path": "/auth/credential",
   "reads": [
    "cache:idempotency",
+   "identity.password_policy",
    "identity.principal",
-   "identity.principal_credential",
-   "identity.password_policy"
+   "identity.principal_credential"
   ],
   "writes": [
    "cache:idempotency",
@@ -56363,8 +56431,8 @@
   "verb": "GET",
   "path": "/orders/{orderId}/calendar-event",
   "reads": [
-   "orders.sales_order",
    "orders.order_line",
+   "orders.sales_order",
    "platform.scope"
   ],
   "writes": [],
@@ -56437,8 +56505,8 @@
   "verb": "POST",
   "path": "/eligibility-checks",
   "reads": [
-   "catalogue.product_eligibility_rule",
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.product_eligibility_rule"
   ],
   "writes": [],
   "routing": null,
@@ -56540,8 +56608,7 @@
   "verb": "GET",
   "path": "/deposit-policy",
   "reads": [
-   "orders.deposit_policy",
-   "orders.deposit_policy (dining_* columns)"
+   "orders.deposit_policy"
   ],
   "writes": [],
   "routing": "replica",
@@ -56817,12 +56884,10 @@
   "verb": "PUT",
   "path": "/deposit-policy",
   "reads": [
-   "orders.deposit_policy",
-   "orders.deposit_policy (dining_* columns)"
+   "orders.deposit_policy"
   ],
   "writes": [
-   "orders.deposit_policy",
-   "orders.deposit_policy (dining_* columns)"
+   "orders.deposit_policy"
   ],
   "routing": null,
   "scope": "venue",
@@ -57472,20 +57537,23 @@
   "verb": "POST",
   "path": "/carts/{cartId}/promo-codes",
   "reads": [
-   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "orders.cart",
+   "orders.cart_line",
+   "promotions.coupon_campaign",
+   "promotions.coupon_code"
+  ],
+  "writes": [
+   "orders.cart",
    "orders.cart_line"
   ],
-  "writes": [],
   "routing": null,
   "scope": "venue",
   "perm": null,
   "offline": false,
   "summary": "Apply a promo code to the cart",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "guest",
    "partner"
@@ -57494,7 +57562,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "note": "SD-022"
  },
  "assignPerformanceMedia": {
   "contract": "catalogue",
@@ -57887,13 +57956,20 @@
   "reads": [
    "transport.network_import"
   ],
-  "writes": [],
+  "writes": [
+   "transport.fare_table",
+   "transport.route",
+   "transport.route_stop",
+   "transport.station",
+   "transport.timetable",
+   "transport.timetable_run"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_MANAGE",
   "offline": false,
   "summary": "Apply a previewed import to the network",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -58129,13 +58205,15 @@
   "reads": [
    "transport.pass_type"
   ],
-  "writes": [],
+  "writes": [
+   "transport.pass_type"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_PRICE",
   "offline": false,
   "summary": "Define a multi-trip or unlimited pass",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -58155,6 +58233,7 @@
    "transport.station"
   ],
   "writes": [
+   "transport.route",
    "transport.route_stop"
   ],
   "routing": null,
@@ -58162,7 +58241,7 @@
   "perm": "TRANSPORT_MANAGE",
   "offline": false,
   "summary": "Define a route with its ordered stops",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -58179,13 +58258,15 @@
   "reads": [
    "transport.station"
   ],
-  "writes": [],
+  "writes": [
+   "transport.station"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_MANAGE",
   "offline": false,
   "summary": "Add a station",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -58193,17 +58274,20 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "note": "SD-009/SD-022"
  },
  "createTransportTimetable": {
   "contract": "transport",
   "verb": "POST",
   "path": "/transport/routes/{routeId}/timetables",
   "reads": [
+   "transport.route",
    "transport.timetable",
    "transport.timetable_run"
   ],
   "writes": [
+   "transport.timetable",
    "transport.timetable_run"
   ],
   "routing": null,
@@ -58211,7 +58295,7 @@
   "perm": "TRANSPORT_MANAGE",
   "offline": false,
   "summary": "Draft a timetable for a route",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -58701,8 +58785,7 @@
   "verb": "GET",
   "path": "/signatory-signature-guardian",
   "reads": [
-   "marketing.waiver_signatory_rule",
-   "marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)"
+   "marketing.waiver_signatory_rule"
   ],
   "writes": [],
   "routing": "replica",
@@ -58829,8 +58912,7 @@
   "verb": "GET",
   "path": "/waiver-testing",
   "reads": [
-   "marketing.waiver_version_control",
-   "marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)"
+   "marketing.waiver_version_control"
   ],
   "writes": [],
   "routing": "replica",
@@ -58879,13 +58961,15 @@
   "reads": [
    "transport.network_import"
   ],
-  "writes": [],
+  "writes": [
+   "transport.network_import"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_MANAGE",
   "offline": false,
   "summary": "Read a network file into a preview",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -59501,17 +59585,21 @@
   "verb": "POST",
   "path": "/guided-choices/{guidedChoiceId}/publish",
   "reads": [
+   "whitelabel.booking_flow",
    "whitelabel.guided_choice",
    "whitelabel.guided_choice_answer",
    "whitelabel.guided_choice_question"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.guided_choice"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TENANT_PUBLISH",
   "offline": false,
   "summary": "Publish a Help me choose set-up to guests",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -59519,7 +59607,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "note": "New columns: guided_choice.behaviour, show_everything; question.kind; answer filter/consent_prefill (jsonb)."
  },
  "publishHardwareDeployment": {
   "contract": "access",
@@ -59552,13 +59641,16 @@
    "transport.timetable",
    "transport.timetable_run"
   ],
-  "writes": [],
+  "writes": [
+   "transport.departure",
+   "transport.timetable"
+  ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_MANAGE",
   "offline": false,
   "summary": "Publish a timetable and release its departures",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -59566,7 +59658,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "note": "publishing generates the departures"
  },
  "quoteTransportFare": {
   "contract": "transport",
@@ -59920,15 +60013,18 @@
   "verb": "POST",
   "path": "/transport/favourite-routes",
   "reads": [
+   "transport.favourite_route",
+   "transport.station"
+  ],
+  "writes": [
    "transport.favourite_route"
   ],
-  "writes": [],
   "routing": null,
   "scope": "venue",
   "perm": null,
   "offline": false,
   "summary": "Save route",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "guest"
   ],
@@ -59936,7 +60032,8 @@
   "stores": [
    "postgres",
    "redis"
-  ]
+  ],
+  "note": "SD-022"
  },
  "searchTransportDepartures": {
   "contract": "transport",
@@ -61079,17 +61176,20 @@
   "reads": [
    "transport.fare_matrix_cell",
    "transport.fare_passenger_type",
-   "transport.fare_table"
+   "transport.fare_table",
+   "transport.route"
   ],
   "writes": [
-   "transport.fare_passenger_type"
+   "transport.fare_matrix_cell",
+   "transport.fare_passenger_type",
+   "transport.fare_table"
   ],
   "routing": null,
   "scope": "venue",
   "perm": "TRANSPORT_PRICE",
   "offline": false,
   "summary": "Set a route's fares and passenger types",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -61633,6 +61733,7 @@
    "transport.station"
   ],
   "writes": [
+   "transport.route",
    "transport.route_stop"
   ],
   "routing": null,
@@ -61640,7 +61741,7 @@
   "perm": "TRANSPORT_MANAGE",
   "offline": false,
   "summary": "Amend a route",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -62870,6 +62971,7 @@
   "path": "/orders/{orderId}/merge",
   "reads": [
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.sales_order"
@@ -69809,18 +69911,13 @@
   "reads": [
    "ai.forecast_definition",
    "ai.forecast_version",
-   "ai.release",
-   "ai.signal_observation",
-   "cache:idempotency",
-   "marketing.guest_profile",
-   "marketing.segment",
-   "orders.order_line"
+   "ai.history_observation",
+   "ai.venue_settings",
+   "cache:idempotency"
   ],
   "writes": [
-   "ai.forecast_accuracy",
    "ai.forecast_point",
    "ai.forecast_version",
-   "ai.insight",
    "cache:idempotency"
   ],
   "routing": null,
@@ -69828,7 +69925,7 @@
   "perm": "AI_CONFIGURE",
   "offline": false,
   "summary": "Run a forecast now",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -69839,7 +69936,8 @@
    "qdrant",
    "redis"
   ],
-  "lineageNote": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. The snapshot now carries customerSegment and originCountry per booking and admission; forecast-threshold detectors raise ai.insight on publish."
+  "lineageNote": "ai.decision_record, risk_assessment, rec_decision, rec_event and forecast_point live in the AI log database (design 2.4); table names unchanged. The snapshot now carries customerSegment and originCountry per booking and admission; forecast-threshold detectors raise ai.insight on publish.",
+  "note": "adds baseline inputs; existing snapshot reads unchanged"
  },
  "runSemanticQuery": {
   "contract": "reporting",
@@ -70327,7 +70425,6 @@
   "path": "/forecast-definitions/{definitionKey}",
   "reads": [
    "ai.forecast_definition",
-   "ai.signal_source",
    "cache:idempotency"
   ],
   "writes": [
@@ -70339,7 +70436,7 @@
   "perm": "AI_CONFIGURE",
   "offline": false,
   "summary": "Define a forecast",
-  "source": "derived",
+  "source": "29 September pass (P29), applied 30 September 2026",
   "audience": [
    "staff"
   ],
@@ -70349,7 +70446,8 @@
    "postgres-analytical",
    "qdrant",
    "redis"
-  ]
+  ],
+  "note": "new columns history_window_months, cold_start"
  },
  "setGuestVerificationPolicy": {
   "contract": "identity",
@@ -70989,5 +71087,1478 @@
    "postgres"
   ],
   "lineageNote": "cancels any open approvals request through its API"
+ },
+ "bookVisitPlan": {
+  "contract": "venue-map",
+  "verb": "POST",
+  "path": "/visit-plans/{planId}/booking",
+  "reads": [
+   "cache:idempotency",
+   "catalogue.channel_capacity",
+   "catalogue.performance",
+   "catalogue.product",
+   "catalogue.variant",
+   "orders.cart",
+   "orders.cart_line",
+   "promotions.bundle",
+   "venuemap.visit_plan",
+   "venuemap.visit_plan_item"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "catalogue.inventory_hold",
+   "orders.cart",
+   "orders.cart_line",
+   "venuemap.visit_plan"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Book this plan — turn it into cart lines",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "cart writes are made by the orders service through createCart/addCartLine (service to service), with addCartLine's lease and refusals; venue-map writes only visit_plan (status booked, cart_id)"
+ },
+ "captureWalletHold": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-holds/{walletHoldId}/capture",
+  "reads": [
+   "wallet.balance",
+   "wallet.hold"
+  ],
+  "writes": [
+   "platform.idempotency_record",
+   "platform.outbox",
+   "wallet.balance",
+   "wallet.hold",
+   "wallet.wallet_transaction"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Debit a held amount",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "service",
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "convertInventoryHold": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/inventory-holds/{inventoryHoldId}/convert",
+  "reads": [
+   "cache:idempotency",
+   "catalogue.channel_allocation",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "catalogue.channel_allocation",
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Turn a paid hold into sold units",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "service"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "service-only, called by orders inside the order transaction; lock excludes cache:idempotency; service CatalogueService"
+ },
+ "createBookingFlowDefinition": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/venues/{venueId}/booking-flows",
+  "reads": [
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Pick a booking flow for a venue",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Clears isDefaultForType on the previous default in the same transaction."
+ },
+ "createStockReservation": {
+  "contract": "inventory",
+  "verb": "POST",
+  "path": "/stock-reservations",
+  "reads": [
+   "cache:idempotency",
+   "inventory.item",
+   "inventory.location",
+   "inventory.movement",
+   "inventory.stock_reservation"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "inventory.stock_reservation"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PROCUREMENT_REQUEST",
+  "offline": false,
+  "summary": "Reserve stock for a work order or another need",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "InventoryService",
+  "stores": [
+   "derived",
+   "postgres",
+   "redis"
+  ],
+  "note": "service InventoryService"
+ },
+ "createVendorServiceRequest": {
+  "contract": "maintenance",
+  "verb": "POST",
+  "path": "/vendor-service-requests",
+  "reads": [
+   "cache:idempotency",
+   "inventory.supplier",
+   "maintenance.vendor_service_request",
+   "maintenance.work_order"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "maintenance.vendor_service_request"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORK_ORDER_MANAGE",
+  "offline": false,
+  "summary": "Engage an outside vendor on a work order",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "decideProductionAccess": {
+  "contract": "public-api",
+  "verb": "POST",
+  "path": "/production-access-requests/{requestId}/decide",
+  "reads": [
+   "cache:idempotency",
+   "control.integration_listing",
+   "control.production_access_request"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.api_client",
+   "control.production_access_request"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "DEVELOPER_ADMIN",
+  "offline": false,
+  "summary": "Approve or reject production access",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "approval creates the production api_client row"
+ },
+ "deleteBookingFlow": {
+  "contract": "white-label",
+  "verb": "DELETE",
+  "path": "/booking-flows/{bookingFlowId}",
+  "reads": [
+   "catalogue.product",
+   "catalogue.product_category",
+   "whitelabel.booking_flow"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Remove a booking flow from a venue",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Reads the catalogue to refuse a flow still named (409); cross-context read through the catalogue API."
+ },
+ "generateVisitPlan": {
+  "contract": "venue-map",
+  "verb": "POST",
+  "path": "/visit-plans",
+  "reads": [
+   "cache:idempotency",
+   "catalogue.performance",
+   "catalogue.product",
+   "catalogue.product_eligibility_rule",
+   "catalogue.variant",
+   "queue.reading",
+   "venuemap.map",
+   "venuemap.path",
+   "venuemap.point",
+   "venuemap.visit_plan",
+   "venuemap.visit_plan_item"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "venuemap.visit_plan",
+   "venuemap.visit_plan_item"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Build a visit plan from the party, the dates and what they like",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "guest-owned, permission null, audience guest; typical waits from queue readings"
+ },
+ "getAiVenueSettings": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/venues/{venueId}/ai-settings",
+  "reads": [
+   "ai.venue_settings"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The venue AI profile the baselines stand on",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getAppBuild": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/tenant-config/app-builds/{appBuildId}",
+  "reads": [
+   "whitelabel.app_build"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "One app build, with its package and store status",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getBookingFlow": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/booking-flows/{bookingFlowId}",
+  "reads": [
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Read one of a venue's booking flows, every step included",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getPublishedBookingFlow": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/venues/{venueId}/booking-flow",
+  "reads": [
+   "catalogue.product",
+   "catalogue.product_category",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step",
+   "whitelabel.config_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "The published booking flow a product or category books through",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "guest"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Flows come from the current ConfigVersion snapshot; product/category bookingFlowId via the catalogue API."
+ },
+ "getSiteSetupProgress": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/tenant-config/site-setup",
+  "reads": [
+   "whitelabel.booking_flow",
+   "whitelabel.config_version",
+   "whitelabel.site_setup_progress",
+   "whitelabel.tenant_config"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Where the tenant is in the Site Builder",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "minimumPathDone is onRead."
+ },
+ "getStoreAccounts": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/tenant-config/store-accounts",
+  "reads": [
+   "whitelabel.config_version",
+   "whitelabel.store_account",
+   "whitelabel.tenant_config"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The client's store accounts and the publishing checklist",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Checklist computed."
+ },
+ "getVenueHistoryImport": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/history-imports/{importId}",
+  "reads": [
+   "ai.history_import"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "One history import, with its findings",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "getVisitPlan": {
+  "contract": "venue-map",
+  "verb": "GET",
+  "path": "/visit-plans/{planId}",
+  "reads": [
+   "venuemap.visit_plan",
+   "venuemap.visit_plan_item"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "A visit plan, at its current version or an earlier one",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getWorkOrderPriorityPolicy": {
+  "contract": "maintenance",
+  "verb": "GET",
+  "path": "/work-order-priority-policy",
+  "reads": [
+   "maintenance.priority_scoring_model"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORK_ORDER_VIEW",
+  "offline": true,
+  "summary": "Read how a fault's priority is scored",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "holdWalletFunds": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallets/{walletId}/holds",
+  "reads": [
+   "wallet.balance",
+   "wallet.hold",
+   "wallet.wallet"
+  ],
+  "writes": [
+   "platform.idempotency_record",
+   "platform.outbox",
+   "wallet.balance",
+   "wallet.hold",
+   "wallet.wallet_transaction"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Hold wallet funds for a spend in progress",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "service",
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "row lock on wallet.balance"
+ },
+ "importVenueHistory": {
+  "contract": "ai",
+  "verb": "POST",
+  "path": "/venues/{venueId}/history-imports",
+  "reads": [
+   "ai.history_import",
+   "assets.media_asset",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.history_import",
+   "ai.history_observation",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Import the venue's own historical exports for the AI baselines",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "note": "never the ledger; history_observation on the AI log database"
+ },
+ "issueOrderEntitlements": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/internal/orders/{orderId}/entitlements",
+  "reads": [
+   "access.entitlement",
+   "catalogue.entitlement_template",
+   "catalogue.variant",
+   "orders.order_line",
+   "orders.sales_order"
+  ],
+  "writes": [
+   "access.entitlement",
+   "access.parking_entitlement",
+   "platform.idempotency_record",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Issue the tickets for a paid order",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "service"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "order.paid consumer; emits entitlement.issued"
+ },
+ "listAiCapabilityHealth": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/governance/capability-health",
+  "reads": [
+   "ai.activity",
+   "ai.capability",
+   "ai.provider",
+   "cache:ai-breaker"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "How each AI capability is running now",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "note": "computed from gateway telemetry over the last hour"
+ },
+ "listAiCapabilityMaturity": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/capability-maturity",
+  "reads": [
+   "ai.capability",
+   "ai.capability_maturity"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "Where each AI answer stands on the way from baseline to learned",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "note": "rows written by the nightly re-estimate job"
+ },
+ "listAiTrainingRuns": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/training-runs",
+  "reads": [
+   "ai.eval_run",
+   "ai.release",
+   "ai.training_run"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The per-tenant training and backtest runs",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "note": "rows written by the weekly training job"
+ },
+ "listApiAnomalies": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/api-anomalies",
+  "reads": [
+   "control.api_anomaly"
+  ],
+  "writes": [],
+  "routing": "analytical",
+  "scope": "tenant",
+  "perm": "DEVELOPER_VIEW",
+  "offline": false,
+  "summary": "Flagged API traffic",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listApiScopes": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/api-scopes",
+  "reads": [
+   "control.api_licence"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVELOPER_VIEW",
+  "offline": false,
+  "summary": "The scope catalogue, one read and one write scope per module",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "public",
+   "staff",
+   "partner"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "catalogue generated at release from x-ticvai-api-scope; licensed flag from the tenant licence"
+ },
+ "listAppBuilds": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/tenant-config/app-builds",
+  "reads": [
+   "whitelabel.app_build"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The tenant's app builds, newest first",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listBookingFlowTypes": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/booking-flow-types",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The booking flow types a venue can pick from, with their steps",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listBookingFlows": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/venues/{venueId}/booking-flows",
+  "reads": [
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "A venue's booking flows, in the working draft",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listProductionAccessRequests": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/production-access-requests",
+  "reads": [
+   "control.production_access_request"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVELOPER_VIEW",
+  "offline": false,
+  "summary": "Production access requests, pending first",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listVendorServiceRequests": {
+  "contract": "maintenance",
+  "verb": "GET",
+  "path": "/vendor-service-requests",
+  "reads": [
+   "maintenance.vendor_service_request"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORK_ORDER_VIEW",
+  "offline": false,
+  "summary": "Requests sent to outside vendors",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listVenueHistoryImports": {
+  "contract": "ai",
+  "verb": "GET",
+  "path": "/venues/{venueId}/history-imports",
+  "reads": [
+   "ai.history_import"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "AI_USE",
+  "offline": false,
+  "summary": "The venue's history imports",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ]
+ },
+ "listVisitPlanAlternatives": {
+  "contract": "venue-map",
+  "verb": "GET",
+  "path": "/visit-plans/{planId}/items/{itemId}/alternatives",
+  "reads": [
+   "catalogue.performance",
+   "catalogue.product",
+   "catalogue.product_eligibility_rule",
+   "queue.reading",
+   "venuemap.path",
+   "venuemap.point",
+   "venuemap.visit_plan",
+   "venuemap.visit_plan_item"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "What could take this item's place",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "computed on read"
+ },
+ "postOrderRevenue": {
+  "contract": "finance",
+  "verb": "POST",
+  "path": "/internal/order-postings",
+  "reads": [
+   "ledger.account",
+   "ledger.journal_entry",
+   "ledger.journal_line",
+   "ledger.tax_code",
+   "orders.order_line",
+   "orders.sales_order"
+  ],
+  "writes": [
+   "ledger.journal_entry",
+   "ledger.journal_line",
+   "platform.idempotency_record",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Post a paid order's revenue and tax",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "service"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "order.paid consumer; idempotent on orderId"
+ },
+ "receivePaymentProviderWebhook": {
+  "contract": "payments",
+  "verb": "POST",
+  "path": "/payment-providers/{provider}/webhooks",
+  "reads": [
+   "orders.payment",
+   "orders.sales_order",
+   "payments.provider_connection",
+   "payments.provider_event"
+  ],
+  "writes": [
+   "catalogue.channel_capacity",
+   "catalogue.inventory_hold",
+   "ledger.journal_entry",
+   "ledger.journal_line",
+   "orders.order_event",
+   "orders.payment",
+   "payments.payment_attempt",
+   "payments.provider_event",
+   "platform.idempotency_record",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Take a payment provider's notification of what happened",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "service"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres"
+  ],
+  "note": "a paid order runs the createPayment transaction"
+ },
+ "releaseStockReservation": {
+  "contract": "inventory",
+  "verb": "POST",
+  "path": "/stock-reservations/{stockReservationId}/release",
+  "reads": [
+   "cache:idempotency",
+   "inventory.stock_reservation"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "inventory.stock_reservation"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PROCUREMENT_REQUEST",
+  "offline": false,
+  "summary": "Give reserved stock back",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "InventoryService",
+  "stores": [
+   "derived",
+   "postgres",
+   "redis"
+  ]
+ },
+ "releaseWalletHold": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-holds/{walletHoldId}/release",
+  "reads": [
+   "wallet.balance",
+   "wallet.hold"
+  ],
+  "writes": [
+   "platform.idempotency_record",
+   "platform.outbox",
+   "wallet.balance",
+   "wallet.hold",
+   "wallet.wallet_transaction"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Give held wallet funds back",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "service",
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "requestAppBuild": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/tenant-config/app-builds",
+  "reads": [
+   "whitelabel.app_build",
+   "whitelabel.config_version",
+   "whitelabel.store_account"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.app_build"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_PUBLISH",
+  "offline": false,
+  "summary": "Build the branded app for a store",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Queues the build job; the package lands in the assets library."
+ },
+ "requestProductionAccess": {
+  "contract": "public-api",
+  "verb": "POST",
+  "path": "/api-clients/{clientId}/production-access",
+  "reads": [
+   "cache:idempotency",
+   "control.api_client",
+   "control.developer_account",
+   "control.integration_listing",
+   "control.production_access_request"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.production_access_request"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "DEVELOPER_MANAGE",
+  "offline": false,
+  "summary": "Ask for production keys for a sandbox client that passed certification",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "partner"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "resolveTenantHost": {
+  "contract": "tenancy",
+  "verb": "GET",
+  "path": "/tenant-domains/{hostname}",
+  "reads": [
+   "control.tenant_domain"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "region",
+  "perm": null,
+  "offline": false,
+  "summary": "Which tenant, cell and database a hostname belongs to",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAiVenueSettings": {
+  "contract": "ai",
+  "verb": "PUT",
+  "path": "/venues/{venueId}/ai-settings",
+  "reads": [
+   "ai.venue_settings",
+   "cache:idempotency"
+  ],
+  "writes": [
+   "ai.venue_settings",
+   "cache:idempotency"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Set the venue AI profile",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "AiService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "qdrant",
+   "redis"
+  ],
+  "note": "config scope venue"
+ },
+ "setApiAnomalyRule": {
+  "contract": "public-api",
+  "verb": "PUT",
+  "path": "/api-anomaly-rules",
+  "reads": [
+   "cache:idempotency",
+   "control.api_anomaly_rule"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.api_anomaly_rule"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "DEVELOPER_ADMIN",
+  "offline": false,
+  "summary": "When API traffic is flagged as abnormal",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "config scope tenant"
+ },
+ "setSiteSetupProgress": {
+  "contract": "white-label",
+  "verb": "PUT",
+  "path": "/tenant-config/site-setup",
+  "reads": [
+   "whitelabel.config_version",
+   "whitelabel.site_setup_progress"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.site_setup_progress"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Save the Site Builder's progress",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setStoreAccounts": {
+  "contract": "white-label",
+  "verb": "PUT",
+  "path": "/tenant-config/store-accounts",
+  "reads": [
+   "whitelabel.store_account"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.store_account"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Record the client's own Apple and Google store accounts and listings",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Credential itself goes to the secret store; only its reference is stored."
+ },
+ "setTenantDomainMapping": {
+  "contract": "tenancy",
+  "verb": "PUT",
+  "path": "/tenant-domains/{hostname}",
+  "reads": [
+   "control.tenant",
+   "control.tenant_domain"
+  ],
+  "writes": [
+   "control.tenant_domain"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Route a hostname to a tenant",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "service"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWorkOrderPriorityPolicy": {
+  "contract": "maintenance",
+  "verb": "PUT",
+  "path": "/work-order-priority-policy",
+  "reads": [
+   "cache:idempotency",
+   "maintenance.priority_scoring_model"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "maintenance.priority_scoring_model"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORK_ORDER_MANAGE",
+  "offline": false,
+  "summary": "Set how a fault's priority is scored",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "config scope venue"
+ },
+ "suggestWorkOrderAssignee": {
+  "contract": "maintenance",
+  "verb": "GET",
+  "path": "/work-orders/{workOrderId}/assignee-suggestions",
+  "reads": [
+   "maintenance.work_order",
+   "resources.qualification",
+   "resources.resource",
+   "workforce.shift"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORK_ORDER_VIEW",
+  "offline": false,
+  "summary": "Who should take this work order, ranked",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "rules, no AI"
+ },
+ "updateBookingFlowDefinition": {
+  "contract": "white-label",
+  "verb": "PATCH",
+  "path": "/booking-flows/{bookingFlowId}",
+  "reads": [
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Reorder a flow's steps, switch optional steps, change its settings",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateVendorServiceRequest": {
+  "contract": "maintenance",
+  "verb": "PATCH",
+  "path": "/vendor-service-requests/{vendorServiceRequestId}",
+  "reads": [
+   "cache:idempotency",
+   "maintenance.vendor_service_request"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "maintenance.vendor_service_request"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WORK_ORDER_MANAGE",
+  "offline": false,
+  "summary": "Move a vendor request along",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateVisitPlan": {
+  "contract": "venue-map",
+  "verb": "PUT",
+  "path": "/visit-plans/{planId}",
+  "reads": [
+   "cache:idempotency",
+   "catalogue.performance",
+   "catalogue.product_eligibility_rule",
+   "queue.reading",
+   "venuemap.path",
+   "venuemap.point",
+   "venuemap.visit_plan",
+   "venuemap.visit_plan_item"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "venuemap.visit_plan",
+   "venuemap.visit_plan_item"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Swap, remove, add, move or undo, as a new version",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "a new version per call; older item rows never updated; also called by the AI planner agent as the guest (the venue-map service writes, not AI)"
+ },
+ "validateBookingFlow": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/booking-flows/{bookingFlowId}/validate",
+  "reads": [
+   "whitelabel.booking_flow",
+   "whitelabel.booking_flow_step"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "whitelabel.booking_flow_step"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Check a flow against its type",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "Writes nothing else."
+ },
+ "recordCheckoutConsents": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/consent-records/checkout",
+  "reads": [
+   "marketing.consent_record",
+   "marketing.consent_record_channel",
+   "marketing.guest_match_policy",
+   "marketing.guest_profile",
+   "platform.idempotency_record"
+  ],
+  "writes": [
+   "marketing.consent_record",
+   "marketing.consent_record_channel",
+   "platform.idempotency_record"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Record the marketing opt-ins a guest ticked at checkout",
+  "source": "29 September pass (P29), applied 30 September 2026",
+  "audience": [
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "note": "New (M18-15). The order.created consumer; idempotent on order id + channel + purpose; attaches to marketing.guest_profile on a GuestMatchPolicy match."
  }
 }

@@ -35,13 +35,13 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 364
 - service: PlatformService
-  operationCalls: 308
+  operationCalls: 312
 - service: AiService
-  operationCalls: 267
+  operationCalls: 274
 - service: OrderService
   operationCalls: 176
 - service: TenancyService
-  operationCalls: 108
+  operationCalls: 117
 - service: IdentityService
   operationCalls: 47
 - service: WhiteLabelService
@@ -667,14 +667,18 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decideProductionAccess
   - getApiUsage
   - getEntitlementUsage
   - getSsoConfig
   - getTenant
   - getTenantLicences
+  - listApiAnomalies
   - listApiClients
+  - listProductionAccessRequests
   - listTenantCells
   - listTenants
+  - setApiAnomalyRule
   - setApiQuota
   states:
   - emptyFirstRun
@@ -685,6 +689,7 @@ screens:
   offlineState: false
   entryParams:
   - tenantId<-ADM-002
+  - requestId<-navigation
   goesTo:
   - ADM-001
   - ADM-002
@@ -908,7 +913,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - reinventoryHoldId<-deepLink
+  - releaseId<-deepLink
   goesTo:
   - ADM-001
   - ADM-002
@@ -939,7 +944,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - reinventoryHoldId<-deepLink
+  - releaseId<-deepLink
   goesTo:
   - ADM-001
   - ADM-002
@@ -11406,7 +11411,9 @@ screens:
   density: compact
   operations:
   - getActionPlan
+  - getAiVenueSettings
   - getEffectiveAiPolicy
+  - setAiVenueSettings
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11416,6 +11423,7 @@ screens:
   offlineState: false
   entryParams:
   - planId<-navigation
+  - venueId<-session
   goesTo:
   - ADM-002
   - ADM-490
@@ -12164,6 +12172,7 @@ screens:
   density: compact
   operations:
   - listAiCapabilities
+  - listAiCapabilityMaturity
   - listAiGovernanceAlerts
   - pauseAiCapability
   - promoteAiRelease
@@ -12456,8 +12465,11 @@ screens:
   density: compact
   operations:
   - createAiGovernancePolicyDraft
+  - evaluateApprovalRequirement
   - listAiGovernancePolicyVersions
   - listAiTools
+  - listApprovalMatrices
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12506,7 +12518,9 @@ screens:
   density: compact
   operations:
   - decideProposedAction
+  - evaluateApprovalRequirement
   - getActionPlan
+  - listApprovalMatrices
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12556,8 +12570,12 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createApprovalDelegation
+  - escalateApprovalRequest
   - getActionPlan
+  - listApprovalDelegations
   - listProposedActions
+  - setApprovalSlaPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12567,6 +12585,7 @@ screens:
   offlineState: false
   entryParams:
   - planId<-navigation
+  - requestId<-navigation
   goesTo:
   - ADM-529
   boardFrames: null
@@ -12584,6 +12603,7 @@ screens:
   - getActionPlan
   - pauseActionPlan
   - resumeActionPlan
+  - rollbackActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -12928,6 +12948,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getAiUsage
+  - listAiCapabilityHealth
   - listAiGovernanceAlerts
   - listAiIncidents
   - listGovernanceRiskMonitoring
@@ -13059,6 +13081,7 @@ screens:
   operations:
   - listAiEvaluations
   - listAiGovernanceAlerts
+  - listAiTrainingRuns
   - promoteAiRelease
   - rollbackAiRelease
   - runAiEvaluation

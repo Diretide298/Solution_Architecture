@@ -56,6 +56,8 @@ info:
     '
 servers:
 - url: https://api.ticvai.com/v1
+security:
+- bearerAuth: []
 paths:
   /rental-products:
     get:
@@ -118,6 +120,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-494 Rental Product Command Center"
         - "P08 BO-495 Create Rental Product Wizard"
+      x-ticvai-conflict-policy: serverWins
       summary: Define a rental product
       description: 'Board 1.2. **Created as a draft and published separately.** The wizard has seven
         steps and a product half-configured is not sellable — `publishRentalProduct` is where the
@@ -187,6 +190,7 @@ paths:
       operationId: updateRentalProduct
       x-ticvai-consumed-by:
         - "P08 BO-496 Rental Product Profile"
+      x-ticvai-conflict-policy: serverWins
       summary: Change a rental product
       tags:
       - rental
@@ -226,6 +230,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-495 Create Rental Product Wizard"
         - "P08 BO-503 Product Validation, Approval & Publication"
+      x-ticvai-conflict-policy: serverWins
       summary: What is still missing before this can be sold
       description: 'Board 1.10 and 4.10. **The board draws this as a checklist and that is exactly what
         it is** — basic information, category, location, inventory model, duration, rules, customer
@@ -267,6 +272,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-494 Rental Product Command Center"
         - "P08 BO-503 Product Validation, Approval & Publication"
+      x-ticvai-conflict-policy: serverWins
       summary: Move a product through draft, review, approval and activation
       description: 'Board 1.10. *Draft → Configuration Review → Approval → Active → Suspended.*
 
@@ -359,6 +365,7 @@ paths:
       operationId: createRentalCategory
       x-ticvai-consumed-by:
         - "P08 BO-497 Rental Category & Classification Setup"
+      x-ticvai-conflict-policy: serverWins
       summary: Define a category and its defaults
       tags:
       - rental
@@ -396,6 +403,7 @@ paths:
       operationId: setRentalProductLocations
       x-ticvai-consumed-by:
         - "P08 BO-499 Rental Location Assignment"
+      x-ticvai-conflict-policy: serverWins
       summary: Where it can be collected, and where it can be returned
       description: 'Board 1.6. **Pickup and return are configured separately and the board shows why** —
         *Adventure Zone: available ✓, pickup ✓, return —*. A station that hands out kayaks and has no way
@@ -453,6 +461,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-500 Rental Duration & Turnaround Configuration"
         - "P08 BO-517 Timeslot & Duration Availability Setup"
+      x-ticvai-conflict-policy: serverWins
       summary: Minimum, maximum, increment, extension and turnaround
       description: 'Board 1.7. **The turnaround buffer feeds availability automatically** — *rental
         10:00–11:00, turnaround 11:00–11:15, next available 11:15.* A venue that has to remember to
@@ -500,6 +509,7 @@ paths:
       operationId: setRentalOperationalRules
       x-ticvai-consumed-by:
         - "P08 BO-501 Rental Rules & Operational Policy"
+      x-ticvai-conflict-policy: serverWins
       summary: Who may rent it, how many, and what must happen at the counter
       description: 'Board 1.8. Age, height, weight, ID, guardian, membership, driving licence and safety
         briefing on the customer side; scan, inspection and photo requirements on the operational side.
@@ -546,6 +556,7 @@ paths:
       operationId: setRentalAgreementRequirements
       x-ticvai-consumed-by:
         - "P08 BO-502 Customer Requirements, Agreement & Waiver"
+      x-ticvai-conflict-policy: serverWins
       summary: The agreement, waiver and signature a rental needs
       description: 'Board 1.9. **The signed agreement is linked to the booking and the version is kept.**
         A waiver is only a defence if it can be shown that *this* guest signed *that* text, and a venue
@@ -593,6 +604,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-498 Inventory Tracking Model"
         - "P08 BO-904 Rental Resource Configuration"
+      x-ticvai-conflict-policy: serverWins
       summary: Pooled, serialised or hybrid
       description: 'Board 1.5, and **the single most load-bearing choice in this contract.**
 
@@ -645,6 +657,7 @@ paths:
       operationId: importRentalCatalogue
       x-ticvai-consumed-by:
         - "P08 BO-494 Rental Product Command Center"
+      x-ticvai-conflict-policy: serverWins
       summary: Load a client's rental items and inventory at onboarding
       description: '**26 August, and it is the reason this operation exists at all:** *"rental item and
         inventory data is expected to be provided by each client during onboarding, with a screen
@@ -704,6 +717,9 @@ paths:
         - "P08 BO-536 Availability Selection & Alternative Options"
         - "P08 BO-556 Rental Extension Request"
         - "P08 BO-905 Rental Inventory & Availability Control"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: What can be rented, when, with turnaround already subtracted
       description: 'Board 3. **Free windows, not a booking list for the caller to subtract from.** A
         client computing this itself will forget the turnaround buffer, and a bike returned at 11:00 with
@@ -775,6 +791,7 @@ paths:
         - "P08 BO-520 Blackout, Closure & Capacity Blocking"
         - "P08 BO-522 Inventory Holds, Buffers & Release Rules"
         - "P08 BO-905 Rental Inventory & Availability Control"
+      x-ticvai-conflict-policy: serverWins
       summary: Operating hours, rental windows, buffers and release rules
       description: 'Boards 3.2, 3.3 and 3.9. **The buffer and the hold-release rule are the two that get
         forgotten.** An inventory buffer keeps a reserve back from online sale so the counter always has
@@ -812,6 +829,7 @@ paths:
       operationId: createRentalBlackout
       x-ticvai-consumed-by:
         - "P08 BO-520 Blackout, Closure & Capacity Blocking"
+      x-ticvai-conflict-policy: serverWins
       summary: Close a product, location or window
       description: 'Board 3.7. **Closure and capacity reduction are the same act at different strengths**
         — a lake closed for weather and a lake down to half capacity both come from one operational
@@ -890,6 +908,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-524 Rental Pricing Command Center"
         - "P08 BO-525 Pricing Profile Builder"
+      x-ticvai-conflict-policy: serverWins
       summary: Define how a rental is priced
       description: 'Board 4.2. Flat, duration-based, tiered, peak/off-peak, weekend, seasonal, dynamic
         or hybrid, scoped by venue, location, channel, segment and effective dates.
@@ -937,6 +956,7 @@ paths:
         - "P08 BO-525 Pricing Profile Builder"
         - "P08 BO-526 Duration & Tiered Pricing Configuration"
         - "P08 BO-527 Calendar, Peak & Seasonal Pricing"
+      x-ticvai-conflict-policy: serverWins
       summary: Change a pricing profile
       tags:
       - rental
@@ -970,6 +990,10 @@ paths:
         - "P08 BO-535 New Rental Booking Wizard"
         - "P08 BO-540 Booking Commercial Summary & Payment"
         - "P08 BO-557 Extension Pricing & Confirmation"
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: What this rental would cost, and the deposit it would hold
       description: 'Board 4.10. **One quote covers both numbers and they are not the same kind of
         money.** *Base 2 × AED 120 = 240, peak +40, deposit 2 × 300.* The board is explicit that **the
@@ -1005,6 +1029,7 @@ paths:
       operationId: explainRentalPrice
       x-ticvai-consumed-by:
         - "P08 BO-533 Pricing Simulation, Validation & AI Commercial Intelligence"
+      x-ticvai-conflict-policy: serverWins
       summary: Why the price is what it is, rule by rule
       description: '**Board 4.10 asks for this in as many words** — *"the system should show why the
         price was calculated. This is important for customer service and auditability."*
@@ -1044,6 +1069,7 @@ paths:
         - "P08 BO-529 Deposit & Security Hold Policy"
         - "P08 BO-530 Deposit Lifecycle & Settlement Rules"
         - "P08 BO-909 Deposit & Rental Financial Control"
+      x-ticvai-conflict-policy: serverWins
       summary: How much is held, how, and what happens to it
       description: 'Boards 4.6 and 4.7. Fixed or percentage, with minimum and maximum, by
         pre-authorisation, card charge, cash or wallet.
@@ -1088,6 +1114,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-531 Late Fee, Grace Period & Extension Pricing"
         - "P08 BO-909 Deposit & Rental Financial Control"
+      x-ticvai-conflict-policy: serverWins
       summary: Grace period, late fees and extension pricing
       description: 'Board 4.8. *Expected 14:00, actual 15:12, grace 15 minutes, chargeable 57 minutes.*
 
@@ -1129,6 +1156,7 @@ paths:
       operationId: simulateRentalPricing
       x-ticvai-consumed-by:
         - "P08 BO-533 Pricing Simulation, Validation & AI Commercial Intelligence"
+      x-ticvai-conflict-policy: serverWins
       summary: Test a commercial configuration before publishing it
       description: 'Board 4.10. **Rental pricing is the stack most likely to be wrong in a way nobody
         notices** — duration, calendar, location, deposit and dynamic pricing all compose — so it is
@@ -1170,6 +1198,7 @@ paths:
       operationId: requestRentalCommercialOverride
       x-ticvai-consumed-by:
         - "P08 BO-532 Commercial Exceptions, Waivers & Overrides"
+      x-ticvai-conflict-policy: serverWins
       summary: Deviate from policy, with a reason and an approver
       description: 'Board 4.9. Price override, complimentary rental, deposit waiver or reduction, late-fee
         waiver, damage-fee waiver, extension-fee waiver, manual refund, goodwill.
@@ -1268,6 +1297,10 @@ paths:
         - "P08 BO-535 New Rental Booking Wizard"
         - "P08 BO-538 Group Rental & Participant Management"
         - "P08 BO-542 Reservation Modification, Cancellation & No-Show"
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Reserve a rental
       description: 'Board 5.2. **Reserves capacity, not an asset.** Even for a serialised product the
         specific bike is chosen at the counter by `assignRentalEquipment` — deciding it days ahead means
@@ -1365,6 +1398,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-537 Customer & Participant Information"
         - "P08 BO-542 Reservation Modification, Cancellation & No-Show"
+      x-ticvai-conflict-policy: serverWins
       summary: Modify, cancel or mark a no-show
       description: 'Board 5.9. **A no-show is not a cancellation** and the money differs — a cancellation
         may be refundable under policy and a no-show generally is not. Keeping them as one status with a
@@ -1426,6 +1460,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-538 Group Rental & Participant Management"
         - "P08 BO-539 Rental Agreement & Waiver Completion"
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: Capture the signature, against a version
       description: 'Boards 1.9 and 5.6. **The version signed is stored with the signature.** A venue that
         updates its liability wording has otherwise changed the text under every signature already given,
@@ -1539,6 +1577,7 @@ paths:
         - "P08 BO-548 Equipment Scan & Validation"
         - "P08 BO-552 Group & Multi-Item Checkout"
         - "P08 BO-907 Guest & Resource Assignment"
+      x-ticvai-conflict-policy: serverWins
       summary: Bind specific assets to the booking, by scan where required
       description: 'Boards 6.4 and 6.5. **This is the moment a serialised rental stops being a quantity.**
         Until now the booking held *two mountain bikes*; now it holds BIKE-014 and BIKE-022, and every
@@ -1602,6 +1641,7 @@ paths:
         - "P06 EMP-084 Extension Pricing & Confirmation"
         - "P08 BO-557 Extension Pricing & Confirmation"
         - "P08 BO-908 Rental Duration, Extension & Return Management"
+      x-ticvai-conflict-policy: serverWins
       summary: Keep it longer, if it is free and the guest accepts the price
       description: '**Board 4.10 traces this end to end and the order matters:** *"Can I keep the bike
         another hour?"* → availability check → **if it is reserved for somebody else the extension cannot
@@ -1677,6 +1717,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-085 Equipment Swap / Replacement"
         - "P08 BO-558 Equipment Swap / Replacement"
+      x-ticvai-conflict-policy: serverWins
       summary: Replace a faulty item mid-rental
       description: 'Board 7.5. **The rental continues; only the asset changes.** The deposit, the
         agreement and the clock stay where they are, and the returned item goes to `maintenance` with the
@@ -1800,6 +1841,7 @@ paths:
         - "P08 BO-567 Post-Rental Condition Inspection"
         - "P08 BO-568 Before vs After Condition Comparison"
         - "P08 BO-911 Inspection, Condition & Compliance Management"
+      x-ticvai-conflict-policy: append
       summary: Condition before or after, with evidence
       description: 'Boards 6.5 and 8.4. **Before and after are the same record with a different phase**,
         which is what makes board 8.5 — the before/after comparison — possible at all. Two differently
@@ -1844,6 +1886,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-096 Damage Assessment & Charge Workflow"
         - "P08 BO-569 Damage Assessment & Charge Workflow"
+      x-ticvai-conflict-policy: serverWins
       summary: Price the damage, and say who approved it
       description: 'Board 8.6. **A damage charge is a commercial decision taken under pressure at a
         counter**, which is why it carries an assessor, an approver above the configured threshold, the
@@ -1929,6 +1972,7 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-086 Rental Incident & Operational Exception"
         - "P08 BO-559 Rental Incident & Operational Exception"
+      x-ticvai-conflict-policy: serverWins
       summary: Something happened during a rental
       description: 'Board 7.6. Injury, loss, theft, a complaint, an equipment failure. **Distinct from
         damage**, which is assessed at return against a deposit — an incident may have no charge attached
@@ -1997,6 +2041,7 @@ paths:
                         $ref: '#/components/schemas/RentalAgreement'
     post:
       operationId: createRentalAgreement
+      x-ticvai-conflict-policy: serverWins
       summary: Raise a rental agreement
       description: >
         **Raised before signature, not after.** `rental.agreement_signature` points at an agreement,
@@ -2056,6 +2101,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalAgreementDetail'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Staff session token (common.yaml bearerAuth). Added 29 September (system-design review SD-054).
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
   schemas:
     RentalAgreementDetail:
       type: object

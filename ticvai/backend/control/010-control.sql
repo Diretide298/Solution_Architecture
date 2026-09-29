@@ -1,5 +1,33 @@
--- control — 75 tables
+-- control — 79 tables
 -- **Derived. Do not hand-edit.**
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.api_anomaly (
+    id                                uuid PRIMARY KEY NOT NULL,
+    rule_key                          text NOT NULL,
+    client_id                         uuid NOT NULL,
+    measure                           text,
+    observed                          numeric(18,4),
+    baseline                          numeric(18,4),
+    action_taken                      text CONSTRAINT api_anomaly_action_taken_chk CHECK (action_taken IN ('flag', 'throttle', 'suspend')),
+    detected_at                       timestamptz NOT NULL,
+    resolved_at                       timestamptz
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.api_anomaly_rule (
+    id                                uuid PRIMARY KEY,
+    rule_key                          text NOT NULL,
+    client_id                         uuid,
+    measure                           text NOT NULL CONSTRAINT api_anomaly_rule_measure_chk CHECK (measure IN ('callsPerMinute', 'clientErrorShare', 'allowListRefusals', 'unusualOperations', 'authFailures')),
+    comparison                        text NOT NULL CONSTRAINT api_anomaly_rule_comparison_chk CHECK (comparison IN ('aboveBaselineMultiple', 'aboveFixed')),
+    threshold                         numeric(18,4) NOT NULL,
+    window_minutes                    integer DEFAULT 5,
+    action                            text NOT NULL DEFAULT 'flag' CONSTRAINT api_anomaly_rule_action_chk CHECK (action IN ('flag', 'throttle', 'suspend')),
+    is_active                         boolean DEFAULT true
+);
 
 -- The one credential model (CF-135a). 2.7.52, 7.1.25 and 7.1.30 each asserted their own. Bound to
 -- one environment, because a key that works in both is a key somebody will use in the wrong one
@@ -10,6 +38,10 @@ CREATE TABLE IF NOT EXISTS control.api_client (
     client_id                         text,
     environment                       text NOT NULL CONSTRAINT api_client_environment_chk CHECK (environment IN ('sandbox', 'production')),
     scopes                            text[] NOT NULL,
+    issued_by                         text CONSTRAINT api_client_issued_by_chk CHECK (issued_by IN ('partner', 'ticvai')),
+    certification_listing_id          uuid,
+    credential_ttl_days               integer,
+    expires_at                        timestamptz,
     allowed_tenant_ids                text[],
     ip_allow_list                     text[],
     status                            text NOT NULL CONSTRAINT api_client_status_chk CHECK (status IN ('active', 'suspended', 'revoked')),
@@ -23,6 +55,7 @@ CREATE TABLE IF NOT EXISTS control.api_licence (
     tenant_id                         uuid NOT NULL,
     licensed_modules                  text[] NOT NULL,
     call_allowance_per_month          integer,
+    catalogue_write_exception         jsonb,
     overage_rate_per_thousand         numeric(18,4),
     revenue_share_percent             numeric(18,4),
     effective_from                    date,
@@ -243,7 +276,7 @@ CREATE TABLE IF NOT EXISTS control.content_block (
 
 -- A credit note against a tenant invoice — TICVAI crediting its own customer, not a venue
 -- crediting a guest. Points at the invoice it corrects; an invoice is never edited, it is credited
--- and reissued. Reached by: 3 operations read it and 1 write it; 1 tables reference it.
+-- and reissued
 CREATE TABLE IF NOT EXISTS control.credit_note (
     id                                uuid PRIMARY KEY NOT NULL,
     credit_note_number                text NOT NULL,
@@ -312,7 +345,8 @@ CREATE TABLE IF NOT EXISTS control.integration_listing (
     status                            text NOT NULL CONSTRAINT integration_listing_status_chk CHECK (status IN ('draft', 'submitted', 'inReview', 'certified', 'rejected', 'revoked', 'delisted')),
     certified_until                   date,
     certified_against_version         text,
-    listing_fee_model                 text CONSTRAINT integration_listing_listing_fee_model_chk CHECK (listing_fee_model IN ('none', 'flat', 'revenueShare'))
+    listing_fee_model                 text CONSTRAINT integration_listing_listing_fee_model_chk CHECK (listing_fee_model IN ('none', 'flat', 'revenueShare')),
+    visibility                        text DEFAULT 'public' CONSTRAINT integration_listing_visibility_chk CHECK (visibility IN ('public', 'private'))
 );
 
 -- A bill to a tenant. Lines are children
@@ -1106,6 +1140,25 @@ CREATE TABLE IF NOT EXISTS control.partner_user (
     can_manage_users                  boolean DEFAULT false
 );
 
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.production_access_request (
+    id                                uuid PRIMARY KEY NOT NULL,
+    developer_id                      uuid NOT NULL,
+    sandbox_client_id                 uuid NOT NULL,
+    listing_id                        uuid NOT NULL,
+    scopes                            text[],
+    allowed_tenant_ids                text[],
+    ip_allow_list                     text[],
+    note                              text,
+    status                            text NOT NULL CONSTRAINT production_access_request_status_chk CHECK (status IN ('pending', 'approved', 'rejected', 'withdrawn')),
+    decided_by_principal_id           uuid,
+    decided_at                        timestamptz,
+    reason                            text,
+    production_client_id              uuid,
+    requested_at                      timestamptz
+);
+
 -- a shipped version. Promoted through dev, staging and production; superseded by a later one Hangs
 -- off: reaches control.partner through its keys; references identity.principal. Reached by: 5
 -- operations read it and 3 write it; 3 tables reference it.
@@ -1136,7 +1189,7 @@ CREATE TABLE IF NOT EXISTS control.release_component (
 -- One release reaching cells, in waves, with a canary first
 CREATE TABLE IF NOT EXISTS control.rollout (
     id                                uuid PRIMARY KEY NOT NULL,
-    reinventory_hold_id               uuid NOT NULL,
+    release_id                        uuid NOT NULL,
     environment                       text NOT NULL CONSTRAINT rollout_environment_chk CHECK (environment IN ('dev', 'staging', 'production')),
     status                            text NOT NULL CONSTRAINT rollout_status_chk CHECK (status IN ('queued', 'canary', 'rolling', 'paused', 'complete', 'failed', 'rolledBack')),
     cells_total                       integer,
@@ -1147,7 +1200,7 @@ CREATE TABLE IF NOT EXISTS control.rollout (
     paused_reason                     text,
     started_at                        timestamptz NOT NULL,
     completed_at                      timestamptz,
-    release_id                        uuid NOT NULL
+    reinventory_hold_id               uuid
 );
 
 -- One cell in a rollout — its wave, whether it is the canary, and what version it moved between
@@ -1277,6 +1330,20 @@ CREATE TABLE IF NOT EXISTS control.tenant (
     created_at                        timestamptz NOT NULL,
     activated_at                      timestamptz,
     subscription_id                   uuid
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.tenant_domain (
+    id                                uuid PRIMARY KEY,
+    hostname                          text NOT NULL CONSTRAINT tenant_domain_hostname_chk CHECK (char_length(hostname) <= 253),
+    tenant_id                         uuid NOT NULL,
+    cell_id                           uuid,
+    database_name                     text CONSTRAINT tenant_domain_database_name_chk CHECK (char_length(database_name) <= 63),
+    kind                              text NOT NULL CONSTRAINT tenant_domain_kind_chk CHECK (kind IN ('platformSubdomain', 'customDomain')),
+    channel                           text CONSTRAINT tenant_domain_channel_chk CHECK (channel IN ('guestWeb', 'backOffice', 'partnerPortal', 'developerPortal')),
+    status                            text NOT NULL CONSTRAINT tenant_domain_status_chk CHECK (status IN ('active', 'detached')),
+    verified_at                       timestamptz
 );
 
 -- a tenant moving between cells — shared to dedicated, or rebalancing Hangs off: a child of

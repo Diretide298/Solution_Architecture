@@ -8,6 +8,11 @@ description: An order has been paid in full. The moment revenue is recognisable 
   be issued.
 aggregate: order
 emittedWhen: OrderStatus pending or partiallyPaid to paid
+emittedBy:
+- orders.createPayment
+- orders.capturePayment
+- orders.syncOrders
+- payments.receivePaymentProviderWebhook
 payload:
 - field: orderId
   type: string
@@ -30,13 +35,17 @@ payload:
   type: integer
   notes: Monotonic per order. Ordering is guaranteed within one order, never across orders
 consumers:
-- context: catalogue
-  purpose: Issue entitlements against the paid lines
+- context: access
+  purpose: Issue entitlements against the paid lines. AccessService owns access.entitlement, so it issues
+    (system-design review SD-026, 29 September; was catalogue)
+  operation: access.issueOrderEntitlements
   idempotencyKey: orderId + lineId
   onFailure: retryThenDeadLetter
   isCritical: true
 - context: ledger
-  purpose: Post revenue and tax
+  purpose: Post revenue and tax, once, against the clearing account the payment's cash-receipt entry
+    credited. The payment path posts the cash receipt only (SD-026)
+  operation: finance.postOrderRevenue
   idempotencyKey: orderId
   onFailure: retryThenDeadLetter
   isCritical: true
@@ -64,4 +73,10 @@ consumers:
   isCritical: false
 retention: 30 days after publication
 notes: '**The most consumed event in the platform.** Six consumers, three of them critical. A dead-lettered
-  order.paid means a guest paid and holds nothing, so it pages rather than logs.'
+  order.paid means a guest paid and holds nothing, so it pages rather than logs.
+
+
+  **The saga** (system-design review SD-026, 29 September): the payment transaction converts the inventory
+  holds (catalogue.convertInventoryHold), posts the cash receipt and writes this event; AccessService issues the
+  tickets from it and publishes entitlement.issued; the orders consumer of entitlement.issued completes the
+  order. A dead-lettered issuance is replayed, never compensated by an automatic refund.'

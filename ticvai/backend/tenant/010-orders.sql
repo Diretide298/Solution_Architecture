@@ -103,8 +103,8 @@ CREATE TABLE IF NOT EXISTS orders.b2b_credit (
 
 -- A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on
 -- something Hangs off: reaches orders.sales_order through its keys; references pii.subject,
--- platform.scope. Reached by: 23 operations read it and 7 write it; 5 tables reference it; written
--- by 2 contracts — marketing-crm, orders.
+-- platform.scope. Reached by: 24 operations read it and 9 write it; 7 tables reference it; written
+-- by 3 contracts — marketing-crm, orders, venue-map.
 CREATE TABLE IF NOT EXISTS orders.cart (
     id                                uuid PRIMARY KEY NOT NULL,
     token                             text,
@@ -128,8 +128,8 @@ CREATE TABLE IF NOT EXISTS orders.cart (
 
 -- One line, with the lease that holds its capacity. Null lease for a product with no capacity
 -- Hangs off: a child of orders.cart; reaches orders.sales_order through its keys; references
--- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 11 operations
--- read it and 4 write it; 4 tables reference it.
+-- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 12 operations
+-- read it and 6 write it; 3 tables reference it; written by 2 contracts — orders, venue-map.
 CREATE TABLE IF NOT EXISTS orders.cart_line (
     id                                uuid PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
@@ -151,9 +151,7 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
     inventory_hold_id                 text,
     lease_expires_at                  timestamptz,
     is_available                      boolean,
-    cart_id                           uuid NOT NULL,
-    attributes_id                     uuid,
-    booked_window_id                  uuid
+    cart_id                           uuid NOT NULL
 );
 
 -- a denomination and a count from a blind till count Hangs off: reaches orders.sales_order through
@@ -316,7 +314,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit_box_opening_denomination (
 CREATE TABLE IF NOT EXISTS orders.deposit_policy (
     id                                uuid PRIMARY KEY,
     applies_to                        text[],
-    dining_id                         uuid,
+    dining                            jsonb,
     basis                             text NOT NULL CONSTRAINT deposit_policy_basis_chk CHECK (basis IN ('fixedPerBooking', 'fixedPerGuest', 'percentOfTotal', 'perBand')),
     amount                            numeric(18,4),
     percent                           numeric(18,4),
@@ -325,24 +323,6 @@ CREATE TABLE IF NOT EXISTS orders.deposit_policy (
     balance_due_days_before           integer,
     refundable_until_hours            integer DEFAULT 24,
     scope_path                        ltree NOT NULL
-);
-
--- Holds 13 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS orders.deposit_policy (dining_* columns) (
-    is_enabled                        boolean DEFAULT false,
-    basis                             text DEFAULT 'fixedPerGuest' CONSTRAINT deposit_policy (dining_* columns)_basis_chk CHECK (basis IN ('fixedPerGuest', 'fixedPerTable', 'percentOfMinimumSpend')),
-    amount                            numeric(18,4),
-    percent                           numeric(18,4),
-    minimum_spend_per_guest           numeric(18,4),
-    applies_from_party_size           integer DEFAULT 1,
-    outlet_ids                        text[],
-    collection                        text DEFAULT 'authorisationHold' CONSTRAINT deposit_policy (dining_* columns)_collection_chk CHECK (collection IN ('authorisationHold', 'charge')),
-    deposit_variant_id                uuid,
-    refundable_until_hours            integer DEFAULT 24,
-    on_late_cancel_or_no_show         text DEFAULT 'forfeit' CONSTRAINT deposit_policy (dining_* columns)_on_late_cancel_or_no_show_chk CHECK (on_late_cancel_or_no_show IN ('forfeit', 'release')),
-    on_arrival                        text DEFAULT 'releaseHold' CONSTRAINT deposit_policy (dining_* columns)_on_arrival_chk CHECK (on_arrival IN ('releaseHold', 'applyToBill')),
-    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -810,9 +790,6 @@ CREATE TABLE IF NOT EXISTS orders.order_fee (
 -- One thing bought on one order, priced at the moment of sale. A price list changing afterwards
 -- does not change what somebody paid
 CREATE TABLE IF NOT EXISTS orders.order_line (
-    promotion_id                      uuid NOT NULL,
-    name                              text,
-    reason                            text,
     sales_order_id                    text NOT NULL,
     id                                text PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
@@ -835,8 +812,18 @@ CREATE TABLE IF NOT EXISTS orders.order_line (
     entitlement_ids                   text[],
     cross_region_right_ids            text[],
     reprint_count                     integer DEFAULT 0,
-    attributes_id                     uuid,
-    booked_window_id                  uuid
+    venue_id                          uuid
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.order_line_discount (
+    order_line_id                     text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    promotion_id                      uuid,
+    source                            text NOT NULL,
+    amount                            numeric(18,4) NOT NULL,
+    reason                            text
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
@@ -899,6 +886,8 @@ CREATE TABLE IF NOT EXISTS orders.payment (
     status                            text NOT NULL CONSTRAINT payment_status_chk CHECK (status IN ('authorised', 'captured', 'pendingConfirmation', 'declined', 'failed', 'voided', 'refunded')),
     provider_name                     text,
     provider_reference                text,
+    provider_idempotency_key          text,
+    terminal_id                       uuid,
     last_inquiry_at                   timestamptz,
     recorded_at                       timestamptz NOT NULL,
     synced_at                         timestamptz
@@ -1278,9 +1267,7 @@ CREATE TABLE IF NOT EXISTS orders.reservation_line (
     quantity                          integer NOT NULL,
     quoted_unit_price                 numeric(18,4) NOT NULL,
     holder_name                       text,
-    data_mask_values                  jsonb,
-    attributes_id                     uuid,
-    booked_window_id                  uuid
+    data_mask_values                  jsonb
 );
 
 -- The sale. What was bought, by whom, through which channel, at what scope. Every payment, refund,

@@ -31,7 +31,7 @@
 |---|---|---|---|---|---|---|
 | bill | [`closeTableVisit`](#closetablevisit) | POST | `/table-visits/{visitId}/close` | core | 1 | EMP-059, POS-028 |
 | fnb | [`attachModifierGroup`](#attachmodifiergroup) | PUT | `/menu-items/{menuItemId}/modifier-groups` | setup | 2 | BO-045 |
-| fnb | [`buildProductionPlan`](#buildproductionplan) | POST | `/production-plans` | setup | 2 | BO-136 |
+| fnb | [`buildProductionPlan`](#buildproductionplan) | POST | `/production-plans` | setup | 1 | BO-136 |
 | fnb | [`chaseStation`](#chasestation) | POST | `/kitchen-stations/{stationId}/chase` | core | 2 | KIT-006 |
 | fnb | [`createTableReservation`](#createtablereservation) | POST | `/table-reservations` | core | 2 | EMP-055, GST-070, WEB-036 |
 | fnb | [`escalateCorrectiveAction`](#escalatecorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/escalate` | setup | 2 | BO-044 |
@@ -52,7 +52,7 @@
 | fnb | [`rebalanceStationLoad`](#rebalancestationload) | POST | `/kitchen-stations/rebalance` | core | 2 | KIT-005 |
 | fnb | [`recallKitchenTicket`](#recallkitchenticket) | POST | `/kitchen-tickets/{ticketId}/recall` | core | 2 | KIT-002 |
 | fnb | [`refireItem`](#refireitem) | POST | `/kitchen-tickets/{ticketId}/refire` | core | 2 | KIT-002 |
-| fnb | [`releaseProductionPlan`](#releaseproductionplan) | POST | `/production-plans/{planId}/release` | setup | 2 | BO-136 |
+| fnb | [`releaseProductionPlan`](#releaseproductionplan) | POST | `/production-plans/{planId}/release` | setup | 1 | BO-136 |
 | fnb | [`seatTableReservation`](#seattablereservation) | POST | `/table-reservations/{reservationId}/seat` | core | 1 | EMP-058, POS-028 |
 | fnb | [`setCourseRules`](#setcourserules) | PUT | `/outlets/{outletId}/course-rules` | core | 2 | KIT-003 |
 | fnb | [`setKitchenSla`](#setkitchensla) | PUT | `/outlets/{outletId}/kitchen-sla` | core | 2 | BO-134, KIT-009 |
@@ -81,7 +81,7 @@
 | kitchen | [`setKitchenTicketStatus`](#setkitchenticketstatus) | PUT | `/kitchen/tickets/{ticketId}/status` | core | 1 | BO-020, BO-046, KIT-002, KIT-003, KIT-006, KIT-008 … |
 | menu | [`createMenu`](#createmenu) | POST | `/menus` | core | 2 | BO-045, BO-104, CMS-009 |
 | menu | [`getMenu`](#getmenu) | GET | `/menus/{menuId}` | core | 2 | BO-045, CMS-009 |
-| menu | [`listMenus`](#listmenus) | GET | `/menus` | core | 1 | BO-007, BO-045, BO-104, BO-109, BO-729, BO-730 … |
+| menu | [`listMenus`](#listmenus) | GET | `/menus` | core | 1 | BO-007, BO-011, BO-045, BO-104, BO-109, BO-729 … |
 | menu | [`setItemAvailability`](#setitemavailability) | PUT | `/menu-items/{itemId}/availability` | core | 1 | BO-014, BO-049, BO-140, EMP-062, KIT-008, POS-021 … |
 | menu | [`setMenuSections`](#setmenusections) | PUT | `/menus/{menuId}/sections` | core | 2 | BO-045, BO-109, CMS-009 |
 | menu | [`updateMenu`](#updatemenu) | PATCH | `/menus/{menuId}` | core | 2 | BO-045, BO-111, CMS-009 |
@@ -90,7 +90,7 @@
 | order | [`createFnbOrder`](#createfnborder) | POST | `/fnb-orders` | core | 1 | BO-020, EMP-058, EMP-059, POS-022 |
 | order | [`getFnbOrder`](#getfnborder) | GET | `/fnb-orders/{orderId}` | core | 2 | BO-020, KIT-004 |
 | order | [`listFnbOrders`](#listfnborders) | GET | `/fnb-orders` | core | 1 | BO-020, BO-044, EMP-051, KIT-001, POS-029 |
-| production | [`setRecipe`](#setrecipe) | PUT | `/recipes` | setup | 2 | BO-110, BO-111 |
+| production | [`setRecipe`](#setrecipe) | PUT | `/recipes` | setup | 1 | BO-110, BO-111 |
 | table | [`clearTable`](#cleartable) | POST | `/tables/{tableId}/clear` | core | 1 | POS-028 |
 | table | [`getTableMap`](#gettablemap) | GET | `/outlets/{outletId}/tables` | core | 1 | BO-044, EMP-051, EMP-052, EMP-060, POS-028 |
 | table | [`mergeTableVisits`](#mergetablevisits) | POST | `/table-visits/{visitId}/merge` | core | 1 | EMP-058, POS-028 |
@@ -113,7 +113,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
+| Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
 | Writes | `cache:idempotency`, `fnb.service_order`, `fnb.table_visit` |
 | Called by | EMP-059, POS-028 |
 | State model | Table visit ([states/table-visit.yaml](../../../states/table-visit.yaml)): moves `billRequested` -> `settled`, `open` -> `settled` |
@@ -162,11 +162,12 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | visit.orders[].tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | visit.orders[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) | yes | The full lifecycle from 4.6.35. |
 | visit.orders[].lines | array of object | yes |  |
-| visit.orders[].salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
+| visit.orders[].salesOrderId | string |  | Retyped 29 September (SD-046): orders.sales_order.id is a ULID, so a uuid here could never join. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | visit.orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | visit.orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | visit.orders[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | visit.orders[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| visit.orders[].kitchenTickets | array of KitchenTicket |  | The kitchen tickets this order created, one per station (SD-046). (read-only) |
 | visit.orders[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | visit.orders[].createdAt | string (date-time) | yes |  |
 | visit.orders[].recordedAt | string (date-time) |  |  |
@@ -219,6 +220,7 @@ Board 2E. **Attachment is separate from definition** because that is what makes 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | menuItemId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -254,6 +256,7 @@ Board 2E. **Attachment is separate from definition** because that is what makes 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Attached. |
 | 409 |  | The group adds an allergen the item does not declare. |
 
@@ -270,10 +273,10 @@ Board 2M. **Demand forecast through recipes to quantities per item and per stati
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.production_plan` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.suggestion`, `cache:idempotency`, `fnb.menu_item`, `fnb.production_plan`, `fnb.production_plan_line`, `fnb.recipe`, `fnb.menu_item_modifier` |
+| Reads | `ai.suggestion`, `cache:idempotency`, `fnb.menu_item`, `fnb.menu_item_modifier`, `fnb.production_plan`, `fnb.production_plan_line`, `fnb.recipe` |
 | Writes | `cache:idempotency`, `fnb.production_plan`, `fnb.production_plan_line` |
 | Called by | BO-136 |
 | State model | ProductionPlan ([states/production-plan.yaml](../../../states/production-plan.yaml)): created as `draft`; moves `draft` -> `cancelled` **(not settled: see the Gaps sheet)** |
@@ -382,8 +385,8 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
-| Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
+| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation` |
+| Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Called by | EMP-055, GST-070, WEB-036 |
 | State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): created as `booked` or `awaitingDeposit` |
 
@@ -465,6 +468,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 201 |  | booked where no deposit applies (no card, no cart; REV3-8), or awaitingDeposit with deposit filled where the venue's dining deposit applies (REV3-8b). |
 | 409 |  | No cover available for that party size at that time. |
 
@@ -848,7 +852,7 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `fnb.sold_out_item`, `fnb.menu_item` |
+| Reads | `fnb.menu_item`, `fnb.sold_out_item` |
 | Writes | - |
 | Called by | KIT-008 |
 
@@ -899,7 +903,7 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
+| Reads | `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Writes | - |
 | Called by | EMP-051, EMP-054, EMP-060, POS-028 |
 
@@ -967,7 +971,7 @@ Board 5G. **A delivery arriving warm is a rejection decision made at the door**,
 | Part of slice | setup, makes `fnb.cold_chain_event`, `fnb.corrective_action` non-empty |
 | Wave | 2 |
 | Offline | yes |
-| Conflict policy | lastWriterWins |
+| Conflict policy | append |
 | Reads | `cache:idempotency`, `fnb.cold_chain_event`, `inventory.goods_receipt` |
 | Writes | `cache:idempotency`, `fnb.cold_chain_event`, `fnb.corrective_action` |
 | Called by | EMP-065 |
@@ -1086,7 +1090,7 @@ Board 5J. **HACCP records are a UAE regulatory obligation and nothing in the pac
 | Part of slice | setup, makes `fnb.corrective_action`, `fnb.temperature_log` non-empty |
 | Wave | 2 |
 | Offline | yes |
-| Conflict policy | lastWriterWins |
+| Conflict policy | append |
 | Reads | `cache:idempotency`, `fnb.corrective_action`, `fnb.temperature_log`, `platform.scope` |
 | Writes | `cache:idempotency`, `fnb.corrective_action`, `fnb.temperature_log` |
 | Called by | EMP-062, EMP-067 |
@@ -1165,8 +1169,8 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
-| Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.service_order`, `fnb.service_order_line` |
-| Writes | `cache:idempotency`, `fnb.service_order`, `fnb.kitchen_ticket` |
+| Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line` |
+| Writes | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.service_order` |
 | Called by | KIT-006, POS-022 |
 
 **Parameters**
@@ -1201,6 +1205,7 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | lines[].note | string |  | Free text to the kitchen. (max length 200) |
 | lines[].seatNumber | integer |  | Which cover ordered it. (nullable) |
 | lines[].course | integer |  | Course grouping, so the kitchen fires in sequence. (nullable) |
+| lines[].redeemEntitlementId | string |  | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). (nullable) |
 | lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1210,7 +1215,7 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
+| salesOrderId | string |  | Retyped 29 September (SD-046): orders.sales_order.id is a ULID, so a uuid here could never join. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1221,6 +1226,35 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| kitchenTickets | array of KitchenTicket |  | The kitchen tickets this order created, one per station (SD-046). (read-only) |
+| kitchenTickets[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kitchenTickets[].orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kitchenTickets[].orderNumber | string |  |  |
+| kitchenTickets[].outletId | string (uuid) | yes |  |
+| kitchenTickets[].tableLabel | string |  | (nullable) |
+| kitchenTickets[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
+| kitchenTickets[].coursing | object |  | BL-131. (nullable) |
+| kitchenTickets[].buzzerCode | string |  | BL-128. (nullable) |
+| kitchenTickets[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| kitchenTickets[].priority | integer |  | Higher fires sooner. |
+| kitchenTickets[].prioritisedByPrincipalId | string (uuid) |  | (nullable) |
+| kitchenTickets[].prioritiseReason | string |  | (nullable) |
+| kitchenTickets[].lines | array of object | yes |  |
+| kitchenTickets[].lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kitchenTickets[].lines[].name | string | yes |  |
+| kitchenTickets[].lines[].quantity | integer | yes |  |
+| kitchenTickets[].lines[].modifiers | array of string |  |  |
+| kitchenTickets[].lines[].note | string |  | (nullable) |
+| kitchenTickets[].lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| kitchenTickets[].lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| kitchenTickets[].lines[].refireReason | object |  | (read-only; nullable) |
+| kitchenTickets[].lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
+| kitchenTickets[].lines[].course | integer |  | (nullable) |
+| kitchenTickets[].lines[].stationId | string (uuid) |  | (nullable) |
+| kitchenTickets[].lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| kitchenTickets[].createdAt | string (date-time) | yes |  |
+| kitchenTickets[].targetReadyAt | string (date-time) |  | (nullable) |
+| kitchenTickets[].elapsedSeconds | integer |  |  |
 | estimatedReadyAt | string (date-time) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  |  |
@@ -1248,7 +1282,7 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
-| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.kitchen_ticket`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
+| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
 | Writes | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.table_visit` |
 | Called by | EMP-058, POS-028 |
 
@@ -1295,10 +1329,11 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 | orders[].lines[].note | string |  | Free text to the kitchen. (max length 200) |
 | orders[].lines[].seatNumber | integer |  | Which cover ordered it. (nullable) |
 | orders[].lines[].course | integer |  | Course grouping, so the kitchen fires in sequence. (nullable) |
+| orders[].lines[].redeemEntitlementId | string |  | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). (nullable) |
 | orders[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | orders[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | orders[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| orders[].salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
+| orders[].salesOrderId | string |  | Retyped 29 September (SD-046): orders.sales_order.id is a ULID, so a uuid here could never join. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | orders[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1309,6 +1344,23 @@ Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` ex
 | orders[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | orders[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | orders[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| orders[].kitchenTickets | array of KitchenTicket |  | The kitchen tickets this order created, one per station (SD-046). (read-only) |
+| orders[].kitchenTickets[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].kitchenTickets[].orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].kitchenTickets[].orderNumber | string |  |  |
+| orders[].kitchenTickets[].outletId | string (uuid) | yes |  |
+| orders[].kitchenTickets[].tableLabel | string |  | (nullable) |
+| orders[].kitchenTickets[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
+| orders[].kitchenTickets[].coursing | object |  | BL-131. (nullable) |
+| orders[].kitchenTickets[].buzzerCode | string |  | BL-128. (nullable) |
+| orders[].kitchenTickets[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| orders[].kitchenTickets[].priority | integer |  | Higher fires sooner. |
+| orders[].kitchenTickets[].prioritisedByPrincipalId | string (uuid) |  | (nullable) |
+| orders[].kitchenTickets[].prioritiseReason | string |  | (nullable) |
+| orders[].kitchenTickets[].lines | array of object | yes |  |
+| orders[].kitchenTickets[].createdAt | string (date-time) | yes |  |
+| orders[].kitchenTickets[].targetReadyAt | string (date-time) |  | (nullable) |
+| orders[].kitchenTickets[].elapsedSeconds | integer |  |  |
 | orders[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | orders[].createdAt | string (date-time) | yes |  |
 | orders[].recordedAt | string (date-time) |  |  |
@@ -1562,7 +1614,7 @@ Board 3. **A refire is not a new order and it must not be.** It is the same line
 | Part of slice | core |
 | Wave | 2 |
 | Offline | yes |
-| Conflict policy | lastWriterWins |
+| Conflict policy | append |
 | Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
 | Writes | `cache:idempotency`, `fnb.kitchen_ticket_line`, `inventory.movement` |
 | Called by | KIT-002 |
@@ -1636,7 +1688,7 @@ The label matters: planned quantities against the forecast are what make a model
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.production_plan` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.production_plan`, `fnb.production_plan_line` |
@@ -1690,7 +1742,7 @@ A party seated at a different size from the booking is recorded as such. A booki
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
-| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
+| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Writes | `cache:idempotency`, `fnb.table_reservation`, `fnb.table_session`, `fnb.table_visit` |
 | Called by | EMP-058, POS-028 |
 | State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): moves `booked` -> `seated`, `confirmed` -> `seated`, `noShow` -> `seated` |
@@ -1776,6 +1828,7 @@ Board 3. **Coursing was a per-ticket field with no default**, so every table was
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `CourseRules`
@@ -1804,6 +1857,7 @@ Board 3. **Coursing was a per-ticket field with no default**, so every table was
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 
 ### setKitchenSla
@@ -1832,6 +1886,7 @@ Board 3. **`getKitchenSla` was drawn on the board and nothing set the target.** 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `KitchenSla`
@@ -1866,6 +1921,7 @@ Board 3. **`getKitchenSla` was drawn on the board and nothing set the target.** 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 
 ### setTableCombinations
@@ -1894,6 +1950,7 @@ Without it, `getTableMap` reports a full room while the venue turns away a booki
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -1924,6 +1981,7 @@ Without it, `getTableMap` reports a full room while the venue turns away a booki
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set. |
 
 ### signCorrectiveAction
@@ -2000,8 +2058,8 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
-| Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
+| Reads | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
+| Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
 | Called by | GST-070, WEB-031 |
 | State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): moves `awaitingDeposit` -> `cancelled`, `booked` -> `confirmed`, `booked` -> `cancelled`, `confirmed` -> `cancelled` |
 
@@ -2010,6 +2068,7 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | reservationId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `TableReservation`
@@ -2084,6 +2143,7 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Updated |
 
 
@@ -2281,7 +2341,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.location_session`, `fnb.menu_item`, `inventory.stock_level`, `fnb.delivery_policy`, `fnb.menu_item_modifier` |
+| Reads | `cache:idempotency`, `fnb.delivery_policy`, `fnb.location_session`, `fnb.menu_item`, `fnb.menu_item_modifier`, `inventory.stock_level` |
 | Writes | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.order_fulfilment`, `fnb.service_order` |
 | Called by | GST-024, GST-032, KSK-016, WEB-036 |
 | State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): created as `ordered` |
@@ -2351,6 +2411,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 201 |  | Placed |
 | 409 |  | An item became unavailable, the quoted total no longer matches, the location session expired, or the outlet stopped taking orders. |
 | 422 |  | The order breaks the outlet's FnbDeliveryPolicy. |
@@ -2570,7 +2631,7 @@ The order's `FnbOrderStatus` — ordered, accepted, inPreparation, ready, then s
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `fnb.delivery_location`, `fnb.service_order`, `fnb.kitchen_ticket` |
+| Reads | `fnb.delivery_location`, `fnb.kitchen_ticket`, `fnb.service_order` |
 | Writes | - |
 | Called by | BO-021, GST-024, GST-025, GST-032, WEB-036, WEB-038 |
 
@@ -2672,7 +2733,7 @@ Ordering method is stated per outlet, because it varies within one venue: a tabl
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `fnb.service_order`, `fnb.menu`, `platform.outlet` |
+| Reads | `fnb.menu`, `fnb.service_order`, `platform.outlet` |
 | Writes | - |
 | Called by | BO-062, BO-065, EMP-030, GST-024, GST-029, WEB-036 |
 
@@ -2776,7 +2837,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `fnb.delivery_location`, `fnb.service_order`, `fnb.delivery_location_outlet` |
+| Reads | `cache:idempotency`, `fnb.delivery_location`, `fnb.delivery_location_outlet`, `fnb.service_order` |
 | Writes | `cache:idempotency`, `fnb.service_order` |
 | Called by | BO-021, KIT-007, POS-012 |
 | State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): moves `ready` -> `served`, `ready` -> `collected`, `ready` -> `delivered`<br/>Kitchen ticket ([states/kitchen-ticket.yaml](../../../states/kitchen-ticket.yaml)): moves `ready` -> `served` |
@@ -2844,6 +2905,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -2858,6 +2920,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Saved. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | An outlet that is not an F&B outlet of this venue, or a location of another venue. |
@@ -2886,6 +2949,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `FnbDeliveryPolicy`
@@ -2952,6 +3016,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Saved |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
@@ -2979,6 +3044,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | locationId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -3011,6 +3077,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Updated |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
@@ -3230,6 +3297,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | outletId | query | yes | string (uuid) | The outlet whose stations these are. |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
@@ -3251,6 +3319,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 400 |  | A workstation is assigned to more than one station (displayWorkstationIds, audit R277), or the body fails validation. |
 | 200 |  | Configured |
 
@@ -3502,7 +3571,7 @@ Back-office use. A terminal reads its menu from the catalogue bundle.
 | Read routing | replica |
 | Reads | `fnb.menu`, `fnb.menu_item`, `fnb.menu_section` |
 | Writes | - |
-| Called by | BO-007, BO-045, BO-104, BO-109, BO-729, BO-730, CMS-009, POS-021, POS-024 |
+| Called by | BO-007, BO-011, BO-045, BO-104, BO-109, BO-729, BO-730, CMS-009, POS-021, POS-024 |
 
 **Parameters**
 
@@ -3571,6 +3640,7 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | itemId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -3610,6 +3680,7 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 400 | BadRequest | Validation failed |
 | 200 |  | Updated |
 
@@ -3637,6 +3708,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | menuId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -3708,6 +3780,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Applied |
 
 ### updateMenu
@@ -3732,6 +3805,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | menuId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -3790,6 +3864,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Updated |
 
 
@@ -3937,8 +4012,8 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line` |
-| Writes | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line` |
+| Reads | `fnb.kitchen_station`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.menu_item`, `fnb.service_order`, `fnb.service_order_line` |
+| Writes | `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | BO-020, EMP-058, EMP-059, POS-022 |
 | State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): created as `ordered`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `seated` -> `ordered` |
 
@@ -3964,6 +4039,8 @@ Offline behaviour depends on the items: an order containing only untracked items
 | lines[].note | string |  | Free text to the kitchen. (max length 200) |
 | lines[].seatNumber | integer |  | Which cover ordered it. (nullable) |
 | lines[].course | integer |  | Course grouping, so the kitchen fires in sequence. (nullable) |
+| lines[].redeemEntitlementId | string |  | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). (nullable) |
+| salesOrderId | string |  | The orders.sales_order this F&B order fulfils (SD-046, 29 September). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | recordedAt | string (date-time) | yes |  |
 
 **Response**: `FnbOrder`
@@ -3984,6 +4061,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | lines[].note | string |  | Free text to the kitchen. (max length 200) |
 | lines[].seatNumber | integer |  | Which cover ordered it. (nullable) |
 | lines[].course | integer |  | Course grouping, so the kitchen fires in sequence. (nullable) |
+| lines[].redeemEntitlementId | string |  | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). (nullable) |
 | lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -3993,7 +4071,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
+| salesOrderId | string |  | Retyped 29 September (SD-046): orders.sales_order.id is a ULID, so a uuid here could never join. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4004,6 +4082,35 @@ Offline behaviour depends on the items: an order containing only untracked items
 | taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| kitchenTickets | array of KitchenTicket |  | The kitchen tickets this order created, one per station (SD-046). (read-only) |
+| kitchenTickets[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kitchenTickets[].orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kitchenTickets[].orderNumber | string |  |  |
+| kitchenTickets[].outletId | string (uuid) | yes |  |
+| kitchenTickets[].tableLabel | string |  | (nullable) |
+| kitchenTickets[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
+| kitchenTickets[].coursing | object |  | BL-131. (nullable) |
+| kitchenTickets[].buzzerCode | string |  | BL-128. (nullable) |
+| kitchenTickets[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| kitchenTickets[].priority | integer |  | Higher fires sooner. |
+| kitchenTickets[].prioritisedByPrincipalId | string (uuid) |  | (nullable) |
+| kitchenTickets[].prioritiseReason | string |  | (nullable) |
+| kitchenTickets[].lines | array of object | yes |  |
+| kitchenTickets[].lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kitchenTickets[].lines[].name | string | yes |  |
+| kitchenTickets[].lines[].quantity | integer | yes |  |
+| kitchenTickets[].lines[].modifiers | array of string |  |  |
+| kitchenTickets[].lines[].note | string |  | (nullable) |
+| kitchenTickets[].lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| kitchenTickets[].lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| kitchenTickets[].lines[].refireReason | object |  | (read-only; nullable) |
+| kitchenTickets[].lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
+| kitchenTickets[].lines[].course | integer |  | (nullable) |
+| kitchenTickets[].lines[].stationId | string (uuid) |  | (nullable) |
+| kitchenTickets[].lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| kitchenTickets[].createdAt | string (date-time) | yes |  |
+| kitchenTickets[].targetReadyAt | string (date-time) |  | (nullable) |
+| kitchenTickets[].elapsedSeconds | integer |  |  |
 | estimatedReadyAt | string (date-time) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  |  |
@@ -4015,7 +4122,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 |---|---|---|
 | 201 |  | Created. |
 | 400 | BadRequest | Validation failed |
-| 409 |  | An item is unavailable, modifier constraints are unmet, or a tracked item was ordered offline. |
+| 409 |  | An item is unavailable, modifier constraints are unmet, a tracked item was ordered offline, or a line's redeemEntitlementId cannot be redeemed here (entitlementNotRedeemable: used, another item or ou… |
 
 ### getFnbOrder
 
@@ -4030,7 +4137,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `fnb.service_order`, `fnb.service_order_line` |
+| Reads | `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line` |
 | Writes | - |
 | Called by | BO-020, KIT-004 |
 
@@ -4058,6 +4165,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | lines[].note | string |  | Free text to the kitchen. (max length 200) |
 | lines[].seatNumber | integer |  | Which cover ordered it. (nullable) |
 | lines[].course | integer |  | Course grouping, so the kitchen fires in sequence. (nullable) |
+| lines[].redeemEntitlementId | string |  | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). (nullable) |
 | lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4067,7 +4175,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
+| salesOrderId | string |  | Retyped 29 September (SD-046): orders.sales_order.id is a ULID, so a uuid here could never join. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4078,6 +4186,35 @@ Offline behaviour depends on the items: an order containing only untracked items
 | taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| kitchenTickets | array of KitchenTicket |  | The kitchen tickets this order created, one per station (SD-046). (read-only) |
+| kitchenTickets[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kitchenTickets[].orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kitchenTickets[].orderNumber | string |  |  |
+| kitchenTickets[].outletId | string (uuid) | yes |  |
+| kitchenTickets[].tableLabel | string |  | (nullable) |
+| kitchenTickets[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
+| kitchenTickets[].coursing | object |  | BL-131. (nullable) |
+| kitchenTickets[].buzzerCode | string |  | BL-128. (nullable) |
+| kitchenTickets[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| kitchenTickets[].priority | integer |  | Higher fires sooner. |
+| kitchenTickets[].prioritisedByPrincipalId | string (uuid) |  | (nullable) |
+| kitchenTickets[].prioritiseReason | string |  | (nullable) |
+| kitchenTickets[].lines | array of object | yes |  |
+| kitchenTickets[].lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kitchenTickets[].lines[].name | string | yes |  |
+| kitchenTickets[].lines[].quantity | integer | yes |  |
+| kitchenTickets[].lines[].modifiers | array of string |  |  |
+| kitchenTickets[].lines[].note | string |  | (nullable) |
+| kitchenTickets[].lines[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| kitchenTickets[].lines[].refireOfLineId | string |  | Set on a refire. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| kitchenTickets[].lines[].refireReason | object |  | (read-only; nullable) |
+| kitchenTickets[].lines[].isChargeable | boolean |  | A refire's chargeable flag. (read-only; nullable) |
+| kitchenTickets[].lines[].course | integer |  | (nullable) |
+| kitchenTickets[].lines[].stationId | string (uuid) |  | (nullable) |
+| kitchenTickets[].lines[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| kitchenTickets[].createdAt | string (date-time) | yes |  |
+| kitchenTickets[].targetReadyAt | string (date-time) |  | (nullable) |
+| kitchenTickets[].elapsedSeconds | integer |  |  |
 | estimatedReadyAt | string (date-time) |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | recordedAt | string (date-time) |  |  |
@@ -4103,7 +4240,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `fnb.service_order`, `fnb.service_order_line` |
+| Reads | `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line` |
 | Writes | - |
 | Called by | BO-020, BO-044, EMP-051, KIT-001, POS-029 |
 
@@ -4136,10 +4273,11 @@ Offline behaviour depends on the items: an order containing only untracked items
 | items[].lines[].note | string |  | Free text to the kitchen. (max length 200) |
 | items[].lines[].seatNumber | integer |  | Which cover ordered it. (nullable) |
 | items[].lines[].course | integer |  | Course grouping, so the kitchen fires in sequence. (nullable) |
+| items[].lines[].redeemEntitlementId | string |  | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). (nullable) |
 | items[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | items[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| items[].salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
+| items[].salesOrderId | string |  | Retyped 29 September (SD-046): orders.sales_order.id is a ULID, so a uuid here could never join. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | items[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | items[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4150,6 +4288,23 @@ Offline behaviour depends on the items: an order containing only untracked items
 | items[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].kitchenTickets | array of KitchenTicket |  | The kitchen tickets this order created, one per station (SD-046). (read-only) |
+| items[].kitchenTickets[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].kitchenTickets[].orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].kitchenTickets[].orderNumber | string |  |  |
+| items[].kitchenTickets[].outletId | string (uuid) | yes |  |
+| items[].kitchenTickets[].tableLabel | string |  | (nullable) |
+| items[].kitchenTickets[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
+| items[].kitchenTickets[].coursing | object |  | BL-131. (nullable) |
+| items[].kitchenTickets[].buzzerCode | string |  | BL-128. (nullable) |
+| items[].kitchenTickets[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| items[].kitchenTickets[].priority | integer |  | Higher fires sooner. |
+| items[].kitchenTickets[].prioritisedByPrincipalId | string (uuid) |  | (nullable) |
+| items[].kitchenTickets[].prioritiseReason | string |  | (nullable) |
+| items[].kitchenTickets[].lines | array of object | yes |  |
+| items[].kitchenTickets[].createdAt | string (date-time) | yes |  |
+| items[].kitchenTickets[].targetReadyAt | string (date-time) |  | (nullable) |
+| items[].kitchenTickets[].elapsedSeconds | integer |  |  |
 | items[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | items[].createdAt | string (date-time) | yes |  |
 | items[].recordedAt | string (date-time) |  |  |
@@ -4177,7 +4332,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.recipe` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.recipe`, `fnb.recipe_ingredient` |
@@ -4188,6 +4343,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `Recipe`
@@ -4226,6 +4382,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set. |
 
 
@@ -4362,7 +4519,7 @@ Two tables pushed together. Orders and covers combine; the absorbed visit closes
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
+| Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
 | Writes | `cache:idempotency`, `fnb.service_order`, `fnb.table_visit` |
 | Called by | EMP-058, POS-028 |
 | State model | Table visit ([states/table-visit.yaml](../../../states/table-visit.yaml)): moves `open` -> `merged` |
@@ -4407,10 +4564,11 @@ Two tables pushed together. Orders and covers combine; the absorbed visit closes
 | orders[].lines[].note | string |  | Free text to the kitchen. (max length 200) |
 | orders[].lines[].seatNumber | integer |  | Which cover ordered it. (nullable) |
 | orders[].lines[].course | integer |  | Course grouping, so the kitchen fires in sequence. (nullable) |
+| orders[].lines[].redeemEntitlementId | string |  | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). (nullable) |
 | orders[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | orders[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | orders[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| orders[].salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
+| orders[].salesOrderId | string |  | Retyped 29 September (SD-046): orders.sales_order.id is a ULID, so a uuid here could never join. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | orders[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4421,6 +4579,23 @@ Two tables pushed together. Orders and covers combine; the absorbed visit closes
 | orders[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | orders[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | orders[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| orders[].kitchenTickets | array of KitchenTicket |  | The kitchen tickets this order created, one per station (SD-046). (read-only) |
+| orders[].kitchenTickets[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].kitchenTickets[].orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].kitchenTickets[].orderNumber | string |  |  |
+| orders[].kitchenTickets[].outletId | string (uuid) | yes |  |
+| orders[].kitchenTickets[].tableLabel | string |  | (nullable) |
+| orders[].kitchenTickets[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
+| orders[].kitchenTickets[].coursing | object |  | BL-131. (nullable) |
+| orders[].kitchenTickets[].buzzerCode | string |  | BL-128. (nullable) |
+| orders[].kitchenTickets[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| orders[].kitchenTickets[].priority | integer |  | Higher fires sooner. |
+| orders[].kitchenTickets[].prioritisedByPrincipalId | string (uuid) |  | (nullable) |
+| orders[].kitchenTickets[].prioritiseReason | string |  | (nullable) |
+| orders[].kitchenTickets[].lines | array of object | yes |  |
+| orders[].kitchenTickets[].createdAt | string (date-time) | yes |  |
+| orders[].kitchenTickets[].targetReadyAt | string (date-time) |  | (nullable) |
+| orders[].kitchenTickets[].elapsedSeconds | integer |  |  |
 | orders[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | orders[].createdAt | string (date-time) | yes |  |
 | orders[].recordedAt | string (date-time) |  |  |
@@ -4460,7 +4635,7 @@ Covers is captured at seating because it drives split-by-covers at close.
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
+| Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
 | Writes | `cache:idempotency`, `fnb.service_order`, `fnb.table_visit` |
 | Called by | EMP-058, POS-028 |
 | State model | Table visit ([states/table-visit.yaml](../../../states/table-visit.yaml)): created as `open`; moves `billRequested` -> `open` |
@@ -4509,10 +4684,11 @@ Covers is captured at seating because it drives split-by-covers at close.
 | orders[].lines[].note | string |  | Free text to the kitchen. (max length 200) |
 | orders[].lines[].seatNumber | integer |  | Which cover ordered it. (nullable) |
 | orders[].lines[].course | integer |  | Course grouping, so the kitchen fires in sequence. (nullable) |
+| orders[].lines[].redeemEntitlementId | string |  | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). (nullable) |
 | orders[].lines[].status | FnbOrderStatus: enum (ordered, accepted, inPreparation, ready, served, collected, delivered, cancelled, …) |  | The full lifecycle from 4.6.35. |
 | orders[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | orders[].lines[].lineTotal | Money |  | On the wire this is three fields; in the database it is one column. |
-| orders[].salesOrderId | string (uuid) |  | Taken from their fnb.order, 20 September. (nullable) |
+| orders[].salesOrderId | string |  | Retyped 29 September (SD-046): orders.sales_order.id is a ULID, so a uuid here could never join. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | orders[].updatedAt | string (date-time) |  | Taken from their fnb.order. (nullable) |
 | orders[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | orders[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -4523,6 +4699,23 @@ Covers is captured at seating because it drives split-by-covers at close.
 | orders[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | orders[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | orders[].kitchenTicketId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| orders[].kitchenTickets | array of KitchenTicket |  | The kitchen tickets this order created, one per station (SD-046). (read-only) |
+| orders[].kitchenTickets[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].kitchenTickets[].orderId | string | yes | The F&B order the ticket was created from on acceptance (FnbOrder.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].kitchenTickets[].orderNumber | string |  |  |
+| orders[].kitchenTickets[].outletId | string (uuid) | yes |  |
+| orders[].kitchenTickets[].tableLabel | string |  | (nullable) |
+| orders[].kitchenTickets[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) |  |  |
+| orders[].kitchenTickets[].coursing | object |  | BL-131. (nullable) |
+| orders[].kitchenTickets[].buzzerCode | string |  | BL-128. (nullable) |
+| orders[].kitchenTickets[].status | KitchenTicketStatus: enum (received, preparing, ready, served, recalled, cancelled) | yes |  |
+| orders[].kitchenTickets[].priority | integer |  | Higher fires sooner. |
+| orders[].kitchenTickets[].prioritisedByPrincipalId | string (uuid) |  | (nullable) |
+| orders[].kitchenTickets[].prioritiseReason | string |  | (nullable) |
+| orders[].kitchenTickets[].lines | array of object | yes |  |
+| orders[].kitchenTickets[].createdAt | string (date-time) | yes |  |
+| orders[].kitchenTickets[].targetReadyAt | string (date-time) |  | (nullable) |
+| orders[].kitchenTickets[].elapsedSeconds | integer |  |  |
 | orders[].estimatedReadyAt | string (date-time) |  | (nullable) |
 | orders[].createdAt | string (date-time) | yes |  |
 | orders[].recordedAt | string (date-time) |  |  |
@@ -4571,6 +4764,7 @@ The outlet's whole layout in one call — the outlet is the one in the path. Eac
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -4618,6 +4812,7 @@ The outlet's whole layout in one call — the outlet is the one in the path. Eac
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Applied |
 
 ## Tables
@@ -4976,7 +5171,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | service_mode | text | yes |  |
 | table_visit_id | text | no |  |
 | status | text | yes |  |
-| sales_order_id | uuid | no | Taken from their fnb.order, 20 September. |
+| sales_order_id | text | no | Retyped 29 September (SD-046): orders.sales_order.id is a ULID, so a uuid here could never join. |
 | updated_at | timestamptz | no | Taken from their fnb.order. |
 | gross_amount | numeric(18,4) | yes |  |
 | tax_amount | numeric(18,4) | no |  |
@@ -4998,6 +5193,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | note | text | no | Free text to the kitchen. |
 | seat_number | integer | no | Which cover ordered it. |
 | course | integer | no | Course grouping, so the kitchen fires in sequence. |
+| redeem_entitlement_id | text | no | A meal combo redeemed at the till or by a scan (29 September, MOB-4; applied 30 September). |
 | status | text | no |  |
 | unit_price | numeric(18,4) | no |  |
 | line_total | numeric(18,4) | no |  |
@@ -5045,19 +5241,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | actual_party_size | integer | no |  |
 | table_visit_id | text | no |  |
 | created_at | timestamptz | no |  |
-| amount | numeric(18,4) | yes |  |
-| basis | text | yes |  |
-| hold_expires_at | timestamptz | no | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. |
-| refundable_until | timestamptz | no | startsAt less dining.refundableUntilHours. |
-| variant_id | uuid | no | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
-| cart_line_id | uuid | no | The orders.CartLine carrying the deposit, once added. |
-| deposit_id | uuid | no | The orders.deposit row, once the payment is authorised. |
-
-### `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | amount | numeric(18,4) | yes |  |
 | basis | text | yes |  |
 | hold_expires_at | timestamptz | no | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. |

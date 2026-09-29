@@ -81,6 +81,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - fnb.menu_item
   - promotions.allocation_component
   - promotions.bundle
   - promotions.bundle_choice_group

@@ -1412,7 +1412,9 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
-    handle money should not be able to move it (CF-87's class).
+    handle money should not be able to move it (CF-87's class). **Capacity writes removed 29 September**
+    (M17-04); a partner no longer creates or amends a capacity envelope or sets channel allocations; it
+    reads them and may still return its own unsold allocation (`relinquishChannelAllocation`).
   density: compact
   pattern: listDetail
   patternReason: '`listChannelCapacities` reads the population and `getChannelAllocations` reads one of
@@ -1574,10 +1576,6 @@ screens:
         operation: applyManualDiscount
         provenance: contract orders.yaml POST /orders/{orderId}/discounts
       - kind: secondaryButton
-        label: Create channel capacity
-        operation: createChannelCapacity
-        provenance: contract catalogue.yaml POST /channel-capacities
-      - kind: secondaryButton
         label: Exchange order lines
         operation: exchangeOrderLines
         provenance: contract orders.yaml POST /orders/{orderId}/exchanges
@@ -1605,14 +1603,6 @@ screens:
         label: Resume order
         operation: resumeOrder
         provenance: contract orders.yaml POST /orders/{orderId}/resume
-      - kind: secondaryButton
-        label: Save channel allocations
-        operation: setChannelAllocations
-        provenance: contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations
-      - kind: secondaryButton
-        label: Save channel capacity
-        operation: updateChannelCapacity
-        provenance: contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}
       - kind: destructiveButton
         label: Void order
         operation: voidOrder
@@ -1670,23 +1660,6 @@ screens:
       - reasonCode
       - approverPrincipalId
     provenance: contract orders.yaml POST /orders/{orderId}/discounts
-  - id: formCreateChannelCapacity
-    component: modal
-    trigger: Create channel capacity
-    body: '**Collects what `createChannelCapacity` sends before it is called.** Required: `performanceId`,
-      `name`, `capacity`. Optional: `seatCategoryId`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateEnvelopeRequest
-    confirm:
-      label: Create channel capacity
-      operation: createChannelCapacity
-    dismiss:
-      label: Cancel
-      discards:
-      - performanceId
-      - name
-      - capacity
-      - seatCategoryId
-    provenance: contract catalogue.yaml POST /channel-capacities
   - id: formExchangeOrderLines
     component: modal
     trigger: Exchange order lines
@@ -1789,33 +1762,6 @@ screens:
       - waiveFee
       - reason
     provenance: contract orders.yaml POST /orders/{orderId}/reschedule
-  - id: formSetChannelAllocations
-    component: modal
-    trigger: Save channel allocations
-    body: '**Collects what `setChannelAllocations` sends before it is called.** Required: `allocations`.
-      Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save channel allocations
-      operation: setChannelAllocations
-    dismiss:
-      label: Cancel
-      discards:
-      - allocations
-    provenance: contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations
-  - id: formUpdateChannelCapacity
-    component: modal
-    trigger: Save channel capacity
-    body: '**Collects what `updateChannelCapacity` sends before it is called.** Nothing in the body is
-      required. Optional: `name`, `capacity`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save channel capacity
-      operation: updateChannelCapacity
-    dismiss:
-      label: Cancel
-      discards:
-      - name
-      - capacity
-    provenance: contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}
   states:
     loading: The inventory allocation list.
     error: Could not load. Names which read failed and leaves the inventory allocation untouched.
@@ -1838,12 +1784,6 @@ screens:
   - operationId: applyManualDiscount
     contract: orders
     purpose: Apply a discount a cashier chose
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
-  - operationId: createChannelCapacity
-    contract: catalogue
-    purpose: Create a capacity envelope
     trigger: onAction
     invalidates:
     - listChannelCapacities
@@ -1909,18 +1849,6 @@ screens:
     trigger: onAction
     invalidates:
     - listChannelCapacities
-  - operationId: setChannelAllocations
-    contract: catalogue
-    purpose: Allocate envelope capacity across channels
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
-  - operationId: updateChannelCapacity
-    contract: catalogue
-    purpose: Amend an envelope
-    trigger: onAction
-    invalidates:
-    - listChannelCapacities
   - operationId: voidOrder
     contract: orders
     purpose: Void an order
@@ -1972,12 +1900,18 @@ screens:
         edge carries nothing and PTR-003 opens cold
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **Read only since 29
+    September** (decided 17 September, M17-04; applied 29 September, P29). Partners never create products,
+    prices or performances through the API or this portal; product configuration stays in the venue back
+    office (BO-007, BO-008, BO-009), and a partner reads the products assigned to its channel (`listProducts`,
+    `getProduct`, `listProductVariants`) and its partner price lists (`listPriceLists`, `getPriceList`,
+    `listPrices`). The create, set, copy, transition and update actions were removed with the partner
+    audience on those catalogue writes.
   density: compact
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getPriceList` reads one of them — list, select,
     act'
-  purpose: Find product catalog (b2b pricing) for this venue.
+  purpose: See the products assigned to this partner and the partner prices, read only.
   layout:
     template: split
     regions:
@@ -2114,50 +2048,15 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Copy price list
-        operation: copyPriceList
-        provenance: contract catalogue.yaml POST /price-lists/{priceListId}/copy
-      - kind: secondaryButton
-        label: Create price list
-        operation: createPriceList
-        provenance: contract catalogue.yaml POST /price-lists
-      - kind: secondaryButton
-        label: Create product
-        operation: createProduct
-        provenance: contract catalogue.yaml POST /products
-      - kind: secondaryButton
         label: Resolve product by code
         operation: resolveProductByCode
         provenance: contract catalogue.yaml GET /products/resolve
-      - kind: secondaryButton
-        label: Save alternative codes
-        operation: setAlternativeCodes
-        provenance: contract catalogue.yaml PUT /products/{productId}/alternative-codes
-      - kind: secondaryButton
-        label: Save prices
-        operation: setPrices
-        provenance: contract catalogue.yaml PUT /price-lists/{priceListId}/prices
-      - kind: secondaryButton
-        label: Save product attributes
-        operation: setProductAttributes
-        provenance: contract catalogue.yaml PUT /products/{productId}/attributes
-      - kind: secondaryButton
-        label: Transition product lifecycle
-        operation: transitionProductLifecycle
-        provenance: contract catalogue.yaml POST /products/{productId}/lifecycle
-      - kind: secondaryButton
-        label: Save price list
-        operation: updatePriceList
-        provenance: contract catalogue.yaml PATCH /price-lists/{priceListId}
-      - kind: secondaryButton
-        label: Save product
-        operation: updateProduct
-        provenance: contract catalogue.yaml PATCH /products/{productId}
   states:
     loading: The product catalog (b2b list.
     error: Could not load. Names which read failed and leaves the product catalog (b2b untouched.
-    emptyFirstRun: No product catalog (b2b yet. Offers Create price list (`createPriceList`); distinct
-      from a filter that matched nothing.
+    emptyFirstRun: No product is assigned to this partner yet. **Offers no create action** — a partner
+      never creates products or prices (M17-04); it says to ask the venue to assign products and a partner
+      price list.
     emptyNoResults: Nothing matches the filter on venueId, kind, isSellable and the product catalog (b2b
       are still there. Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names
@@ -2172,24 +2071,6 @@ screens:
     contract: catalogue
     purpose: from page inventory
     trigger: onAction
-  - operationId: copyPriceList
-    contract: catalogue
-    purpose: Copy a price list, optionally with an adjustment
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: createPriceList
-    contract: catalogue
-    purpose: Create a price list
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: createProduct
-    contract: catalogue
-    purpose: Create a product
-    trigger: onAction
-    invalidates:
-    - listProducts
   - operationId: getProduct
     contract: catalogue
     purpose: Read a product
@@ -2214,42 +2095,6 @@ screens:
     contract: catalogue
     purpose: Resolve a partner code to a product
     trigger: onAction
-  - operationId: setAlternativeCodes
-    contract: catalogue
-    purpose: Set external identifiers
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: setPrices
-    contract: catalogue
-    purpose: Set prices in bulk
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: setProductAttributes
-    contract: catalogue
-    purpose: Set the attribute axes for a product
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: transitionProductLifecycle
-    contract: catalogue
-    purpose: Move a product through its lifecycle
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: updatePriceList
-    contract: catalogue
-    purpose: Amend a price list
-    trigger: onAction
-    invalidates:
-    - listProducts
-  - operationId: updateProduct
-    contract: catalogue
-    purpose: Update a product
-    trigger: onAction
-    invalidates:
-    - listProducts
   entryState:
     params:
     - name: priceListId
@@ -2271,159 +2116,6 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formCopyPriceList
-    component: modal
-    trigger: Copy price list
-    body: '**Collects what `copyPriceList` sends before it is called.** Required: `code`, `name`. Optional:
-      `adjustmentPercent`, `roundTo`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    confirm:
-      label: Copy price list
-      operation: copyPriceList
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-      - name
-      - adjustmentPercent
-      - roundTo
-      - validFrom
-      - validTo
-    provenance: contract catalogue.yaml POST /price-lists/{priceListId}/copy
-  - id: formCreatePriceList
-    component: modal
-    trigger: Create price list
-    body: '**Collects what `createPriceList` sends before it is called.** Required: `code`, `name`, `venueId`,
-      `channels`. Optional: `validFrom`, `validTo`, `priority`. Dismissing sends nothing; the screen behind
-      is unchanged.'
-    bindsTo: CreatePriceListRequest
-    confirm:
-      label: Create price list
-      operation: createPriceList
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-      - name
-      - venueId
-      - channels
-      - validFrom
-      - validTo
-      - priority
-    provenance: contract catalogue.yaml POST /price-lists
-  - id: formCreateProduct
-    component: modal
-    trigger: Create product
-    body: '**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`,
-      `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: CreateProductRequest
-    confirm:
-      label: Create product
-      operation: createProduct
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-      - name
-      - kind
-      - venueId
-      - description
-      - channels
-      - entitlementTemplateId
-      - dataMaskValues
-    provenance: contract catalogue.yaml POST /products
-  - id: formSetAlternativeCodes
-    component: modal
-    trigger: Save alternative codes
-    body: '**Collects what `setAlternativeCodes` sends before it is called.** Required: `codes`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save alternative codes
-      operation: setAlternativeCodes
-    dismiss:
-      label: Cancel
-      discards:
-      - codes
-    provenance: contract catalogue.yaml PUT /products/{productId}/alternative-codes
-  - id: formSetPrices
-    component: modal
-    trigger: Save prices
-    body: '**Collects what `setPrices` sends before it is called.** Required: `prices`. Dismissing sends
-      nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save prices
-      operation: setPrices
-    dismiss:
-      label: Cancel
-      discards:
-      - prices
-    provenance: contract catalogue.yaml PUT /price-lists/{priceListId}/prices
-  - id: formSetProductAttributes
-    component: modal
-    trigger: Save product attributes
-    body: '**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Save product attributes
-      operation: setProductAttributes
-    dismiss:
-      label: Cancel
-      discards:
-      - axes
-    provenance: contract catalogue.yaml PUT /products/{productId}/attributes
-  - id: formTransitionProductLifecycle
-    component: modal
-    trigger: Transition product lifecycle
-    body: '**Collects what `transitionProductLifecycle` sends before it is called.** Required: `transition`,
-      `reason`. Optional: `effectiveAt`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Transition product lifecycle
-      operation: transitionProductLifecycle
-    dismiss:
-      label: Cancel
-      discards:
-      - transition
-      - reason
-      - effectiveAt
-    provenance: contract catalogue.yaml POST /products/{productId}/lifecycle
-  - id: formUpdatePriceList
-    component: modal
-    trigger: Save price list
-    body: '**Collects what `updatePriceList` sends before it is called.** Nothing in the body is required.
-      Optional: `name`, `validFrom`, `validTo`, `priority`, `isActive`. Dismissing sends nothing; the
-      screen behind is unchanged.'
-    confirm:
-      label: Save price list
-      operation: updatePriceList
-    dismiss:
-      label: Cancel
-      discards:
-      - name
-      - validFrom
-      - validTo
-      - priority
-      - isActive
-    provenance: contract catalogue.yaml PATCH /price-lists/{priceListId}
-  - id: formUpdateProduct
-    component: modal
-    trigger: Save product
-    body: '**Collects what `updateProduct` sends before it is called.** Nothing in the body is required.
-      Optional: `name`, `description`, `channels`, `dataMaskValues`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: UpdateProductRequest
-    confirm:
-      label: Save product
-      operation: updateProduct
-    dismiss:
-      label: Cancel
-      discards:
-      - name
-      - description
-      - channels
-      - dataMaskValues
-    provenance: contract catalogue.yaml PATCH /products/{productId}
 - id: PTR-007
   name: Availability Search
   module: Inventory & Pricing
@@ -5659,6 +5351,21 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: multiSelect
+        label: Scopes, by module
+        bindsTo: ApiScope
+        operation: listApiScopes
+        notes: '**A scope picker grouped by module** (M17-05): `{module}.read` and `{module}.write`, with
+          unlicensed modules shown and disabled rather than hidden. No scope opens a catalogue write (M17-04).'
+        provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
+      - kind: banner
+        label: Production access
+        bindsTo: ProductionAccessRequest
+        operation: listProductionAccessRequests
+        notes: '**Where production access stands** (M17-06): sandbox only, requested (pending), approved
+          (a production client issued by TICVAI) or rejected with the reason. Production keys only after
+          certification; a sandbox key is never promoted.'
+        provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
       - kind: dataTable
         label: Every API client
         bindsTo: ApiClient
@@ -5697,6 +5404,13 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
+      - kind: secondaryButton
+        label: Request production access
+        operation: requestProductionAccess
+        notes: '**Production keys only after certification** (M17-06). Enabled on a sandbox client whose
+          integration is certified; asks for the tenants, the scopes and the IP allow-list. TICVAI issues
+          the production client.'
+        provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
       - kind: primaryButton
         label: Create API client
         operation: createApiClient
@@ -5710,6 +5424,25 @@ screens:
         operation: revokeApiCredential
         provenance: contract public-api.yaml DELETE /api-clients/{clientId}/credentials
   overlays:
+  - id: formRequestProductionAccess
+    component: modal
+    trigger: Request production access
+    body: '**Collects what `requestProductionAccess` sends before it is called.** Required: `listingId`
+      (a certified integration), `scopes`, `allowedTenantIds`, `ipAllowList` (at least one address, M17-07).
+      Optional: `note`. The form says that a new production key is issued and the sandbox key stays a
+      sandbox key.'
+    confirm:
+      label: Request production access
+      operation: requestProductionAccess
+    dismiss:
+      label: Cancel
+      discards:
+      - listingId
+      - scopes
+      - allowedTenantIds
+      - ipAllowList
+      - note
+    provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
   - id: confirmRevokeApiCredential
     component: confirmDialog
     trigger: Revoke API credential
@@ -5764,6 +5497,21 @@ screens:
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
   apis:
+  - operationId: listApiScopes
+    contract: public-api
+    purpose: Scopes to choose from, by module
+    trigger: onLoad
+    provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
+  - operationId: listProductionAccessRequests
+    contract: public-api
+    purpose: Where production access stands for these clients
+    trigger: onLoad
+    provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
+  - operationId: requestProductionAccess
+    contract: public-api
+    purpose: Ask for production keys for a certified integration
+    trigger: onAction
+    provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
   - operationId: listApiClients
     contract: public-api
     purpose: Clients issued to this partner

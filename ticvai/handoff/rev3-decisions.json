@@ -29,7 +29,8 @@
   "proposal": "Reorder the dated flow to WEB-006 (date, then time) before WEB-005 (tickets), or fold both into one staged step, and state the reveal rule on the screens. Add BookingFlowConfig.performanceReveal enum [dateTimeTicket, allAtOnce] default dateTimeTicket.",
   "needsClient": "",
   "decision": "Our proposal adopted (29 September): Reorder the dated flow to WEB-006 (date, then time) before WEB-005 (tickets), or fold both into one staged step, and state the reveal rule on the screens. Add BookingFlowConfig.performanceReveal enum [dateTimeTicket, allAtOnce] default dateTimeTicket.",
-  "decided": "2026-09-29"
+  "decided": "2026-09-29",
+  "superseded": "Setting moved per flow 29 September (W12): `performanceReveal` is now `BookingFlow.settings.performanceReveal` on each booking flow (white-label, CMS-103), read by the guest screens through getPublishedBookingFlow; the decision itself stands."
  },
  {
   "ref": "REV3-3",
@@ -48,7 +49,8 @@
   "proposal": "Add BookingFlowConfig.signInAt enum [afterAddOns, atPayment] default afterAddOns. On web, move the gate from WEB-012 to the WEB-008 exit when afterAddOns.",
   "needsClient": "",
   "decision": "Our proposal adopted (29 September): Add BookingFlowConfig.signInAt enum [afterAddOns, atPayment] default afterAddOns. On web, move the gate from WEB-012 to the WEB-008 exit when afterAddOns.",
-  "decided": "2026-09-29"
+  "decided": "2026-09-29",
+  "superseded": "Setting moved per flow 29 September (W12): `signInAt` is now `BookingFlow.settings.signInAt` on each booking flow (white-label, CMS-103), read by the guest screens through getPublishedBookingFlow; the decision itself stands."
  },
  {
   "ref": "REV3-4",
@@ -65,7 +67,8 @@
   "proposal": "Add BookingFlowConfig.seatEventDateMode enum [inlineStep, popupOnSeatMap] default inlineStep. Add a date/time overlay to WEB-007 and GST-049 for the pop-up mode. Skip WEB-006 when the event has exactly one on-sale performance.",
   "needsClient": "",
   "decision": "Our proposal adopted (29 September): Add BookingFlowConfig.seatEventDateMode enum [inlineStep, popupOnSeatMap] default inlineStep. Add a date/time overlay to WEB-007 and GST-049 for the pop-up mode. Skip WEB-006 when the event has exactly one on-sale performance.",
-  "decided": "2026-09-29"
+  "decided": "2026-09-29",
+  "superseded": "Setting moved per flow 29 September (W12): `seatEventDateMode` is now `BookingFlow.settings.seatEventDateMode` on each booking flow (white-label, CMS-103), read by the guest screens through getPublishedBookingFlow; the decision itself stands."
  },
  {
   "ref": "REV3-5",
@@ -194,7 +197,8 @@
   "proposal": "Add a venue-scoped GuidedChoice config to white-label (part of the published tenant config): mode enum [button, popupOnArrival, banner, off]; questions[<=2] {text: LocalisedText, answers[3] {title, description, iconKey, badge, target: LinkTarget}}; resultCards keyed by target {title, description, imageAssetId}. Guests read it through the public tenant config. Add get/setGuidedChoice (TENANT_CONFIGURE).",
   "needsClient": "Help me choose is not in the RFP sources. Accept it as in scope (CR), or keep it as a later option?",
   "decision": "Help me choose is in scope as a venue configuration (questions, answers, the flow each answer opens). Once products are uploaded, AI analyses them and proposes Help me choose sections, which the venue reviews and publishes (a suggestion, never auto-published).",
-  "decided": "2026-09-29"
+  "decided": "2026-09-29",
+  "superseded": "Updated 29 September (W4): Help me choose filters the catalogue by default (`GuidedChoice.behaviour: filter`, with a Show everything link); `recommend` stays an option. Up to four questions, each with a kind (choice, yes/no, age, level, certification) and an answer filter the catalogue applies (`guidedAnswerIds` on listProducts and searchCatalogue). Answers filter, never consent: a swimmer answer pre-fills the REV3-26 consent, which the guest still confirms."
  },
  {
   "ref": "REV3-13",
@@ -325,7 +329,8 @@
   "proposal": "Add BookingFlowConfig.quickTour bool default false. The first-visit flag is kept on the device only.",
   "needsClient": "",
   "decision": "Our proposal adopted (29 September): Add BookingFlowConfig.quickTour bool default false. The first-visit flag is kept on the device only.",
-  "decided": "2026-09-29"
+  "decided": "2026-09-29",
+  "superseded": "Setting moved per flow 29 September (W12): `quickTour` is now `BookingFlow.settings.quickTour` on each booking flow (white-label, CMS-103), read by the guest screens through getPublishedBookingFlow; the decision itself stands."
  },
  {
   "ref": "REV3-21",
@@ -352,7 +357,8 @@
   "proposal": "Keep the pop-up UI but record the answer per declared person (one 'everyone in my party can swim' tick that sets confidentSwimmer for each person is fine). Show it when any cart product has swimAbility=confident, not from a tenant toggle.",
   "needsClient": "Can one person declare swim ability for the whole party, or must each guest (or guardian) confirm per person?",
   "decision": "The swim question is a consent, not a data field: a venue attaches one or several consent questions to a product or flow (e.g. 'Are you able to swim?', 'Do you hold a scuba certification?', 'I accept the risk'), each with its own text, version and whether it is per person or once per booking. The answer is stored as a consent record (question version, answer, who answered, when). Single or multiple questions, per the venue's choice.",
-  "decided": "2026-09-29"
+  "decided": "2026-09-29",
+  "superseded": "Setting moved per flow 29 September (W12): `consentQuestionIds` is now `BookingFlow.settings.consentQuestionIds` on each booking flow (white-label, CMS-103), read by the guest screens through getPublishedBookingFlow; the decision itself stands."
  },
  {
   "ref": "23SEP-3",
@@ -483,7 +489,8 @@
   "proposal": "Add BookingFlowConfig.categoryDisplay enum [grid, rowStrip] default grid.",
   "needsClient": "",
   "decision": "Our proposal adopted (29 September): Add BookingFlowConfig.categoryDisplay enum [grid, rowStrip] default grid.",
-  "decided": "2026-09-29"
+  "decided": "2026-09-29",
+  "superseded": "Superseded 29 September by W7: `categoryDisplay` is removed; `cardLayout` already carries rows or grid, so one setting drives the product cards."
  },
  {
   "ref": "23SEP-19",
@@ -691,7 +698,8 @@
   "proposal": "Align the prototype to wave 4, and show the itinerary suggestion only if the planner ships.",
   "needsClient": "",
   "decision": "Itinerary screens stay in wave 4.",
-  "decided": "2026-09-29"
+  "decided": "2026-09-29",
+  "superseded": "Superseded 29 September by MOB-6 (the Block A re-plan): the itinerary screens are Block A, wave 1 (GST-051 Plan, GST-052 Suggested Itineraries, GST-053 Your Plan, GST-054 AI Planner, GST-059 Plan in Progress, and WEB-050 Plan Your Visit on the web)."
  },
  {
   "ref": "GAP-D1",
@@ -873,6 +881,21 @@
   "proposal": "Put the Rev 3 fields (REV3-1..20, 23SEP-3/6/18/19) in BookingFlowConfig with an optional venue override map, venueOverrides{venueId: partial BookingFlowConfig}, following the VenueSettings tenant-default pattern.",
   "needsClient": "Do any booking-flow settings need to differ between venues of one tenant?",
   "decision": "Booking-flow settings are set per tenant with a per-venue override (venueOverrides). Adopted 29 September.",
+  "decided": "2026-09-29"
+ },
+ {
+  "ref": "M17-04",
+  "source": "MoM 17 September 2026, item M17-04 (partner API scope); decided again 29 September",
+  "what": "Partners never create products, prices or performances through the API; partner screens read assigned products and partner prices.",
+  "kind": "conflict",
+  "package": "Twelve catalogue writes (createProduct, updateProduct, setProductAttributes, createPriceList, updatePriceList, copyPriceList, setPrices, createChannelCapacity, updateChannelCapacity, setChannelAllocations, transitionProductLifecycle, setAlternativeCodes) carried x-ticvai-audience [staff, partner], and PTR-006 edited products.",
+  "screens": [
+   "PTR-005",
+   "PTR-006"
+  ],
+  "proposal": "Remove the partner audience from the twelve writes; PTR-006 read only; public-api scopes never open a catalogue write, with a platform-staff exception only (ApiLicence.catalogueWriteException via setApiLicensing).",
+  "needsClient": "",
+  "decision": "Resolved against the former [staff, partner] audience on the 12 catalogue writes (29 September): partner removed, PTR-006 read only, PTR-005 keeps its reads; no API scope grants a catalogue write; an exception is set only by TICVAI platform staff through setApiLicensing, for a named client and named operations, with an end date.",
   "decided": "2026-09-29"
  }
 ]

@@ -2,10 +2,11 @@ openapi: 3.1.0
 info:
   title: TICVAI — Venue map
   version: 1.0.0
-  x-ticvai-screen-count: 15
+  x-ticvai-screen-count: 20
   x-ticvai-tier: satellite
   x-ticvai-module: "21 — Seat Management & Venue Mapping"
   x-ticvai-platforms:
+    - P01 Guest Web
     - P02 Guest App
     - P06 Venue Staff App
     - P08 Venue Management
@@ -81,6 +82,22 @@ info:
 
     ---
 
+    ## The visit planner (29 September, MOB-6)
+
+    **The Plan tab is Block A**, decided 29 September: a rules planner with the AI planner agent on
+    top, superseding rev 3 GAP-C3 and audits R187 and R209. It lives here because a plan is laid out
+    on the map: points with a planning duration, interest and cuisine tags, walking times over the
+    published graph. `generateVisitPlan` builds it with no AI, `updateVisitPlan` changes it as a new
+    version (so undo works), `listVisitPlanAlternatives` offers swaps, and `bookVisitPlan` turns it
+    into cart lines through the orders service's `addCartLine`. Plans are the guest's own
+    (`venuemap.visit_plan`, `venuemap.visit_plan_item`), like a cart. The AI planner agent reaches
+    them only as tools called for the guest, so AI still writes nothing outside `ai.*` (ADR-0020).
+
+    **A point also carries what Item Detail shows** (MOB-4): a description, a gallery and a featured
+    offer (a product or a bundle, for any kind of point).
+
+    ---
+
     ## What a venue sends
 
     **`handoff/venue-map-input-spec.md` is the venue-facing document** and this contract enforces
@@ -98,6 +115,8 @@ info:
 servers:
   - url: https://api.ticvai.com/v1
 
+security:
+- bearerAuth: []
 paths:
   /venue-maps:
     get:
@@ -169,10 +188,14 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-039 Venue Map & Wait Times"
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-004 Item Detail"
         - "P02 GST-021 Interactive Map"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
         - "P06 EMP-030 Venue map"
         - "P08 BO-094 Map Editor & Publish"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: A map with its points and paths
       description: >
         19.2.55. **The whole map in one call.** A guest app opening the map should not make one
@@ -715,6 +738,9 @@ paths:
         - "P01 WEB-039 Venue Map & Wait Times"
         - "P02 GST-021 Interactive Map"
         - "P08 BO-094 Map Editor & Publish"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: The navigation graph, ready to route over
       description: >
         19.2.56. **The platform guarantees the graph; the client routes over it.** That division
@@ -1011,6 +1037,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
+      security:
+      - guestAuth: []
+      - bearerAuth: []
       summary: The published maps of a venue that carry bookable spots
       description: >
         **How a guest finds the map to pick a cabana on** (decided 29 September, readiness
@@ -1063,8 +1092,375 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/BookableVenueMaps' }
+  /visit-plans:
+    post:
+      operationId: generateVisitPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-051 Plan"
+        - "P02 GST-052 Suggested Itineraries"
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 and the Block A re-plan (the Plan tab is Block A, rules planner first, AI planner agent on top; supersedes rev 3 GAP-C3 and audits R187, R209); shape follows createCart (guest-owned, permission null)'
+      summary: Build a visit plan from the party, the dates and what they like
+      description: >
+        **The Plan tab's first answer, and it needs no AI** (29 September, MOB-6). The guest gives
+        party size, each person's height or age, the dates, the pace (packed or relaxed), interests
+        and cuisines; the planner returns one itinerary per day with timed items and add-ons such
+        as Fast Track.
+
+        **Rules, in order.** (1) Candidates: the venue's published map points that are
+        destinations and have a `typicalDurationMinutes`, and the dated performances on each day.
+        (2) Eligibility: a ride whose product's `catalogue.ProductEligibilityRule` excludes anyone
+        in the party by height or age is dropped, and the reason is kept on the plan
+        (`excluded`). (3) Scoring: interest tags matched, then the venue's featured order.
+        (4) Layout: from opening time, the next item is the best-scoring one reachable by walking
+        time over the published graph (`venuemap.path`), with the typical wait for that hour and
+        its duration; a meal is placed at a cuisine-matched dining point around 12:30 and 19:00;
+        `relaxed` leaves a 30-minute gap after every two items and stops by 18:00, `packed` fills
+        to closing. (5) Add-ons: where the expected wait on a planned ride exceeds 30 minutes and
+        the venue sells a Fast Track for it, the add-on is suggested on that item, never added.
+
+        **The same inputs give the same plan**, so the guest can trust that a regenerate changes
+        only what they changed. `presetKey` (or the older `preset`) gives the ready-made day
+        plans of GST-052 (the same rules with preset interests and pace). **The AI planner agent refines a plan; it does
+        not make the first one** (ai `requestSuggestion` kind `itinerary`): when AI is off or
+        fails, this answer is the plan.
+
+        **Owned by the guest session**, as a cart is: a signed-in guest's plan is theirs, an
+        anonymous one is bound to the device session and claimed on sign-in. Nothing is held or
+        sold here; `bookVisitPlan` turns the plan into cart lines.
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VisitPlanRequest' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The plan, version 1, one day per date asked for.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlan' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '422':
+          description: >
+            The venue has no published map, or none of its points carries a planning duration
+            (`venue-not-plannable`), so there is nothing to lay out; or a date is outside the
+            venue's opening calendar (`venue-closed-on-date`); or `presetKey` names no ready-made plan of
+            the venue (`unknown-preset`). The problem names which.
+          x-ticvai-problem-types:
+            - venue-not-plannable
+            - venue-closed-on-date
+            - unknown-preset
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /visit-plans/{planId}:
+    parameters:
+      - name: planId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getVisitPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-053 Your Plan"
+        - "P02 GST-054 AI Planner"
+        - "P02 GST-059 Plan in Progress"
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 (Plan tab Block A); shape follows getVenueMap (version query)'
+      summary: A visit plan, at its current version or an earlier one
+      description: >
+        The plan with its days and items (29 September, MOB-6). **`version` reads an earlier
+        version**, which is what lets GST-053 show what undo would restore before the guest
+        commits to it. Only the guest session that owns the plan may read it (404 otherwise,
+        never 403, so a plan id reveals nothing).
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          schema: { type: integer, minimum: 1 }
+          description: Absent means the current version.
+      responses:
+        '200':
+          description: The plan
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlan' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateVisitPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-053 Your Plan"
+        - "P02 GST-054 AI Planner"
+        - "P02 GST-059 Plan in Progress"
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 (swap, remove, add and undo on GST-053); shape follows setVenuePoint (optimistic version)'
+      summary: Swap, remove, add, move or undo, as a new version
+      description: >
+        **Every change is a new version, so undo is a change too** (29 September, MOB-6). The body
+        names the version it was made against (`baseVersion`) and a list of changes: `swap` an
+        item for an alternative from `listVisitPlanAlternatives`, `remove`, `add` a point or a
+        performance, `move` an item to another time, or `revertTo` an earlier version. The server
+        re-lays the affected day with the same rules as `generateVisitPlan`, so the times after a
+        change still add up, and returns the new current version.
+
+        **A stale `baseVersion` is refused 409 `plan-version-conflict`** rather than merged: the
+        AI planner agent and the guest can both change a plan, and a change made against a plan
+        the guest no longer sees is a change they did not choose.
+
+        **The AI planner agent calls this as the guest** (ai `setAiTool`, toolKey
+        `venue-map.updateVisitPlan`): the agent's proposal becomes a version the guest can undo.
+        AI never writes the plan tables itself (ADR-0020).
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VisitPlanUpdate' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The new current version
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlan' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: >
+            `baseVersion` is not the current version (`plan-version-conflict`), or the plan is
+            already `booked` (`plan-booked`; a booked plan is read-only, generate a new one).
+          x-ticvai-problem-types:
+            - plan-version-conflict
+            - plan-booked
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            A change names an item not on the plan, a `revertTo` version that does not exist, or a
+            point the party is not eligible for (`item-not-eligible`, with the rule that excludes).
+          x-ticvai-problem-types:
+            - item-not-eligible
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /visit-plans/{planId}/items/{itemId}/alternatives:
+    parameters:
+      - name: planId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - name: itemId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: listVisitPlanAlternatives
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-053 Your Plan"
+        - "P02 GST-059 Plan in Progress"
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 (swap on GST-053); shape follows listForecastDefinitions (paged)'
+      summary: What could take this item's place
+      description: >
+        **The swap sheet** (29 September, MOB-6): points and performances the whole party is
+        eligible for that fit the item's slot, best first by interest match, then by the time
+        lost to walking and the expected wait. Each carries why it was offered, so the sheet can
+        say *"Same thrill level, 4 minutes closer"*. Computed on read, never stored; choosing one
+        is an `updateVisitPlan` `swap`.
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: kind
+          in: query
+          schema: { type: string, enum: [attraction, show, meal, shop, rest] }
+          description: Only alternatives of this kind. Absent means the item's own kind.
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Alternatives, best first
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/VisitPlanAlternative' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+
+  /visit-plans/{planId}/booking:
+    parameters:
+      - name: planId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: bookVisitPlan
+      x-ticvai-consumed-by:
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-053 Your Plan"
+      security:
+      - guestAuth: []
+      x-ticvai-agreed: '29 September: MOB-6 ("Book this plan" to GST-041); shape follows addCartLine, whose rules it applies line by line'
+      summary: Book this plan — turn it into cart lines
+      description: >
+        **"Book this plan"** (29 September, MOB-6). For each item that is bought (an admission per
+        day, a timed attraction, a show performance, a meal combo, an accepted Fast Track add-on)
+        the server adds a line to the guest's cart **by the orders service's `addCartLine`, with
+        its rules unchanged**: the 15-minute lease, the capacity refusal, the seat limit, the
+        info-only refusal. Free items (a walk-up ride, a toilet, a photo spot) add nothing.
+        Quantities come from the party: one admission per person by their age band's variant.
+
+        **The cart handoff.** With `cartId`, lines are added to that cart; without it a cart is
+        created for the venue and the guest channel (`orders.createCart`), exactly as the Buy
+        tickets button would. The response is the cart id, the lines added and each item that
+        could not be added with the `addCartLine` refusal it met (`soldOutForSession`,
+        `productInfoOnly`, ...). **A partly booked plan is still a success**: the guest goes to
+        GST-041 with what was added and the plan marks the rest, rather than losing the whole
+        plan to one sold-out show. Nothing is paid here; checkout is `orders.checkoutCart`.
+
+        The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets shows what was
+        bought. `baseVersion` must be current (409 as `updateVisitPlan`).
+      tags: [visitPlan]
+      x-ticvai-permission: null
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [guest]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [baseVersion]
+              properties:
+                baseVersion:
+                  type: integer
+                  minimum: 1
+                  description: The version the guest is looking at.
+                cartId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The guest's open cart. Null creates one.
+                itemIds:
+                  type: array
+                  items: { type: string, format: uuid }
+                  description: Only these items. Empty books every bookable item of every day.
+                includeAddOns:
+                  type: boolean
+                  default: true
+                  description: Also add the add-ons the guest accepted on the plan (`VisitPlanItem.addOnAccepted`).
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Lines added, and what could not be
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlanBooking' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: >
+            `baseVersion` is not current (`plan-version-conflict`), or the cart is not the caller's
+            or is no longer open (`cart-not-open`). Refusals of single lines are not a 409; they
+            are listed in `VisitPlanBooking.notAdded`.
+          x-ticvai-problem-types:
+            - plan-version-conflict
+            - cart-not-open
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            Nothing on the plan could be added (`nothing-bookable`); the problem lists each item's
+            refusal, so the guest is told why rather than taken to an empty cart.
+          x-ticvai-problem-types:
+            - nothing-bookable
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Staff session token (common.yaml bearerAuth). Added 29 September (system-design review SD-054).
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
   # **Server-owned fields are `readOnly`.** createVenueMap, setVenuePoint and the two accept
   # operations take these schemas as their body, and without the marks a client had to invent the
   # id, the status and the scope path. OpenAPI 3.1: a `readOnly` property listed in `required` is
@@ -1075,6 +1471,304 @@ components:
   # working draft; each publish copies them into a `VenueMapVersion` snapshot, and a guest reads a
   # snapshot. Closures sit on the path row and apply to both.
   schemas:
+    VisitPlanRequest:
+      type: object
+      x-ticvai-persistence: none — request only; kept as `inputs` on venuemap.visit_plan
+      description: >
+        What `generateVisitPlan` takes (29 September, MOB-6): the Plan tab's form on GST-051 and
+        WEB-050.
+      required: [venueId, dates, party]
+      properties:
+        venueId: { type: string, format: uuid }
+        dates:
+          type: array
+          minItems: 1
+          maxItems: 7
+          items: { type: string, format: date }
+        party:
+          type: array
+          minItems: 1
+          maxItems: 20
+          description: >
+            One entry per person. **Height where the guest knows it, age otherwise**: height is what
+            ride eligibility rules test, and an age band is the fallback the rule may also state.
+            Nothing here identifies a person.
+          items:
+            type: object
+            properties:
+              heightCm: { type: integer, minimum: 40, maximum: 230, nullable: true }
+              ageYears: { type: integer, minimum: 0, maximum: 120, nullable: true }
+        pace:
+          type: string
+          enum: [packed, relaxed]
+          default: relaxed
+        interestTags:
+          type: array
+          maxItems: 12
+          description: The same closed list as `VenuePoint.interestTags`.
+          items: { type: string }
+        cuisineTags:
+          type: array
+          maxItems: 8
+          items: { type: string }
+        mustIncludePointIds:
+          type: array
+          maxItems: 10
+          items: { type: string, format: uuid }
+        preset:
+          type: string
+          nullable: true
+          enum: [highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining]
+          description: >
+            A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and
+            the pace, and the party still decides eligibility.
+        presetKey:
+          type: string
+          nullable: true
+          maxLength: 64
+          pattern: '^[a-z][a-zA-Z0-9]*$'
+          description: >
+            The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the
+            built-in `preset` keys above, or a key of a ready-made plan the venue defines. **The same
+            rules planner runs**: the preset only supplies interests, pace and must-include points,
+            and the party still decides eligibility. When both `preset` and `presetKey` are sent they
+            must name the same plan; `presetKey` is the field new clients send. An unknown key is
+            refused 422 `unknown-preset`.
+        startTime:
+          type: string
+          nullable: true
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+          description: When the party arrives. Null means opening time.
+        locale: { type: string, nullable: true }
+
+    VisitPlan:
+      type: object
+      x-ticvai-persistence: venuemap.visit_plan
+      description: >
+        **A guest's visit plan** (29 September, MOB-6): the Plan tab. One row per plan; its items are
+        `venuemap.visit_plan_item` rows carrying the version they belong to, so every earlier version
+        stays readable and undo is a new version equal to an old one. **Owned by the guest session**,
+        like a cart: `subjectId` when signed in, `sessionRef` for an anonymous device session, claimed
+        on sign-in.
+      required: [id, venueId, status, version, days]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        venueId: { type: string, format: uuid }
+        scopePath:
+          type: string
+          readOnly: true
+          description: Derived from `venueId`.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: marketing.guest_profile
+          description: The signed-in guest. From the session, never from the body.
+        sessionRef:
+          type: string
+          nullable: true
+          readOnly: true
+          description: The anonymous device session that owns the plan until sign-in.
+        status:
+          type: string
+          enum: [draft, booked, archived]
+          readOnly: true
+          description: '`booked` after `bookVisitPlan`; a booked plan is read-only. `archived` after its last date.'
+        version:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: The current version. Every `updateVisitPlan` adds one.
+        source:
+          type: string
+          enum: [rules, preset, aiAgent]
+          readOnly: true
+          description: >
+            What produced the current version: the rules planner, a preset, or the AI planner agent
+            acting for the guest. **The guest sees which**, as every AI answer says what it is based on.
+        inputs:
+          $ref: '#/components/schemas/VisitPlanRequest'
+        mapVersion:
+          type: integer
+          readOnly: true
+          description: The published map version the plan was laid out on.
+        cartId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: orders.cart
+          description: The cart `bookVisitPlan` filled.
+        excluded:
+          type: array
+          readOnly: true
+          description: >
+            **What was left out and why**, e.g. a coaster excluded because one of the party is under
+            its 120 cm minimum. Shown on GST-053, so the planner never looks as if it forgot.
+          items:
+            type: object
+            properties:
+              pointId: { type: string, format: uuid }
+              productId: { type: string, format: uuid, nullable: true }
+              reason: { type: string, enum: [heightRule, ageRule, closedOnDate, notInInterests, noTime] }
+        days:
+          type: array
+          readOnly: true
+          description: One per date, in order. The items of the version read.
+          items:
+            type: object
+            required: [date, items]
+            properties:
+              date: { type: string, format: date }
+              opensAt: { type: string, nullable: true }
+              closesAt: { type: string, nullable: true }
+              items:
+                type: array
+                items: { $ref: '#/components/schemas/VisitPlanItem' }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+
+    VisitPlanItem:
+      type: object
+      x-ticvai-persistence: venuemap.visit_plan_item
+      description: >
+        **One timed stop on a plan day** (29 September, MOB-6). Rows are kept per `planVersion`: a
+        change writes the day's items again under the new version, and an older version's rows are
+        never updated.
+      required: [id, planId, planVersion, date, sequence, kind, startsAt, endsAt]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        planId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: venuemap.visit_plan
+        planVersion: { type: integer, minimum: 1, readOnly: true }
+        date: { type: string, format: date }
+        sequence: { type: integer, minimum: 1 }
+        kind: { type: string, enum: [attraction, show, meal, shop, rest, travel] }
+        pointId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: venuemap.point
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.product
+          description: What is bought for this stop, where it is bought. Null for a free stop.
+        bundleId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: promotions.bundle
+          description: A meal combo or package, from the point's `featuredOffer`.
+        performanceId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: catalogue.performance
+        startsAt: { type: string, format: date-time }
+        endsAt: { type: string, format: date-time }
+        walkMinutesBefore: { type: integer, minimum: 0, nullable: true }
+        expectedWaitMinutes:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one.
+        addOnSuggestion:
+          type: object
+          nullable: true
+          description: A suggested add-on for this stop, e.g. Fast Track where the wait is long. Never added by itself.
+          properties:
+            productId: { type: string, format: uuid }
+            reason: { type: string }
+        addOnAccepted:
+          type: boolean
+          default: false
+        pinned:
+          type: boolean
+          default: false
+          description: The guest fixed this stop; a re-lay moves other stops around it.
+        note: { type: string, nullable: true, maxLength: 200 }
+
+    VisitPlanUpdate:
+      type: object
+      x-ticvai-persistence: none — request only; lands as a new version of venuemap.visit_plan_item rows
+      description: What `updateVisitPlan` takes (29 September, MOB-6).
+      required: [baseVersion, changes]
+      properties:
+        baseVersion: { type: integer, minimum: 1 }
+        changes:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items:
+            type: object
+            required: [op]
+            properties:
+              op: { type: string, enum: [swap, remove, add, move, pin, acceptAddOn, declineAddOn, revertTo] }
+              itemId: { type: string, format: uuid, nullable: true }
+              date: { type: string, format: date, nullable: true }
+              pointId: { type: string, format: uuid, nullable: true }
+              performanceId: { type: string, format: uuid, nullable: true }
+              startsAt: { type: string, format: date-time, nullable: true }
+              version:
+                type: integer
+                nullable: true
+                description: For `revertTo`, the earlier version to restore (undo).
+
+    VisitPlanAlternative:
+      type: object
+      x-ticvai-persistence: none — computed on read
+      description: One candidate for a swap (29 September, MOB-6).
+      required: [kind, startsAt, reason]
+      properties:
+        kind: { type: string, enum: [attraction, show, meal, shop, rest] }
+        pointId: { type: string, format: uuid, nullable: true }
+        productId: { type: string, format: uuid, nullable: true }
+        performanceId: { type: string, format: uuid, nullable: true }
+        name: { type: string }
+        startsAt: { type: string, format: date-time }
+        durationMinutes: { type: integer }
+        walkMinutes: { type: integer, nullable: true }
+        expectedWaitMinutes: { type: integer, nullable: true }
+        matchedInterests: { type: array, items: { type: string } }
+        reason:
+          type: string
+          description: Why it is offered, in words the sheet shows, e.g. *Same thrill level, 4 minutes closer*.
+
+    VisitPlanBooking:
+      type: object
+      x-ticvai-persistence: none — computed; the lines are orders.cart_line rows
+      description: 'What `bookVisitPlan` returns (29 September, MOB-6): the cart handoff.'
+      required: [planId, cartId, added, notAdded]
+      properties:
+        planId: { type: string, format: uuid }
+        cartId: { type: string, format: uuid }
+        added:
+          type: array
+          items:
+            type: object
+            properties:
+              itemId: { type: string, format: uuid }
+              cartLineId: { type: string, format: uuid }
+              leaseExpiresAt: { type: string, format: date-time, nullable: true }
+        notAdded:
+          type: array
+          description: Items that could not be added, with the `addCartLine` refusal each met.
+          items:
+            type: object
+            properties:
+              itemId: { type: string, format: uuid }
+              reason:
+                type: string
+                description: The orders `CartProblem` code, e.g. `soldOutForSession`, `productInfoOnly`, `seatLimitExceeded`.
+        freeItems:
+          type: integer
+          description: Stops that need nothing bought.
     BookableVenueMaps:
       type: object
       description: >
@@ -1305,7 +1999,10 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: For a ride or show — links to wait times and to booking.
+          description: >
+            For a ride or show — links to wait times and to booking. **What a guest is offered
+            from any point, including a restaurant or a shop, is `featuredOffer`** (29 September,
+            MOB-4); this link stays for wait times.
         accessPointId:
           type: string
           format: uuid
@@ -1340,6 +2037,85 @@ components:
             Separate from `isNavigable` because the two differ: a junction is navigable and not a
             destination, and a fenced landmark is a destination you can be shown but not walked
             into.
+        description:
+          type: object
+          nullable: true
+          additionalProperties: { type: string, maxLength: 1000 }
+          description: >
+            **What the guest reads on Item Detail** (29 September, MOB-4). Keyed by locale, like
+            `nameLocalised`. One screen now serves rides, shows, restaurants and shops (GST-004 and
+            GST-006 merged), and it opens from the map pin, so the point carries the words rather
+            than each kind borrowing them from a different module. Set on BO-094.
+        media:
+          type: array
+          maxItems: 12
+          description: >
+            **The gallery on Item Detail** (29 September, MOB-4): images and short clips from the
+            asset library, first `isPrimary` shown on the map card. Assets are referenced, never
+            copied, so a replaced photo changes everywhere.
+          items:
+            type: object
+            required: [assetId, kind]
+            properties:
+              assetId:
+                type: string
+                format: uuid
+                x-ticvai-references: assets.media_asset
+              kind: { type: string, enum: [image, video] }
+              isPrimary: { type: boolean, default: false }
+              altText: { type: string, nullable: true, maxLength: 200 }
+        featuredOffer:
+          type: object
+          nullable: true
+          required: [kind, id]
+          description: >
+            **The product card on Item Detail, for every kind of point** (29 September, MOB-4).
+            `productId` above links a ride or show to its wait times; this is what the guest is
+            offered from the point, and it may be a bundle: a restaurant offers *meal combo with
+            admission* (`promotions` bundle with an admission and a meal component), which checks
+            out in about three steps (GST-004 → GST-056 → GST-041). A point with none shows no card.
+            **Referenced, not priced here**: the card reads `catalogue.getProduct` or
+            `promotions.getBundle` for the live price and availability.
+          properties:
+            kind: { type: string, enum: [product, bundle] }
+            id:
+              type: string
+              format: uuid
+              description: The `catalogue.product` id or the `promotions.bundle` id, by `kind`.
+            label:
+              type: string
+              nullable: true
+              maxLength: 40
+              description: The button text, e.g. *Buy meal combo*. Null uses the product's own call to action.
+        typicalDurationMinutes:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 600
+          description: >
+            **How long a visit to this point usually takes**, ride time and queue excluded (29
+            September, MOB-6). The visit planner lays out a day with it; the queue comes from
+            `queue.getWaitTimes` on the day. Null for a point the planner never places (a toilet).
+        interestTags:
+          type: array
+          maxItems: 12
+          description: >
+            **What a guest who says they like this would like here** (29 September, MOB-6): the
+            planner matches the guest's interests against these. A closed list so that the
+            Plan tab's interest chips and the venue's tags are the same words.
+          items:
+            type: string
+            enum: [thrill, family, kids, water, animals, shows, culture, shopping, dining, relaxing,
+                   photo, adventure, sport, nightlife, indoor]
+        cuisineTags:
+          type: array
+          maxItems: 8
+          description: >
+            **For dining points** (restaurant, cafe, kiosk; 29 September, MOB-6). The planner places
+            meals at points whose cuisine the party chose, at meal times. Free text codes such as
+            `arabic`, `indian`, `italian`, `fastFood`, `vegetarian`, `halal` — cuisines are too many
+            to close, and a wrong enum is worse than an unmatched tag.
+          items: { type: string, maxLength: 30 }
 
     SetVenuePointRequest:
       description: >

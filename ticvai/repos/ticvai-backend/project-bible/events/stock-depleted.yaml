@@ -7,6 +7,8 @@ publisher: inventory
 description: Stock left a location — sold, wasted, transferred or counted out.
 aggregate: inventoryItem
 emittedWhen: Any movement posted to the ledger
+emittedBy:
+- postStockCount
 payload:
 - field: movementId
   type: string

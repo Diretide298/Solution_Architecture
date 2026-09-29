@@ -66,10 +66,22 @@ TRADING_NOUN = re.compile(r"WorkOrder|WaitTime|QueueStatus|PathClosure")
 TRADING_PERM = re.compile(r"_(EXECUTE|VALIDATE|BOOK|CREATE|MODIFY)$")
 
 
+# **Operations Block A needs that no core screen calls** (30 September). The AI engine answers through
+# the gateway on every AI call (governance decision point, usage and policy), the operator side of the
+# no-data AI the Block A apps use (Help me choose question sets, CMS translations), and the map-import
+# label suggestion on BO-093, a Venue Management setup screen the setup walk does not reach because it
+# writes no table a core operation reads. From the AI functions review and the P29 pass.
+ALSO = ["evaluateAiGovernance", "getAiUsage", "getAiPolicy", "proposeGuidedChoice", "proposeTranslations",
+        "proposeVenueLabels", "getAiVenueSettings", "setAiVenueSettings", "importVenueHistory",
+        "listVenueHistoryImports", "getVenueHistoryImport"]
+
+
 def is_deferred(s: dict) -> bool:
     """**A screen with a `deferred` block is out of the first release** (decided 28 September, audit
-    R187 and R242): the itinerary planner GST-051..054 and GST-059, and the in-venue notifications feed
-    GST-030 and WEB-046, all `wave: 4`. Kept in the package for the release that builds them, but
+    R187 and R242). None is deferred today: the in-venue notifications feed GST-030 and WEB-046 came back in
+    rev 3 (R242 reversed), and the itinerary planner
+    GST-051..054 and GST-059 was deferred the same way and came back into Block A on 29 September (MoM
+    MOB-6: the Plan tab); its `deferred` blocks were removed. Kept in the package for the release that builds them, but
     neither they nor the operations only they call may count toward Block A."""
     return bool(s.get("deferred"))
 
@@ -127,6 +139,9 @@ def main() -> int:
             if not t.startswith("cache:"):
                 writers[t].add(o)
 
+    for o in ALSO:
+        if o in lineage:
+            core.setdefault(o, set()).add("AI")
     slice_ = set(core)
     setup_for: dict[str, set[str]] = defaultdict(set)  # setup op -> tables it makes non-empty
     while True:

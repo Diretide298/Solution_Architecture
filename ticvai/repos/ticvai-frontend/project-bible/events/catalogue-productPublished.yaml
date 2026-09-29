@@ -7,6 +7,8 @@ publisher: catalogue
 description: A product is on sale, or has returned to sale.
 aggregate: product
 emittedWhen: ProductLifecycleState approved or withdrawn to live
+emittedBy:
+- transitionProductLifecycle
 payload:
 - field: productId
   type: uuid

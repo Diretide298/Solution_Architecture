@@ -180,7 +180,8 @@ operations:
   offline: false
   reads:
   - platform.wallet_authorisation
-  writes: []
+  writes:
+  - platform.wallet_authorisation
 - operation: resolveGuestLink
   verb: GET
   path: /guest-links/resolve

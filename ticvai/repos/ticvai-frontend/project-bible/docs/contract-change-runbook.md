@@ -153,7 +153,15 @@ burst scope and both workbooks, **while every checker passes.**
 10. **Read the checker block at the end.** Twenty-four checks, all non-fatal so one failure cannot
     hide the twenty-three below it. The baseline is `check-screens` PASS and `check-package` 9.
 11. **Re-check ring 4 by hand.** Nothing else will.
-12. **Only then commit**, and scope the commit to the work actually done.
+12. **A frozen contract passes the breaking-change gate** (ADR-0026; SD-050 and 17 September minutes
+    M17-14, added 30 September). `python3 tools/check-contract-compat.py` refuses, against the
+    `--freeze` baseline, a removed or moved operation, a removed or retyped field, anything newly
+    required in a request, **a new value in a response enum**, and a change to an operation's
+    `x-ticvai-permission`, `x-ticvai-conflict-policy`, `x-ticvai-read-routing`, `security` or
+    `x-ticvai-emits`. A breaking change is a new major version. At release,
+    `--changes <contract>` prints the diff as `ApiVersion.changes` rows for the developer changelog
+    (DEV-001), so the changelog is generated, not written.
+13. **Only then commit**, and scope the commit to the work actually done.
 
 ---
 

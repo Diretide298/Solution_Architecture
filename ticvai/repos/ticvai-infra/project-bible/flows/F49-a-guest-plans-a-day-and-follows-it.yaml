@@ -3,81 +3,107 @@ id: F49
 name: A guest plans a day and follows it
 actor: guest
 capability: Itinerary planning
-wave: 4
-deferred:
-  release: later
-  decided: '2026-09-28'
-  decision: R187
-  reason: The itinerary planner is deferred to a later release and its five screens leave Block A,
-    since no itinerary schema, operation, table or on-device store exists to build them against.
+wave: 1
 frequency: Routine.
 criticality: revenue
-primaryContract: ai
+primaryContract: venue-map
 contracts:
+- venue-map
 - ai
 - catalogue
+- orders
 - queue
 platforms:
 - P02
+- P01
 trigger:
   description: A guest with a whole day and too many options. **Planning is the feature a venue sells
-    a full-day ticket on.**
-offlineBehaviour: '**A saved itinerary reads offline; building one does not.** The plan is worth having
-  in a basement; making it needs availability nobody can cache.'
+    a full-day ticket on.** On the app it is the Plan tab (GST-051); on the web, *Plan your visit* in
+    the header (WEB-050).
+  entryScreen: GST-051
+offlineBehaviour: '**A saved plan reads offline; building or booking one does not.** The plan is worth
+  having in a basement; making it needs availability nobody can cache.'
 steps:
 - step: 1
   screen: GST-051
-  action: They start planning.
+  action: They answer six questions (party, heights, days, pace, interests, lunch) and choose Make my
+    plan.
   operations:
-  - listProducts
-  outcome: What is on, and when.
+  - generateVisitPlan
+  outcome: '**The rules planner, no AI.** A plan per day that leaves out rides over a child''s height
+    and plans lunch where the chosen cuisine is served.'
 - step: 2
-  screen: GST-052
-  action: Suggested itineraries are offered.
-  operations:
-  - listProducts
-  outcome: '**Seeded, not generated, on day one.** A venue with no history has nothing to learn from,
-    and a suggestion built on nothing is worse than a curated list.'
-  crossesDevice: true
-- step: 3
   screen: GST-053
-  action: They build their own instead.
+  action: They swap, remove and add items, undo a change and add Fast Track.
   operations:
-  - listProducts
-  outcome: '**Availability at build time, not at save time.** A plan that books nothing is a plan the
-    venue cannot honour.'
-  crossesDevice: true
-- step: 4
+  - getVisitPlan
+  - listVisitPlanAlternatives
+  - updateVisitPlan
+  outcome: '**Every change is a new version**, so undo is one step back. Swap candidates suit everyone
+    in the party.'
+- step: 3
   screen: GST-054
-  action: An optimised order is proposed.
+  action: They ask the AI planner to change the plan in their own words.
   operations:
-  - listProducts
-  - getWaitTimes
-  outcome: '**No AI suggestion for an itinerary** (decided 28 September, audit R209): the planner is deferred
-    (R187) and `requestSuggestion` has no guest itinerary kind; `scenario` is staff-only. The later release
-    decides how an order is proposed.'
-  crossesDevice: true
+  - sendAiMessage
+  - requestSuggestion
+  - updateVisitPlan
+  outcome: '**The agent refines the rules plan** through the plan operations (`requestSuggestion` kind
+    `itinerary`, guest-allowed since 29 September). With AI off or failing the rules plan stays.'
+- step: 4
+  screen: GST-053
+  action: They choose Book this plan.
+  operations:
+  - bookVisitPlan
+  outcome: The plan and its add-ons become cart lines; the guest confirms dates and tickets in the basket.
 - step: 5
+  screen: GST-041
+  action: They check out.
+  operations:
+  - getCart
+  - checkoutCart
+  outcome: Paid like any other basket; the tickets land on the Tickets tab.
+- step: 6
   screen: GST-059
   action: They follow it through the day.
   operations:
+  - getVisitPlan
   - getWaitTimes
-  outcome: '**Re-ordered as waits change.** A plan fixed at 9am is a plan abandoned by 11.'
+  - updateVisitPlan
+  outcome: '**Re-ordered as waits change**, with the guest deciding. A plan fixed at 9am is a plan
+    abandoned by 11.'
   crossesDevice: true
 exitStates:
 - state: followed
-  description: Planned and largely followed.
+  description: Planned, booked and largely followed.
+- state: planned
+  description: Planned and saved but not booked; the plan stays on the Plan tab.
 - state: abandoned
   description: '**Plans are abandoned constantly and that is normal** — the value is in what was attempted.'
 branches:
+- at: 1
+  condition: Nothing suits the whole party on the chosen day (every ride is over a child's height, or
+    the park is closed).
+  behaviour: '**Refused with a reason**, naming the answer that ruled everything out, and the answers
+    are kept so changing one costs nothing.'
+  severity: recoverable
+  resolvedBy: guest
+- at: 3
+  condition: AI is off for the venue, not licensed, or the call fails or times out.
+  behaviour: '**Falls back to the rules plan, never to an error.** The planner chat says it is
+    unavailable; everything on GST-053 keeps working.'
+  severity: recoverable
+  resolvedBy: Automatic
 - at: 4
-  condition: There is not enough history to optimise.
-  behaviour: '**Refused with a reason**, naming what is missing. A confident itinerary built on nothing
-    teaches a guest not to trust the next one. (The mechanism is the later release''s to choose; not
-    `requestSuggestion`, audit R209.)'
-  severity: medium
-  resolvedBy: Later release
-notes: '**Written 24 August.** Five screens. **Deferred to a later release on 28 September** (audit R187):
-  all five screens (GST-051 to GST-054, GST-059) carry a `deferred` block, and neither this flow nor
-  its screens count toward Block A. `GST-054` no longer calls `requestSuggestion` (audit R209).'
+  condition: An item sold out after the plan was made.
+  behaviour: The basket is not built for that item; the guest is told which one and offered a swap,
+    and the rest of the plan is kept.
+  severity: recoverable
+  resolvedBy: guest
+notes: '**Written 24 August.** **Deferred on 28 September** (audit R187) and **brought into Block A on
+  29 September** (the 29 September re-plan, MOB-6): a rules-based Plan tab with the AI planner agent
+  on top, superseding R187, the deferral half of R209 and rev 3 GAP-C3. The web runs the same planner
+  on WEB-050 (questions, plan, Book this plan to the cart). The plan operations are venue-map
+  `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives` and
+  `bookVisitPlan` (tables `venuemap.visit_plan`, `venuemap.visit_plan_item`).'
 openQuestions: null

@@ -104,7 +104,6 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - platform.scope
   - resources.resource
   writes:
   - cache:idempotency
@@ -315,6 +314,8 @@ operations:
   - maintenance.work_order
   - resources.booking
   - resources.resource
+  - resources.resource_block
+  - resources.resource_hold
   writes: []
 - operation: getResourceCalendar
   verb: GET

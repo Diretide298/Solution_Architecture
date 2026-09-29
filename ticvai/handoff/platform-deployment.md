@@ -6,11 +6,11 @@ This table was maintained by hand until 26 August and held **twelve rows against
 
 **A figure typed once is correct once.** `platform-P01.md` claimed 35 screens against a live 46; the viewer carried *654 operations* in 25 places against a live 1,023. This file is now derived for the same reason both of those were fixed.
 
-**16 platforms · 2440 screens · 8 drawn.**
+**16 platforms · 2445 screens · 8 drawn.**
 
 | | Short | Purpose | Audience | Form factor | App | Offline | Screens | Drawn |
 |---|---|---|---|---|---|---|---:|---:|
-| P01 | **Guest Web** | Guest Web — Storefront | guest | web | `guest-web` | no | 49 | 1 |
+| P01 | **Guest Web** | Guest Web — Storefront | guest | web | `guest-web` | no | 50 | 1 |
 | P02 | **Guest App** | Guest App — Mobile | guest | mobileApp | `guest-app` | yes | 77 | 0 |
 | P04 | **Venue POS** | Venue POS — Terminal and Tablet | staff | posTerminal | `venue-pos` | yes | 30 | 7 |
 | P05 | **Guest Kiosk** | Guest Kiosk — Self-Service | guest | kiosk | `guest-app` | no | 17 | 0 |
@@ -21,10 +21,10 @@ This table was maintained by hand until 26 August and held **twelve rows against
 | P10 | **Partner Web** | Partner Web — Reseller Portal | partner | web | `partner-web` | no | 51 | 0 |
 | P11 | **Accreditation Web** | Accreditation Web — Applications | public | web | `accreditation-web` | no | 8 | 0 |
 | P12 | **Venue Support** | Venue Support — Agent Console | staff | web | `venue-support-web` | no | 28 | 0 |
-| P13 | **Venue CMS** | Venue CMS — White Label | staff | web | `venue-management-web` | no | 100 | 0 |
+| P13 | **Venue CMS** | Venue CMS — White Label | staff | web | `venue-management-web` | no | 103 | 0 |
 | P14 | **Developer** | Developer Portal | partner | web | `developer-portal-web` | no | 8 | 0 |
 | P15 | **Kitchen Display** | Kitchen Display — Pass and Stations | staff | kiosk | `kitchen-display` | yes | 10 | 0 |
-| P16 | **Venue Analytics** | Venue Analytics — Cross-Domain Reporti | staff | web | `venue-management-web` | no | 69 | 0 |
+| P16 | **Venue Analytics** | Venue Analytics — Cross-Domain Reporti | staff | web | `venue-management-web` | no | 70 | 0 |
 | P17 | **TICVAI Sign-up** | TICVAI Sign-up — Onboarding & Purchase | public | web | `signup-web` | no | 24 | 0 |
 
 ## What the columns mean

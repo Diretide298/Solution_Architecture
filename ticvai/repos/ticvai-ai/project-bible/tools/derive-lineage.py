@@ -92,6 +92,9 @@ def persistence_map() -> dict:
     return out
 
 
+_VALID_TABLE = re.compile(r"^[a-z][a-z0-9_]*\.[a-z][a-z0-9_]*$")
+
+
 def _snake(name: str) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
 
@@ -470,11 +473,23 @@ def main() -> int:
     if not a.apply:
         print("\n  nothing written - pass --apply")
         return 0
-    if not missing and not repaired and not moved and not rehomed and not followed:
+    _bad = sum(1 for v in stored.values() for k in ("reads", "writes") for t in (v.get(k) or [])
+               if ":" not in t and not _VALID_TABLE.match(t))
+    if not missing and not repaired and not moved and not rehomed and not followed and not _bad:
         print("  nothing to add")
         return 0
     for o in missing:
         stored[o] = {k: v for k, v in fresh[o].items() if not k.startswith("_")}
+    # **A name that is not `<schema>.<table>` is not a table, and is removed** (SD-007, 29
+    # September). The one exception to "never removed": authored entries carried the prose after
+    # `none —` (`embedded as attributes (jsonb) on orders.cart_line ...`) and table names with a
+    # parenthetical, and every derivation downstream turned them into schemas, tables and keys.
+    for o in stored:
+        for key in ("reads", "writes"):
+            vals = stored[o].get(key) or []
+            keep = [t for t in vals if ":" in t or _VALID_TABLE.match(t)]
+            if len(keep) != len(vals):
+                stored[o][key] = keep
     LINEAGE.write_text(json.dumps(stored, indent=1, ensure_ascii=False), encoding="utf-8")
     print("  added %d · %d operations total -> handoff/%s" % (len(missing), len(stored),
                                                               LINEAGE.name))

@@ -62,7 +62,7 @@ The self-service builder. A definition names its data source, columns, filters, 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
-| Writes | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter`, `reporting.report_definition_version` |
+| Writes | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_definition_version`, `reporting.report_filter`, `reporting.report_parameter` |
 | Called by | ANL-032, ANL-054, BO-029, BO-058, BO-059, BO-060, BO-1060, PTR-018, SUP-008 |
 
 **Parameters**
@@ -200,7 +200,7 @@ Retired rather than deleted where executions or paused schedules reference it â€
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | analytical |
-| Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter`, `reporting.report_definition_version` |
+| Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_definition_version`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | - |
 | Called by | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
@@ -357,7 +357,7 @@ Definitions are versioned. Historic executions keep the version they ran against
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
-| Writes | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter`, `reporting.report_definition_version` |
+| Writes | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_definition_version`, `reporting.report_filter`, `reporting.report_parameter` |
 | Called by | ANL-035, ANL-036, ANL-037, ANL-038, BO-029, BO-058, BO-059, BO-060, PTR-018, SUP-008 |
 
 **Parameters**
@@ -915,7 +915,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
-| Writes | `ai.activity`, `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter`, `reporting.natural_language_query` |
+| Writes | `ai.activity`, `cache:idempotency`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Called by | ANL-052, BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
 **Parameters**

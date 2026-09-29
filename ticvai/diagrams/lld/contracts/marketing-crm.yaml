@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 263 operations
+title: marketing-crm — 264 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -161,7 +161,6 @@ operations:
   offline: false
   reads:
   - marketing.waiver_version_control
-  - marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)
   writes: []
 - operation: awardBadge
   verb: POST
@@ -924,7 +923,6 @@ operations:
   offline: false
   reads:
   - marketing.waiver_signatory_rule
-  - marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)
   writes: []
 - operation: getSuppressionList
   verb: GET
@@ -963,7 +961,6 @@ operations:
   offline: false
   reads:
   - marketing.waiver_version_control
-  - marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)
   writes: []
 - operation: getWishlist
   verb: GET
@@ -2337,6 +2334,24 @@ operations:
   writes:
   - cache:idempotency
   - marketing.case
+- operation: recordCheckoutConsents
+  verb: POST
+  path: /consent-records/checkout
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - marketing.consent_record
+  - marketing.consent_record_channel
+  - marketing.guest_match_policy
+  - marketing.guest_profile
+  - platform.idempotency_record
+  writes:
+  - marketing.consent_record
+  - marketing.consent_record_channel
+  - platform.idempotency_record
 - operation: recordConsent
   verb: POST
   path: /guests/{subjectId}/consents
@@ -3310,10 +3325,8 @@ operations:
   offline: false
   reads:
   - marketing.waiver_signatory_rule
-  - marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)
   writes:
   - marketing.waiver_signatory_rule
-  - marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)
 - operation: setSlaPolicy
   verb: PUT
   path: /sla-policies

@@ -195,6 +195,23 @@ components:
     description: Ordered events with timestamps. Order statements, asset history, audit.
     states: [loading, empty, error]
 
+  - kind: calendarView
+    description: >
+      A scheduling calendar: day, week, month and agenda views of dated records, with hour slots in
+      the day and week views, a category filter and a *today* control.
+    states: [loading, empty, error, filtered]
+    notes: >
+      **Added 30 September for the 17 September minutes (M17-03)**: operators asked for a real
+      calendar, not a table of dates, on every scheduling screen. The day starts at the venue's
+      `VenueSettings.calendarDayStartHour` (tenancy), so a night that runs past midnight stays on
+      its own day. Hour slots default to 60 minutes (15 or 30 where the screen says so). The
+      visible window is sent as the operation's `from`/`to` and the category filter as its
+      `categoryId` where the operation takes them (catalogue `listPerformances`, maintenance
+      `listWorkOrders` and `getDueMaintenance`); otherwise the screen filters what it read. The
+      agenda view is the accessible and narrow-screen rendering, not an afterthought. `timeline`
+      stays the component for ordered history (audit, statements); `calendarView` is for things
+      placed in time.
+
   - kind: emptyState
     description: Illustration, one line of explanation, and the action that resolves it.
     notes: >

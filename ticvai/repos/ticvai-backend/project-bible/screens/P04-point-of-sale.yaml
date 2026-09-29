@@ -1046,14 +1046,6 @@ screens:
     - to: POS-013
       trigger: A guest wants cash back and the drawer is heavy
       provenance: flow F32 step 3→4
-    - to: BO-084
-      trigger: The manager sees it in their inbox
-      provenance: flow F14 step 2→3
-      operation: evaluateApprovalRequirement
-      crossesDevice: true
-      back: false
-      carries:
-      - approvalRequestId
     - to: BO-130
       trigger: Four transactions are rejected — a product retired while the till was offline
       provenance: flow F33 step 6→7
@@ -1091,6 +1083,14 @@ screens:
       carries:
       - orderId
       - outletId
+    - to: BO-084
+      trigger: The manager sees it in their inbox
+      provenance: flow F14 step 2→3
+      operation: evaluateApprovalRequirement
+      crossesDevice: true
+      back: false
+      carries:
+      - approvalRequestId
     - to: GST-026
       trigger: Checks the balance in the app
       provenance: flow F18 step 1→2
@@ -10094,8 +10094,10 @@ screens:
         edge carries nothing and POS-025 opens cold
     - to: POS-022
       trigger: Send to Kitchen
-      provenance: derived — POS-022 declares entryState.params orderId, ticketId and POS-029 holds none
-        of them, so the edge carries nothing and POS-022 opens cold
+      carries:
+      - orderId
+      provenance: derived — POS-022 declares entryState.params orderId, ticketId and POS-029 holds orderId,
+        so an edge into it carries them
   notes: '**The prototype models five stages with the action that leaves each one** — received → *send
     to kitchen*, preparing → *mark ready*, ready → *dispatch / hand over*, out for delivery → *mark delivered*,
     completed → *reopen*. P04 had `listFnbOrders` and nineteen queue operations and no board to work them

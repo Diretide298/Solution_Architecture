@@ -155,6 +155,10 @@ NOT_CONFIG = re.compile(
     # question, an append-only record against one booking. The question itself is configuration
     # (`createConsentQuestion`, scoped); the answer is what happened.
     r"recordConsentAnswers|"
+    # **`recordCheckoutConsents` is the same case** (30 September, M18-15): the service that turns the
+    # opt-ins a guest ticked at checkout into append-only consent records, one per order, channel and
+    # purpose. It is what happened at a checkout, called by the event relay, not a setting anyone holds.
+    r"recordCheckoutConsents|"
     # **`recordDashboardView` is an event, not a setting** (29 September, writers pass): it logs that a
     # person opened a dashboard, for the most-viewed list. It matches `Dashboard`; it configures nothing.
     r"recordDashboardView", re.I)

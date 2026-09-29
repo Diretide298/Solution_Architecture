@@ -1,5 +1,5 @@
 id: LLD-P16
-title: P16 Venue Analytics — Cross-Domain Reporting — 69 screens
+title: P16 Venue Analytics — Cross-Domain Reporting — 70 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -37,12 +37,12 @@ modulesUsed:
 - module: analytics
   screens: 68
 - module: ai
-  screens: 1
+  screens: 2
 servicesCalled:
 - service: ReportingService
   operationCalls: 118
 - service: AiService
-  operationCalls: 31
+  operationCalls: 37
 - service: TenancyService
   operationCalls: 4
 - service: InventoryService
@@ -58,9 +58,9 @@ servicesCalled:
 - service: AccessService
   operationCalls: 1
 coverage:
-  screens: 69
+  screens: 70
   inAFlow: 64
-  drawn: 69
+  drawn: 70
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -402,6 +402,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -410,6 +411,7 @@ screens:
   - suggestionId<-deepLink
   goesTo:
   - ANL-001
+  - ANL-071
   boardFrames:
   - POS Board 6.dc.html#pos-6f
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-010
@@ -1852,3 +1854,31 @@ screens:
   inFlows:
   - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
     Center'
+- screen: ANL-071
+  name: AI Maturity & Learning
+  module: Analytics
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations:
+  - getAiVenueSettings
+  - getVenueHistoryImport
+  - importVenueHistory
+  - listAiCapabilityMaturity
+  - listVenueHistoryImports
+  - setAiVenueSettings
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - importId<-deepLink
+  goesTo:
+  - ANL-010
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-071
+  inFlows: null

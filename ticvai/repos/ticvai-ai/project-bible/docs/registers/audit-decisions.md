@@ -8,7 +8,7 @@
 Each default is what the package builds to from now on, and each stays open to the client's correction:
 a correction is raised as a change request, like any other.
 
-**77 decisions. 77 applied to the package so far.** A decision is applied when every
+**78 decisions. 78 applied to the package so far.** A decision is applied when every
 contract, state model, screen, table and document it touches says the same thing.
 
 | Id | Topic | Decision | Confirms | First release | Applied |
@@ -56,15 +56,15 @@ contract, state model, screen, table and document it touches says the same thing
 | R171 | Inventory rules | (1) Yes. (2) By line. (3) Approved and later. (4) Adjustments and waste need a reason, and the kind decides the direction. (5) Allocated is reserved for orders; available is on-hand minus allocated. (6) Yes. (7) Yes, with blind counts hiding the figure. (8) From the quotation, editable with a reason; PO numbers per venue, in sequence. | Client operations | yes | applied 28 September |
 | R183 | Ownership level | Upsell rules are owned at region and read at venue. Suppliers are owned at tenant, and venues may quote against them. Both venues see a transfer between them. A venue sets only its own matrix, tighter than the level above. | Client operations | yes | applied 28 September |
 | R184 | Second sign-in on a till | Refused, as section 3.1.3 says. A supervisor ends the other session, and POS-000 is reworded. | Client operations | yes | applied 28 September |
-| R187 | Itinerary planner scope | Defer it to a later release and take the five screens out of Block A, since nothing exists to build them against. | Client product | yes | applied 28 September |
+| R187 | Itinerary planner scope | Defer it to a later release and take the five screens out of Block A, since nothing exists to build them against. | Client product | yes | applied 28 September · **superseded in part** |
 | R191 | Posting rules | Use the existing event types, plus two new ones: game credit loaded and points accrued. Entries post to the open period for the event date. Entry numbers run in sequence per legal entity per fiscal year. | Client finance | yes | applied 28 September |
 | R194 | Glossary: Department, zone | Department is canonical. 'Zone' is defined as a physical area inside a venue. | Client product | yes | applied 28 September |
 | R197 | Escalated permissions | Escalate above a configured value threshold to a distinct manager permission. Where no threshold makes sense, drop the escalation. | Client operations / security | yes | applied 28 September |
 | R203 | AI data residency owner | Per tenant with a compliance gate, as ADR-0009 says. Platform staff set it on ADM-037, and a region may restrict the choice. | Client counsel / client product | yes | applied 28 September |
 | R205 | Minors and Face Pass | The signed-in adult enrols a linked child and is recorded as guardian. Counsel sets the age. | Client counsel | yes | applied 28 September, one value open: Counsel sets the age below which a subject is a minor; missing DOB counts as a minor meanwhile. |
-| R209 | Guest AI day plans | Follow R187: if the planner is deferred, remove the itinerary suggestion from those screens. If it ships, add a guest-allowed itinerary kind. | Client product | yes | applied 28 September |
+| R209 | Guest AI day plans | Follow R187: if the planner is deferred, remove the itinerary suggestion from those screens. If it ships, add a guest-allowed itinerary kind. | Client product | yes | applied 28 September · **superseded in part** |
 | R210 | Glossary: Kitchen Ticket | Yes to Kitchen Ticket as its own term. 'QR' is allowed in guest-facing copy only. | Client product | yes | applied 28 September |
-| R213 | AI suggestion rules | (1) We draft a one-line rule and a minimum history per kind for you to correct. (2) Proposed: 7 days; approved but not applied: 24 hours. (3) Anything touching prices or permissions needs a manager; everything else needs the requester's own approval. | Client product | yes | applied 28 September |
+| R213 | AI suggestion rules | (1) We draft a one-line rule and a minimum history per kind for you to correct. (2) Proposed: 7 days; approved but not applied: 24 hours. (3) Anything touching prices or permissions needs a manager; everything else needs the requester's own approval. | Client product | yes | applied 28 September · **superseded in part** |
 | R214 | Subscription rules | (1) Upgrades take effect immediately with proration; downgrades take effect at the next renewal. (2) Active, renewing one term from start. (3) Suspended yes, terminated no. (4) Per tenant, filterable by client. | Client finance / commercial | yes | applied 28 September |
 | R215 | Retail rules | (1) The outlet of the workstation asking; inactive items are not found. (2) At least 15 minutes ahead and no later than the end of the visit day. (3) Receipt barcode first, then receipt number, then order number; several matches return a list. | Client operations (retail) | yes | applied 28 September |
 | R220 | Glossary: Game and Gift Card | Keep Game Card and Gift Card as recorded exceptions, since guests know them by those names. | Client product | yes | applied 28 September |
@@ -90,6 +90,7 @@ contract, state model, screen, table and document it touches says the same thing
 | R283 | Hub screen counts | Bind takings and admissions to getKpiValues. Drop the attention counts until a summary operation exists. | Client operations | no | applied 28 September |
 | STATE-MEDIA | Media library lifecycle | Restore is allowed: archived->ready and quarantined->ready (after review) stay; nothing is terminal except by deletion, which removes the row. | Client product | yes | applied 28 September |
 | STATE-SUBSCRIPTION | Subscription reactivation | Reactivation within the paid period is allowed on the same record; after the period ends the subscription expires and a new one is required. | Client product / finance | no | applied 28 September |
+| R-M18-15 | Marketing opt-in at guest checkout | An unticked opt-in beside the terms, one per channel and purpose; checkoutCart carries marketingConsents[] (never defaulted to granted), bound to the order and the verified contact; marketing recordCheckoutConsents writes each ticked entry as a consent record with source checkout and attaches it to the profile when the contact matches one. Nothing is sent without it. Kept make-or-break on whether a guest-checkout opt-in is sufficient consent under PDPL. | Client legal / DPO | yes | applied 30 September |
 
 ## The questions in full
 
@@ -627,6 +628,8 @@ contract, state model, screen, table and document it touches says the same thing
 
 **Client confirms.** Client product
 
+**Superseded.** Superseded 29 September (MOB-6, the Block A re-plan, Chinmay): the itinerary planner ships in Block A, a rules-based planner with the AI planner agent on top. GST-051..054 and GST-059 lost their deferred block and are wave 1 with their Mobile v4 roles; WEB-050 Plan Your Visit is the web planner; venue-map generateVisitPlan, getVisitPlan, updateVisitPlan, listVisitPlanAlternatives and bookVisitPlan (tables venuemap.visit_plan, venuemap.visit_plan_item) are the operations; flow F49 is wave 1.
+
 ### R191: Posting rules
 
 **Question.** Confirm how each money event posts to the ledger: card payment, cash payment, refund, POS offline sync, loading game credits (a liability), and loyalty points accrual (no event type exists for it). Also, how is a journal entry number formed?
@@ -699,6 +702,8 @@ contract, state model, screen, table and document it touches says the same thing
 
 **Client confirms.** Client product
 
+**Superseded.** The deferral half superseded 29 September (MOB-6): the planner ships, so the other branch of this decision applies. requestSuggestion has a guest-allowed kind `itinerary`, used by GST-054 AI Planner to refine a rules plan; F49 no longer uses kind scenario.
+
 ### R210: Glossary: Kitchen Ticket
 
 **Question.** May 'Kitchen Ticket' be its own glossary term (the order slip on the kitchen display), and may guest-facing copy say 'QR' (GST-055 'Dynamic QR Ticket')?
@@ -722,6 +727,8 @@ contract, state model, screen, table and document it touches says the same thing
 **Decided (28 September, our recommendation).** (1) We draft a one-line rule and a minimum history per kind for you to correct. (2) Proposed: 7 days; approved but not applied: 24 hours. (3) Anything touching prices or permissions needs a manager; everything else needs the requester's own approval.
 
 **Client confirms.** Client product
+
+**Superseded.** Part (1) re-read 29 September (AI2 baseline; AI-D17, 30 September): the minimum history per kind is the point where the tenant's own data takes over from the day-one baseline, not a refusal. requestSuggestion answers from day one with its maturity stated (Suggestion.maturity) and no longer answers 422 insufficient-data. Parts (2) and (3) stand.
 
 ### R214: Subscription rules
 
@@ -1024,3 +1031,15 @@ contract, state model, screen, table and document it touches says the same thing
 **Decided (28 September, our recommendation).** Reactivation within the paid period is allowed on the same record; after the period ends the subscription expires and a new one is required.
 
 **Client confirms.** Client product / finance
+
+### R-M18-15: Marketing opt-in at guest checkout
+
+**Question.** May a guest who checks out without an account opt in to marketing at checkout, and does that opt-in, given against a verified contact, count as marketing consent?
+
+**Why it matters.** The 18 September minutes (M18-15) asked for the opt-in beside the terms at checkout. The package recorded marketing consent only against a guest profile, so a guest-checkout opt-in had nowhere to go, and a pre-ticked or inferred consent is what PDPL forbids.
+
+**Blocks.** WEB-012, GST-009, orders checkoutCart, marketing consent records.
+
+**Decided (28 September, our recommendation).** An unticked opt-in beside the terms, one per channel and purpose; checkoutCart carries marketingConsents[] (never defaulted to granted), bound to the order and the verified contact; marketing recordCheckoutConsents writes each ticked entry as a consent record with source checkout and attaches it to the profile when the contact matches one. Nothing is sent without it. Kept make-or-break on whether a guest-checkout opt-in is sufficient consent under PDPL.
+
+**Client confirms.** Client legal / DPO

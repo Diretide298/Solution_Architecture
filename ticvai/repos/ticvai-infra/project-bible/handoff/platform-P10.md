@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 51 |
-| Operations | 151 |
+| Operations | 142 |
 | Contracts | 10 |
 | Modules | 9 |
 | Undrawn | 0 |
@@ -52,8 +52,8 @@
 | `PTR-002` | Partner Dashboard | Overview | 2 | 16 | yes |
 | `PTR-003` | Profile & Company Details | Access & Account | 2 | 4 | yes |
 | `PTR-004` | Notifications | Access & Account | 3 | 2 | yes |
-| `PTR-005` | Inventory & Allocation View | Inventory & Pricing | 2 | 19 | yes |
-| `PTR-006` | Product Catalog (B2B Pricing) | Inventory & Pricing | 2 | 17 | yes |
+| `PTR-005` | Inventory & Allocation View | Inventory & Pricing | 2 | 16 | yes |
+| `PTR-006` | Product Catalog (B2B Pricing) | Inventory & Pricing | 2 | 8 | yes |
 | `PTR-007` | Availability Search | Inventory & Pricing | 2 | 1 | yes |
 | `PTR-008` | Booking Creation | Booking & Quotes | 2 | 14 | yes |
 | `PTR-009` | Group / Bulk Booking | Booking & Quotes | 3 | 4 | yes |
@@ -66,7 +66,7 @@
 | `PTR-016` | Voucher / Ticket Download | Orders & Fulfilment | 2 | 13 | yes |
 | `PTR-017` | Commission Statement | Reports & Settlement | 3 | 2 | yes |
 | `PTR-018` | Reports & Sales Performance | Reports & Settlement | 3 | 9 | yes |
-| `PTR-019` | API Credentials & Integration | Access & Account | 3 | 4 | yes |
+| `PTR-019` | API Credentials & Integration | Access & Account | 3 | 7 | yes |
 | `PTR-020` | Sub-Agent Management | Access & Account | 3 | 3 | yes |
 | `PTR-021` | Support & Contact | Support | 3 | 7 | yes |
 | `PTR-022` | Partner Management Command Center | Partners | 3 | 2 | yes |

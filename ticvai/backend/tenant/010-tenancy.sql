@@ -2,7 +2,7 @@
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 4 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS tenancy.data_retention_setting (
     id                                uuid PRIMARY KEY,
     data_class                        text NOT NULL,

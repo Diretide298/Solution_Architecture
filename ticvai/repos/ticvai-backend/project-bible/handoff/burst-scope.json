@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 34,
-  "ofTotalOperations": 2608,
-  "tables": 58,
-  "ofTotalTables": 1076
+  "ofTotalOperations": 2660,
+  "tables": 63,
+  "ofTotalTables": 1091
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2574,
-    "tables": 1076,
+    "operations": 2626,
+    "tables": 1091,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 34,
-    "tables": 58,
+    "tables": 63,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -225,6 +225,17 @@
  ],
  "tables": [
   {
+   "table": "catalogue.channel_capacity",
+   "schema": "catalogue",
+   "columns": 12,
+   "burstOperations": 6,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**How much of a performance each sales channel may sell.** Two hundred seats with eighty to the web, eighty to the box office and forty held back. Renamed from `envelope`, which was unguessable"
+  },
+  {
    "table": "orders.sales_order",
    "schema": "orders",
    "columns": 20,
@@ -238,7 +249,7 @@
   {
    "table": "catalogue.inventory_hold",
    "schema": "catalogue",
-   "columns": 14,
+   "columns": 18,
    "burstOperations": 5,
    "written": true,
    "contention": {
@@ -253,31 +264,20 @@
    "note": "**A short-lived claim on contended stock** while somebody decides. A seat in a basket is held, not sold — CF-115 settled that contended inventory is leased rather than reserved, and the hold expires on its own. Renamed f"
   },
   {
-   "table": "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-   "schema": "embedded as attributes (jsonb) on orders",
-   "columns": 2,
+   "table": "catalogue.product",
+   "schema": "catalogue",
+   "columns": 41,
    "burstOperations": 5,
-   "written": true,
+   "written": false,
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Holds 2 columns. **No description has been written for this table** — the name is the only thing saying what it is"
-  },
-  {
-   "table": "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
-   "schema": "embedded as window_starts_at and window_ends_at on orders",
-   "columns": 3,
-   "burstOperations": 5,
-   "written": true,
-   "contention": null,
-   "contended": false,
-   "contentionIndeterminate": false,
-   "note": "Holds 3 columns. **No description has been written for this table** — the name is the only thing saying what it is"
+   "note": "**What a venue sells** — admission, a session, a bundle, a membership, a locker. Not the instance: a product is the offer and `catalogue.performance` is the occasion"
   },
   {
    "table": "orders.payment",
    "schema": "orders",
-   "columns": 16,
+   "columns": 18,
    "burstOperations": 5,
    "written": true,
    "contention": null,
@@ -297,17 +297,6 @@
    "note": "**What a guest actually holds** — found missing 18 August. The package sold products, defined EntitlementTemplate, recorded ScanEvent.ticketId, transferred ticket_ids and issued wallet passes against entitlementId: **fiv"
   },
   {
-   "table": "catalogue.channel_capacity",
-   "schema": "catalogue",
-   "columns": 12,
-   "burstOperations": 4,
-   "written": false,
-   "contention": null,
-   "contended": false,
-   "contentionIndeterminate": false,
-   "note": "**How much of a performance each sales channel may sell.** Two hundred seats with eighty to the web, eighty to the box office and forty held back. Renamed from `envelope`, which was unguessable"
-  },
-  {
    "table": "catalogue.performance",
    "schema": "catalogue",
    "columns": 11,
@@ -319,15 +308,15 @@
    "note": "**When a product happens** — a session, a showing, a timed entry slot. Capacity lives here and in `catalogue.channel_capacity`, never on the product"
   },
   {
-   "table": "catalogue.product",
-   "schema": "catalogue",
-   "columns": 39,
+   "table": "orders.order_line",
+   "schema": "orders",
+   "columns": 23,
    "burstOperations": 4,
-   "written": false,
+   "written": true,
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "**What a venue sells** — admission, a session, a bundle, a membership, a locker. Not the instance: a product is the offer and `catalogue.performance` is the occasion"
+   "note": "**One thing bought on one order**, priced at the moment of sale. A price list changing afterwards does not change what somebody paid"
   },
   {
    "table": "seating.seat_hold",
@@ -382,15 +371,15 @@
    "note": "Holds 16 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
-   "table": "orders.order_line",
+   "table": "orders.order_line_discount",
    "schema": "orders",
-   "columns": 27,
+   "columns": 6,
    "burstOperations": 3,
-   "written": true,
+   "written": false,
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "**One thing bought on one order**, priced at the moment of sale. A price list changing afterwards does not change what somebody paid"
+   "note": "Holds 6 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "orders.order_line_eligibility",
@@ -406,7 +395,7 @@
   {
    "table": "platform.outbox",
    "schema": "platform",
-   "columns": 11,
+   "columns": 15,
    "burstOperations": 3,
    "written": true,
    "contention": null,
@@ -456,7 +445,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another **Hangs off**: reaches `approvals.request` through its keys; references `approvals.matrix`. **Reached by**: 15 operations read it"
+   "note": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another **Hangs off**: reaches `approvals.request` through its keys; references `approvals.external_provider`, `approvals.matrix`. **Reac"
   },
   {
    "table": "catalogue.entitlement_template",
@@ -468,6 +457,28 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**The rules a ticket carries before anybody buys one** — validity, entries allowed, transferability, what a gate does with it. `access.entitlement` is the issued instance"
+  },
+  {
+   "table": "catalogue.product_category",
+   "schema": "catalogue",
+   "columns": 12,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "The merchandise hierarchy — categories, brands, collections (Retail Board 2, 20 August). **listSeatCategories existed and a product category did not.** One tree rather than four tables, because a brand under a department"
+  },
+  {
+   "table": "catalogue.product_eligibility_rule",
+   "schema": "catalogue",
+   "columns": 15,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Who may take part in a product: age, height, supervision, swim ability.** Declared by the guest at booking, checked by staff at the gate; whether a guest who fails there is refunded is a column, because the design says"
   },
   {
    "table": "catalogue.variant",
@@ -501,17 +512,6 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**A balanced set of postings.** Append-only: a correction is another entry, never an edit, which is what makes a period closeable"
-  },
-  {
-   "table": "ledger.posting",
-   "schema": "ledger",
-   "columns": 12,
-   "burstOperations": 2,
-   "written": true,
-   "contention": null,
-   "contended": false,
-   "contentionIndeterminate": false,
-   "note": "**One side of a double-entry movement.** Renamed from `entry`, which sat beside `journal_entry` and `journal_line` — **three things called entry in one schema is a schema nobody reads twice.** **Hangs off**: reaches `led"
   },
   {
    "table": "marketing.consent_question",
@@ -549,7 +549,7 @@
   {
    "table": "orders.cart_line",
    "schema": "orders",
-   "columns": 23,
+   "columns": 21,
    "burstOperations": 2,
    "written": true,
    "contention": null,
@@ -567,6 +567,17 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**A guest, and the only table holding who they are.** Name, and through its children the contacts, documents and biometrics. **Isolated deliberately** — erasure is a delete here and a pseudonym everywhere else, which is "
+  },
+  {
+   "table": "platform.idempotency_record",
+   "schema": "platform",
+   "columns": 11,
+   "burstOperations": 2,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 11 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "promotions.promotion_evaluation_trace",
@@ -589,6 +600,17 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**One seat, addressable and holdable.** 396 rows in the sample manifest is one amphitheatre"
+  },
+  {
+   "table": "whitelabel.guided_choice_answer",
+   "schema": "whitelabel",
+   "columns": 5,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 4 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "access.blacklist",
@@ -633,6 +655,17 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 31 operations read it an"
+  },
+  {
+   "table": "catalogue.channel_allocation",
+   "schema": "catalogue",
+   "columns": 19,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**How much of a capacity each channel may sell.** Web cannot consume the counter’s share"
   },
   {
    "table": "catalogue.price_list",
@@ -688,6 +721,28 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.scope`. **Reached by**: 17"
+  },
+  {
+   "table": "ledger.journal_line",
+   "schema": "ledger",
+   "columns": 8,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One side of a posting.** Entries balance; lines do not"
+  },
+  {
+   "table": "ledger.posting",
+   "schema": "ledger",
+   "columns": 12,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One side of a double-entry movement.** Renamed from `entry`, which sat beside `journal_entry` and `journal_line` — **three things called entry in one schema is a schema nobody reads twice.** **Hangs off**: reaches `led"
   },
   {
    "table": "marketing.guest_profile",
@@ -747,7 +802,7 @@
   {
    "table": "payments.payment_attempt",
    "schema": "payments",
-   "columns": 16,
+   "columns": 19,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -903,8 +958,6 @@
    "reads": [
     "catalogue.channel_capacity",
     "catalogue.inventory_hold",
-    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "marketing.consent_question",
     "marketing.consent_question_version",
     "orders.cart",
@@ -936,11 +989,14 @@
    "contract": "catalogue",
    "callsPerBuyer": 3,
    "reads": [
+    "catalogue.channel_allocation",
     "catalogue.channel_capacity",
     "catalogue.inventory_hold",
     "platform.workstation"
    ],
    "writes": [
+    "catalogue.channel_allocation",
+    "catalogue.channel_capacity",
     "catalogue.inventory_hold"
    ],
    "lock": "FOR UPDATE SKIP LOCKED"
@@ -954,7 +1010,10 @@
    "callsPerBuyer": 3,
    "reads": [
     "catalogue.product",
-    "catalogue.product_media"
+    "catalogue.product_category",
+    "catalogue.product_eligibility_rule",
+    "catalogue.product_media",
+    "whitelabel.guided_choice_answer"
    ],
    "writes": [],
    "lock": null
@@ -970,19 +1029,15 @@
     "catalogue.channel_capacity",
     "catalogue.performance",
     "catalogue.variant",
-    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "marketing.consent_question",
     "marketing.consent_question_version",
     "orders.cart",
     "orders.cart_line"
    ],
    "writes": [
-    "catalogue.inventory_hold",
-    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.cart",
-    "orders.cart_line"
+    "orders.cart_line",
+    "platform.idempotency_record"
    ],
    "lock": null
   },
@@ -1042,7 +1097,9 @@
    "contract": "catalogue",
    "callsPerBuyer": 2,
    "reads": [
-    "catalogue.performance"
+    "catalogue.performance",
+    "catalogue.product",
+    "catalogue.product_category"
    ],
    "writes": [],
    "lock": null
@@ -1082,9 +1139,8 @@
    "callsPerBuyer": 1,
    "reads": [
     "access.entitlement",
-    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.order_line",
+    "orders.order_line_discount",
     "orders.order_line_eligibility",
     "orders.payment",
     "orders.sales_order"
@@ -1105,9 +1161,8 @@
    "contract": "orders",
    "callsPerBuyer": 1,
    "reads": [
-    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.order_line",
+    "orders.order_line_discount",
     "orders.order_line_eligibility",
     "orders.payment",
     "orders.sales_order"
@@ -1147,16 +1202,13 @@
    "contract": "orders",
    "callsPerBuyer": 1,
    "reads": [
-    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.order_line",
+    "orders.order_line_discount",
     "orders.order_line_eligibility",
     "orders.payment",
     "orders.sales_order"
    ],
    "writes": [
-    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
-    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.order_event",
     "orders.order_line",
     "orders.payment",
@@ -1173,17 +1225,22 @@
    "contract": "orders",
    "callsPerBuyer": 1,
    "reads": [
+    "catalogue.inventory_hold",
     "ledger.fx_rate",
+    "orders.order_line",
     "orders.payment",
     "orders.sales_order",
     "payments.provider_connection"
    ],
    "writes": [
+    "catalogue.channel_capacity",
+    "catalogue.inventory_hold",
     "ledger.journal_entry",
-    "ledger.posting",
+    "ledger.journal_line",
     "orders.order_event",
     "orders.payment",
     "payments.payment_attempt",
+    "platform.idempotency_record",
     "platform.outbox"
    ],
    "lock": null
@@ -1407,12 +1464,12 @@
    "contract": "identity",
    "callsPerBuyer": 1,
    "reads": [
-    "identity.session",
-    "identity.refresh_token"
+    "identity.refresh_token",
+    "identity.session"
    ],
    "writes": [
-    "identity.session",
-    "identity.refresh_token"
+    "identity.refresh_token",
+    "identity.session"
    ],
    "lock": null
   },
@@ -1424,9 +1481,11 @@
    "contract": "catalogue",
    "callsPerBuyer": 1,
    "reads": [
+    "catalogue.channel_capacity",
     "catalogue.inventory_hold"
    ],
    "writes": [
+    "catalogue.channel_capacity",
     "catalogue.inventory_hold"
    ],
    "lock": null
@@ -1441,8 +1500,10 @@
    "reads": [
     "catalogue.event",
     "catalogue.product",
+    "catalogue.product_eligibility_rule",
     "catalogue.product_media",
-    "catalogue.variant"
+    "catalogue.variant",
+    "whitelabel.guided_choice_answer"
    ],
    "writes": [],
    "lock": null

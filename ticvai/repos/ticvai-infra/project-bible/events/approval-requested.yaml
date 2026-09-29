@@ -7,6 +7,8 @@ publisher: approvals
 description: An approval request entered routing and is waiting on its first level.
 aggregate: approvalRequest
 emittedWhen: ApprovalStatus draft to pending (submitApprovalRequest), or a request raised directly at pending (createApprovalRequest)
+emittedBy:
+- submitApprovalRequest
 payload:
 - field: requestId
   type: string

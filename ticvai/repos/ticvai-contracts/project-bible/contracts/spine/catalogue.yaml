@@ -84,11 +84,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-002 Event & Attraction Listing"
         - "P01 WEB-005 Ticket Type Selection"
-        - "P02 GST-002 Explore Categories"
+        - "P02 GST-001 Home"
+        - "P02 GST-002 Explore"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-101 Help Me Choose"
+        - "P13 CMS-103 Booking Flows"
       summary: The merchandise hierarchy — categories, brands, collections
       description: 'Retail Board 2. **`listSeatCategories` existed and a product category did not** —
         a seat category prices a seat; this groups a catalogue.
@@ -122,6 +124,7 @@ paths:
       operationId: setProductCategories
       x-ticvai-consumed-by:
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
+        - "P13 CMS-103 Booking Flows"
       summary: Define the hierarchy, in the order a guest sees it
       description: '**The whole tree in one call.** A hierarchy edited node by node is a hierarchy that
         spends time in states nobody intended — a category reparented before its new parent exists.
@@ -188,6 +191,12 @@ paths:
           x-ticvai-problem-types:
           - category-still-referenced
           - duplicate-code
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: A category `bookingFlowId` that is not a booking flow of the venue (W12, 29 September).
           content:
             application/problem+json:
               schema:
@@ -955,9 +964,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-002 Event & Attraction Listing"
         - "P01 WEB-003 Search Results"
-        - "P02 GST-001 Home – Default"
-        - "P02 GST-003 Event & Attraction Listing"
-        - "P02 GST-063 Search"
+        - "P02 GST-001 Home"
+        - "P02 GST-002 Explore"
+        - "P02 GST-003 Buy Tickets"
+        - "P02 GST-063 Explore – Search Results"
       x-ticvai-audience:
       - guest
       summary: Find something by name
@@ -977,7 +987,11 @@ paths:
         for `infoOnly` ones. A `hidden` product is never returned to a guest. When the venue''s
         `BookingFlowConfig.showInfoOnly` is off, `infoOnly` products are left out as well.
 
+        **Help me choose narrows the search too** (decided 29 September, W4): `guidedAnswerIds` applies the
+        chosen answers'' filters, exactly as on `listProducts`.
+
         '
+      x-ticvai-agreed: '29 September: W4 (Help me choose filters the catalogue)'
       tags:
       - catalogue
       x-ticvai-permission: null
@@ -1009,6 +1023,29 @@ paths:
           - membership
           - merchandise
           - menuItem
+      - name: guidedAnswerIds
+        in: query
+        style: form
+        explode: false
+        description: '**Help me choose answers, as filters** (decided 29 September, W4). The ids of answers
+          from the venue''s published guided choice (white-label `getPublishedGuidedChoice`). Each answer''s
+          `filter` (products, categories, segment tags, age range, swimmer, certification) is applied on the
+          server and the answers are combined with AND, so web, mobile and kiosk show the same list for the same
+          answers. Segment tags match as `segmentTag` does, the age range is read against
+          `ProductEligibilityRule` minimum and maximum age, and `requiresSwimmer: false` leaves out products
+          whose consent questions include the swim question, so a guest who said they cannot swim is not later
+          asked to consent to swimming (REV3-26 stays a consent, asked once). An answer with no filter narrows
+          nothing. The filter fields are white-label `GuidedChoice` `answer.filter`''s, by name: `productIds`,
+          `productCategoryIds`, `segmentTags`, `minAgeYears`/`maxAgeYears` (against `ProductEligibilityRule`),
+          `requiresSwimmer`, and `certificationCode` with `holdsCertification` (against
+          `ProductEligibilityRule.requiredCertificationCode`). An id that is not an answer of the venue''s
+          published guided choice is a `400`. Guest-callable.'
+        schema:
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       responses:
         '200':
@@ -1051,6 +1088,13 @@ paths:
                         attraction should learn it is sold out, not that it does not exist.
 
                         '
+        '400':
+          description: A `guidedAnswerIds` entry that is not an answer of the venue's published guided choice
+            (W4, 29 September).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /donation-campaigns:
     get:
       operationId: listDonationCampaigns
@@ -1335,22 +1379,22 @@ paths:
         - "P01 WEB-022 Membership Plans"
         - "P01 WEB-035 Multi-Currency & Pricing"
         - "P01 WEB-048 Book a Space by the Hour"
-        - "P02 GST-002 Explore Categories"
-        - "P02 GST-003 Event & Attraction Listing"
+        - "P01 WEB-050 Plan Your Visit"
+        - "P02 GST-001 Home"
+        - "P02 GST-002 Explore"
+        - "P02 GST-003 Buy Tickets"
         - "P02 GST-005 What's On"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-015 Memberships"
         - "P02 GST-021 Interactive Map"
-        - "P02 GST-038 Digital Companion Mode"
+        - "P02 GST-038 At the Venue"
         - "P02 GST-044 Multi-Currency & Pricing"
         - "P02 GST-050 Resource Booking – Cabana"
-        - "P02 GST-051 Plan Your Adventure – Start"
+        - "P02 GST-051 Plan"
         - "P02 GST-052 Suggested Itineraries"
-        - "P02 GST-053 Build Your Own Itinerary"
-        - "P02 GST-054 AI Optimized Itinerary"
+        - "P02 GST-053 Your Plan"
         - "P02 GST-058 Resource Availability (Cabana)"
-        - "P02 GST-059 Plan My Day – In Progress"
         - "P02 GST-075 Book a Space by the Hour"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
@@ -1361,10 +1405,13 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-014 Catalogue Publishing"
+        - "P08 BO-094 Map Editor & Publish"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
         - "P13 CMS-101 Help Me Choose"
+        - "P13 CMS-103 Booking Flows"
         - "P16 ANL-004 Product Performance"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - guest
@@ -1388,7 +1435,13 @@ paths:
         to one category of the `listProductCategories` tree, so a guest can go from a category tile to that
         category''s tickets; `segmentTag` narrows by tag, e.g. a surf level.
 
+        **Help me choose filters the list** (decided 29 September, W4). `guidedAnswerIds` applies the filter of
+        each chosen answer on the server; the guest screen offers *Show everything*, which is the same call
+        without it. **A partner caller reads here** what is assigned to its channel (M17-04): partners never
+        write products, prices or performances.
+
         '
+      x-ticvai-agreed: '29 September: W4 (Help me choose filters the catalogue) and M17-04 (partners read only)'
       tags:
       - product
       x-ticvai-permission: PRODUCT_VIEW
@@ -1432,6 +1485,29 @@ paths:
         schema:
           type: string
           maxLength: 120
+      - name: guidedAnswerIds
+        in: query
+        style: form
+        explode: false
+        description: '**Help me choose answers, as filters** (decided 29 September, W4). The ids of answers
+          from the venue''s published guided choice (white-label `getPublishedGuidedChoice`). Each answer''s
+          `filter` (products, categories, segment tags, age range, swimmer, certification) is applied on the
+          server and the answers are combined with AND, so web, mobile and kiosk show the same list for the same
+          answers. Segment tags match as `segmentTag` does, the age range is read against
+          `ProductEligibilityRule` minimum and maximum age, and `requiresSwimmer: false` leaves out products
+          whose consent questions include the swim question, so a guest who said they cannot swim is not later
+          asked to consent to swimming (REV3-26 stays a consent, asked once). An answer with no filter narrows
+          nothing. The filter fields are white-label `GuidedChoice` `answer.filter`''s, by name: `productIds`,
+          `productCategoryIds`, `segmentTags`, `minAgeYears`/`maxAgeYears` (against `ProductEligibilityRule`),
+          `requiresSwimmer`, and `certificationCode` with `holdsCertification` (against
+          `ProductEligibilityRule.requiredCertificationCode`). An id that is not an answer of the venue''s
+          published guided choice is a `400`. Guest-callable.'
+        schema:
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -1449,7 +1525,8 @@ paths:
                       items:
                         $ref: '#/components/schemas/Product'
         '400':
-          description: A `categoryId` that names no category of the venue.
+          description: A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is
+            not an answer of the venue's published guided choice (W4, 29 September).
           content:
             application/problem+json:
               schema:
@@ -1463,10 +1540,12 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P09 ADM-119 Product Creation Workspace"
-        - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Create a product
       description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation.
@@ -1513,7 +1592,8 @@ paths:
           description: 'A `media` asset that is not `ready` or whose kind does not match, a
             `consentQuestionIds` entry that names no active consent question of the tenant, or
             `requiresTimeWindow` on a product whose variants carry no `durationMinutes` (decided 29 September,
-            23SEP-4, rev 3 REV3-26 and REV3-13).
+            23SEP-4, rev 3 REV3-26 and REV3-13), or a `bookingFlowId` that is not a booking flow of the venue
+            (W12, 29 September).
 
             '
           content:
@@ -1525,7 +1605,7 @@ paths:
       operationId: getProductEligibilityRule
       x-ticvai-consumed-by:
         - "P01 WEB-004 Attraction Details"
-        - "P02 GST-004 Attraction Details"
+        - "P02 GST-004 Item Detail"
         - "P08 BO-161 Guest, Companion & Eligibility Rules"
       summary: 'Who may take part: age, height, supervision'
       description: '**A product with no rule set answers `200`, not `404`.** The schema''s own reading
@@ -1791,8 +1871,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-004 Attraction Details"
         - "P01 WEB-022 Membership Plans"
-        - "P02 GST-004 Attraction Details"
-        - "P02 GST-006 Event / Exhibition Details"
+        - "P02 GST-004 Item Detail"
+        - "P02 GST-006 Item Detail – Event / Exhibition"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
         - "P06 EMP-034 Walk-up sale"
@@ -1801,6 +1881,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - guest
@@ -1835,10 +1916,13 @@ paths:
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
-        - "P10 PTR-006 Product Catalog (B2B Pricing)"
+        - "P13 CMS-103 Booking Flows"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Update a product
       description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation.
@@ -1885,7 +1969,8 @@ paths:
           description: 'A `media` asset that is not `ready` or whose kind does not match, a
             `consentQuestionIds` entry that names no active consent question of the tenant, or
             `requiresTimeWindow` on a product whose variants carry no `durationMinutes` (decided 29 September,
-            23SEP-4, rev 3 REV3-26 and REV3-13).
+            23SEP-4, rev 3 REV3-26 and REV3-13), or a `bookingFlowId` that is not a booking flow of the venue
+            (W12, 29 September).
 
             '
           content:
@@ -1908,10 +1993,12 @@ paths:
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
-        - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Set the attribute axes for a product
       description: 'Attributes are axes that generate sellable variants. Changing them triggers variant
         regeneration; the response reports how many variants result.
@@ -2014,6 +2101,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - guest
@@ -2142,6 +2230,7 @@ paths:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -2178,10 +2267,12 @@ paths:
       operationId: createPriceList
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
-        - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Create a price list
       description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation.
@@ -2234,6 +2325,7 @@ paths:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -2268,10 +2360,12 @@ paths:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
         - "P08 BO-601 Product, Pricing & Sales Channel Setup"
-        - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Set prices in bulk
       description: 'Currency must match the region''s currency and scale. A price in a currency the region
         does not use is rejected — money carries its scale, and a mismatched scale silently truncates.
@@ -2410,8 +2504,8 @@ paths:
         - "P01 WEB-004 Attraction Details"
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-007 Interactive Seat Selection"
-        - "P02 GST-003 Event & Attraction Listing"
-        - "P02 GST-004 Attraction Details"
+        - "P02 GST-003 Buy Tickets"
+        - "P02 GST-004 Item Detail"
         - "P02 GST-005 What's On"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-049 Interactive Seat Selection"
@@ -2449,6 +2543,14 @@ paths:
         schema:
           type: string
           format: date-time
+      - name: categoryId
+        in: query
+        description: 'Only performances of products in this product category (a product in several
+          categories matches each), the calendar''s category filter (17 September minutes M17-03, added 30
+          September). With `from` and `to` it is what the day, week and month calendar views ask for.'
+        schema:
+          type: string
+          format: uuid
       - name: language
         in: query
         description: Only performances given in this language, e.g. the guided tours in French. Matched on
@@ -2543,6 +2645,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -2582,10 +2685,12 @@ paths:
         - "P06 EMP-033 Capacity view"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
-        - "P10 PTR-005 Inventory & Allocation View"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Create a channel capacity
       tags:
       - capacity
@@ -2626,6 +2731,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -2661,10 +2767,12 @@ paths:
         - "P06 EMP-033 Capacity view"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
-        - "P10 PTR-005 Inventory & Allocation View"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Allocate a channel capacity across sales channels
       description: 'Allocations may not exceed envelope capacity in total. An unallocated remainder forms
         a general pool any channel may draw from once its own allocation is exhausted.
@@ -2739,6 +2847,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
       - partner
@@ -2789,6 +2898,7 @@ paths:
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
+        - "P08 BO-094 Map Editor & Publish"
       x-ticvai-audience:
       - staff
       - guest
@@ -3056,13 +3166,27 @@ paths:
         - "P08 BO-018 Allocation & Holds"
       x-ticvai-audience:
       - staff
+      - service
+      x-ticvai-agreed: '29 September: SD-023 (system-design review): one capacity model, a guarded decrement at
+        hold, conversion on payment, holds by workstation or by cart'
       summary: Acquire an inventory hold
       description: 'Grants the caller N units of a capacity envelope for a TTL. The holder may sell against
         them without further server contact, including offline.
 
-        **Not a guest call.** A hold belongs to a workstation, and a guest session has none (`guestAuth`).
-        A guest''s cart takes its hold through `orders.addCartLine`, which acquires it server-side, and
-        `orders.checkoutCart` carries it into the order.
+        **Not a guest call.** A guest session never calls this (`guestAuth`). A guest''s cart takes its hold
+        through `orders.addCartLine`, which calls this as the order service with `holderKind: cart` and the
+        cart''s id (decided 29 September, SD-023): **a hold belongs to a workstation or to a cart**, and a
+        browser has no workstation, so `holderWorkstationId` is null on a cart hold.
+
+        **The capacity model** (decided 29 September, SD-023, closing what ADR-0037 left open). One guarded
+        statement moves the units: `UPDATE catalogue.channel_capacity SET remaining = remaining - n, leased =
+        leased + n WHERE id = ? AND remaining >= n`, with `n` cut to what remains for a partial grant, under
+        the row lock declared here. **Units leave `remaining` at the hold, not at the sale.** They go to `sold`
+        when the hold converts (`convertInventoryHold`, in the order transaction when the order is paid) or
+        when a workstation reports them consumed (`renewInventoryHold`, `relinquishInventoryHold`); they go back
+        to `remaining` when the hold is released, force-released or expires. The expiry sweeper
+        (`states/lease.yaml` timer) runs the same statement in reverse for each `active` hold past
+        `expiresAt`, so an expired hold never strands units and **a converted hold is never swept**.
 
         Unsold units return automatically on expiry. Requesting more than remains returns a partial grant
         — the caller decides whether that is enough.
@@ -3140,11 +3264,22 @@ paths:
       - staff
       summary: Return unsold units
       description: 'Consumed units are reported and retained; the remainder returns to the pool immediately
-        rather than waiting for TTL expiry.
+        rather than waiting for TTL expiry. **Consumed units move from `leased` to `sold`, the rest from
+        `leased` to `remaining`**, in one statement under the capacity row lock (decided 29 September,
+        SD-023).
 
         '
       tags:
       - lease
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+        - "cache:idempotency"
+      x-ticvai-lock-excludes-note: >
+        ADR-0037, SD-023 (29 September). The idempotency key is resolved before the transaction opens; inside
+        the lock sit only the hold row and its `catalogue.channel_capacity` row, locked in that order (capacity
+        first, then hold) on every hold write so two writers never wait on each other in opposite orders.
+      x-ticvai-lock-note: 'ADR-0031, SD-023. Every write that moves units between `remaining`, `leased` and
+        `sold` takes the capacity row lock, so the counts cannot drift under burst.'
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
@@ -3165,6 +3300,9 @@ paths:
                   minimum: 0
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
           content:
             application/json:
@@ -3207,11 +3345,22 @@ paths:
       - staff
       summary: Extend an inventory hold's TTL
       description: 'Reports consumption so far and extends the hold. A holder renews while the link is
-        up; if the link drops, the lease expires naturally and the units return.
+        up; if the link drops, the lease expires naturally and the units return. **Newly reported consumption
+        moves from `leased` to `sold`, and `additionalUnits` is the same guarded decrement as an acquire**
+        (decided 29 September, SD-023).
 
         '
       tags:
       - lease
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+        - "cache:idempotency"
+      x-ticvai-lock-excludes-note: >
+        ADR-0037, SD-023 (29 September). The idempotency key is resolved before the transaction opens; inside
+        the lock sit only the hold row and its `catalogue.channel_capacity` row, locked in that order (capacity
+        first, then hold) on every hold write so two writers never wait on each other in opposite orders.
+      x-ticvai-lock-note: 'ADR-0031, SD-023. Every write that moves units between `remaining`, `leased` and
+        `sold` takes the capacity row lock, so the counts cannot drift under burst.'
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
@@ -3283,6 +3432,15 @@ paths:
         '
       tags:
       - lease
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+        - "cache:idempotency"
+      x-ticvai-lock-excludes-note: >
+        ADR-0037, SD-023 (29 September). The idempotency key is resolved before the transaction opens; inside
+        the lock sit only the hold row and its `catalogue.channel_capacity` row, locked in that order (capacity
+        first, then hold) on every hold write so two writers never wait on each other in opposite orders.
+      x-ticvai-lock-note: 'ADR-0031, SD-023. Every write that moves units between `remaining`, `leased` and
+        `sold` takes the capacity row lock, so the counts cannot drift under burst.'
       x-ticvai-permission: CAPACITY_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -3314,13 +3472,104 @@ paths:
                 $ref: '#/components/schemas/InventoryHold'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+  /inventory-holds/{inventoryHoldId}/convert:
+    parameters:
+    - name: inventoryHoldId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    post:
+      operationId: convertInventoryHold
+      x-ticvai-audience:
+      - service
+      x-ticvai-agreed: '29 September: SD-023 (system-design review): a hold converts on payment and its units
+        become sold'
+      summary: Turn a paid hold into sold units
+      description: '**Called by the order service inside the order transaction when the order is paid**
+        (`orders.checkoutCart`, `orders.createPayment`; decided 29 September, SD-023). Moves the hold''s
+        `grantedUnits` less anything already reported consumed from `leased` to `sold` on its
+        `catalogue.channel_capacity` row, sets the hold `converted` with the order id, and stops the expiry
+        sweeper from ever returning those units. **Idempotent on `orderId`**: converting a hold already
+        converted for the same order answers `200` with the hold as it is.
+
+        **A hold that is no longer `active` is refused `409`** (`hold-not-active`): it expired, was released
+        or force-released, or was converted for another order, so its units may already be sold to someone
+        else. The order service then re-acquires with `acquireInventoryHold` before taking the payment; it
+        never sells against a hold it does not hold. No screen calls this operation.
+
+        '
+      tags:
+      - lease
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+        - "cache:idempotency"
+      x-ticvai-lock-excludes-note: >
+        ADR-0037, SD-023. The idempotency key is resolved before the transaction opens. Inside the lock sit the
+        capacity row and then the hold row, in the same order as every other hold write.
+      x-ticvai-lock-note: 'ADR-0031, SD-023. The conversion and the sweeper both want the same hold; the row
+        lock decides which one moves the units, and the loser sees a status that is no longer `active`.'
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - serviceAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - orderId
+              properties:
+                orderId:
+                  type: string
+                  format: uuid
+                  description: The paid order the units are sold to.
+                units:
+                  type: integer
+                  minimum: 1
+                  description: Units sold, when fewer than the hold grants (a line reduced before payment). The
+                    rest go back to `remaining`. Absent means all of them.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Converted; the units are sold
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryHold'
+        '400':
+          description: '`units` is more than the hold grants.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The hold is not `active` (expired, released, force-released or converted for another
+            order). Re-acquire before taking payment.
+          x-ticvai-problem-types:
+          - hold-not-active
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /availability:
     get:
       operationId: getAvailability
       x-ticvai-consumed-by:
         - "P01 WEB-004 Attraction Details"
         - "P01 WEB-006 Date & Performance Selection"
-        - "P02 GST-004 Attraction Details"
+        - "P02 GST-004 Item Detail"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-050 Resource Booking – Cabana"
         - "P02 GST-058 Resource Availability (Cabana)"
@@ -3329,6 +3578,7 @@ paths:
         - "P05 KSK-005 Choose a performance"
         - "P05 KSK-015 Assistant"
         - "P10 PTR-007 Availability Search"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - guest
@@ -3412,10 +3662,12 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
-        - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Move a product through its lifecycle
       description: 'Draft → review → approved → live → withdrawn → archived.
 
@@ -3519,6 +3771,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -3550,10 +3803,12 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
-        - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Set external identifiers
       description: '**What the PUT does.** The body is the product''s whole set of alternative codes: a
         code left out is removed, a code sent is stored as sent, and an empty `codes` removes them all.
@@ -3618,6 +3873,7 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -3666,6 +3922,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
       - partner
@@ -3690,10 +3947,12 @@ paths:
       operationId: updatePriceList
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
-        - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Amend a price list
       description: '**Currency and scale cannot be changed here.** They are resolved from the region
         rather than stored on the list (ADR-0018), so the body has no field for either and no price in
@@ -3751,10 +4010,12 @@ paths:
       operationId: copyPriceList
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
-        - "P10 PTR-006 Product Catalog (B2B Pricing)"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Copy a price list, optionally with an adjustment
       description: 'Next season''s prices from this season''s, uplifted by a percentage. The alternative
         is editing thousands of prices by hand, which is how a decimal point goes missing.
@@ -3905,7 +4166,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-010 Shopping Cart"
-        - "P02 GST-006 Event / Exhibition Details"
+        - "P02 GST-006 Item Detail – Event / Exhibition"
         - "P02 GST-041 Checkout Entry"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-002 Queue Configuration"
@@ -4131,10 +4392,12 @@ paths:
         - "P06 EMP-033 Capacity view"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
-        - "P10 PTR-005 Inventory & Allocation View"
       x-ticvai-audience:
       - staff
-      - partner
+      x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
+        or performances through the API. The partner audience is removed; partners read assigned products
+        and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
+        platform grant through public-api setApiLicensing, never a default.'
       summary: Amend a channel capacity
       description: 'Capacity may be increased freely. Reducing it below what has already sold is refused
         — the seats are gone, and pretending otherwise oversells the next guest.
@@ -17385,6 +17648,15 @@ components:
             most 200 characters.
 
             '
+        bookingFlowId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The booking flow for every product filed here** that names none of its own (decided 29
+            September, W12, BO-115). Null means the venue''s flow for each product''s `kind`. A white-label
+            `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.
+
+            '
         isActive:
           type: boolean
           default: true
@@ -18419,6 +18691,15 @@ components:
         refundableIfIneligibleAtGate:
           type: boolean
           default: false
+        requiredCertificationCode:
+          type: string
+          nullable: true
+          maxLength: 60
+          description: '**A certification the participant must hold** (decided 29 September, W4; added 30
+            September), e.g. `padiOpenWater` for a dive. Null means none. Help me choose reads it: an answer whose
+            `filter.certificationCode` names it with `holdsCertification: false` leaves the product out, and
+            with `holdsCertification: true` (or no flag) keeps only products needing that certification or none.
+            Proof, where the venue asks for it, is a consent question on the product (REV3-26), not this field.'
         scopePath:
           type: string
           readOnly: true
@@ -18736,6 +19017,28 @@ components:
             Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.
 
             '
+        salesContact:
+          allOf:
+          - $ref: '#/components/schemas/ProductSalesContact'
+          nullable: true
+          description: '**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a
+            training course listed with full details and no Book button. Shown as *Call sales* and *Email sales*
+            on an `infoOnly` product. Null means the venue''s own contact (white-label `getTenantAppStatus.contact`).
+            Ignored unless `guestListing` is `infoOnly`.
+
+            '
+        bookingFlowId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**The booking flow this product is sold through** (decided 29 September, W8 and W12): a
+            white-label `BookingFlow` of the venue, which orders the guest''s steps (for a workshop, the product
+            first and then the date and time). Null means the category''s flow
+            (`ProductCategory.bookingFlowId`), and failing that the venue''s flow for the product''s `kind`.
+            Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue
+            with `422`.
+
+            '
         displayTags:
           type: array
           maxItems: 6
@@ -18782,9 +19085,11 @@ components:
             marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per
             person or once per booking; the answer is stored there as a consent record (question version,
             answer, who answered, when). **One question or several, as the venue chooses.** A flow can
-            carry its own list too (`white-label.BookingFlowConfig.consentQuestionIds`, per venue through
-            `venueOverrides`); a booking asks the union of the flow''s questions and those of every product
-            in the cart, each question once (`orders.Cart.consentQuestions`). An id that names
+            carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product''s
+            published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the
+            venue''s flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the
+            union of the flow''s questions and those of every product in the cart, each question once
+            (`orders.Cart.consentQuestions`). An id that names
             no active consent question of the tenant is a `422`.
 
             '
@@ -18899,6 +19204,16 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
           nullable: true
+        salesContact:
+          allOf:
+          - $ref: '#/components/schemas/ProductSalesContact'
+          nullable: true
+          description: See `Product.salesContact` (W3, 29 September).
+        bookingFlowId:
+          type: string
+          format: uuid
+          nullable: true
+          description: See `Product.bookingFlowId` (W8, W12, 29 September).
         displayTags:
           type: array
           maxItems: 6
@@ -18948,6 +19263,16 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
           nullable: true
+        salesContact:
+          allOf:
+          - $ref: '#/components/schemas/ProductSalesContact'
+          nullable: true
+          description: See `Product.salesContact` (W3, 29 September).
+        bookingFlowId:
+          type: string
+          format: uuid
+          nullable: true
+          description: See `Product.bookingFlowId` (W8, W12, 29 September).
         displayTags:
           type: array
           maxItems: 6
@@ -19078,6 +19403,30 @@ components:
         white-label's `LocalisedText`.
       additionalProperties:
         type: string
+    ProductSalesContact:
+      x-ticvai-persistence: none — jsonb column on catalogue.product
+      type: object
+      description: 'Who to contact to book a view-only product (decided 29 September, W3). At least one of
+        `phone` or `email`.
+
+        '
+      minProperties: 1
+      properties:
+        phone:
+          type: string
+          maxLength: 32
+          nullable: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          nullable: true
+        note:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200
+            characters per language.
     GuestListing:
       type: string
       enum:
@@ -19628,12 +19977,28 @@ components:
         sold:
           type: integer
           readOnly: true
+          x-ticvai-derived: onWrite
+          description: 'Units sold. **Maintained on write** (decided 29 September, SD-023): raised by
+            `convertInventoryHold` in the order transaction and by consumption a workstation reports on
+            `renewInventoryHold` or `relinquishInventoryHold`, lowered when a refund or cancellation returns
+            the units. Always `capacity + oversellAllowance = sold + leased + remaining`.
+
+            '
         leased:
           type: integer
           readOnly: true
+          x-ticvai-derived: onWrite
+          description: Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release,
+            force-release and expiry (SD-023).
         remaining:
           type: integer
           readOnly: true
+          x-ticvai-derived: onWrite
+          description: 'What can still be held. **Decremented at the hold with a guarded statement**
+            (`remaining >= n`) under the row lock, never at the sale, so two buyers cannot both take the last
+            unit (SD-023, 29 September).
+
+            '
         hasChannelAllocations:
           type: boolean
           description: 'True where capacity is divided across channels. Leases then draw from a channel
@@ -19896,7 +20261,14 @@ components:
       type: string
       description: '`states/lease.yaml`. **`expired` is set by that model''s timer transition when `expiresAt`
         passes without a renewal**, not by any operation in this contract. The job that runs the timer is
-        the sweeper ADR-0037 defers until it is designed.
+        the sweeper ADR-0037 deferred: it returns an expired hold''s unconsumed units to `remaining` in the
+        same guarded statement as a release (SD-023, 29 September), and **writes `inventoryHold.expired` to
+        the outbox in the same transaction** (SD-023/SD-033, applied 30 September;
+        `events/inventoryHold-expired.yaml`), so the cart that held the units hears of it before checkout.
+        A `converted` hold is never swept.
+
+        **`converted` is set by `convertInventoryHold`** when the order that holds the units is paid (decided
+        29 September, SD-023); its units are `sold` and the sweeper never touches it.
 
         '
       enum:
@@ -19904,6 +20276,7 @@ components:
       - expired
       - released
       - forceReleased
+      - converted
     AcquireLeaseRequest:
       type: object
       description: The body of `acquireInventoryHold`. **Named before the 26 August rename** (lease to
@@ -19914,6 +20287,14 @@ components:
       - requestedUnits
       - ttlSeconds
       properties:
+        holderKind:
+          $ref: '#/components/schemas/InventoryHoldHolderKind'
+        cartId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Required when `holderKind` is `cart`, else `400`. Sent by the order service from
+            `orders.addCartLine` (SD-023, 29 September).
         channel:
           allOf:
           - $ref: '#/components/schemas/Channel'
@@ -19942,13 +20323,24 @@ components:
             client to correct under audit R094).
 
             '
+    InventoryHoldHolderKind:
+      type: string
+      enum:
+      - workstation
+      - cart
+      default: workstation
+      description: '**Who holds the units** (decided 29 September, SD-023). A till, kiosk or edge node holds as
+        a `workstation`; a guest''s web or app cart holds as a `cart`, acquired by the order service. A browser
+        has no workstation, so a cart hold carries `cartId` and no `holderWorkstationId`.
+
+        '
     InventoryHold:
       x-ticvai-persistence: catalogue.inventory_hold
       type: object
       required:
       - id
       - channelCapacityId
-      - holderWorkstationId
+      - holderKind
       - grantedUnits
       - consumedUnits
       - status
@@ -19960,9 +20352,30 @@ components:
         channelCapacityId:
           type: string
           format: uuid
+        holderKind:
+          $ref: '#/components/schemas/InventoryHoldHolderKind'
         holderWorkstationId:
           type: string
           format: uuid
+          nullable: true
+          description: The holding workstation when `holderKind` is `workstation`; null on a cart hold, because
+            a browser has none (SD-023, 29 September).
+        holderCartId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The holding cart (`orders.cart`) when `holderKind` is `cart` (SD-023, 29 September).
+        convertedOrderId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The paid order the hold was converted for, set by `convertInventoryHold`.
+        convertedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
         parentLeaseId:
           type: string
           nullable: true
@@ -39474,6 +39887,11 @@ components:
           format: date-time
           readOnly: true
   securitySchemes:
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
     bearerAuth:
       type: http
       scheme: bearer

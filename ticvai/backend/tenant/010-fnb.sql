@@ -1,4 +1,4 @@
--- fnb — 49 tables
+-- fnb — 48 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
@@ -515,7 +515,7 @@ CREATE TABLE IF NOT EXISTS fnb.service_order (
     service_mode                      text NOT NULL CONSTRAINT service_order_service_mode_chk CHECK (service_mode IN ('quickService', 'tableService', 'roomService', 'collection', 'delivery')),
     table_visit_id                    text,
     status                            text NOT NULL CONSTRAINT service_order_status_chk CHECK (status IN ('ordered', 'accepted', 'inPreparation', 'ready', 'served', 'collected', 'delivered', 'cancelled', 'refunded')),
-    sales_order_id                    uuid,
+    sales_order_id                    text,
     updated_at                        timestamptz,
     gross_amount                      numeric(18,4) NOT NULL,
     tax_amount                        numeric(18,4),
@@ -536,6 +536,7 @@ CREATE TABLE IF NOT EXISTS fnb.service_order_line (
     note                              text,
     seat_number                       integer,
     course                            integer,
+    redeem_entitlement_id             text,
     status                            text,
     unit_price                        numeric(18,4),
     line_total                        numeric(18,4)
@@ -601,9 +602,8 @@ CREATE TABLE IF NOT EXISTS fnb.table_combination (
 
 -- A booking with a time and a party size. Distinct from a table session, which is a guest already
 -- sitting down Hangs off: reaches fnb.service_order through its keys; references
--- catalogue.variant, fnb.modifier_group, fnb.table_reservation (deposit_* columns; the money
--- itself is orders.deposit). Reached by: 6 operations read it and 4 write it; 3 tables reference
--- it.
+-- catalogue.variant, fnb.modifier_group, fnb.table_visit. Reached by: 6 operations read it and 4
+-- write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS fnb.table_reservation (
     id                                uuid PRIMARY KEY,
     outlet_id                         uuid NOT NULL,
@@ -621,19 +621,6 @@ CREATE TABLE IF NOT EXISTS fnb.table_reservation (
     created_at                        timestamptz,
     amount                            numeric(18,4) NOT NULL,
     basis                             text NOT NULL CONSTRAINT table_reservation_basis_chk CHECK (basis IN ('fixedPerGuest', 'fixedPerTable', 'percentOfMinimumSpend')),
-    hold_expires_at                   timestamptz,
-    refundable_until                  timestamptz,
-    variant_id                        uuid,
-    cart_line_id                      uuid,
-    deposit_id                        uuid
-);
-
--- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is
-CREATE TABLE IF NOT EXISTS fnb.table_reservation (deposit_* columns; the money itself is orders.deposit) (
-    id                                uuid PRIMARY KEY NOT NULL,
-    amount                            numeric(18,4) NOT NULL,
-    basis                             text NOT NULL CONSTRAINT table_reservation (deposit_* columns; the money it_e2ce0686_chk CHECK (basis IN ('fixedPerGuest', 'fixedPerTable', 'percentOfMinimumSpend')),
     hold_expires_at                   timestamptz,
     refundable_until                  timestamptz,
     variant_id                        uuid,

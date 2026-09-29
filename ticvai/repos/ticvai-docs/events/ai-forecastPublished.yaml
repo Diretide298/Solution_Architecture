@@ -8,6 +8,8 @@ description: A forecast version was published and is now the one every consumer 
 aggregate: aiForecastVersion
 emittedWhen: AiForecastVersion draft or awaitingApproval to published (publishForecastVersion, or the
   nightly run where the definition auto-publishes)
+emittedBy:
+- publishForecastVersion
 payload:
 - field: tenantId
   type: uuid

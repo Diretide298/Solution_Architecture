@@ -7,6 +7,8 @@ publisher: inventory
 description: A purchase order is fully received.
 aggregate: purchaseOrder
 emittedWhen: PurchaseOrderStatus acknowledged or partiallyReceived to received
+emittedBy:
+- createGoodsReceipt
 payload:
 - field: purchaseOrderId
   type: uuid

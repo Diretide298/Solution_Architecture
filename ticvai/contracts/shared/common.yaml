@@ -75,10 +75,26 @@ components:
         body, or a body `id` that already exists under another key, is the shared `Conflict`
         response with problem type `idempotency-conflict`. It never applies the second request.
 
+        - **The record is durable** (system-design review SD-024, 29 September). The key, the operation, a
+        hash of the request and the stored response are written to `platform.idempotency_record` **in the same
+        transaction as the state change**, unique on (key, operation). Redis (`cache:idempotency`) is a
+        read-through cache in front of it and never the guarantee, so a Redis failover during a retry storm
+        cannot let `createPayment` or `syncOrders` apply twice.
+
         '
       schema:
         type: string
         pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      description: '**Optimistic concurrency for `serverWins`** (system-design review SD-013, 29 September;
+        ADR-0031). The `ETag` of the version the caller read. A write whose row has moved since is refused
+        with the shared `PreconditionFailed` response instead of silently overwriting. Absent, the write is
+        unconditional, as before.'
+      schema:
+        type: string
     PreferValidateOnly:
       name: Prefer
       in: header
@@ -102,8 +118,9 @@ components:
       name: X-Consistency-Token
       in: header
       required: false
-      description: 'WAL LSN returned by a prior write. When present the read is routed to a replica that
-        has caught up past this position, or to the primary. Prevents a ticket sold at the gate being
+      description: 'Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025,
+        29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). When present
+        the read is routed to a replica that has caught up past this position, or to the primary. Prevents a ticket sold at the gate being
         refused by a lagging replica seconds later.
 
 
@@ -639,6 +656,26 @@ components:
       headers:
         Retry-After:
           $ref: '#/components/headers/RetryAfter'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    ServiceUnavailable:
+      description: '**The dependency is unavailable or its circuit breaker is open** (system-design review
+        SD-043, 29 September; ADR-0032). Retry after `Retry-After`; nothing was written.'
+      x-ticvai-problem-types:
+      - service-unavailable
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    PreconditionFailed:
+      description: The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
+      x-ticvai-problem-types:
+      - precondition-failed
       content:
         application/problem+json:
           schema:

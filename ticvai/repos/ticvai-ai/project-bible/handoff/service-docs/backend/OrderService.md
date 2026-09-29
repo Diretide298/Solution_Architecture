@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 83 of 287 |
+| Operations in the slice | 83 of 288 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -26,7 +26,7 @@
 | Service | Tables it reads |
 |---|---|
 | [AccessService](AccessService.md) | `access.entitlement`, `access.scan_event` |
-| [CatalogueService](CatalogueService.md) | `catalogue.channel_capacity`, `catalogue.entitlement_template`, `catalogue.group_package`, `catalogue.inventory_hold`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `promotions.promotion` |
+| [CatalogueService](CatalogueService.md) | `catalogue.channel_capacity`, `catalogue.entitlement_template`, `catalogue.group_package`, `catalogue.inventory_hold`, `catalogue.performance`, `catalogue.price_list`, `catalogue.product`, `catalogue.variant`, `promotions.coupon_campaign`, `promotions.coupon_code`, `promotions.promotion` |
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `pii.subject` |
 | [LedgerService](LedgerService.md) | `ledger.fx_rate`, `ledger.posting`, `ledger.tax_invoice_line` |
 | [MarketingService](MarketingService.md) | `marketing.consent_question`, `marketing.consent_question_version`, `marketing.consent_record` |
@@ -43,7 +43,7 @@
 | cart | [`claimCart`](#claimcart) | POST | `/carts/{cartId}/claim` | core | 1 | GST-041, WEB-016 |
 | cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | WEB-010 |
 | cart | [`extendCart`](#extendcart) | POST | `/carts/{cartId}/extend` | core | 1 | GST-041, WEB-010 |
-| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, KSK-006, POS-010 … |
+| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, GST-053, KSK-006 … |
 | cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cart | [`updateCartLine`](#updatecartline) | PATCH | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, EMP-009, POS-001, POS-007 … |
@@ -181,8 +181,8 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.variant`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
-| Writes | `cache:idempotency`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.cart`, `orders.cart_line` |
+| Reads | `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.variant`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
+| Writes | `orders.cart`, `orders.cart_line`, `platform.idempotency_record` |
 | Called by | GST-007, GST-008, GST-009, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-006, KSK-017, POS-002, POS-021, POS-023, PTR-010, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active`, `expired` -> `active` |
 
@@ -265,7 +265,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
-| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
 | consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
@@ -308,6 +308,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Added, and the cart re-priced |
 | 409 |  | No capacity, or the product is not sellable on this channel (notSellableOnChannel). |
 | 422 |  | The booked window is missing, not allowed or the wrong length for the variant (windowRequired, windowNotAllowed, windowLengthMismatch; rev 3 REV3-13), or a table deposit line names a booking that is… |
@@ -328,8 +329,8 @@ Applying a code the cart already holds returns the cart unchanged.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
-| Writes | - |
+| Reads | `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.coupon_campaign`, `promotions.coupon_code` |
+| Writes | `orders.cart`, `orders.cart_line` |
 | Called by | GST-041, WEB-010 |
 
 **Parameters**
@@ -393,7 +394,7 @@ Applying a code the cart already holds returns the cart unchanged.
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
-| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
 | consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
@@ -436,6 +437,7 @@ Applying a code the cart already holds returns the cart unchanged.
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Applied, and the cart re-priced |
 | 410 |  | Expired (cartExpired), as for getCart. |
 | 422 |  | The code is not accepted: no such code, voided or used up (promoCodeInvalid), or a real code that nothing in this cart qualifies for (promoCodeNotApplicable). |
@@ -466,8 +468,8 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.cart`, `orders.order_line`, `orders.sales_order` |
+| Reads | `catalogue.inventory_hold`, `marketing.consent_question`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Writes | `marketing.consent_record`, `orders.cart`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | GST-009, GST-026, GST-027, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-033, WEB-041, WEB-042 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
 
@@ -483,6 +485,11 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | subjectId | string (uuid) |  | The guest the order is for. |
+| marketingConsents | array of object |  | Marketing opt-ins given at checkout (29 September, M18-15). |
+| marketingConsents[].channel | enum (email, sms, whatsapp, push) | yes |  |
+| marketingConsents[].purpose | string | yes | The consent purpose code (marketing ConsentPurpose), for example marketing. (max length 60) |
+| marketingConsents[].granted | boolean | yes | True only when the guest ticked it. |
+| marketingConsents[].noticeVersion | string |  | The version of the consent notice shown. (max length 40) |
 | attendees | array of object |  | The named holder for each cart line that needs one. |
 | attendees[].lineId | string (uuid) | yes | A CartLine.id in this cart. |
 | attendees[].holderName | string | yes |  |
@@ -572,6 +579,13 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
+| lines[].discounts[].id | string (uuid) | yes |  |
+| lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
+| lines[].discounts[].source | enum (promotion, promoCode, manual, bundle, member) | yes |  |
+| lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -594,7 +608,13 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | payments[].changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | payments[].providerName | string |  | (nullable) |
-| payments[].providerReference | string |  | (nullable) |
+| payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| payments[].nextAction.kind | enum (redirect, terminal) |  |  |
+| payments[].nextAction.url | string (uri) |  | (nullable) |
+| payments[].nextAction.expiresAt | string (date-time) |  | (nullable) |
 | payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | payments[].recordedAt | string (date-time) | yes |  |
 | payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -612,6 +632,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 201 |  | An order, pending payment |
 | 403 |  | The contact the tickets would go to is not proven — an unverified session (sessionNotVerified), or a guest checkout with no confirmed one-time code (contactNotConfirmed). |
 | 409 |  | A lease expired between the last read and checkout (leaseExpired), or a resource hold did (resourceHoldInvalid, rev 3 REV3-15). |
@@ -632,7 +653,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `pii.subject` |
+| Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `pii.subject` |
 | Writes | `cache:idempotency`, `orders.cart`, `orders.cart_line` |
 | Called by | GST-041, WEB-016 |
 
@@ -680,7 +701,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.conflicts[].lineIds | array of string (uuid) |  |  |
 | cart.conflicts[].message | string |  |  |
 | cart.conflicts[].isBlocking | boolean |  | Most are not. |
-| cart.consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| cart.consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
 | cart.consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | cart.consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | cart.consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
@@ -727,6 +748,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Claimed, and merged where the guest already had one |
 
 ### createCart
@@ -745,7 +767,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `pii.subject`, `platform.scope` |
+| Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `pii.subject`, `platform.scope` |
 | Writes | `cache:idempotency`, `orders.cart` |
 | Called by | WEB-010 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): created as `active` |
@@ -813,7 +835,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
-| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
 | consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
@@ -856,6 +878,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 201 |  | Started |
 
 ### extendCart
@@ -874,7 +897,7 @@ Offered once, typically, and the interface should say it is the last extension r
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
+| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart` |
 | Called by | GST-041, WEB-010 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active` |
@@ -934,7 +957,7 @@ Offered once, typically, and the interface should say it is the last extension r
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
-| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
 | consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
@@ -977,6 +1000,7 @@ Offered once, typically, and the interface should say it is the last extension r
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Extended |
 | 409 |  | Extension cap reached (extensionCapReached), or a lease could not be extended because the capacity has gone (noCapacity, naming the lines in lineIds). |
 
@@ -996,15 +1020,16 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
+| Reads | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
 | Writes | - |
-| Called by | GST-007, GST-009, GST-032, GST-041, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011 |
+| Called by | GST-007, GST-009, GST-032, GST-041, GST-053, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
+| X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 
 **Response**: `Cart`
 
@@ -1054,7 +1079,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
-| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
 | consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
@@ -1097,6 +1122,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | The cart |
 | 410 |  | Expired (cartExpired). |
 
@@ -1114,7 +1140,7 @@ Releases its lease immediately.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
+| Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart_line` |
 | Called by | GST-041, PTR-010, WEB-010 |
 
@@ -1174,7 +1200,7 @@ Releases its lease immediately.
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
-| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
 | consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
@@ -1234,7 +1260,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart_line` |
 | Called by | GST-041, PTR-010, WEB-010 |
 
@@ -1244,6 +1270,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
 | lineId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**
@@ -1300,7 +1327,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
-| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
 | consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
@@ -1343,6 +1370,8 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Updated |
 | 409 |  | Not enough capacity to increase (noCapacity). |
 
@@ -1658,7 +1687,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `access.entitlement`, `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `access.entitlement`, `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `access.entitlement`, `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-027, CMS-010, EMP-036, POS-010 |
 
@@ -1742,6 +1771,8 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | order.lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | order.lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
 | order.payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -1755,7 +1786,10 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.payments[].changeAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | order.payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | order.payments[].providerName | string |  | (nullable) |
-| order.payments[].providerReference | string |  | (nullable) |
+| order.payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| order.payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| order.payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| order.payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
 | order.payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | order.payments[].recordedAt | string (date-time) | yes |  |
 | order.payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -1813,7 +1847,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
@@ -1925,6 +1959,13 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
+| lines[].discounts[].id | string (uuid) | yes |  |
+| lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
+| lines[].discounts[].source | enum (promotion, promoCode, manual, bundle, member) | yes |  |
+| lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -1947,7 +1988,13 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | payments[].changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | payments[].providerName | string |  | (nullable) |
-| payments[].providerReference | string |  | (nullable) |
+| payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| payments[].nextAction.kind | enum (redirect, terminal) |  |  |
+| payments[].nextAction.url | string (uri) |  | (nullable) |
+| payments[].nextAction.expiresAt | string (date-time) |  | (nullable) |
 | payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | payments[].recordedAt | string (date-time) | yes |  |
 | payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -2042,8 +2089,8 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `promotions.promotion_evaluation_trace` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `promotions.promotion_evaluation_trace` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-130, EMP-014, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `converted`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `converted` |
 
@@ -2177,6 +2224,13 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
+| lines[].discounts[].id | string (uuid) | yes |  |
+| lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
+| lines[].discounts[].source | enum (promotion, promoCode, manual, bundle, member) | yes |  |
+| lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -2199,7 +2253,13 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | payments[].changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | payments[].providerName | string |  | (nullable) |
-| payments[].providerReference | string |  | (nullable) |
+| payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| payments[].nextAction.kind | enum (redirect, terminal) |  |  |
+| payments[].nextAction.url | string (uri) |  | (nullable) |
+| payments[].nextAction.expiresAt | string (date-time) |  | (nullable) |
 | payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | payments[].recordedAt | string (date-time) | yes |  |
 | payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -2241,7 +2301,7 @@ The replacement is held before the original is released, never the other way rou
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_event`, `orders.sales_order`, `platform.outbox` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-010, POS-011, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
@@ -2389,7 +2449,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | - |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, GST-018, GST-019, GST-028, KSK-009, KSK-011, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
 
@@ -2398,6 +2458,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | orderId | path | yes | string |  |
+| X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 
 **Response**: `Order`
 
@@ -2484,6 +2545,13 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
+| lines[].discounts[].id | string (uuid) | yes |  |
+| lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
+| lines[].discounts[].source | enum (promotion, promoCode, manual, bundle, member) | yes |  |
+| lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -2506,7 +2574,13 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | payments[].changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | payments[].providerName | string |  | (nullable) |
-| payments[].providerReference | string |  | (nullable) |
+| payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| payments[].nextAction.kind | enum (redirect, terminal) |  |  |
+| payments[].nextAction.url | string (uri) |  | (nullable) |
+| payments[].nextAction.expiresAt | string (date-time) |  | (nullable) |
 | payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | payments[].recordedAt | string (date-time) | yes |  |
 | payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -2544,7 +2618,7 @@ Returns an iCalendar (RFC 5545) event per dated line: the venue, the session sta
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `orders.sales_order`, `orders.order_line`, `platform.scope` |
+| Reads | `orders.order_line`, `orders.sales_order`, `platform.scope` |
 | Writes | - |
 | Called by | GST-018 |
 
@@ -2691,7 +2765,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
-| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `held` |
@@ -2796,6 +2870,13 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
+| lines[].discounts[].id | string (uuid) | yes |  |
+| lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
+| lines[].discounts[].source | enum (promotion, promoCode, manual, bundle, member) | yes |  |
+| lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -2818,7 +2899,13 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | payments[].changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | payments[].providerName | string |  | (nullable) |
-| payments[].providerReference | string |  | (nullable) |
+| payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| payments[].nextAction.kind | enum (redirect, terminal) |  |  |
+| payments[].nextAction.url | string (uri) |  | (nullable) |
+| payments[].nextAction.expiresAt | string (date-time) |  | (nullable) |
 | payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | payments[].recordedAt | string (date-time) | yes |  |
 | payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -2919,8 +3006,8 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
@@ -3025,6 +3112,8 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | order.lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | order.lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
 | order.payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -3038,7 +3127,10 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.payments[].changeAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | order.payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | order.payments[].providerName | string |  | (nullable) |
-| order.payments[].providerReference | string |  | (nullable) |
+| order.payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| order.payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| order.payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| order.payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
 | order.payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | order.payments[].recordedAt | string (date-time) | yes |  |
 | order.payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -3214,7 +3306,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `held` -> `pending` |
@@ -3286,6 +3378,8 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | order.lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | order.lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
 | order.payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -3299,7 +3393,10 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.payments[].changeAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | order.payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | order.payments[].providerName | string |  | (nullable) |
-| order.payments[].providerReference | string |  | (nullable) |
+| order.payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| order.payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| order.payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| order.payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
 | order.payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | order.payments[].recordedAt | string (date-time) | yes |  |
 | order.payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -3358,6 +3455,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | orderId | path | yes | string |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `VisitReminder`
@@ -3388,6 +3486,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Saved |
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
@@ -3470,7 +3569,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `voided` |
@@ -3576,6 +3675,13 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
+| lines[].discounts[].id | string (uuid) | yes |  |
+| lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
+| lines[].discounts[].source | enum (promotion, promoCode, manual, bundle, member) | yes |  |
+| lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
 | payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -3598,7 +3704,13 @@ Only before settlement and only within the same shift. After that it is a refund
 | payments[].changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | payments[].providerName | string |  | (nullable) |
-| payments[].providerReference | string |  | (nullable) |
+| payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| payments[].nextAction.kind | enum (redirect, terminal) |  |  |
+| payments[].nextAction.url | string (uri) |  | (nullable) |
+| payments[].nextAction.expiresAt | string (date-time) |  | (nullable) |
 | payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | payments[].recordedAt | string (date-time) | yes |  |
 | payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -3916,7 +4028,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `platform.scope` |
+| Reads | `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `platform.scope` |
 | Writes | - |
 | Called by | ADM-593, GST-009, WEB-014 |
 
@@ -3983,6 +4095,13 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
+| lines[].discounts[].id | string (uuid) | yes |  |
+| lines[].discounts[].promotionId | string (uuid) |  | The promotion that gave it. (nullable) |
+| lines[].discounts[].source | enum (promotion, promoCode, manual, bundle, member) | yes |  |
+| lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | amountDue | Money |  | On the wire this is three fields; in the database it is one column. |
 | amountDue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amountDue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -4068,7 +4187,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `orders.payment`, `payments.dunning_case`, `orders.sales_order` |
+| Reads | `orders.payment`, `orders.sales_order`, `payments.dunning_case` |
 | Writes | - |
 | Called by | GST-015, WEB-023 |
 
@@ -4141,7 +4260,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order`, `pii.subject` |
+| Reads | `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order`, `pii.subject` |
 | Writes | - |
 | Called by | GST-019, WEB-019 |
 
@@ -4149,6 +4268,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 | since | query |  | string (date) | Only orders whose createdAt falls on or after this date. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
@@ -4213,6 +4333,8 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].lines[].entitlementIds | array of string |  | The entitlements this line issued. |
 | items[].lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | items[].lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
+| items[].lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
+| items[].lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | items[].payments | array of Payment |  |  |
 | items[].payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
@@ -4226,7 +4348,10 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].payments[].changeAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].payments[].status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | items[].payments[].providerName | string |  | (nullable) |
-| items[].payments[].providerReference | string |  | (nullable) |
+| items[].payments[].providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| items[].payments[].providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| items[].payments[].terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| items[].payments[].nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
 | items[].payments[].lastInquiryAt | string (date-time) |  | (nullable) |
 | items[].payments[].recordedAt | string (date-time) | yes |  |
 | items[].payments[].syncedAt | string (date-time) |  | (nullable) |
@@ -4315,7 +4440,7 @@ BL-072. **Payment against the link, by somebody with no account.**
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `orders.payment_link`, `payments.provider`, `orders.reservation`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `payments.provider` |
 | Writes | `access.entitlement`, `cache:idempotency`, `orders.payment`, `orders.payment_link`, `orders.reservation`, `orders.sales_order` |
 | Called by | GST-009, WEB-014 |
 
@@ -4344,6 +4469,7 @@ BL-072. **Payment against the link, by somebody with no account.**
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 200 |  | Paid, and the reservation converted |
 | 409 |  | The hold went while they were paying (linesUnavailable). |
 
@@ -4500,6 +4626,7 @@ CF-131. **Network International and Stripe for Phase 1** — two gateways, which
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `SetPaymentProviderRequest`
@@ -4575,6 +4702,7 @@ CF-131. **Network International and Stripe for Phase 1** — two gateways, which
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Configured |
 
 ### shareEntitlement
@@ -4712,6 +4840,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | templateId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `TicketTemplateRequest`
@@ -4749,6 +4878,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Updated |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
@@ -4820,7 +4950,13 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 | changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | providerName | string |  | (nullable) |
-| providerReference | string |  | (nullable) |
+| providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| nextAction.kind | enum (redirect, terminal) |  |  |
+| nextAction.url | string (uri) |  | (nullable) |
+| nextAction.expiresAt | string (date-time) |  | (nullable) |
 | lastInquiryAt | string (date-time) |  | (nullable) |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -4846,8 +4982,8 @@ Captures an authorised payment. **Writes one `payments.payment_attempt` row for 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.payment`, `payments.provider_connection` |
-| Writes | `cache:idempotency`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.outbox` |
+| Reads | `ledger.fx_rate`, `orders.payment`, `payments.provider_connection` |
+| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | BO-024, EMP-035, POS-005, PTR-012 |
 | State model | Payment ([states/payment.yaml](../../../states/payment.yaml)): moves `authorised` -> `captured` |
 
@@ -4892,7 +5028,13 @@ Captures an authorised payment. **Writes one `payments.payment_attempt` row for 
 | changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | providerName | string |  | (nullable) |
-| providerReference | string |  | (nullable) |
+| providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| nextAction.kind | enum (redirect, terminal) |  |  |
+| nextAction.url | string (uri) |  | (nullable) |
+| nextAction.expiresAt | string (date-time) |  | (nullable) |
 | lastInquiryAt | string (date-time) |  | (nullable) |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -4923,8 +5065,8 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
-| Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.outbox` |
+| Reads | `catalogue.inventory_hold`, `ledger.fx_rate`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
+| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | BO-024, EMP-035, EMP-059, GST-009, GST-026, GST-027, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033, WEB-041, WEB-042 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `paid`, `pending` -> `partiallyPaid`, `partiallyPaid` -> `paid`, `pending` -> `failed`<br/>PaymentLink ([states/payment-link.yaml](../../../states/payment-link.yaml)): moves `issued` -> `paid`, `viewed` -> `paid`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): created as `authorised` or `pendingConfirmation`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `sold`<br/>SubBill ([states/sub-bill.yaml](../../../states/sub-bill.yaml)): moves `open` -> `paid`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `billRequested` -> `needsClearing` |
 
@@ -4951,6 +5093,9 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | walletAuthorisationId | string |  | Cross-cell wallet hold, where the guest's home cell is elsewhere. (nullable) |
+| walletHoldId | string (uuid) |  | For a wallet tender, the hold wallet.holdWalletFunds placed (SD-027). (nullable) |
+| returnUrl | string (uri) |  | Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). (nullable) |
+| terminalId | string (uuid) |  | The card terminal to instruct, for a card payment at a till (ECR flow, SD-034). (nullable) |
 | deviceId | string (uuid) |  | (nullable) |
 | recordedAt | string (date-time) | yes |  |
 
@@ -4979,7 +5124,13 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | providerName | string |  | (nullable) |
-| providerReference | string |  | (nullable) |
+| providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| nextAction.kind | enum (redirect, terminal) |  |  |
+| nextAction.url | string (uri) |  | (nullable) |
+| nextAction.expiresAt | string (date-time) |  | (nullable) |
 | lastInquiryAt | string (date-time) |  | (nullable) |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -4988,6 +5139,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal |
 | 201 |  | Recorded |
 | 402 |  | Declined by the provider (providerDeclined). |
 | 409 |  | Tender unavailable offline (tenderUnavailableOffline), amount exceeds the balance due (exceedsBalanceDue), or a guest channel sent a tender other than card or wallet (tenderNotAllowedOnChannel, audit… |
@@ -5045,7 +5197,13 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | changeAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (authorised, captured, pendingConfirmation, declined, failed, voided, refunded) | yes |  |
 | providerName | string |  | (nullable) |
-| providerReference | string |  | (nullable) |
+| providerReference | string |  | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). (nullable) |
+| providerIdempotencyKey | string |  | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). (read-only; nullable) |
+| terminalId | string (uuid) |  | The card terminal a till payment ran on (ECR flow, SD-034). (nullable) |
+| nextAction | object |  | What the caller does while the payment is pendingConfirmation (SD-034, 29 September). (nullable) |
+| nextAction.kind | enum (redirect, terminal) |  |  |
+| nextAction.url | string (uri) |  | (nullable) |
+| nextAction.expiresAt | string (date-time) |  | (nullable) |
 | lastInquiryAt | string (date-time) |  | (nullable) |
 | recordedAt | string (date-time) | yes |  |
 | syncedAt | string (date-time) |  | (nullable) |
@@ -5151,6 +5309,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
+| Conflict policy | serverWins |
 | Reads | `payments.provider_connection` |
 | Writes | `payments.provider_connection` |
 | Called by | ADM-570, ADM-571 |
@@ -5305,6 +5464,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `PayInstalmentPolicy`
@@ -5351,6 +5511,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 | 422 |  | A share due at purchase outside 0-100, or more instalments than the frequency allows within the product's term. |
 
@@ -5379,6 +5540,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string | Client-generated ULID. |
 
 **Request body**: `RefundPolicy`
@@ -5441,6 +5603,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 | 422 |  | The thresholds do not ascend: selfAuthoriseLimit above requiresSecondUserAbove, or either above requiresApprovalAbove (refund-thresholds-not-ascending, audit R123 (6)). |
 
@@ -5698,7 +5861,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.reservation`, `orders.reservation_line` |
+| Reads | `orders.reservation`, `orders.reservation_line` |
 | Writes | - |
 | Called by | GST-016, GST-017, WEB-031 |
 
@@ -5768,7 +5931,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.reservation`, `orders.reservation_line` |
+| Reads | `orders.reservation`, `orders.reservation_line` |
 | Writes | - |
 | Called by | GST-016, WEB-031 |
 
@@ -7534,7 +7697,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 
 **`POST /sync/orders`**: Replay orders recorded offline
 
-Ordered batch, processed in `sequence` order, stopping at the first entry that cannot be accepted. A void must never be evaluated before the sale it voids.
+Ordered batch, processed in `sequence` order. An entry refused on its merits is quarantined in `sync.rejection` and the batch continues; only a transient failure stops it (SD-028, 29 September). A void must never be evaluated before the sale it voids.
 Every line is re-priced on ingest. Variances are returned per order and posted to the variance account; the client surfaces nothing to the cashier.
 
 |  |  |
@@ -7545,8 +7708,8 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `orders.sales_order` |
-| Writes | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.sales_order` |
+| Reads | `catalogue.inventory_hold`, `catalogue.price_list`, `catalogue.variant`, `orders.sales_order` |
+| Writes | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.price_variance`, `orders.order_line`, `orders.order_line_discount`, `orders.payment`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox`, `sync.rejection` |
 | Called by | BO-037, BO-130, BO-132, EMP-017, POS-002, POS-013, SCN-014 |
 
 **Parameters**
@@ -7593,6 +7756,9 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | orders[].payments[].tenderCurrency | string |  | The currency the guest handed over, where it is not the venue's — becomes Payment.tenderCurrency. (pattern ^[A-Z]{3}$; nullable) |
 | orders[].payments[].tenderAmount | object |  | What the guest handed over, in tenderCurrency — becomes Payment.tenderAmount, one name for one concept (renamed from tenderedAmount on 26 September). |
 | orders[].payments[].walletAuthorisationId | string |  | Cross-cell wallet hold, where the guest's home cell is elsewhere. (nullable) |
+| orders[].payments[].walletHoldId | string (uuid) |  | For a wallet tender, the hold wallet.holdWalletFunds placed (SD-027). (nullable) |
+| orders[].payments[].returnUrl | string (uri) |  | Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). (nullable) |
+| orders[].payments[].terminalId | string (uuid) |  | The card terminal to instruct, for a card payment at a till (ECR flow, SD-034). (nullable) |
 | orders[].payments[].deviceId | string (uuid) |  | (nullable) |
 | orders[].payments[].recordedAt | string (date-time) | yes |  |
 
@@ -7601,17 +7767,18 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | accepted | integer | yes |  |
-| stoppedAtSequence | integer |  | First entry that could not be processed. (nullable) |
+| stoppedAtSequence | integer |  | First entry that hit a transient failure (SD-028, 29 September): a refusal on the merits no longer stops the batch. (nullable) |
 | results | array of object | yes |  |
 | results[].id | string | yes | The OfflineOrder.id this result is about. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | results[].sequence | integer | yes |  |
-| results[].status | enum (accepted, duplicate, rejected) | yes |  |
+| results[].status | enum (accepted, duplicate, rejected, blockedByRejection) | yes | rejected: refused on its merits and quarantined in sync.rejection; the batch continues. |
 | results[].orderNumber | string |  | (nullable) |
 | results[].priceVariance | object |  | Posted to the variance account. |
 | results[].priceVariance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | results[].priceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | results[].priceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | results[].varianceExceedsThreshold | boolean |  | True when review is required per the venue's variance threshold. |
+| results[].rejectionId | string |  | For a rejected or blockedByRejection entry, the sync.rejection row it was quarantined into (SD-028). (nullable) |
 | results[].error | Problem |  | RFC 9457 problem details. |
 | results[].error.type | string (uri) | yes | The problem type URI, https://api.ticvai.com/problems/<slug>. |
 | results[].error.title | string | yes |  |
@@ -7625,7 +7792,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Batch processed, wholly or up to the first rejection |
+| 200 |  | Batch processed; entries refused on their merits are quarantined, and only a transient failure stops it (SD-028) |
 
 ## Tables
 
@@ -7679,8 +7846,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | lease_expires_at | timestamptz | no | Shown to the guest. |
 | is_available | boolean | no | Re-checked on every read. |
 | cart_id | uuid | yes | Points at orders.cart. |
-| attributes_id | uuid | no | Points at embedded as attributes (jsonb) on orders.cart_line and orders.order_line. |
-| booked_window_id | uuid | no | Points at embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line. |
 
 ### `orders.cash_count_line`
 
@@ -7838,9 +8003,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| promotion_id | uuid | yes |  |
-| name | text | no |  |
-| reason | text | no |  |
 | sales_order_id | text | yes | The parent row. |
 | id | text | yes | Client-generated ULID of the line. |
 | variant_id | uuid | yes |  |
@@ -7863,8 +8025,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | entitlement_ids | text[] | no | The entitlements this line issued. |
 | cross_region_right_ids | text[] | no | Redemption rights propagated to other cells for this line. |
 | reprint_count | integer | no | How many times this line's tickets were reprinted or resent. |
-| attributes_id | uuid | no | Points at embedded as attributes (jsonb) on orders.cart_line and orders.order_line. |
-| booked_window_id | uuid | no | Points at embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line. |
+| venue_id | uuid | no | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. |
+
+### `orders.order_line_discount`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| order_line_id | text | yes | The parent row. |
+| id | uuid | yes |  |
+| promotion_id | uuid | no | The promotion that gave it. |
+| source | text | yes |  |
+| amount | numeric(18,4) | yes |  |
+| reason | text | no | A cashier's reason for a manual discount. |
 
 ### `orders.order_line_eligibility`
 
@@ -7894,7 +8066,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | change_amount | numeric(18,4) | no |  |
 | status | text | yes |  |
 | provider_name | text | no |  |
-| provider_reference | text | no |  |
+| provider_reference | text | no | The provider's own id for the charge (Stripe PaymentIntent, NI order reference). |
+| provider_idempotency_key | text | no | The idempotency key sent to the provider, which is this payment's id (SD-034, 29 September). |
+| terminal_id | uuid | no | The card terminal a till payment ran on (ECR flow, SD-034). |
 | last_inquiry_at | timestamptz | no |  |
 | recorded_at | timestamptz | yes |  |
 | synced_at | timestamptz | no |  |
@@ -8065,8 +8239,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | quoted_unit_price | numeric(18,4) | yes | What the client charged, from its local bundle. |
 | holder_name | text | no |  |
 | data_mask_values | jsonb | no | Deliberately open. |
-| attributes_id | uuid | no | Points at embedded as attributes (jsonb) on orders.cart_line and orders.order_line. |
-| booked_window_id | uuid | no | Points at embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line. |
 
 ### `orders.sales_order`
 
@@ -8238,6 +8410,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | decline_class | text | no |  |
 | decline_code | text | no | The provider's own code, kept verbatim. |
 | decline_reason | text | no |  |
+| provider_reference | text | no | The provider's id for this call (SD-034, 29 September). |
+| provider_idempotency_key | text | no | The idempotency key sent with this call, the payment's id plus the attempt kind, so a retried call is recognised by the provider (SD-034). |
+| attempt_kind | text | no | Which adapter call this was (authorise, capture, refund, void, inquire; terminal for an ECR instruction to a card terminal). |
 | latency_ms | integer | no | Request to provider response. |
 | authentication_outcome | text | no | The 3-D Secure result, the authenticationOutcome dimension of getPaymentPerformance. |
 | amount | numeric(18,4) | no |  |
@@ -8310,7 +8485,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-204 operations, added to this service in later releases without changing any of the above.
+205 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -8319,7 +8494,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupArrivalCheck`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `listTicketTransfers`, `setDepositPolicy` |
 | orders | `assignChargeback`, `authoriseStoredValue`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `recordGroupCheckIn`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
-| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
+| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund` |
 | reservation | `convertReservation`, `createReservation`, `extendReservation` |

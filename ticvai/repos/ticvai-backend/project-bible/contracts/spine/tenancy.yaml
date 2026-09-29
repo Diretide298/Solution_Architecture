@@ -105,6 +105,95 @@ tags:
   - name: tenancy
 
 paths:
+  /tenant-domains/{hostname}:
+    parameters:
+    - name: hostname
+      in: path
+      required: true
+      description: The host a request arrived on, lower-case, no port.
+      schema:
+        type: string
+        maxLength: 253
+    get:
+      operationId: resolveTenantHost
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '29 September: system-design review SD-021 (hostname to tenant routing)'
+      summary: Which tenant, cell and database a hostname belongs to
+      description: '**The first thing an anonymous guest-web request needs** (system-design review SD-021, 29
+        September). A request arrives with only a hostname, and the tenant database cannot be opened to find
+        out which tenant it is. The edge resolves host to tenant to database from `control.tenant_domain` in the
+        control database, cached (a verified domain changes rarely); an unknown host is `404` and never falls
+        through to a default tenant.
+
+        '
+      tags:
+      - tenancy
+      x-ticvai-permission: null
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-read-routing: replica
+      x-ticvai-latency-budget-ms: 20
+      responses:
+        '200':
+          description: The routing row
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantDomain'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    put:
+      operationId: setTenantDomainMapping
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '29 September: system-design review SD-021'
+      x-ticvai-config-scope: tenant
+      summary: Route a hostname to a tenant
+      description: '**Written when a custom domain is verified** (white-label `verifyCustomDomain`) and when a
+        tenant is provisioned with its platform subdomain; removed-by-status when a domain is detached.
+        `hostname` is unique across every tenant: a host already routed to another tenant is refused `409`
+        (`hostname-taken`).
+
+        '
+      tags:
+      - tenancy
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantDomain'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Routed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantDomain'
+        '409':
+          description: The hostname is routed to another tenant (`hostname-taken`).
+          x-ticvai-problem-types:
+          - hostname-taken
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /org-units:
     get:
       operationId: listOrgUnits
@@ -1742,6 +1831,9 @@ paths:
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-125 Product & Category Button Configuration"
+      security:
+      - apiKeyAuth: []
+      - serviceAuth: []
       x-ticvai-audience: [device]
       summary: Device heartbeat and status
       description: >
@@ -1795,6 +1887,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-407 Reader Credit & Payment Configuration"
         - "P09 ADM-581 Terminal Provisioning & Device Configuration\t51"
+      x-ticvai-conflict-policy: serverWins
       summary: Take a registered device through enrolment to activation
       description: '16.1.2, 16.1.3, 16.1.6. **`registerDevice` created a row; nothing turned it into a
         device you could trust.** Registration is an assertion — *this serial exists* — and enrolment is
@@ -1854,6 +1947,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
         - "P09 ADM-582 POS, Kiosk & Terminal Assignment Manager\t52"
+      x-ticvai-conflict-policy: serverWins
       summary: Who owns it, who holds it, and where it is
       description: '16.2.9, 16.2.10 and 16.2.11. **Ownership, custody and location are three facts and
         the package carried none of them.** A device bound to a workstation has a venue, which answers
@@ -2172,6 +2266,7 @@ paths:
       operationId: startDeviceFirmwareRollout
       x-ticvai-consumed-by:
         - "P08 BO-129 Software, Configuration & Version Management"
+      x-ticvai-conflict-policy: serverWins
       summary: Push an update to a fleet, in waves
       description: '16.6.31 and 16.6.33. **Staged, never all at once.** A firmware update that bricks a
         scanner has bricked one scanner if it went to a canary and the whole estate if it did not — and
@@ -2231,6 +2326,7 @@ paths:
       operationId: rollbackDeviceFirmware
       x-ticvai-consumed-by:
         - "P08 BO-129 Software, Configuration & Version Management"
+      x-ticvai-conflict-policy: serverWins
       summary: Put the fleet back on the previous version
       description: '16.6.34. **The requirement that makes the rest safe.** A staged rollout is only a
         containment strategy if there is a way back, and the previous image has to still be on the device
@@ -2298,6 +2394,7 @@ paths:
       operationId: issueDeviceCredential
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
+      x-ticvai-conflict-policy: serverWins
       summary: Give the device an identity it can prove
       description: '16.7.35, 16.7.36 and 16.7.37. **A device that authenticates with a shared key is a
         device that cannot be revoked alone.** Per-device credentials with an expiry are what make
@@ -2345,6 +2442,7 @@ paths:
       operationId: revokeDeviceCredential
       x-ticvai-consumed-by:
         - "P08 BO-036 Device Registry"
+      x-ticvai-conflict-policy: serverWins
       summary: Cut a device off now
       tags:
       - devices
@@ -2455,6 +2553,7 @@ paths:
                   $ref: '#/components/schemas/DeviceTamperEvent'
     post:
       operationId: recordDeviceTamperEvent
+      x-ticvai-conflict-policy: append
       summary: A device reports interference
       tags:
       - devices
@@ -2917,6 +3016,119 @@ components:
           pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
           description: Local time, 24-hour `HH:MM`, when the outlet closes.
 
+    TenantDomain:
+      type: object
+      x-ticvai-persistence: control.tenant_domain
+      x-ticvai-agreed: '29 September: system-design review SD-021'
+      description: '**Hostname to tenant, outside every tenant database** (SD-021, 29 September). In the control
+        database, because the edge must answer it before it knows which tenant database to open.
+        `whitelabel.custom_domain` stays the tenant''s own record of its domain and its verification.'
+      required:
+      - hostname
+      - tenantId
+      - kind
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        hostname:
+          type: string
+          maxLength: 253
+          x-ticvai-unique: tenant
+        tenantId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.tenant
+        cellId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The cell serving the tenant, so the edge routes to the right region.
+        databaseName:
+          type: string
+          maxLength: 63
+          nullable: true
+          description: The tenant database on the cell's instance (ADR-0038).
+        kind:
+          type: string
+          enum:
+          - platformSubdomain
+          - customDomain
+        channel:
+          type: string
+          nullable: true
+          enum:
+          - guestWeb
+          - backOffice
+          - partnerPortal
+          - developerPortal
+        status:
+          type: string
+          enum:
+          - active
+          - detached
+        verifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+    PlatformIdempotencyRecord:
+      type: object
+      x-ticvai-persistence: platform.idempotency_record
+      x-ticvai-agreed: '29 September: system-design review SD-024 (durable idempotency store)'
+      description: '**The durable idempotency record** (SD-024, 29 September): written in the same transaction as
+        the state change a keyed write makes, unique on (`idempotencyKey`, `operationId`). A replay returns the
+        stored response; Redis is a cache in front of this table. Rows expire after `expiresAt` (a sweeper
+        deletes them in batches; offline clients replay within the offline bound, so the window covers it).'
+      required:
+      - id
+      - idempotencyKey
+      - operationId
+      - requestHash
+      - status
+      - createdAt
+      - expiresAt
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+        idempotencyKey:
+          type: string
+          maxLength: 26
+        operationId:
+          type: string
+          maxLength: 100
+        requestHash:
+          type: string
+          maxLength: 64
+          description: SHA-256 of the canonical request, so the same key with a different body is a `409`.
+        status:
+          type: string
+          enum:
+          - inProgress
+          - completed
+        responseStatus:
+          type: integer
+          nullable: true
+        responseBody:
+          type: object
+          nullable: true
+          additionalProperties: true
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005).
     PlatformCellEndpoint:
       type: object
       x-ticvai-persistence: platform.cell_endpoint
@@ -3933,6 +4145,18 @@ components:
           format: uuid
           readOnly: true
           description: From the path of `setVenueSettings`.
+        calendarDayStartHour:
+          type: integer
+          minimum: 0
+          maximum: 23
+          nullable: true
+          default: 6
+          description: >
+            **Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September):
+            the first hour row of every day and week calendar view (`calendarView` in
+            `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it
+            belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant
+            default (proposed 6, client to correct).
         currencyCode:
           type: string
           pattern: ^[A-Z]{3}$
@@ -4751,6 +4975,21 @@ components:
         isActive: { type: boolean, default: true }
 
   securitySchemes:
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Guest session token (common.yaml guestAuth). Scoped to the guest's own resources.
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell workload token over mTLS (common.yaml serviceAuth).
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+      description: Partner, developer and device key (common.yaml apiKeyAuth).
     bearerAuth:
       type: http
       scheme: bearer

@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-29",
+ "generated": "2026-09-30",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1186,
-  "operations": 1448,
+  "operations": 1460,
   "contracts": 32,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 185
+  "operationsWithNoScreen": 186
  },
  "waves": {
   "wave1": 60,
@@ -157,20 +157,20 @@
    "operations": 65
   },
   {
-   "contract": "finance",
-   "operations": 56
+   "contract": "inventory",
+   "operations": 57
   },
   {
    "contract": "wallet",
    "operations": 56
   },
   {
-   "contract": "resources",
-   "operations": 55
+   "contract": "finance",
+   "operations": 56
   },
   {
-   "contract": "inventory",
-   "operations": 54
+   "contract": "resources",
+   "operations": 55
   },
   {
    "contract": "seating",
@@ -193,6 +193,10 @@
    "operations": 40
   },
   {
+   "contract": "maintenance",
+   "operations": 39
+  },
+  {
    "contract": "ai",
    "operations": 38
   },
@@ -205,19 +209,15 @@
    "operations": 34
   },
   {
-   "contract": "maintenance",
-   "operations": 33
-  },
-  {
    "contract": "identity",
    "operations": 29
   },
   {
-   "contract": "subscription",
+   "contract": "approvals",
    "operations": 27
   },
   {
-   "contract": "approvals",
+   "contract": "subscription",
    "operations": 27
   },
   {
@@ -233,24 +233,24 @@
    "operations": 18
   },
   {
+   "contract": "queue",
+   "operations": 13
+  },
+  {
    "contract": "venue-map",
    "operations": 13
   },
   {
-   "contract": "queue",
-   "operations": 13
+   "contract": "public-api",
+   "operations": 12
   },
   {
    "contract": "retail",
    "operations": 12
   },
   {
-   "contract": "public-api",
-   "operations": 10
-  },
-  {
    "contract": "white-label",
-   "operations": 10
+   "operations": 11
   },
   {
    "contract": "payments",
@@ -326,7 +326,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/product-directory",
-   "operations": 14,
+   "operations": 15,
    "drawn": true
   },
   {
@@ -335,7 +335,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/product-detail-variants",
-   "operations": 11,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -362,7 +362,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/packages-bundles",
-   "operations": 12,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -893,7 +893,7 @@
    "module": "Venue Operations",
    "wave": 2,
    "route": "/venue-operations/work-orders",
-   "operations": 9,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -1109,7 +1109,7 @@
    "module": "Access & Venue",
    "wave": 2,
    "route": "/venue-mapping/map-editor",
-   "operations": 7,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -1892,7 +1892,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/api-access-oauth-bo-1073",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -2648,7 +2648,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/category-brand-merchandise-hierarchy",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -2918,7 +2918,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/api-security-access-integration-permissions-bo-1177",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -7148,7 +7148,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/maintenance-work-order-bo-577",
-   "operations": 5,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -7166,7 +7166,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/parts-cost-maintenance-expense-tracking-bo-579",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -9659,7 +9659,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-creation-profile-bo-857",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -9740,7 +9740,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-availability-schedule-configuration-bo-866",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -11298,12 +11298,6 @@
     "summary": "Tick what they may do"
    },
    {
-    "operation": "listStockReservations",
-    "contract": "inventory",
-    "verb": "GET",
-    "summary": "Soft holds on stock"
-   },
-   {
     "operation": "actOnWaiverRequirements",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -12006,6 +12000,12 @@
     "summary": "Block a gift card"
    },
    {
+    "operation": "captureWalletHold",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Debit a held amount"
+   },
+   {
     "operation": "closeWallet",
     "contract": "wallet",
     "verb": "POST",
@@ -12016,6 +12016,12 @@
     "contract": "wallet",
     "verb": "GET",
     "summary": "A wallet's balance"
+   },
+   {
+    "operation": "holdWalletFunds",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Hold wallet funds for a spend in progress"
    },
    {
     "operation": "listWalletHolds",
@@ -12030,10 +12036,10 @@
     "summary": "Unfreeze a wallet"
    },
    {
-    "operation": "getNavigation",
-    "contract": "white-label",
-    "verb": "GET",
-    "summary": "Read navigation"
+    "operation": "releaseWalletHold",
+    "contract": "wallet",
+    "verb": "POST",
+    "summary": "Give held wallet funds back"
    },
    {
     "operation": "publishContentBlock",

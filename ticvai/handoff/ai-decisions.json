@@ -82,8 +82,24 @@
    "id": "AI-D16",
    "q": "3.12 model promotion",
    "a": "Raise to admin at threshold; never auto-switch"
+  },
+  {
+   "id": "AI-D17",
+   "q": "Six-month plan: which AI ships",
+   "a": "Every AI function inside the six months, baseline first (rules and starting patterns answer on day one), then it learns per tenant from that tenant's own data (Chinmay, 30 September)"
+  },
+  {
+   "id": "AI-D18",
+   "q": "3.3 model fitness scoring (M21-09)",
+   "a": "Our proposal, adopted: each model carries a task-fitness band per agent task (AiModel.taskFitness: score, floor, ceiling, evaluation run); setAiProvider returns fitness warnings (underpowered, overpowered, unscored) and never blocks the choice"
+  },
+  {
+   "id": "AI-D19",
+   "q": "7 AI staffing",
+   "a": "A second AI engineer from 5 October; no third (Chinmay, 30 September). The trained model producers slip first; everything with a baseline ships in the six months"
   }
  ],
  "recorded_in": "docs/architecture/ai-system-design.md section 8",
- "note": "The AI system design questions and trade-offs, answered by Chinmay on 29 September. Read by tools/build-decisions-workbook.py."
+ "note": "The AI system design questions and trade-offs, answered by Chinmay on 29 September. Read by tools/build-decisions-workbook.py.",
+ "decisions_updated": "2026-09-30"
 }

@@ -7,6 +7,8 @@ publisher: seating
 description: A seat was held for a buyer and is not available to anyone else until the hold ends.
 aggregate: seat
 emittedWhen: SeatStatus available to held (createSeatHold)
+emittedBy:
+- createSeatHold
 payload:
 - field: seatId
   type: string
