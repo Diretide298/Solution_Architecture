@@ -2267,9 +2267,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "approveOperational",
      "reject",
      "schedule",
-     "publish"
+     "publish",
+     "suspend",
+     "reinstate"
     ],
-    "description": "Decision taken on BO-293"
+    "description": "Decision taken on BO-293; `suspend` (from `active`, reason required) and `reinstate` (from `suspended`) are the BO-284 quick actions (decided 29 September, writers pass; DM4)"
    },
    "effectiveFrom": {
     "type": "string",

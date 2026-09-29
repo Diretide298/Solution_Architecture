@@ -1,6 +1,6 @@
 # WS08 — Access Control board 8
 
-**10 screens · 19 operations · 20 schemas · 5 permissions**
+**10 screens · 22 operations · 24 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,15 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-214` | Guest Journey Command Center | listDetail | 2 | 0 | — |
+| `BO-214` | Guest Journey Command Center | listDetail | 3 | 1 | — |
 | `BO-215` | Group & B2B Admission Profile Builder | configEditor | 1 | 0 | — |
 | `BO-216` | Group Leader & Fast B2B Validation | listDetail | 1 | 0 | — |
 | `BO-217` | Group Attendance & Partial Entry Manager | listDetail | 1 | 0 | — |
 | `BO-218` | Family, Child, POD & Companion Journey | configEditor | 2 | 0 | — |
 | `BO-219` | Re-entry & Temporary Exit Journey | configEditor | 3 | 0 | — |
 | `BO-220` | Multi-Park & Crossover Journey Orchestrator | listDetail | 4 | 0 | — |
-| `BO-221` | Fast Pass & Attraction Access Journey | configEditor | 3 | 0 | — |
-| `BO-222` | Special Event, Free View & Alternative Admission | configEditor | 3 | 0 | — |
+| `BO-221` | Fast Pass & Attraction Access Journey | configEditor | 4 | 1 | — |
+| `BO-222` | Special Event, Free View & Alternative Admission | configEditor | 4 | 1 | — |
 | `BO-223` | Journey Simulation, Audit & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch

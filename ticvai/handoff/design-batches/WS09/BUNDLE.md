@@ -156,15 +156,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listLiveAccess"
     },
     {
-     "to": "BO-230",
-     "trigger": "Works in Live Gate Mode & Lane Control",
-     "provenance": "flow F119 step 11→12",
-     "operation": "listLiveAccess",
-     "carries": [
-      "accessPointId"
-     ]
-    },
-    {
      "to": "BO-231",
      "trigger": "Works in Queue, Throughput & Lane Optimization",
      "provenance": "flow F119 step 13→14",
@@ -181,6 +172,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Works in Operations Audit, Shift Handover & Control Summary",
      "provenance": "flow F119 step 17→18",
      "operation": "listLiveAccess"
+    },
+    {
+     "to": "BO-230",
+     "trigger": "Works in Live Gate Mode & Lane Control",
+     "provenance": "flow F119 step 11→12",
+     "operation": "listLiveAccess",
+     "carries": [
+      "accessPointId"
+     ]
     }
    ]
   },
@@ -533,6 +533,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "shiftId",
      "from": "navigation",
      "optional": true
+    },
+    {
+     "name": "podiumId",
+     "from": "navigation"
     }
    ]
   },
@@ -888,6 +892,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "entryState": {
    "preloaded": [
     "ValidationExceptionReasonCodeManagerView.operationalResponse"
+   ],
+   "params": [
+    {
+     "name": "reasonCodeId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -2037,7 +2047,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "PodiumOperationsConsoleView"
  },
@@ -2182,7 +2198,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ValidationExceptionReasonCodeManagerView"
  },

@@ -1,6 +1,6 @@
 # WS160 — Resource Management Configuration board 6
 
-**10 screens · 22 operations · 31 schemas · 11 permissions**
+**10 screens · 24 operations · 32 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-903` | Equipment & Asset Command Center | listDetail | 2 | 0 | — |
+| `BO-903` | Equipment & Asset Command Center | listDetail | 4 | 1 | — |
 | `BO-904` | Rental Resource Configuration | configEditor | 2 | 0 | — |
 | `BO-905` | Rental Inventory & Availability Control | configEditor | 2 | 0 | — |
 | `BO-906` | Resource Checkout Workspace | configEditor | 2 | 0 | — |
 | `BO-907` | Guest & Resource Assignment | listDetail | 2 | 0 | — |
 | `BO-908` | Rental Duration, Extension & Return Management | listDetail | 2 | 0 | — |
 | `BO-909` | Deposit & Rental Financial Control | listDetail | 2 | 0 | — |
-| `BO-910` | Maintenance & Resource Blocking | configEditor | 3 | 0 | — |
+| `BO-910` | Maintenance & Resource Blocking | configEditor | 4 | 1 | — |
 | `BO-911` | Inspection, Condition & Compliance Management | listDetail | 3 | 0 | — |
-| `BO-912` | Asset Lifecycle, Depreciation & Retirement | listDetail | 2 | 0 | — |
+| `BO-912` | Asset Lifecycle, Depreciation & Retirement | listDetail | 4 | 1 | — |
 
 ## Thin screens in this batch
 
-**BO-903, BO-907, BO-908, BO-909 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-907, BO-908, BO-909 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -215,6 +215,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Display"
+      },
+      {
+       "kind": "textField",
+       "label": "Resource id",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?resourceId=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?kind=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?from=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?to=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every resource cost entry",
+       "bindsTo": "ResourceCostEntry",
+       "columns": [
+        "ResourceCostEntry.id",
+        "ResourceCostEntry.resourceId",
+        "ResourceCostEntry.kind",
+        "ResourceCostEntry.amount",
+        "ResourceCostEntry.incurredOn",
+        "ResourceCostEntry.fromVenueId",
+        "ResourceCostEntry.toVenueId",
+        "ResourceCostEntry.note",
+        "ResourceCostEntry.scopePath"
+       ],
+       "operation": "listResourceCosts",
+       "provenance": "contract resources.yaml GET /resource-costs"
       }
      ]
     },
@@ -255,6 +301,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Total asset value, Replacement value, Depreciated value, Maintenance cost, Lost/damaged value. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 82 §Where financial permissions allow"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Create resource cost",
+       "operation": "createResourceCost",
+       "permission": "RESOURCE_MANAGE",
+       "notes": "**The writer of `resources.resource_cost`** (decided 29 September, writers pass).",
+       "provenance": "contract resources.yaml POST /resource-costs"
       }
      ]
     }
@@ -281,6 +335,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "The asset register",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listResourceCosts",
+    "contract": "resources",
+    "purpose": "Cost entries booked against resources",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createResourceCost",
+    "contract": "resources",
+    "purpose": "Book a transfer, operating or replacement cost against a resource",
+    "trigger": "onAction",
+    "invalidates": [
+     "listResources",
+     "listAssets",
+     "listResourceCosts"
+    ]
    }
   ],
   "entryState": {
@@ -299,6 +370,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-903"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 82. 0 of 13 labels bound to a contract property; 18 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateResourceCost",
+    "component": "modal",
+    "trigger": "Create resource cost",
+    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ResourceCostEntry",
+    "confirm": {
+     "label": "Create resource cost",
+     "operation": "createResourceCost"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "resourceId",
+      "kind",
+      "amount",
+      "incurredOn",
+      "fromVenueId",
+      "toVenueId",
+      "note",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract resources.yaml POST /resource-costs"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1544,6 +1643,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Manufacturer service",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 91 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create resource cost",
+       "operation": "createResourceCost",
+       "permission": "RESOURCE_MANAGE",
+       "notes": "**The writer of `resources.resource_cost`** (decided 29 September, writers pass).",
+       "provenance": "contract resources.yaml POST /resource-costs"
       }
      ]
     }
@@ -1585,6 +1692,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "What is due",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createResourceCost",
+    "contract": "resources",
+    "purpose": "Book a transfer, operating or replacement cost against a resource",
+    "trigger": "onAction",
+    "invalidates": [
+     "getDueMaintenance"
+    ]
    }
   ],
   "wireframe": {
@@ -1593,6 +1709,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-910"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 91. 0 of 0 labels bound to a contract property; 13 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Manufacturer service are choices sent by `createWorkOrder` (planned work order assigned to the manufacturer (resolution referredExternal)).",
+  "overlays": [
+   {
+    "id": "formCreateResourceCost",
+    "component": "modal",
+    "trigger": "Create resource cost",
+    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ResourceCostEntry",
+    "confirm": {
+     "label": "Create resource cost",
+     "operation": "createResourceCost"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "resourceId",
+      "kind",
+      "amount",
+      "incurredOn",
+      "fromVenueId",
+      "toVenueId",
+      "note",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract resources.yaml POST /resource-costs"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1886,6 +2030,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Track"
+      },
+      {
+       "kind": "textField",
+       "label": "Resource id",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?resourceId=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?kind=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?from=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?to=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every resource cost entry",
+       "bindsTo": "ResourceCostEntry",
+       "columns": [
+        "ResourceCostEntry.id",
+        "ResourceCostEntry.resourceId",
+        "ResourceCostEntry.kind",
+        "ResourceCostEntry.amount",
+        "ResourceCostEntry.incurredOn",
+        "ResourceCostEntry.fromVenueId",
+        "ResourceCostEntry.toVenueId",
+        "ResourceCostEntry.note",
+        "ResourceCostEntry.scopePath"
+       ],
+       "operation": "listResourceCosts",
+       "provenance": "contract resources.yaml GET /resource-costs"
       }
      ]
     },
@@ -1934,6 +2124,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Asset Information",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create resource cost",
+       "operation": "createResourceCost",
+       "permission": "RESOURCE_MANAGE",
+       "notes": "**The writer of `resources.resource_cost`** (decided 29 September, writers pass).",
+       "provenance": "contract resources.yaml POST /resource-costs"
       }
      ]
     }
@@ -1965,6 +2163,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Its life so far",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listResourceCosts",
+    "contract": "resources",
+    "purpose": "Cost entries booked against resources",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createResourceCost",
+    "contract": "resources",
+    "purpose": "Book a transfer, operating or replacement cost against a resource",
+    "trigger": "onAction",
+    "invalidates": [
+     "listResourceCosts"
+    ]
    }
   ],
   "entryState": {
@@ -1993,6 +2206,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS131 Resource Management Configuration Board 6.dc.html#bo-912"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 93. 0 of 17 labels bound to a contract property; 25 of 188 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** → End of Life are choices sent by `setResourceLifecycleState` (state retired with disposal); Asset Information dropped (section heading).",
+  "overlays": [
+   {
+    "id": "formCreateResourceCost",
+    "component": "modal",
+    "trigger": "Create resource cost",
+    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ResourceCostEntry",
+    "confirm": {
+     "label": "Create resource cost",
+     "operation": "createResourceCost"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "resourceId",
+      "kind",
+      "amount",
+      "incurredOn",
+      "fromVenueId",
+      "toVenueId",
+      "note",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract resources.yaml POST /resource-costs"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2100,6 +2341,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "ResourceBlock",
   "responds": "ResourceBlock"
+ },
+ "createResourceCost": {
+  "method": "POST",
+  "path": "/resource-costs",
+  "contract": "resources",
+  "summary": "Book a transfer, operating or replacement cost against a resource",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceCostEntry",
+  "responds": "ResourceCostEntry"
  },
  "createWorkOrder": {
   "method": "POST",
@@ -2328,6 +2588,50 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "performedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listResourceCosts": {
+  "method": "GET",
+  "path": "/resource-costs",
+  "contract": "resources",
+  "summary": "Cost entries booked against resources",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "resourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
     "in": "query",
     "required": null
    },
@@ -4064,6 +4368,69 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cancelled",
    "noShow"
   ]
+ },
+ "ResourceCostEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_cost",
+  "description": "**One cost booked against a resource**: a transfer between locations, an operating cost or a replacement. `getResourceCostAnalytics` sums these per group and window (decided 29 September, data model DM4).\n",
+  "required": [
+   "id",
+   "resourceId",
+   "kind",
+   "amount",
+   "incurredOn"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "transfer",
+     "operating",
+     "replacement"
+    ]
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "incurredOn": {
+    "type": "string",
+    "format": "date"
+   },
+   "fromVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `transfer` only, with `toVenueId`."
+   },
+   "toVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005), written at `venue` scope."
+   }
+  }
  },
  "ResourceKind": {
   "type": "string",

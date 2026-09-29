@@ -260,6 +260,25 @@
   "requestBody": "RentalQuoteRequest",
   "responds": null
  },
+ "transitionDynamicPricingStrategy": {
+  "method": "POST",
+  "path": "/dynamic-pricing-strategies/{strategyId}/lifecycle",
+  "contract": "catalogue",
+  "summary": "Activate, pause, resume or retire a dynamic pricing strategy",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DynamicPricingStrategy"
+ },
  "updateRentalPricingProfile": {
   "method": "PUT",
   "path": "/rental-pricing-profiles/{profileId}",

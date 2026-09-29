@@ -79,6 +79,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "subjectId",
     "in": "query",
     "required": true
@@ -240,6 +245,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "brandId",
     "in": "query",
     "required": false
@@ -298,6 +308,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "from",
     "in": "query",

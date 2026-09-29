@@ -774,6 +774,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save offline policy",
+       "operation": "setOfflinePolicy",
+       "permission": "TENANT_CONFIGURE",
+       "notes": "Board 5 of the client's POS set, and **one of only two things in 36 board screens the package could not do.** ADR-0013 makes the POS local-first and nothing configured the policy.",
+       "provenance": "contract tenancy.yaml PUT /offline-policy"
+      }
+     ]
     }
    ]
   },
@@ -786,10 +800,24 @@
   },
   "apis": [
    {
+    "operationId": "setGateOfflinePolicy",
+    "purpose": "Save the gate offline validation, revocation cache and degraded-mode policy (writers pass, 29 September)",
+    "contract": "access"
+   },
+   {
     "operationId": "listOfflineCredentialRevocation",
     "contract": "access",
     "purpose": "Offline Credential & Revocation Cache",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setOfflinePolicy",
+    "contract": "tenancy",
+    "purpose": "What a workstation may do with no network, and for how long",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOfflineCredentialRevocation"
+    ]
    }
   ],
   "entryState": {
@@ -804,6 +832,33 @@
    "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-208"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 90. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetOfflinePolicy",
+    "component": "modal",
+    "trigger": "Save offline policy",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "OfflinePolicy",
+    "confirm": {
+     "label": "Save offline policy",
+     "operation": "setOfflinePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scopePath",
+      "id",
+      "maxOfflineHours",
+      "allowedOffline",
+      "offlineValueCeiling",
+      "offlineTransactionCeiling",
+      "onCeilingBreach",
+      "requiresManagerToExtend"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /offline-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1038,6 +1093,11 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "setGateOfflinePolicy",
+    "purpose": "Save the gate offline validation, revocation cache and degraded-mode policy (writers pass, 29 September)",
+    "contract": "access"
+   },
    {
     "operationId": "listConnectivityFailureDegraded",
     "contract": "access",
@@ -1454,6 +1514,20 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 96 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      }
+     ]
     }
    ]
   },
@@ -1470,6 +1544,15 @@
     "contract": "access",
     "purpose": "Edge Security, Audit & Deployment",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listEdgeSecurityDeployment"
+    ]
    }
   ],
   "entryState": {
@@ -1480,6 +1563,13 @@
     "EdgeSecurityAuditDeploymentViewSummary.revokedDevices",
     "EdgeSecurityAuditDeploymentViewSummary.failedPackageValidation",
     "EdgeSecurityAuditDeploymentViewSummary.unauthorizedConnectionAttempts"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -1489,6 +1579,27 @@
    "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-213"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 96. 6 of 7 labels bound to a contract property; 7 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

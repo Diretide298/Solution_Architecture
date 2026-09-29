@@ -8,6 +8,13 @@
    "expectedSize"
   ],
   "properties": {
+   "groupQuoteId": {
+    "x-ticvai-references": "orders.group_quote",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The quote this booking converts** (BO-272). Must be the current version and `sent` or `accepted`; conversion sets its `groupBookingId` and moves a `sent` quote to `accepted` (decided 29 September, writers pass)."
+   },
    "kind": {
     "type": "string",
     "enum": [

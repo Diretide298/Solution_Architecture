@@ -168,7 +168,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BiometricValidationAtGateView"
  },
@@ -205,7 +211,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FaceMatchingVerificationThresholdsView"
  },
@@ -218,9 +230,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FaceTagTemporaryEnrollmentView"
+ },
+ "reviewFaceReenrolment": {
+  "method": "POST",
+  "path": "/face-reenrolment-attempts/{attemptId}/review",
+  "contract": "access",
+  "summary": "Review a blocked Face Pass re-enrolment",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessFaceReenrolmentAttempt"
  },
  "setBiometricLifecycleRetention": {
   "method": "PUT",

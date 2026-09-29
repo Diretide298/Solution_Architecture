@@ -315,5 +315,262 @@
     "type": "boolean"
    }
   }
+ },
+ "WorkflowInstance": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.workflow_instance",
+  "description": "**One running workflow** (pack 13.2.1, 13.2.3 and 13.2.5; data model for the agreed operations, 29 September). Started by a `WorkflowTrigger`, on the version in force at that moment and kept on it to the end (audit R129). Its steps are `WorkflowStepExecution` rows, keyed by the same `correlationId` the participating services trace with. **The SLA clock and its reminder and escalation timestamps are held here**, not in a table of their own: there is one clock per instance, and the SLA, Escalation & Bottleneck Monitor lists instances. Lifecycle in `states/workflow-instance.yaml`. The engine writes this row; an operator changes it only through `actOnWorkflowInstance`, which keeps each change as a `WorkflowIntervention` (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "workflowDefinitionId",
+   "workflowVersionId",
+   "sourceModule",
+   "status",
+   "correlationId",
+   "startedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "workflowDefinitionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workflowVersionId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The version the instance started on; never changes"
+   },
+   "workflowTriggerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceModule": {
+    "$ref": "#/components/schemas/WorkflowModule"
+   },
+   "businessObjectType": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "businessObjectId": {
+    "type": "string",
+    "nullable": true,
+    "description": "**A reference, never a copy**, as `ApprovalRequest.subjectId`"
+   },
+   "initiatedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null when a system event or schedule started it"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priority": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "currentNodeId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The node of the version's graph the instance is at"
+   },
+   "status": {
+    "$ref": "#/components/schemas/WorkflowInstanceStatus"
+   },
+   "correlationId": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "The shared correlation id every participating service logs, for distributed tracing"
+   },
+   "slaPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ApprovalSlaPolicy` whose clock runs on this instance"
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean",
+    "default": false
+   },
+   "escalationLevel": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "firstReminderAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "secondReminderAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "managerEscalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "executiveEscalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaOutcome": {
+    "type": "string",
+    "enum": [
+     "metWithinTarget",
+     "metAfterReminder",
+     "metAfterEscalation",
+     "breached"
+    ],
+    "nullable": true,
+    "description": "How the instance finished against its SLA; set on completion (the monitor's Final Outcome)"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005). Written at venue scope"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "WorkflowInstanceActionInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; writes approvals.workflow_intervention (schema WorkflowIntervention) (decided 29 September, writers pass)",
+  "description": "One operator action on a running workflow instance (decided 29 September, writers pass).",
+  "required": [
+   "action",
+   "reason"
+  ],
+  "properties": {
+   "action": {
+    "$ref": "#/components/schemas/WorkflowInterventionAction"
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 500,
+    "description": "Mandatory for every action (pack 13.2.5, \"actions capture a mandatory reason\")"
+   },
+   "workflowStepExecutionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The step acted on; for `retryStep` the step to retry from. Defaults to the instance's current step"
+   },
+   "workflowExceptionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The exception the action is taken from; required for `escalateException`"
+   },
+   "assigneePrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for `reassign`, `addBackupApprover` and `escalateException`"
+   },
+   "alternativeNodeId": {
+    "type": "string",
+    "nullable": true,
+    "description": "For `skipStep`, the node to continue at instead of the next one (Use Approved Alternative)"
+   },
+   "correctedInput": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "For `resume`, the corrected input of the failed step (Correct Data)"
+   },
+   "extendByMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 43200,
+    "nullable": true,
+    "description": "Required for `extendSla`"
+   },
+   "priority": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "Required for `changePriority`"
+   }
+  }
+ },
+ "WorkflowInstanceStatus": {
+  "type": "string",
+  "description": "Where one running workflow stands (pack 13.2.1 and 13.2.3; decided 29 September, readiness close-out). Modelled in `states/workflow-instance.yaml`.",
+  "enum": [
+   "running",
+   "waitingApproval",
+   "waitingTask",
+   "waitingSystem",
+   "escalated",
+   "failed",
+   "completed",
+   "cancelled"
+  ]
+ },
+ "WorkflowInterventionAction": {
+  "type": "string",
+  "description": "What an operator did to a running workflow instance (pack 13.2.3, 13.2.4 and 13.2.5; decided 29 September, writers pass). The effect of each is on `actOnWorkflowInstance`.",
+  "enum": [
+   "reassign",
+   "retryStep",
+   "skipStep",
+   "resume",
+   "cancel",
+   "extendSla",
+   "addBackupApprover",
+   "changePriority",
+   "escalateException"
+  ]
+ },
+ "WorkflowModule": {
+  "type": "string",
+  "description": "The module a workflow, rule or automation belongs to and a workflow instance originates from. The same values as `WorkflowOperationsCommandCenterView.module` (decided 29 September, readiness close-out), named so the workflow engine's tables share one vocabulary (data model for the agreed operations, 29 September).",
+  "enum": [
+   "ticketing",
+   "pricing",
+   "finance",
+   "procurement",
+   "crm",
+   "resourceManagement",
+   "fnb",
+   "retail",
+   "groupSales",
+   "customerService",
+   "membership",
+   "wallet",
+   "waiver",
+   "subscriptionLicensing"
+  ]
  }
 }

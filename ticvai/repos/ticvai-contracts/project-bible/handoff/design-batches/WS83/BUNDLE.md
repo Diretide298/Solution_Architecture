@@ -1801,6 +1801,11 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "campaign",
     "in": "query",
     "required": false

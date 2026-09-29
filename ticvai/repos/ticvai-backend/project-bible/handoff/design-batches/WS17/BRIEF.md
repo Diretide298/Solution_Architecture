@@ -1,6 +1,6 @@
 # WS17 — Approval Workflows and Governance board 5
 
-**10 screens · 8 operations · 6 schemas · 4 permissions**
+**10 screens · 9 operations · 11 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,14 +60,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-384` | Delegation & Escalation Command Center | commandCentre | 2 | 0 | — |
+| `BO-384` | Delegation & Escalation Command Center | commandCentre | 3 | 1 | — |
 | `BO-385` | Delegation Management | configEditor | 4 | 0 | — |
 | `BO-386` | Temporary Delegation & Availability Calendar | listDetail | 2 | 0 | — |
 | `BO-387` | Out-of-Office & Substitute Routing | configEditor | 1 | 0 | — |
 | `BO-388` | Approval SLA Policy Configuration | configEditor | 1 | 0 | — |
 | `BO-389` | Reminder & Breach Notification Rules | listDetail | 1 | 0 | — |
 | `BO-390` | Escalation Policy Builder | listDetail | 1 | 0 | — |
-| `BO-391` | Live Escalation Operations Center | listDetail | 1 | 0 | — |
+| `BO-391` | Live Escalation Operations Center | listDetail | 2 | 1 | — |
 | `BO-392` | SLA & Escalation Performance Analytics | listDetail | 1 | 0 | — |
 | `BO-393` | AI SLA & Escalation Advisor | listDetail | 1 | 0 | — |
 

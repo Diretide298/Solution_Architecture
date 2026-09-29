@@ -297,7 +297,8 @@
    "acceptedQuoteId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "A `rental.quote` id from `quoteRentalPrice`. **The booking is priced at the quote's `rentalAmount` and `depositAmount`** while the quote is unexpired and its product, location, window and quantity match the request; an expired or mismatched quote is `422` (`quoteExpired`, `quoteMismatch`) rather than silently repriced. Without it the booking is priced now (decided 29 September, writers pass; DM4)."
    }
   }
  },
@@ -347,7 +348,7 @@
  "RentalQuote": {
   "type": "object",
   "x-ticvai-persistence": "rental.quote",
-  "description": "Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n",
+  "description": "Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n**Consumed by `acceptedQuoteId`** on `createRentalBooking` and the extension. A quote is not deleted when it is used or expires: a nightly job removes quotes 30 days past `expiresAt` that no booking references, so a booking can always show the quote it was priced at (decided 29 September, writers pass; DM4).\n",
   "required": [
    "quoteId",
    "productId",

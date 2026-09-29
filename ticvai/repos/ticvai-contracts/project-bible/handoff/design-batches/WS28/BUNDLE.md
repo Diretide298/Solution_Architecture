@@ -1,6 +1,6 @@
 # WS28 — Group Sales   Corporate Booking Management board 2
 
-**10 screens · 18 operations · 27 schemas · 4 permissions**
+**10 screens · 19 operations · 29 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -66,7 +66,7 @@ convincingly. It is never a caption.
 | `BO-277` | Group Payment, Deposit & Balance Management | listDetail | 2 | 0 | — |
 | `BO-278` | Group Ticket, Seat & Entitlement Allocation | listDetail | 2 | 0 | — |
 | `BO-279` | Group Ticket Fulfillment & Distribution | listDetail | 2 | 0 | — |
-| `BO-280` | Group Arrival, Check-In & Admission Operations | listDetail | 1 | 0 | — |
+| `BO-280` | Group Arrival, Check-In & Admission Operations | listDetail | 2 | 1 | — |
 | `BO-281` | Group Amendments, Cancellation & Refund Operations | listDetail | 4 | 0 | — |
 | `BO-282` | Group Booking Reconciliation, Closure & Performance | listDetail | 1 | 0 | — |
 | `BO-283` | Group Sales Analytics & AI Intelligence Center | listDetail | 2 | 0 | — |
@@ -132,12 +132,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listGroupBooking"
     },
     {
-     "to": "BO-280",
-     "trigger": "Works in Group Arrival, Check-In & Admission Operations",
-     "provenance": "flow F137 step 11→12",
-     "operation": "listGroupBooking"
-    },
-    {
      "to": "BO-282",
      "trigger": "Works in Group Booking Reconciliation, Closure & Performance",
      "provenance": "flow F137 step 15→16",
@@ -180,6 +174,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-279",
      "trigger": "Works in Group Ticket Fulfillment & Distribution",
      "provenance": "flow F137 step 9→10",
+     "operation": "listGroupBooking",
+     "carries": [
+      "groupBookingId"
+     ]
+    },
+    {
+     "to": "BO-280",
+     "trigger": "Works in Group Arrival, Check-In & Admission Operations",
+     "provenance": "flow F137 step 11→12",
      "operation": "listGroupBooking",
      "carries": [
       "groupBookingId"
@@ -1402,6 +1405,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 29 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Record group check in",
+       "operation": "recordGroupCheckIn",
+       "permission": "ORDER_MODIFY",
+       "notes": "**Group check-in is a status distinct from the access scan** (MoM 31 Aug Key Decisions).",
+       "provenance": "contract orders.yaml POST /group-bookings/{groupBookingId}/check-in"
+      }
+     ]
     }
    ]
   },
@@ -1418,6 +1435,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Group Arrival, Check-In & Admission Operations",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordGroupCheckIn",
+    "contract": "orders",
+    "purpose": "Record a group's arrival at the venue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGroupArrivalCheck"
+    ]
    }
   ],
   "entryState": {
@@ -1428,6 +1454,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "GroupArrivalCheckInAdmissionOperationsView.groupSize",
     "GroupArrivalCheckInAdmissionOperationsView.checkedIn",
     "GroupArrivalCheckInAdmissionOperationsView.remaining"
+   ],
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -1437,6 +1470,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-280"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 29. 10 of 10 labels bound to a contract property; 16 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formRecordGroupCheckIn",
+    "component": "modal",
+    "trigger": "Record group check in",
+    "body": "**Collects what `recordGroupCheckIn` sends before it is called.** Required: `arrivedCount`. Optional: `additionalGuests`, `staffLeadersCount`, `arrivalGateId`, `actualArrivalAt`, `checkInIssues`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "GroupCheckInRequest",
+    "confirm": {
+     "label": "Record group check in",
+     "operation": "recordGroupCheckIn"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "arrivedCount",
+      "additionalGuests",
+      "staffLeadersCount",
+      "arrivalGateId",
+      "actualArrivalAt",
+      "checkInIssues"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /group-bookings/{groupBookingId}/check-in"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2005,7 +2063,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupAmendmentsCancellationRefundOperationsView"
  },
@@ -2018,7 +2082,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupArrivalCheckInAdmissionOperationsView"
  },
@@ -2031,7 +2101,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupBookingOperationsCommandCenterView"
  },
@@ -2044,7 +2120,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupBookingReconciliationClosurePerformanceView"
  },
@@ -2057,7 +2139,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupPaymentDepositBalanceManagementView"
  },
@@ -2070,7 +2158,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupSalesCommandCenterView"
  },
@@ -2084,6 +2178,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "customerType",
     "in": "query",
@@ -2147,7 +2246,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupTicketFulfillmentDistributionView"
  },
@@ -2160,7 +2265,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupTicketSeatEntitlementAllocationView"
  },
@@ -2173,7 +2284,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ParticipantsGuestListsGroupStructureView"
  },
@@ -2195,6 +2312,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "ModifyOrderRequest",
   "responds": "OrderModificationResult"
+ },
+ "recordGroupCheckIn": {
+  "method": "POST",
+  "path": "/group-bookings/{groupBookingId}/check-in",
+  "contract": "orders",
+  "summary": "Record a group's arrival at the venue",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupCheckInRequest",
+  "responds": "GroupVisitPlan"
  },
  "rescheduleOrder": {
   "method": "POST",
@@ -2966,10 +3102,63 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "GroupCheckInRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; lands in the check-in columns of `orders.group_visit_plan`",
+  "description": "**What the group check-in desk records** (BO-280). Counts are the running totals for the group, not increments: a second call as the rest of the group arrives sends the new totals.",
+  "required": [
+   "arrivedCount"
+  ],
+  "properties": {
+   "arrivedCount": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Members of the booked group who have arrived."
+   },
+   "additionalGuests": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0,
+    "description": "People who arrived beyond the booked size; they still need entitlements to be admitted."
+   },
+   "staffLeadersCount": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "arrivalGateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "actualArrivalAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Defaults to now on the first call; later calls keep the first arrival time."
+   },
+   "checkInIssues": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "missingGuest",
+      "extraGuest",
+      "invalidTicket",
+      "wrongDate",
+      "lateArrival",
+      "paymentHold",
+      "missingCredential",
+      "accessibilityRequirement"
+     ]
+    }
+   }
+  }
+ },
  "GroupOperationalPlanningTaskWorkspaceInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.price_list at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; lands in `orders.group_visit_plan` and `orders.group_task` (DM5, 29 September)",
   "description": "**What Group Operational Planning & Task Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Each task should contain* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
    "arrivalDate": {
@@ -4021,6 +4210,175 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      ]
     },
     "description": "Package items allocated with the tickets."
+   }
+  }
+ },
+ "GroupVisitPlan": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.group_visit_plan",
+  "description": "**The day-of-visit record for one group booking: the operational plan, the sales-to-operations handover, and the group check-in** (DM5, 29 September: data model for the agreed operations; MoM 31 Aug 4.7-4.8 and Key Decisions: group check-in is a status distinct from the access scan).\n**One row per group booking, beside it rather than on it**: operations writes this, sales owns the booking, and the booking's shape stays what its operations already return. Tasks are `orders.group_task` rows against the same booking.\n**Check-in here is the group's arrival, not admission.** Each guest is still admitted by their own entitlement scan; `arrivedCount` is what the group leader and the gate agree on, which is why it can differ from the scans.",
+  "required": [
+   "id",
+   "groupBookingId",
+   "checkInStatus",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "groupBookingId": {
+    "x-ticvai-references": "orders.group_booking",
+    "type": "string",
+    "format": "uuid",
+    "description": "Unique; one plan per group booking."
+   },
+   "arrivalAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "arrivalLocation": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "meetingPoint": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "entryGateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "departureAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "groupLeaders": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "contactId": {
+    "x-ticvai-references": "orders.group_customer_organization_contact",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketingMethod": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "requirements": {
+    "type": "object",
+    "nullable": true,
+    "description": "Seating, guides, catering, transportation, parking, accessibility, equipment and special requirements, as free text keyed by those names. **Free text on purpose**: each is fulfilled by its own service (resources, F&B, transport), and this is the brief they are fulfilled against, not the booking of them."
+   },
+   "operationalOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "handoverNotes": {
+    "type": "string",
+    "maxLength": 4000,
+    "nullable": true
+   },
+   "handoverAttachmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "handoverAcknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "handoverAcknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "checkInStatus": {
+    "type": "string",
+    "default": "expected",
+    "enum": [
+     "expected",
+     "partiallyArrived",
+     "arrived",
+     "noShow"
+    ]
+   },
+   "actualArrivalAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "arrivalGateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "arrivedCount": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "additionalGuests": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "staffLeadersCount": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "checkInIssues": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "missingGuest",
+      "extraGuest",
+      "invalidTicket",
+      "wrongDate",
+      "lateArrival",
+      "paymentHold",
+      "missingCredential",
+      "accessibilityRequirement"
+     ]
+    }
+   },
+   "checkedInByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },

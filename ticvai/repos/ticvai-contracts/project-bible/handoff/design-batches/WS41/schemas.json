@@ -1403,5 +1403,108 @@
     }
    }
   }
+ },
+ "PrivacyNoticeGovernance": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.privacy_notice_governance",
+  "description": "**The privacy governance of one version of one privacy document.** The document itself is white-label's `Policy` (`setPolicy`, never overwritten); this row adds what the privacy administrator decides about it: lifecycle status, the change classification (set by an authorised user, **never by AI**), re-acceptance and notification, owner and approval. One row per policy version. Read by `listPrivacyNoticePolicy`; written by `setPrivacyNoticePolicyGovernance` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n",
+  "required": [
+   "id",
+   "policyId",
+   "documentType",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "policyId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The white-label `Policy` version this governs (`documentId` on the view)."
+   },
+   "documentType": {
+    "type": "string",
+    "enum": [
+     "privacyPolicy",
+     "privacyNotice",
+     "cookieNotice",
+     "marketingNotice",
+     "biometricPrivacyNotice",
+     "childrensPrivacyNotice",
+     "locationServicesNotice",
+     "other"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "review",
+     "approved",
+     "scheduled",
+     "published",
+     "superseded",
+     "archived"
+    ],
+    "default": "draft"
+   },
+   "changeClassification": {
+    "type": "string",
+    "enum": [
+     "minor",
+     "material"
+    ],
+    "nullable": true,
+    "description": "Set by an authorised user, never by AI."
+   },
+   "requiresReAcceptance": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresNotification": {
+    "type": "boolean",
+    "default": false
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approvals request raised when the row entered `review` (`setPrivacyNoticePolicyGovernance`); its decision stamps `approvedByPrincipalId` and `approvedAt`. (decided 29 September, writers pass)"
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
  }
 }

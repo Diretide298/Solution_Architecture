@@ -1,6 +1,6 @@
 # WS10 — Access Control board 10
 
-**10 screens · 18 operations · 27 schemas · 6 permissions**
+**10 screens · 19 operations · 28 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -67,13 +67,13 @@ convincingly. It is never a caption.
 | `BO-238` | Identity, Membership & Accreditation Policies | listDetail | 3 | 0 | — |
 | `BO-239` | Policy Scope, Hierarchy & Inheritance | configEditor | 2 | 0 | — |
 | `BO-240` | Authorization Governance & Temporary Access | listDetail | 1 | 0 | — |
-| `BO-241` | Policy Evaluation Architecture & Offline Distribution | listDetail | 3 | 0 | — |
+| `BO-241` | Policy Evaluation Architecture & Offline Distribution | listDetail | 4 | 1 | — |
 | `BO-242` | Policy Simulation, Conflict & Impact Analysis | listDetail | 1 | 0 | — |
 | `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | listDetail | 5 | 1 | — |
 
 ## Thin screens in this batch
 
-**BO-235, BO-236, BO-237, BO-238, BO-240, BO-241, BO-242 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-235, BO-236, BO-237, BO-238, BO-240, BO-242 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -1224,6 +1224,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "impliedBy": "setEdgeNodeLocal"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save policy evaluation setting",
+       "operation": "setPolicyEvaluationSetting",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Policy Evaluation Architecture & Offline Distribution** (BO-241): for one policy category, the evaluation mode (central, edge, device, hybrid), the locations that may evaluate it, its offline behaviour and the oldest cached data an offline evaluation may use.",
+       "provenance": "contract access.yaml PUT /policy-evaluation-settings"
+      }
+     ]
     }
    ]
   },
@@ -1257,6 +1271,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Save what the edge may decide while central services are unreachable",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setPolicyEvaluationSetting",
+    "contract": "access",
+    "purpose": "Set where and how a policy category is evaluated",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPolicyEvaluationArchitecture"
+    ]
    }
   ],
   "entryState": {
@@ -1269,6 +1292,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-241"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 143. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPolicyEvaluationSetting",
+    "component": "modal",
+    "trigger": "Save policy evaluation setting",
+    "body": "**Collects what `setPolicyEvaluationSetting` sends before it is called.** Required: `id`, `scopePath`, `policyCategory`, `evaluationMode`. Optional: `supportedLocations`, `offlineBehaviour`, `maxDataAgeMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessPolicyEvaluationSetting",
+    "confirm": {
+     "label": "Save policy evaluation setting",
+     "operation": "setPolicyEvaluationSetting"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "policyCategory",
+      "evaluationMode",
+      "supportedLocations",
+      "offlineBehaviour",
+      "maxDataAgeMinutes"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /policy-evaluation-settings"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1717,7 +1766,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccessAttributeCatalogView"
  },
@@ -1778,7 +1833,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "IdentityMembershipAccreditationPoliciesView"
  },
@@ -1815,7 +1876,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "PolicyEvaluationArchitectureOfflineDistributionView"
  },
@@ -1828,7 +1895,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "PolicyScopeHierarchyInheritanceView"
  },
@@ -1945,6 +2018,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "OfflinePolicy",
   "responds": "OfflinePolicy"
+ },
+ "setPolicyEvaluationSetting": {
+  "method": "PUT",
+  "path": "/policy-evaluation-settings",
+  "contract": "access",
+  "summary": "Set where and how a policy category is evaluated",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessPolicyEvaluationSetting",
+  "responds": "AccessPolicyEvaluationSetting"
  },
  "setPolicyScopeHierarchy": {
   "method": "PUT",
@@ -2125,6 +2217,76 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "attributeKey",
    "category"
   ]
+ },
+ "AccessPolicyEvaluationSetting": {
+  "type": "object",
+  "x-ticvai-persistence": "access.policy_evaluation_setting",
+  "description": "Where and how one policy category is evaluated - evaluation mode, supported locations, offline behaviour and the oldest cached data an offline evaluation may use (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "policyCategory",
+   "evaluationMode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "policyCategory": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "e.g. Ticket Status, Time Rule, Membership Tier, Live Occupancy, Live Fraud AI. Unique per scope"
+   },
+   "evaluationMode": {
+    "type": "string",
+    "enum": [
+     "central",
+     "edge",
+     "device",
+     "hybrid"
+    ]
+   },
+   "supportedLocations": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "central",
+      "edge",
+      "device"
+     ]
+    }
+   },
+   "offlineBehaviour": {
+    "type": "string",
+    "enum": [
+     "available",
+     "conditional",
+     "unavailable"
+    ],
+    "nullable": true
+   },
+   "maxDataAgeMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
  },
  "AccessProfile": {
   "type": "object",

@@ -565,6 +565,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save ticket status transition",
+       "operation": "setTicketStatusTransition",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Virtual Ticket Status & Lifecycle Model** (BO-336): for one move between Virtual Ticket statuses, whether it is allowed, whether it needs an authorised exception and where it may originate.",
+       "provenance": "contract access.yaml PUT /ticket-status-transitions"
+      }
+     ]
     }
    ]
   },
@@ -581,6 +595,15 @@
     "contract": "access",
     "purpose": "Virtual Ticket Status & Lifecycle Model",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setTicketStatusTransition",
+    "contract": "access",
+    "purpose": "Set a Virtual Ticket status transition rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listVirtualTicketStatus"
+    ]
    }
   ],
   "entryState": {
@@ -595,6 +618,32 @@
    "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-336"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 11 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetTicketStatusTransition",
+    "component": "modal",
+    "trigger": "Save ticket status transition",
+    "body": "**Collects what `setTicketStatusTransition` sends before it is called.** Required: `id`, `fromStatus`, `toStatus`, `allowed`, `requiresAuthorizedException`, `scopePath`. Optional: `originatingSources`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessTicketStatusTransition",
+    "confirm": {
+     "label": "Save ticket status transition",
+     "operation": "setTicketStatusTransition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "fromStatus",
+      "toStatus",
+      "allowed",
+      "requiresAuthorizedException",
+      "scopePath",
+      "originatingSources"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /ticket-status-transitions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -919,6 +968,27 @@
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save media binding rule",
+       "operation": "setMediaBindingRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "provenance": "contract access.yaml PUT /media-binding-rules"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete media binding rule",
+       "operation": "deleteMediaBindingRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "Deletes a binding rule.",
+       "provenance": "contract access.yaml DELETE /media-binding-rules/{ruleId}"
+      }
+     ]
     }
    ]
   },
@@ -934,6 +1004,24 @@
     "contract": "access",
     "purpose": "Multi-Media Binding & Association Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMediaBindingRule",
+    "contract": "access",
+    "purpose": "Create or replace a multi-media binding rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMultiMediaBinding"
+    ]
+   },
+   {
+    "operationId": "deleteMediaBindingRule",
+    "contract": "access",
+    "purpose": "Delete a multi-media binding rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMultiMediaBinding"
+    ]
    }
   ],
   "wireframe": {
@@ -943,6 +1031,58 @@
    "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-338"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 12 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetMediaBindingRule",
+    "component": "modal",
+    "trigger": "Save media binding rule",
+    "body": "**Collects what `setMediaBindingRule` sends before it is called.** Required: `id`, `scopePath`. Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`, `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`, `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessMediaBindingRule",
+    "confirm": {
+     "label": "Save media binding rule",
+     "operation": "setMediaBindingRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "allowedMediaTypeIds",
+      "mandatoryMediaTypeIds",
+      "optionalMediaTypeIds",
+      "primaryMediaTypeId",
+      "secondaryMediaTypeIds",
+      "backupMediaTypeIds",
+      "temporaryMediaTypeIds",
+      "minimumMediaRequired",
+      "maximumActiveMedia",
+      "mediaCombinations",
+      "simultaneousActivation",
+      "exclusiveActivation",
+      "productId",
+      "ticketType",
+      "eventId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /media-binding-rules"
+   },
+   {
+    "id": "confirmDeleteMediaBindingRule",
+    "component": "confirmDialog",
+    "trigger": "Delete media binding rule",
+    "body": "**Names what `deleteMediaBindingRule` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /media-binding-rules/{ruleId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1169,6 +1309,19 @@
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 14 §Detect"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save credential event propagation rule",
+       "operation": "setCredentialEventPropagationRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "provenance": "contract access.yaml PUT /credential-event-propagation-rules"
+      }
+     ]
     }
    ]
   },
@@ -1185,6 +1338,15 @@
     "contract": "access",
     "purpose": "Entitlement & Cross-Media Synchronization Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCredentialEventPropagationRule",
+    "contract": "access",
+    "purpose": "Set how a ticket lifecycle event propagates to the credential",
+    "trigger": "onAction",
+    "invalidates": [
+     "listEntitlementCrossMedia"
+    ]
    }
   ],
   "entryState": {
@@ -1199,6 +1361,32 @@
    "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-340"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 14. 5 of 5 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetCredentialEventPropagationRule",
+    "component": "modal",
+    "trigger": "Save credential event propagation rule",
+    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessCredentialEventPropagationRule",
+    "confirm": {
+     "label": "Save credential event propagation rule",
+     "operation": "setCredentialEventPropagationRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "triggerEvent",
+      "scopePath",
+      "revocationAction",
+      "propagationTargets",
+      "monitoredConditions",
+      "propagation"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /credential-event-propagation-rules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

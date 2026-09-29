@@ -210,6 +210,129 @@
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   },
+   "jobKind": {
+    "type": "string",
+    "enum": [
+     "productImport",
+     "environmentTransfer",
+     "pricingBulkUpdate",
+     "pricingImport"
+    ],
+    "default": "productImport",
+    "description": "**One job table for every catalogue bulk operation** (29 September, data model DM3): product import (the original use), environment transfer (ADM-124) and bulk pricing update or import (ADM-080). A pricing job never writes prices; committing it creates a change request (`changeRequestId`)."
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "export",
+     "import",
+     null
+    ],
+    "nullable": true
+   },
+   "sourceEnvironment": {
+    "type": "string",
+    "enum": [
+     "development",
+     "sandbox",
+     "uat",
+     "staging",
+     "production",
+     null
+    ],
+    "nullable": true
+   },
+   "targetEnvironment": {
+    "type": "string",
+    "enum": [
+     "development",
+     "sandbox",
+     "uat",
+     "staging",
+     "production",
+     null
+    ],
+    "nullable": true
+   },
+   "productIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Transfer components, per `ProductImportExportEnvironmentTransferView.components`."
+   },
+   "referenceMappings": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`[{kind, sourceRef, targetRef}]`."
+   },
+   "missingReferences": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "fileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceFormat": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "columnMappings": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`[{sourceColumn, targetField, suggestedByAi, confirmed}]`."
+   },
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Bulk pricing: `{selectBy, selectionValues, operation, adjustmentPercent, adjustmentAmount, targetCurrency, effectivePeriodFrom, effectivePeriodTo}`."
+   },
+   "warningCount": {
+    "type": "integer",
+    "default": 0
+   },
+   "errorCount": {
+    "type": "integer",
+    "default": 0
+   },
+   "changeRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },

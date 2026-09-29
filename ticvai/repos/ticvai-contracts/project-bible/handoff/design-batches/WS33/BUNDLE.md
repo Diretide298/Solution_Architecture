@@ -1,6 +1,6 @@
 # WS33 — Order   Reservation Management board 3
 
-**10 screens · 15 operations · 14 schemas · 7 permissions**
+**10 screens · 19 operations · 22 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,11 +62,11 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-324` | Payment & Order Financial Command Center | listDetail | 1 | 0 | — |
 | `BO-325` | Order Payment Detail & Transaction Ledger | listDetail | 1 | 1 | — |
-| `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | configEditor | 1 | 0 | — |
+| `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | configEditor | 2 | 0 | — |
 | `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | listDetail | 5 | 1 | — |
-| `BO-328` | Order Split, Merge & Transaction Relationship Management | listDetail | 2 | 0 | — |
+| `BO-328` | Order Split, Merge & Transaction Relationship Management | listDetail | 3 | 1 | — |
 | `BO-329` | Related Order & Transaction Relationship Explorer | listDetail | 1 | 0 | — |
-| `BO-330` | External Payment, Partner & Settlement Reference Mapping | configEditor | 1 | 0 | — |
+| `BO-330` | External Payment, Partner & Settlement Reference Mapping | configEditor | 3 | 1 | — |
 | `BO-331` | Payment Reconciliation & Exception Management | listDetail | 1 | 0 | — |
 | `BO-332` | Financial Traceability, Control & Audit Explorer | configEditor | 1 | 0 | — |
 | `BO-333` | Order Financial Analytics & AI Reconciliation Intelligence | listDetail | 1 | 0 | — |
@@ -150,12 +150,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listPaymentOrderFinancial"
     },
     {
-     "to": "BO-330",
-     "trigger": "Works in External Payment, Partner & Settlement Reference Mapping",
-     "provenance": "flow F142 step 11→12",
-     "operation": "listPaymentOrderFinancial"
-    },
-    {
      "to": "BO-331",
      "trigger": "Works in Payment Reconciliation & Exception Management",
      "provenance": "flow F142 step 13→14",
@@ -177,6 +171,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-328",
      "trigger": "Works in Order Split, Merge & Transaction Relationship Management",
      "provenance": "flow F142 step 7→8",
+     "operation": "listPaymentOrderFinancial",
+     "carries": [
+      "orderId"
+     ]
+    },
+    {
+     "to": "BO-330",
+     "trigger": "Works in External Payment, Partner & Settlement Reference Mapping",
+     "provenance": "flow F142 step 11→12",
      "operation": "listPaymentOrderFinancial",
      "carries": [
       "orderId"
@@ -689,6 +692,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Deposit",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 43 §Configure whether payment is allocated"
+      },
+      {
+       "kind": "textField",
+       "label": "Channel",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?channel=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "textField",
+       "label": "Terminal id",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?terminalId=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "textField",
+       "label": "Product id",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?productId=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?isActive=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every payment allocation rule",
+       "bindsTo": "PaymentAllocationRule",
+       "columns": [
+        "PaymentAllocationRule.id",
+        "PaymentAllocationRule.channel",
+        "PaymentAllocationRule.terminalId",
+        "PaymentAllocationRule.productId",
+        "PaymentAllocationRule.orderType",
+        "PaymentAllocationRule.customerType",
+        "PaymentAllocationRule.allocationLevel",
+        "PaymentAllocationRule.isActive",
+        "PaymentAllocationRule.scopePath"
+       ],
+       "operation": "listPaymentAllocationRules",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
       }
      ]
     },
@@ -717,6 +766,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Multi-Payment, Split Tender & Payment Allocation Configuration",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listPaymentAllocationRules",
+    "contract": "orders",
+    "purpose": "The venue's split-tender allocation rules",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
@@ -1092,6 +1147,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Payment Responsibility",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Merge orders",
+       "operation": "mergeOrders",
+       "permission": "ORDER_MODIFY",
+       "notes": "**The other half of `splitOrder`** (pack Order & Reservation Management p.46, BO-328 Order Split, Merge & Transaction Relationship Management).",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/merge"
       }
      ]
     },
@@ -1124,6 +1187,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listOrderSplitMerge"
     ]
+   },
+   {
+    "operationId": "mergeOrders",
+    "contract": "orders",
+    "purpose": "Merge orders into one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrderSplitMerge"
+    ]
    }
   ],
   "entryState": {
@@ -1145,6 +1217,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-328"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 4 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Ticket, Product, Payment Responsibility: `splitOrder`.",
+  "overlays": [
+   {
+    "id": "confirmMergeOrders",
+    "component": "confirmDialog",
+    "trigger": "Merge orders",
+    "body": "**Names what `mergeOrders` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted. **Collects what `mergeOrders` sends before it is called.** Required: `sourceOrderIds`. Optional: `reason`.",
+    "provenance": "contract orders.yaml POST /orders/{orderId}/merge"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1444,6 +1525,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Amount",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 49 §Capture"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every external reference mapping",
+       "bindsTo": "ExternalReferenceMapping",
+       "columns": [
+        "ExternalReferenceMapping.id",
+        "ExternalReferenceMapping.orderId",
+        "ExternalReferenceMapping.paymentId",
+        "ExternalReferenceMapping.refundId",
+        "ExternalReferenceMapping.sourceSystem",
+        "ExternalReferenceMapping.provider",
+        "ExternalReferenceMapping.merchantId",
+        "ExternalReferenceMapping.externalTransactionId",
+        "ExternalReferenceMapping.authorizationCode",
+        "ExternalReferenceMapping.partnerOrderId",
+        "ExternalReferenceMapping.settlementBatch",
+        "ExternalReferenceMapping.settlementDate"
+       ],
+       "operation": "listExternalReferenceMappings",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/external-references"
       }
      ]
     },
@@ -1470,6 +1572,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Wallet Providers",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 49 §Support references from"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record external reference",
+       "operation": "recordExternalReference",
+       "permission": "ORDER_MODIFY",
+       "notes": "**The manual mapping `orders.external_reference_mapping` had no writer for** (DM5 open item).",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/external-references"
       }
      ]
     }
@@ -1487,6 +1597,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "External Payment, Partner & Settlement Reference Mapping",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listExternalReferenceMappings",
+    "contract": "orders",
+    "purpose": "The references other systems hold for this order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordExternalReference",
+    "contract": "orders",
+    "purpose": "Map an order to a reference another system holds, by hand",
+    "trigger": "onAction",
+    "invalidates": [
+     "listExternalPaymentPartner",
+     "listExternalReferenceMappings"
+    ]
    }
   ],
   "wireframe": {
@@ -1496,6 +1622,47 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-330"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 16 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** POS Terminals, Finance Systems, Wallet Providers are choices sent by `listExternalPaymentPartner`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formRecordExternalReference",
+    "component": "modal",
+    "trigger": "Record external reference",
+    "body": "**Collects what `recordExternalReference` sends before it is called.** Required: `sourceSystem`, `reason`. Optional: `paymentId`, `refundId`, `provider`, `merchantId`, `externalTransactionId`, `authorizationCode`, `partnerOrderId`, `settlementBatch`, `settlementDate`, `erpReference`, `amount`, `approvalReference`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateExternalReferenceMappingRequest",
+    "confirm": {
+     "label": "Record external reference",
+     "operation": "recordExternalReference"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sourceSystem",
+      "reason",
+      "paymentId",
+      "refundId",
+      "provider",
+      "merchantId",
+      "externalTransactionId",
+      "authorizationCode",
+      "partnerOrderId",
+      "settlementBatch",
+      "settlementDate",
+      "erpReference",
+      "amount",
+      "approvalReference"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/external-references"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1967,7 +2134,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "DepositPartialPaymentOutstandingBalanceManagementView"
  },
@@ -1980,9 +2153,39 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ExternalPaymentPartnerSettlementReferenceMappingView"
+ },
+ "listExternalReferenceMappings": {
+  "method": "GET",
+  "path": "/orders/{orderId}/external-references",
+  "contract": "orders",
+  "summary": "The references other systems hold for this order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listFinancialTraceability": {
   "method": "GET",
@@ -1994,6 +2197,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "export",
     "in": "query",
@@ -2013,6 +2221,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "venue",
     "in": "query",
@@ -2066,7 +2279,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OrderPaymentDetailTransactionLedgerView"
  },
@@ -2079,9 +2298,59 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OrderSplitMergeTransactionRelationshipManagementView"
+ },
+ "listPaymentAllocationRules": {
+  "method": "GET",
+  "path": "/payment-allocation-rules",
+  "contract": "orders",
+  "summary": "The venue's split-tender allocation rules",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "terminalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPaymentOrderFinancial": {
   "method": "GET",
@@ -2093,6 +2362,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "venue",
     "in": "query",
@@ -2126,7 +2400,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "PaymentReconciliationExceptionManagementView"
  },
@@ -2140,6 +2420,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "order",
     "in": "query",
@@ -2179,6 +2464,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "RelatedOrderTransactionRelationshipExplorerView"
  },
+ "mergeOrders": {
+  "method": "POST",
+  "path": "/orders/{orderId}/merge",
+  "contract": "orders",
+  "summary": "Merge orders into one",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
  "recordDepositActivity": {
   "method": "POST",
   "path": "/deposits/{depositId}/activity",
@@ -2202,6 +2506,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "PaymentsDepositActivity",
   "responds": "PaymentsDepositActivity"
+ },
+ "recordExternalReference": {
+  "method": "POST",
+  "path": "/orders/{orderId}/external-references",
+  "contract": "orders",
+  "summary": "Map an order to a reference another system holds, by hand",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateExternalReferenceMappingRequest",
+  "responds": "ExternalReferenceMapping"
  },
  "setDepositPolicy": {
   "method": "PUT",
@@ -2269,6 +2592,100 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "CreateExternalReferenceMappingRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; lands in `orders.external_reference_mapping` with `isManual` true",
+  "description": "A manual mapping. `reason` is required because a manual mapping is only trusted with one.",
+  "required": [
+   "sourceSystem",
+   "reason"
+  ],
+  "properties": {
+   "paymentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "refundId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceSystem": {
+    "type": "string",
+    "enum": [
+     "paymentGateways",
+     "acquirers",
+     "banks",
+     "posTerminals",
+     "b2bPartners",
+     "resellers",
+     "otas",
+     "erp",
+     "financeSystems",
+     "walletProviders"
+    ]
+   },
+   "provider": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "merchantId": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "externalTransactionId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "authorizationCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "partnerOrderId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "settlementBatch": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "settlementDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "erpReference": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "amount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 500
+   },
+   "approvalReference": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   }
+  }
+ },
  "DepositPartialPaymentOutstandingBalanceManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -2635,6 +3052,131 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ExternalReferenceMapping": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.external_reference_mapping",
+  "description": "**A reference another system holds for an order, payment or refund, and who mapped it** (DM5, 29 September: data model for the agreed operations). Gateway references already on `orders.payment` and `orders.refund` are not copied; this holds the partner, OTA, ERP and settlement-batch references nothing else stores, and the manual mappings with their reason.\n**Written by the integration jobs** (partner and OTA order sync, ERP posting, settlement-file ingestion) with `isManual` false, and by `recordExternalReference` with `isManual` true; read by `listExternalReferenceMappings`, `listExternalPaymentPartner` and `listFinancialTraceability`. Append-only (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "orderId",
+   "sourceSystem",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "paymentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "refundId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceSystem": {
+    "type": "string",
+    "enum": [
+     "paymentGateways",
+     "acquirers",
+     "banks",
+     "posTerminals",
+     "b2bPartners",
+     "resellers",
+     "otas",
+     "erp",
+     "financeSystems",
+     "walletProviders"
+    ]
+   },
+   "provider": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "merchantId": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "externalTransactionId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "authorizationCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "partnerOrderId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "settlementBatch": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "settlementDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "erpReference": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "amount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "isManual": {
+    "type": "boolean",
+    "default": false
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Required when `isManual` is true."
+   },
+   "approvalReference": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "FinancialTraceabilityControlAuditExplorerView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -2704,7 +3246,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "MultiPaymentSplitTenderPaymentAllocationConfiguratioInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; lands in `orders.payment_allocation_rule` (DM5, 29 September)",
   "description": "**What Multi-Payment, Split Tender & Payment Allocation Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "channel": {
@@ -2742,6 +3284,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "deposit"
     ],
     "description": "What a payment is allocated against."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true,
+    "description": "False retires the rule for this match key (decided 29 September, writers pass)."
    }
   }
  },
@@ -2788,6 +3335,186 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "What a payment is allocated against."
    }
   }
+ },
+ "Order": {
+  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "channel",
+   "status",
+   "currency",
+   "currencyScale",
+   "grossAmount",
+   "taxAmount",
+   "netAmount",
+   "lines",
+   "createdAt",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client ULID from `CreateOrderRequest.id`."
+   },
+   "orderNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
+   "totalPriceVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Sum across lines. Zero on a normal order."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/OrderLine"
+    }
+   },
+   "payments": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Payment"
+    }
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
  },
  "OrderFinancialAnalyticsAiReconciliationIntelligenceView": {
   "type": "object",
@@ -2856,6 +3583,72 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Reconciliation Exceptions"
    }
   }
+ },
+ "OrderLine": {
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateOrderLine"
+   },
+   {
+    "type": "object",
+    "required": [
+     "serverUnitPrice",
+     "taxAmount",
+     "netAmount",
+     "grossAmount"
+    ],
+    "properties": {
+     "serverUnitPrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "What the server computed on ingest."
+     },
+     "priceVariance": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
+     },
+     "taxAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "netAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "grossAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "entitlementIds": {
+      "type": "array",
+      "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
+      "items": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      }
+     },
+     "crossRegionRightIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Redemption rights propagated to other cells for this line."
+     },
+     "reprintCount": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "readOnly": true,
+      "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     }
+    }
+   }
+  ]
  },
  "OrderPaymentDetailTransactionLedgerView": {
   "type": "object",
@@ -3032,6 +3825,143 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "reissuedFrom"
     ],
     "description": "How the orders relate."
+   }
+  }
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+   },
+   "fxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+   },
+   "fxRateSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
+   },
+   "changeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
+   },
+   "providerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastInquiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },

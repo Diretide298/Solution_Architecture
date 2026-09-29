@@ -5114,7 +5114,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CredentialReplacementReissueRevocationRecoveryView"
  },
@@ -5383,7 +5389,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "TicketReissueFulfillmentRegenerationView"
  },
@@ -6152,6 +6164,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "expectedSize"
   ],
   "properties": {
+   "groupQuoteId": {
+    "x-ticvai-references": "orders.group_quote",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The quote this booking converts** (BO-272). Must be the current version and `sent` or `accepted`; conversion sets its `groupBookingId` and moves a `sent` quote to `accepted` (decided 29 September, writers pass)."
+   },
    "kind": {
     "type": "string",
     "enum": [
@@ -7383,6 +7402,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "type": "string"
     }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
    },
    "venueId": {
     "type": "string",
@@ -8638,6 +8663,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean",
     "default": false,
     "description": "**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"
+   },
+   "productOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."
+   },
+   "operationalContact": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "A principal id or a name, as the context screen takes it."
+   },
+   "businessUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `ledger.legal_entity`, read through finance."
+   },
+   "attractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "siteId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand, as the context screen names it (a catalogue brand category)."
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "salesTerritory": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
    }
   }
  },

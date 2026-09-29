@@ -29,6 +29,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "source",
     "in": "query",
     "required": false
@@ -121,6 +126,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "venueId",
     "in": "query",

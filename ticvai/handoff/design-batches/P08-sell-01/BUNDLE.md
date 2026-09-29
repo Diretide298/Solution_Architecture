@@ -1,6 +1,6 @@
 # P08-sell-01 — P08 · Sell (1 of 4)
 
-**10 screens · 85 operations · 78 schemas · 10 permissions**
+**10 screens · 88 operations · 80 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,8 +62,8 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-007` | Product Directory | listDetail | 14 | 7 | — |
 | `BO-009` | Pricing Rules | listDetail | 11 | 4 | — |
-| `BO-010` | Promotions & Coupons | listDetail | 24 | 10 | — |
-| `BO-011` | Packages & Bundles | listDetail | 10 | 4 | — |
+| `BO-010` | Promotions & Coupons | listDetail | 26 | 10 | — |
+| `BO-011` | Packages & Bundles | listDetail | 12 | 5 | — |
 | `BO-012` | Membership Products | listDetail | 12 | 6 | — |
 | `BO-013` | Channel & Distribution | listDetail | 10 | 6 | — |
 | `BO-014` | Catalogue Publishing | listDetail | 13 | 7 | — |
@@ -1256,6 +1256,53 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "impliedBy": "publishPromotion",
        "notes": "Declares `publishPromotion`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     },
@@ -1829,6 +1876,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "analysePromotionConflicts",
      "getPromotion"
     ]
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -1948,7 +2007,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-011 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-011 holds priceListId, so an edge into it carries them"
     },
     {
      "to": "ANL-009",
@@ -1998,6 +2060,53 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "impliedBy": "publishBundle",
        "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     },
@@ -2095,6 +2204,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Save group package definition",
        "operation": "setGroupPackageDefinition",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/group-package"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save package pricing definition",
+       "operation": "setPackagePricingDefinition",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The pricing model of a package, bundle or add-on** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /package-pricing"
       }
      ]
     }
@@ -2179,6 +2296,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Amend a bundle",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPackagePricingDefinition",
+    "contract": "catalogue",
+    "purpose": "Set how a package, bundle or add-on is priced",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCatalogueBundles",
+     "getLatestBundle",
+     "listCommercialCampaigns"
+    ]
    }
   ],
   "entryState": {
@@ -2312,6 +2446,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      ]
     },
     "provenance": "contract promotions.yaml POST /bundles"
+   },
+   {
+    "id": "formSetPackagePricingDefinition",
+    "component": "modal",
+    "trigger": "Save package pricing definition",
+    "body": "**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`, `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PackagePricing",
+    "confirm": {
+     "label": "Save package pricing definition",
+     "operation": "setPackagePricingDefinition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "productId",
+      "recordKind",
+      "pricingModel",
+      "status",
+      "name",
+      "priceListId",
+      "addOnType",
+      "packagePrice",
+      "components",
+      "componentPriceVisibility"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /package-pricing"
    }
   ],
   "_platform": {
@@ -5631,6 +5794,50 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ChannelListing"
  },
+ "listCommercialCampaigns": {
+  "method": "GET",
+  "path": "/commercial-campaigns",
+  "contract": "promotions",
+  "summary": "List commercial campaigns",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "q",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCouponCampaigns": {
   "method": "GET",
   "path": "/coupon-campaigns",
@@ -6172,6 +6379,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "SeatRecommendationRequest",
   "responds": null
  },
+ "recordDashboardView": {
+  "method": "POST",
+  "path": "/dashboards/{dashboardId}/views",
+  "contract": "reporting",
+  "summary": "Record that a dashboard was opened",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "relinquishChannelAllocation": {
   "method": "POST",
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
@@ -6395,6 +6621,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "MenuItem"
+ },
+ "setPackagePricingDefinition": {
+  "method": "PUT",
+  "path": "/package-pricing",
+  "contract": "catalogue",
+  "summary": "Set how a package, bundle or add-on is priced",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PackagePricing",
+  "responds": "PackagePricing"
  },
  "setPerformanceTemplate": {
   "method": "PUT",
@@ -6996,6 +7241,42 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     },
     "description": "For dynamic bundles — guest chooses among these."
    },
+   "substitutionTriggers": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "enum": [
+      "soldOut",
+      "capacityExhausted",
+      "productSuspended",
+      "venueClosed",
+      "externalApiUnavailable",
+      "inventoryBelowThreshold"
+     ]
+    },
+    "description": "When a substitute from `substituteVariantIds` may replace this component (Dynamic Component Substitution Engine). Empty: never substituted. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "substitutionPriceEffect": {
+    "type": "string",
+    "enum": [
+     "samePrice",
+     "surcharge",
+     "reducedPrice"
+    ],
+    "default": "samePrice",
+    "description": "What a substitution does to the bundle price. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "substitutionApproval": {
+    "type": "string",
+    "enum": [
+     "none",
+     "customer",
+     "operator"
+    ],
+    "default": "customer",
+    "description": "Who must accept a substitution before it stands. Customer by default, because a substitution the guest did not choose is a complaint at the gate. (DM5, 29 September: data model for the agreed operations)"
+   },
    "venueId": {
     "type": "string",
     "format": "uuid",
@@ -7125,6 +7406,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CatalogueConfigStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "active",
+   "inactive",
+   "retired"
+  ],
+  "description": "**The status of a catalogue configuration record** (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and rules, calculation and rounding profiles, package pricing and templates. `draft` is being prepared and is never used by a calculation; `active` is in use from its effective date; `inactive` is switched off and may be switched back; `retired` is kept for history only. A record already used by a live price becomes `active` through a published change request, not by an edit."
+ },
  "Channel": {
   "type": "string",
   "enum": [
@@ -7176,6 +7467,75 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "nullable": true,
     "description": "Unsold units return to the general pool at this time. How distribution holds are freed close to a performance without someone remembering to do it.\n"
+   },
+   "salesChannelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The channel profile (`catalogue.sales_channel`) this allocation serves (29 September, data model DM3)."
+   },
+   "allocationType": {
+    "type": "string",
+    "enum": [
+     "sharedPool",
+     "dedicated",
+     "percentage",
+     "dynamic"
+    ],
+    "default": "dedicated",
+    "description": "How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row."
+   },
+   "minimumUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "replenishmentRule": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`{sourceChannelId, trigger, thresholdUnits, sharePercent, units}`."
+   },
+   "waitlistBehavior": {
+    "type": "string",
+    "enum": [
+     "none",
+     "joinWaitlist",
+     "notifyOnRelease"
+    ],
+    "default": "none"
+   },
+   "releaseThresholdUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "releaseHoursBeforeEvent": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "Alternative to `releaseAt`, relative to the performance start."
+   },
+   "contractualUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "Units a partner agreement guarantees; rebalancing never goes below it."
+   },
+   "minimumGuaranteedUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "isFrozen": {
+    "type": "boolean",
+    "default": false,
+    "description": "Excluded from rebalancing."
    }
   }
  },
@@ -7755,6 +8115,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "validTo": {
     "type": "string",
     "format": "date-time"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The commercial campaign (`promotions.campaign`) the bundle is sold under. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The bundle owner (Bundle Definition & Setup). (DM5, 29 September: data model for the agreed operations)"
+   },
+   "category": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The bundle category the setup screen files it under. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "isStandaloneProduct": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whether the bundle appears as a product in its own right, or only as an offer on another product. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "isRecommendedAtCheckout": {
+    "type": "boolean",
+    "default": false,
+    "description": "Whether checkout recommends the bundle. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "requiredVariantIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Products that must already be in the basket for the bundle to be sold (the setup screen's \"requires another product\"). (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -7803,6 +8200,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "validTo": {
     "type": "string",
     "format": "date-time"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The commercial campaign (`promotions.campaign`) the codes are issued under, as the Coupon & Promo Code Builder names it. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -8186,6 +8589,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     ],
     "description": "Total discount value after which the promotion stops automatically. **Enforced at checkout**, where an order whose discount would take the total past the cap does not receive the promotion (decided 28 September, audit R101)."
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The commercial campaign (`promotions.campaign`) this promotion belongs to; null for a promotion run on its own. The directory, calendar and campaign budget screens group by it. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -8384,6 +8793,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     ],
     "description": "Cap on a percentage discount. Prevents an unbounded discount on a large basket."
+   },
+   "rewardVariantIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "maxApplicationsPerBasket": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -8740,6 +9164,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "description": "For back-office testing of a rule before publishing."
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The order (`orders.sales_order`) being priced for payment. Sent only by the order service when it confirms an order; when present the evaluation writes one `promotions.promotion_evaluation_trace` row for it. (decided 29 September, writers pass)"
    },
    "lines": {
     "type": "array",
@@ -9126,6 +9556,118 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "PackagePricing": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.package_pricing",
+  "description": "**How a package, bundle or add-on is priced from its components** (29 September, data model DM3). ADM-062. The bundle's composition for sale stays `catalogue.published_bundle`; this row is its pricing model. `normalTotal` and `packageSaving` are computed on read from the component rates.",
+  "required": [
+   "id",
+   "scopePath",
+   "productId",
+   "recordKind",
+   "pricingModel",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordKind": {
+    "type": "string",
+    "enum": [
+     "package",
+     "bundle",
+     "addOn"
+    ]
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "priceListId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "pricingModel": {
+    "type": "string",
+    "enum": [
+     "fixedPackagePrice",
+     "sumOfComponents",
+     "discountedComponentSum",
+     "componentOverride"
+    ]
+   },
+   "addOnType": {
+    "type": "string",
+    "enum": [
+     "fastTrack",
+     "parking",
+     "meal",
+     "photo",
+     "equipment",
+     "upgrade",
+     "additionalPerformance",
+     "premiumAccess",
+     "other",
+     null
+    ],
+    "nullable": true
+   },
+   "packagePrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "components": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "`[{productId, quantity, role, componentPrice}]`; `componentPrice` only for `componentOverride`."
+   },
+   "componentPriceVisibility": {
+    "type": "string",
+    "enum": [
+     "packageTotalOnly",
+     "individualComponents",
+     "componentAndSaving"
+    ],
+    "default": "packageTotalOnly"
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "draft"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -9427,6 +9969,129 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "priority": {
     "type": "integer",
     "description": "Where lists overlap, higher priority wins."
+   },
+   "description": {
+    "type": "string",
+    "nullable": true,
+    "description": "Price list master fields (29 September, data model DM3), set with `setPriceListMaster` (ADM-058)."
+   },
+   "priceListType": {
+    "type": "string",
+    "enum": [
+     "standardRetail",
+     "venue",
+     "attraction",
+     "event",
+     "membership",
+     "group",
+     "corporate",
+     "b2b",
+     "reseller",
+     "ota",
+     "internal",
+     "specialMarket"
+    ],
+    "default": "standardRetail"
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "active"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brand": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "businessUnit": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string",
+    "maxLength": 2,
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$"
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "global",
+     "country",
+     "market",
+     "brand",
+     "venue",
+     "event",
+     "businessUnit"
+    ],
+    "default": "venue"
+   },
+   "defaultPriceCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roundingProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priceResolutionPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowOverrides": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowInheritance": {
+    "type": "boolean",
+    "default": true
+   },
+   "allowMultipleCurrencies": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowProductSpecificRates": {
+    "type": "boolean",
+    "default": true
+   },
+   "clonedFromPriceListId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "currentVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The active `catalogue.price_list_version`."
    }
   }
  },
@@ -9559,6 +10224,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isActive": {
     "type": "boolean"
+   },
+   "dynamicPricingStrategyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `catalogue.dynamic_pricing_strategy` a dynamic rule belongs to (29 September, data model DM3). Null for a static pricing rule."
+   },
+   "ruleType": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "description": "Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`."
+   },
+   "inputMetric": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "conditionLogic": {
+    "type": "string",
+    "enum": [
+     "all",
+     "any"
+    ],
+    "default": "all"
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minimumDurationMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "exitThresholdOffset": {
+    "type": "number",
+    "nullable": true
+   },
+   "rangeMinPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "rangeMaxPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "isProtected": {
+    "type": "boolean",
+    "default": false,
+    "description": "A protected segment or channel: dynamic adjustments never apply."
    }
   }
  },
@@ -9739,6 +10456,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean",
     "default": false,
     "description": "**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"
+   },
+   "productOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."
+   },
+   "operationalContact": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "A principal id or a name, as the context screen takes it."
+   },
+   "businessUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `ledger.legal_entity`, read through finance."
+   },
+   "attractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "siteId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand, as the context screen names it (a catalogue brand category)."
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "salesTerritory": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
    }
   }
  },
@@ -9941,6 +10712,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "type": "string",
       "format": "date-time",
       "nullable": true
+     },
+     "version": {
+      "type": "integer",
+      "minimum": 1,
+      "readOnly": true,
+      "description": "Starts at 1 and goes up by one on every saved change. The version the directory, the audit history (`promotions.promotion_audit`) and the channel publication monitor (`promotions.promotion_channel_publication`) name. (DM5, 29 September: data model for the agreed operations)"
      }
     }
    }
@@ -10061,6 +10838,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "advanceDaysMax": {
     "type": "integer",
     "description": "Last-minute — booked no more than this many days ahead."
+   },
+   "eligibilityRuleIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own, saved by setEligibilityRule) that must also hold. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },

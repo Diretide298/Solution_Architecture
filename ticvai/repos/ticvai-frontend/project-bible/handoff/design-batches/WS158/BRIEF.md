@@ -1,6 +1,6 @@
 # WS158 — Resource Management Configuration board 4
 
-**10 screens · 11 operations · 10 schemas · 3 permissions**
+**10 screens · 13 operations · 11 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -68,9 +68,9 @@ convincingly. It is never a caption.
 | `BO-888` | Attendance & Live Workforce Command Center | listDetail | 1 | 0 | — |
 | `BO-889` | Staff Check-In, Check-Out & Attendance Exceptions | configEditor | 2 | 0 | — |
 | `BO-890` | Workforce Compliance Validation Center | listDetail | 1 | 0 | — |
-| `BO-891` | Labor Cost & Staffing Budget Control | listDetail | 1 | 0 | — |
+| `BO-891` | Labor Cost & Staffing Budget Control | listDetail | 3 | 1 | — |
 | `BO-892` | AI Workforce Planner & Roster Optimization | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-883, BO-884, BO-887, BO-888, BO-890, BO-891 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-883, BO-884, BO-887, BO-888, BO-890 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

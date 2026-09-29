@@ -1191,6 +1191,14 @@
     "provenance": "contract access.yaml DELETE /access-point-groups/{groupId}"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "groupId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1414,6 +1422,14 @@
     "provenance": "contract access.yaml DELETE /operating-calendar-entries/{entryId}"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entryId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

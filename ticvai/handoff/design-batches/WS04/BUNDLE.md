@@ -1,6 +1,6 @@
 # WS04 — Access Control board 4
 
-**10 screens · 15 operations · 16 schemas · 2 permissions**
+**10 screens · 16 operations · 17 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -63,7 +63,7 @@ convincingly. It is never a caption.
 | `BO-174` | Media & Credential Command Center | listDetail | 3 | 0 | — |
 | `BO-175` | Media Type & Technology Library | configEditor | 2 | 0 | — |
 | `BO-176` | Virtual Credential & Media Association | listDetail | 1 | 0 | — |
-| `BO-177` | Verification Method Selection & Locking | listDetail | 1 | 0 | — |
+| `BO-177` | Verification Method Selection & Locking | listDetail | 2 | 1 | — |
 | `BO-178` | Media Issuance & Encoding Profile | listDetail | 2 | 0 | — |
 | `BO-179` | Media Swap & Replacement | listDetail | 1 | 0 | — |
 | `BO-180` | RFID & NFC Configuration | configEditor | 2 | 0 | — |
@@ -723,6 +723,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save verification method policy",
+       "operation": "setVerificationMethodPolicy",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Verification Method Selection & Locking** (BO-177): the methods a guest may choose for one product (dynamic QR, card, RFID, Face Pass, Face Tag), whether the method locks on first successful access, who may change it after lock and the reasons allowed.",
+       "provenance": "contract access.yaml PUT /verification-method-policies"
+      }
+     ]
     }
    ]
   },
@@ -739,6 +753,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Verification Method Selection & Locking",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVerificationMethodPolicy",
+    "contract": "access",
+    "purpose": "Set the verification method policy of a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "listVerificationMethodSelection"
+    ]
    }
   ],
   "entryState": {
@@ -753,6 +776,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-177"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetVerificationMethodPolicy",
+    "component": "modal",
+    "trigger": "Save verification method policy",
+    "body": "**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`, `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`. Optional: `reasonCodes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessVerificationMethodPolicy",
+    "confirm": {
+     "label": "Save verification method policy",
+     "operation": "setVerificationMethodPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "productId",
+      "availableMethods",
+      "lockOnFirstSuccessfulAccess",
+      "changeAfterLock",
+      "scopePath",
+      "reasonCodes"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /verification-method-policies"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1603,7 +1652,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ExternalPartnerCredentialMappingView"
  },
@@ -1616,7 +1671,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "HotelWalletExternalMediaIntegrationView"
  },
@@ -1688,7 +1749,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaIssuanceEncodingProfileView"
  },
@@ -1725,7 +1792,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaTypeCredentialTechnologyRegistryView"
  },
@@ -1738,7 +1811,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaTypeTechnologyLibraryView"
  },
@@ -1751,7 +1830,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "VerificationMethodSelectionLockingView"
  },
@@ -1892,6 +1977,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "RfidNfcCardWristbandMediaDesignerInput",
   "responds": "RfidNfcCardWristbandMediaDesignerView"
+ },
+ "setVerificationMethodPolicy": {
+  "method": "PUT",
+  "path": "/verification-method-policies",
+  "contract": "access",
+  "summary": "Set the verification method policy of a product",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessVerificationMethodPolicy",
+  "responds": "AccessVerificationMethodPolicy"
  }
 }
 ```
@@ -1902,6 +2006,86 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessVerificationMethodPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.verification_method_policy",
+  "description": "The verification method selection and locking policy for one product - methods the guest may choose, lock on first successful access, who may change it after lock and the reason vocabulary (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "productId",
+   "availableMethods",
+   "lockOnFirstSuccessfulAccess",
+   "changeAfterLock",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The policyId of listVerificationMethodSelection"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Unique per scope"
+   },
+   "availableMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicQr",
+      "physicalCard",
+      "rfid",
+      "facePass",
+      "faceTag"
+     ]
+    }
+   },
+   "lockOnFirstSuccessfulAccess": {
+    "type": "boolean",
+    "default": true
+   },
+   "changeAfterLock": {
+    "type": "string",
+    "enum": [
+     "notAllowed",
+     "supervisorApproval"
+    ],
+    "default": "supervisorApproval",
+    "description": "Who may change the method once locked; guests may not"
+   },
+   "reasonCodes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "lostPhone",
+      "damagedWristband",
+      "accessibility",
+      "deviceFailure",
+      "guestService",
+      "other"
+     ]
+    },
+    "description": "Reason vocabulary for a method change after lock"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "ExternalPartnerCredentialMappingView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

@@ -1,4 +1,285 @@
 {
+ "AccessOfflinePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.offline_policy",
+  "description": "The offline policy of one venue: what gates validate locally and for how long, how old the revocation cache may get, and how devices step down through degraded modes. Merges access.offline_validation_profile, access.revocation_cache_policy and access.degraded_mode_policy (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "maxOfflineDurationHours": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Hours a gate may validate offline"
+   },
+   "offlineChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "credentialAuthenticity",
+      "digitalSignature",
+      "ticketId",
+      "venue",
+      "park",
+      "zone",
+      "visitDate",
+      "timeWindow",
+      "credentialStatusSnapshot",
+      "ticketType",
+      "guestCategory",
+      "seat",
+      "timeslot",
+      "reservation",
+      "entitlements",
+      "reEntryPermissions",
+      "validityPeriod"
+     ]
+    },
+    "description": "What a gate may validate locally"
+   },
+   "afterThresholdBehavior": {
+    "type": "string",
+    "enum": [
+     "continueRestrictedValidation",
+     "operatorWarning",
+     "supervisorMode",
+     "failClosed",
+     "fallback"
+    ],
+    "nullable": true
+   },
+   "revocationTriggerEvents": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fraudLock",
+      "refund",
+      "cancellation",
+      "lostCredential",
+      "transfer",
+      "reissue",
+      "manualInvalidation"
+     ]
+    },
+    "description": "Events that push an invalidation into the offline cache"
+   },
+   "revocationMaxAllowedAgeMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Maximum allowed revocation cache age"
+   },
+   "revocationStalenessAction": {
+    "type": "string",
+    "enum": [
+     "continue",
+     "continueWithWarning",
+     "restrictedProductsOnly",
+     "supervisorMode",
+     "denySelectedCredentialClasses",
+     "failClosed"
+    ],
+    "nullable": true,
+    "description": "What devices do when the cache is older than the maximum allowed age"
+   },
+   "operatingModes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "online",
+      "degraded",
+      "edgeMode",
+      "localOffline",
+      "unsafeExpired"
+     ]
+    },
+    "description": "Operating modes a device moves through as connectivity fails"
+   },
+   "centralUnavailableAfterSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Seconds without central services before switching to edge mode"
+   },
+   "edgeUnavailableAfterSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Seconds without the venue edge before switching to local offline"
+   },
+   "automaticSwitch": {
+    "type": "boolean",
+    "default": true,
+    "description": "Switch modes automatically without stopping guest flow"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessSecurityAlert": {
+  "type": "object",
+  "x-ticvai-persistence": "access.security_alert",
+  "description": "One access security or fraud alert - severity, what was detected, where and on which credential, identity or device - including biometric anomalies and edge security events (certificate, credential or package-signature failures, unauthorised connections, device authorisation and revocation). Merges the proposed access.security_alert and access.edge_security_event (declared 29 September, data-model close-out DM1). Created `open` by the detection jobs (fraud rules, sharing detection, biometric anomaly, edge security events) and moved by updateSecurityAlert; the lifecycle is states/access-security-alert.yaml (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "scopePath",
+   "category",
+   "severity",
+   "status",
+   "detectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The alertId / anomalyId the lists show"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "fraudSignal",
+     "credentialSharing",
+     "duplicateAccess",
+     "blacklist",
+     "biometric",
+     "companion",
+     "edgeSecurity"
+    ]
+   },
+   "alertType": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "The kind within the category - for fraudSignal the fraud rule's signal; for biometric one of faceChanged, reEnrollment, repeatedFaceMismatch, multipleFacesOneCredential, oneFaceMultipleCredentials, suspiciousEnrollmentFrequency, unusualVerificationFailures; for edgeSecurity one of certificateFailure, credentialFailure, packageSignatureFailure, unauthorizedConnection, deviceAuthorized, deviceRevoked"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "e.g. Credential attempted simultaneous entry at two gates"
+   },
+   "fraudRuleId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The access fraud rule that raised the alert, if one did"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The credential (the list's credentialId)"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity concerned, where known"
+   },
+   "zoneId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The gate (the list's gateId)"
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The device concerned, for device-sharing and edge events"
+   },
+   "faceReenrolmentAttemptId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Biometric alerts raised on a re-enrolment; the attempt holds the old and new references, operator, reason and review"
+   },
+   "faceProfileReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "Biometric alerts. Opaque Face Pass reference; never a template"
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "acknowledged",
+     "resolved",
+     "dismissed"
+    ],
+    "default": "open"
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
  "ConnectivityFailureDegradedModePolicyView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

@@ -48,21 +48,9 @@
      "operation": "listAccessSecurityFraud"
     },
     {
-     "to": "BO-246",
-     "trigger": "Works in Credential Sharing & Concurrent Usage Detection",
-     "provenance": "flow F121 step 3→4",
-     "operation": "listAccessSecurityFraud"
-    },
-    {
      "to": "BO-247",
      "trigger": "Works in Unified Identity & Credential Lock Manager",
      "provenance": "flow F121 step 5→6",
-     "operation": "listAccessSecurityFraud"
-    },
-    {
-     "to": "BO-248",
-     "trigger": "Works in Biometric & Identity Integrity Monitoring",
-     "provenance": "flow F121 step 7→8",
      "operation": "listAccessSecurityFraud"
     },
     {
@@ -90,10 +78,31 @@
      "operation": "listAccessSecurityFraud"
     },
     {
+     "to": "BO-246",
+     "trigger": "Works in Credential Sharing & Concurrent Usage Detection",
+     "provenance": "flow F121 step 3→4",
+     "operation": "listAccessSecurityFraud",
+     "carries": [
+      "alertId"
+     ]
+    },
+    {
+     "to": "BO-248",
+     "trigger": "Works in Biometric & Identity Integrity Monitoring",
+     "provenance": "flow F121 step 7→8",
+     "operation": "listAccessSecurityFraud",
+     "carries": [
+      "alertId"
+     ]
+    },
+    {
      "to": "BO-253",
      "trigger": "Works in Security Analytics, AI Detection & Governance",
      "provenance": "flow F121 step 17→18",
-     "operation": "listAccessSecurityFraud"
+     "operation": "listAccessSecurityFraud",
+     "carries": [
+      "alertId"
+     ]
     }
    ]
   },
@@ -233,6 +242,28 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 151 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lock identity",
+       "operation": "lockIdentity",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The write behind the Unified Identity & Credential Lock Manager** (BO-247): locks one identity at a scope (one credential, a medium, an entitlement, a venue, every venue, or the full identity), for a duration, for a reason.",
+       "provenance": "contract access.yaml POST /identity-locks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      }
+     ]
     }
    ]
   },
@@ -249,6 +280,24 @@
     "contract": "access",
     "purpose": "Access Security & Fraud Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "lockIdentity",
+    "contract": "access",
+    "purpose": "Lock an identity",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessSecurityFraud"
+    ]
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessSecurityFraud"
+    ]
    }
   ],
   "entryState": {
@@ -259,6 +308,13 @@
     "AccessSecurityFraudCommandCenterViewSummary.suspiciousQrActivity",
     "AccessSecurityFraudCommandCenterViewSummary.deviceSharingAlerts",
     "AccessSecurityFraudCommandCenterViewSummary.biometricAlerts"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -268,6 +324,52 @@
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-244"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 151. 13 of 14 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formLockIdentity",
+    "component": "modal",
+    "trigger": "Lock identity",
+    "body": "**Collects what `lockIdentity` sends before it is called.** Required: `subjectId`, `lockScope`, `lockDuration`, `lockReason`. Optional: `venueId`, `lockHours`, `associatedEntitlementIds`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "IdentityLockInput",
+    "confirm": {
+     "label": "Lock identity",
+     "operation": "lockIdentity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "lockScope",
+      "lockDuration",
+      "lockReason",
+      "venueId",
+      "lockHours",
+      "associatedEntitlementIds",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /identity-locks"
+   },
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -460,7 +562,10 @@
      "to": "BO-244",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F121 step 4→5",
-     "operation": "listCredentialSharingConcurrent"
+     "operation": "listCredentialSharingConcurrent",
+     "carries": [
+      "alertId"
+     ]
     }
    ]
   },
@@ -494,6 +599,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      }
+     ]
     }
    ]
   },
@@ -510,6 +629,15 @@
     "contract": "access",
     "purpose": "Credential Sharing & Concurrent Usage Detection",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCredentialSharingConcurrent"
+    ]
    }
   ],
   "entryState": {
@@ -517,6 +645,13 @@
     "CredentialSharingConcurrentUsageDetectionView.additionalDevices",
     "CredentialSharingConcurrentUsageDetectionView.maximumActiveDevices",
     "CredentialSharingConcurrentUsageDetectionView.responseActions"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -526,6 +661,27 @@
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-246"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 154. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -590,13 +746,6 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide the single security lock required by the matrix so suspicious activity can immediately stop all access associated with an identity.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Unified Identity & Credential Lock Manager declares no operation that writes anything** — its only declared call is `listUnifiedIdentityCredential`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -631,6 +780,28 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 155 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lock identity",
+       "operation": "lockIdentity",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The write behind the Unified Identity & Credential Lock Manager** (BO-247): locks one identity at a scope (one credential, a medium, an entitlement, a venue, every venue, or the full identity), for a duration, for a reason.",
+       "provenance": "contract access.yaml POST /identity-locks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release identity lock",
+       "operation": "releaseIdentityLock",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "Releases an active lock: `status: released`, with who and when.",
+       "provenance": "contract access.yaml POST /identity-locks/{lockId}/release"
+      }
+     ]
     }
    ]
   },
@@ -647,11 +818,35 @@
     "contract": "access",
     "purpose": "Unified Identity & Credential Lock Manager",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "lockIdentity",
+    "contract": "access",
+    "purpose": "Lock an identity",
+    "trigger": "onAction",
+    "invalidates": [
+     "listUnifiedIdentityCredential"
+    ]
+   },
+   {
+    "operationId": "releaseIdentityLock",
+    "contract": "access",
+    "purpose": "Release an identity lock",
+    "trigger": "onAction",
+    "invalidates": [
+     "listUnifiedIdentityCredential"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
     "UnifiedIdentityCredentialLockManagerView.propagatedTo"
+   ],
+   "params": [
+    {
+     "name": "lockId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -661,6 +856,50 @@
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-247"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 155. 5 of 5 labels bound to a contract property; 9 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formLockIdentity",
+    "component": "modal",
+    "trigger": "Lock identity",
+    "body": "**Collects what `lockIdentity` sends before it is called.** Required: `subjectId`, `lockScope`, `lockDuration`, `lockReason`. Optional: `venueId`, `lockHours`, `associatedEntitlementIds`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "IdentityLockInput",
+    "confirm": {
+     "label": "Lock identity",
+     "operation": "lockIdentity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "lockScope",
+      "lockDuration",
+      "lockReason",
+      "venueId",
+      "lockHours",
+      "associatedEntitlementIds",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /identity-locks"
+   },
+   {
+    "id": "formReleaseIdentityLock",
+    "component": "modal",
+    "trigger": "Release identity lock",
+    "body": "**Collects what `releaseIdentityLock` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release identity lock",
+     "operation": "releaseIdentityLock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml POST /identity-locks/{lockId}/release"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -716,7 +955,10 @@
      "to": "BO-244",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F121 step 8→9",
-     "operation": "listBiometricIdentityIntegrity"
+     "operation": "listBiometricIdentityIntegrity",
+     "carries": [
+      "alertId"
+     ]
     }
    ]
   },
@@ -763,6 +1005,27 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 156 §Monitor"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Review face reenrolment",
+       "operation": "reviewFaceReenrolment",
+       "permission": "GUEST_MANAGE",
+       "provenance": "contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review"
+      }
+     ]
     }
    ]
   },
@@ -789,6 +1052,24 @@
     "invalidates": [
      "listBiometricIdentityIntegrity"
     ]
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBiometricIdentityIntegrity"
+    ]
+   },
+   {
+    "operationId": "reviewFaceReenrolment",
+    "contract": "access",
+    "purpose": "Review a blocked Face Pass re-enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBiometricIdentityIntegrity"
+    ]
    }
   ],
   "entryState": {
@@ -796,6 +1077,18 @@
     "BiometricIdentityIntegrityMonitoringView.anomalyType",
     "multiple faces associated with one credential",
     "one face associated with multiple credentials"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    },
+    {
+     "name": "attemptId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -805,6 +1098,45 @@
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-248"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 156. 4 of 6 labels bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   },
+   {
+    "id": "formReviewFaceReenrolment",
+    "component": "modal",
+    "trigger": "Review face reenrolment",
+    "body": "**Collects what `reviewFaceReenrolment` sends before it is called.** Required: `decision`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Review face reenrolment",
+     "operation": "reviewFaceReenrolment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "note"
+     ]
+    },
+    "provenance": "contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -897,6 +1229,20 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 158 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save relationship fraud rule",
+       "operation": "setRelationshipFraudRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Relationship & Companion Fraud Monitoring** (BO-249): a rule on the people a credential travels with (a companion changed during the visit, a nanny credential without its primary guest, a child with an unauthorised adult and so on), its severity, weight and responses.",
+       "provenance": "contract access.yaml PUT /relationship-fraud-rules"
+      }
+     ]
     }
    ]
   },
@@ -912,6 +1258,15 @@
     "contract": "access",
     "purpose": "Relationship & Companion Fraud Monitoring",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setRelationshipFraudRule",
+    "contract": "access",
+    "purpose": "Create or replace a relationship / companion fraud rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRelationshipCompanionFraud"
+    ]
    }
   ],
   "wireframe": {
@@ -921,6 +1276,33 @@
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-249"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 158. 0 of 0 labels bound to a contract property; 4 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetRelationshipFraudRule",
+    "component": "modal",
+    "trigger": "Save relationship fraud rule",
+    "body": "**Collects what `setRelationshipFraudRule` sends before it is called.** Required: `relationshipRuleType`, `severity`, `relationshipResponses`. Optional: `ruleId`, `relationshipType`, `weight`, `applicableVenues`, `enabled`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RelationshipFraudRuleInput",
+    "confirm": {
+     "label": "Save relationship fraud rule",
+     "operation": "setRelationshipFraudRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "relationshipRuleType",
+      "severity",
+      "relationshipResponses",
+      "ruleId",
+      "relationshipType",
+      "weight",
+      "applicableVenues",
+      "enabled"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /relationship-fraud-rules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1010,6 +1392,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save risk scoring config",
+       "operation": "setRiskScoringConfig",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Access Risk Scoring & Decision Engine** (BO-250): the score thresholds of the medium, high and critical bands and the context factors the score uses.",
+       "provenance": "contract access.yaml PUT /risk-scoring-config"
+      }
+     ]
     }
    ]
   },
@@ -1026,6 +1422,15 @@
     "contract": "access",
     "purpose": "Access Risk Scoring & Decision Engine",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setRiskScoringConfig",
+    "contract": "access",
+    "purpose": "Set the access risk scoring bands",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessRiskScoring"
+    ]
    }
   ],
   "entryState": {
@@ -1038,6 +1443,31 @@
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-250"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 159. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetRiskScoringConfig",
+    "component": "modal",
+    "trigger": "Save risk scoring config",
+    "body": "**Collects what `setRiskScoringConfig` sends before it is called.** Required: `id`, `scopePath`, `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessRiskScoringConfig",
+    "confirm": {
+     "label": "Save risk scoring config",
+     "operation": "setRiskScoringConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "mediumThreshold",
+      "highThreshold",
+      "criticalThreshold",
+      "riskFactors"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /risk-scoring-config"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1366,7 +1796,17 @@
     "BO-244"
    ],
    "inferred": false,
-   "notes": "**Reached from BO-244, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from BO-244, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-244",
+     "trigger": "Access Security & Fraud Command Center",
+     "carries": [
+      "alertId"
+     ],
+     "provenance": "derived — BO-244 declares entryState.params alertId and BO-253 holds alertId, so an edge into it carries them"
+    }
+   ]
   },
   "density": "compact",
   "purposeNote": "Board 11 — Final 10-Screen Structure # Backend Screen Main Responsibility 11.1 Access Security & Fraud Command Center Real-time security posture 11.2 Fraud Detection Rule & Signal Library Configure fraud indicators 11.3 Credential Sharing & Concurrent Usage Detection Detect credential/device sharing 11.4 Unified Identity & Credential Lock Manager Immediately restrict compromised identities 11.5 Biometric & Identity Integrity Monitoring Detect biometric/identity anomalies 11.6 Relationship & Companion Fraud Monitoring Protect child/POD/nanny/group relationships 11.7 Access Risk Scoring & Decisi",
@@ -1466,6 +1906,20 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 164 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      }
+     ]
     }
    ]
   },
@@ -1482,6 +1936,15 @@
     "contract": "access",
     "purpose": "Security Analytics, AI Detection & Governance",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSecurityDetectionGovernance"
+    ]
    }
   ],
   "entryState": {
@@ -1492,6 +1955,13 @@
     "Duplicate Usage",
     "SecurityAnalyticsAiDetectionGovernanceView.biometricAlerts",
     "SecurityAnalyticsAiDetectionGovernanceView.deviceBindingViolations"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -1501,6 +1971,27 @@
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-253"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 164. 15 of 26 labels bound to a contract property; 26 of 93 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

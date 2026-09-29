@@ -1140,6 +1140,20 @@
        "impliedBy": "setEdgeNodeLocal"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save policy evaluation setting",
+       "operation": "setPolicyEvaluationSetting",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Policy Evaluation Architecture & Offline Distribution** (BO-241): for one policy category, the evaluation mode (central, edge, device, hybrid), the locations that may evaluate it, its offline behaviour and the oldest cached data an offline evaluation may use.",
+       "provenance": "contract access.yaml PUT /policy-evaluation-settings"
+      }
+     ]
     }
    ]
   },
@@ -1173,6 +1187,15 @@
     "purpose": "Save what the edge may decide while central services are unreachable",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setPolicyEvaluationSetting",
+    "contract": "access",
+    "purpose": "Set where and how a policy category is evaluated",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPolicyEvaluationArchitecture"
+    ]
    }
   ],
   "entryState": {
@@ -1185,6 +1208,32 @@
    "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-241"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 143. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPolicyEvaluationSetting",
+    "component": "modal",
+    "trigger": "Save policy evaluation setting",
+    "body": "**Collects what `setPolicyEvaluationSetting` sends before it is called.** Required: `id`, `scopePath`, `policyCategory`, `evaluationMode`. Optional: `supportedLocations`, `offlineBehaviour`, `maxDataAgeMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessPolicyEvaluationSetting",
+    "confirm": {
+     "label": "Save policy evaluation setting",
+     "operation": "setPolicyEvaluationSetting"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "policyCategory",
+      "evaluationMode",
+      "supportedLocations",
+      "offlineBehaviour",
+      "maxDataAgeMinutes"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /policy-evaluation-settings"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

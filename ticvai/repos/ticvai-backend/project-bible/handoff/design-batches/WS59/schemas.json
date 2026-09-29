@@ -1,4 +1,353 @@
 {
+ "AccessCredentialEventPropagationRule": {
+  "type": "object",
+  "x-ticvai-persistence": "access.credential_event_propagation_rule",
+  "description": "For one ticket lifecycle event, the revocation action on the credential and how the change propagates to every bound medium, with the conditions monitored (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "triggerEvent",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "triggerEvent": {
+    "type": "string",
+    "enum": [
+     "entry",
+     "exit",
+     "redemption",
+     "partialConsumption",
+     "cancellation",
+     "refund",
+     "suspension",
+     "reactivation",
+     "transfer",
+     "exchange",
+     "upgrade",
+     "reissue",
+     "expiry",
+     "replacement",
+     "manualInvalidation",
+     "fraudLock",
+     "accountSuspension"
+    ],
+    "description": "Unique per scope; one vocabulary for both screens that read it (decided 29 September, writers pass)"
+   },
+   "revocationAction": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "invalidate",
+     "suspend",
+     "replace"
+    ],
+    "description": "What happens to the credential; refund, exchange and reissue always revoke"
+   },
+   "propagationTargets": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "mobileApp",
+      "gateNetwork",
+      "offlineRevocationPackage",
+      "walletCredentialService"
+     ]
+    }
+   },
+   "monitoredConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "delayedUpdates",
+      "conflictingStates",
+      "offlineTransactionsPendingSynchronization",
+      "providerUpdateFailures",
+      "staleWalletCredentials"
+     ]
+    }
+   },
+   "propagation": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "How the Virtual Ticket state change reaches every bound medium"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessMediaBindingRule": {
+  "type": "object",
+  "x-ticvai-persistence": "access.media_binding_rule",
+  "description": "One multi-media binding rule - which media a Virtual Ticket may, must or may optionally carry, in which roles and combinations - for the scope named by its conditions (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "allowedMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "mandatoryMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "optionalMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "primaryMediaTypeId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "secondaryMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "backupMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "temporaryMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "minimumMediaRequired": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "maximumActiveMedia": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "mediaCombinations": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Permitted media combinations"
+   },
+   "simultaneousActivation": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media that may be active at the same time, e.g. face with RFID"
+   },
+   "exclusiveActivation": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media whose activation revokes another, e.g. RFID activated revokes temporary paper"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketType": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "customerType": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "membership": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "channel": {
+    "type": "string",
+    "maxLength": 50,
+    "nullable": true
+   },
+   "ageCategory": {
+    "type": "string",
+    "maxLength": 50,
+    "nullable": true
+   },
+   "country": {
+    "type": "string",
+    "maxLength": 2,
+    "nullable": true,
+    "description": "ISO 3166-1 alpha-2"
+   },
+   "accessEnvironment": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessTicketStatusTransition": {
+  "type": "object",
+  "x-ticvai-persistence": "access.ticket_status_transition",
+  "description": "One Virtual Ticket lifecycle transition rule - from status, to status, whether allowed, whether it needs an authorised exception and where it may originate (declared 29 September, data-model close-out DM1). Seeded from states/entitlement-status.yaml when a venue is created; setTicketStatusTransition may narrow a move, never add one (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "fromStatus",
+   "toStatus",
+   "allowed",
+   "requiresAuthorizedException",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "fromStatus": {
+    "type": "string",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ]
+   },
+   "toStatus": {
+    "type": "string",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "Unique with fromStatus per scope"
+   },
+   "allowed": {
+    "type": "boolean"
+   },
+   "requiresAuthorizedException": {
+    "type": "boolean",
+    "default": false,
+    "description": "Allowed only with an authorised exception, e.g. used to active"
+   },
+   "originatingSources": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "orderManagement",
+      "cancellation",
+      "refund",
+      "upgradeConversion",
+      "ticketTransfer",
+      "membership",
+      "expiry",
+      "accessUsage",
+      "authorizedOperator",
+      "api",
+      "scheduledProcess"
+     ]
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "EntitlementCrossMediaSynchronizationRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -121,15 +470,19 @@
    "replacementReason": {
     "type": "string",
     "enum": [
-     "lostRfidCard",
-     "damagedWristband",
-     "compromisedQr",
-     "newMobileDevice",
-     "walletCredentialReplacement",
+     "lost",
+     "stolen",
+     "damaged",
+     "compromised",
+     "customerChangedPhone",
+     "rfidFailure",
+     "wristbandReplacement",
+     "qrCompromise",
+     "walletReplacement",
      "faceReEnrollment",
-     "printedTicketReplacement",
-     "incorrectCredentialAssignment"
-    ]
+     "incorrectAssignment"
+    ],
+    "description": "The reason this rule is for, in the vocabulary of `replaceCredential`, so the rule a replacement reads is keyed the way the replacement names it (decided 29 September, writers pass). The old keys map: lostRfidCard to lost or rfidFailure, damagedWristband to wristbandReplacement, compromisedQr to qrCompromise, newMobileDevice to customerChangedPhone, walletCredentialReplacement to walletReplacement, faceReEnrollment unchanged, printedTicketReplacement to damaged, incorrectCredentialAssignment to incorrectAssignment."
    },
    "outcome": {
     "type": "string",
@@ -207,16 +560,19 @@
    "replacementReason": {
     "type": "string",
     "enum": [
-     "lostRfidCard",
-     "damagedWristband",
-     "compromisedQr",
-     "newMobileDevice",
-     "walletCredentialReplacement",
+     "lost",
+     "stolen",
+     "damaged",
+     "compromised",
+     "customerChangedPhone",
+     "rfidFailure",
+     "wristbandReplacement",
+     "qrCompromise",
+     "walletReplacement",
      "faceReEnrollment",
-     "printedTicketReplacement",
-     "incorrectCredentialAssignment"
+     "incorrectAssignment"
     ],
-    "description": "Replacement case this policy covers"
+    "description": "The reason this rule is for, in the vocabulary of `replaceCredential`, so the rule a replacement reads is keyed the way the replacement names it (decided 29 September, writers pass). The old keys map: lostRfidCard to lost or rfidFailure, damagedWristband to wristbandReplacement, compromisedQr to qrCompromise, newMobileDevice to customerChangedPhone, walletCredentialReplacement to walletReplacement, faceReEnrollment unchanged, printedTicketReplacement to damaged, incorrectCredentialAssignment to incorrectAssignment."
    },
    "numberOfReplacements": {
     "type": "integer",

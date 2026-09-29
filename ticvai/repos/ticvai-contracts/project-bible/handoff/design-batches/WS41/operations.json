@@ -117,6 +117,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "subjectId",
     "in": "query",
     "required": true
@@ -174,6 +179,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "brandId",
     "in": "query",
@@ -342,5 +352,24 @@
   ],
   "requestBody": "MinorGuardianAgeBasedPrivacyConfigurationInput",
   "responds": "MinorGuardianAgeBasedPrivacyConfigurationView"
+ },
+ "setPrivacyNoticePolicyGovernance": {
+  "method": "PUT",
+  "path": "/privacy-notice-policy",
+  "contract": "marketing-crm",
+  "summary": "Set the privacy governance of one version of a privacy document",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PrivacyNoticeGovernance",
+  "responds": "PrivacyNoticeGovernance"
  }
 }

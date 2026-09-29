@@ -72,15 +72,6 @@
      "operation": "listLiveAccess"
     },
     {
-     "to": "BO-230",
-     "trigger": "Works in Live Gate Mode & Lane Control",
-     "provenance": "flow F119 step 11→12",
-     "operation": "listLiveAccess",
-     "carries": [
-      "accessPointId"
-     ]
-    },
-    {
      "to": "BO-231",
      "trigger": "Works in Queue, Throughput & Lane Optimization",
      "provenance": "flow F119 step 13→14",
@@ -97,6 +88,15 @@
      "trigger": "Works in Operations Audit, Shift Handover & Control Summary",
      "provenance": "flow F119 step 17→18",
      "operation": "listLiveAccess"
+    },
+    {
+     "to": "BO-230",
+     "trigger": "Works in Live Gate Mode & Lane Control",
+     "provenance": "flow F119 step 11→12",
+     "operation": "listLiveAccess",
+     "carries": [
+      "accessPointId"
+     ]
     }
    ]
   },
@@ -449,6 +449,10 @@
      "name": "shiftId",
      "from": "navigation",
      "optional": true
+    },
+    {
+     "name": "podiumId",
+     "from": "navigation"
     }
    ]
   },
@@ -804,6 +808,12 @@
   "entryState": {
    "preloaded": [
     "ValidationExceptionReasonCodeManagerView.operationalResponse"
+   ],
+   "params": [
+    {
+     "name": "reasonCodeId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {

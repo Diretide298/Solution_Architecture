@@ -1,4 +1,510 @@
 {
+ "AccessFaceReenrolmentAttempt": {
+  "type": "object",
+  "x-ticvai-persistence": "access.face_reenrolment_attempt",
+  "description": "One Face Pass re-enrolment attempt - the existing and new capture references (opaque, never templates), the match result, the reason, the operator and the outcome, with the review of a blocked change (declared 29 September, data-model close-out DM1). Written by enrolFacePass when the subject already has a Face Pass; a pendingReview attempt is decided by reviewFaceReenrolment (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "subjectId",
+   "existingProfileReference",
+   "newCaptureReference",
+   "matchResult",
+   "outcome",
+   "attemptedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The attemptId the list shows"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The guest (pii.subject)"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The credential the Face Pass belongs to"
+   },
+   "existingProfileReference": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Opaque reference to the prior enrolment (pii.subject_biometric)"
+   },
+   "newCaptureReference": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Opaque reference to the new capture"
+   },
+   "matchResult": {
+    "type": "string",
+    "enum": [
+     "withinPolicy",
+     "significantDifference"
+    ]
+   },
+   "reasonForReEnrollment": {
+    "type": "string",
+    "enum": [
+     "appearanceChange",
+     "poorOriginalCapture",
+     "technicalIssue",
+     "guestRequest",
+     "recovery",
+     "other"
+    ],
+    "nullable": true
+   },
+   "verificationProcess": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "How the guest was verified for the change"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "updated",
+     "blocked",
+     "pendingReview"
+    ]
+   },
+   "reviewedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Security or guest service reviewer of a blocked change (the integrity screen's approval)"
+   },
+   "reviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "attemptedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AccessFraudRule": {
+  "type": "object",
+  "x-ticvai-persistence": "access.fraud_rule",
+  "description": "One access fraud rule (not payment fraud, which is orders) - either a signal rule with its severity, weight, threshold, window, credential types, venues, offline availability and response, or a relationship/companion rule with its rule type, relationship and responses; ruleKind tells them apart (declared 29 September, data-model close-out DM1). Signal rows are written by setFraudDetectionRule and relationship rows by setRelationshipFraudRule (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "scopePath",
+   "ruleKind",
+   "severity",
+   "enabled"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The ruleId setFraudDetectionRule is keyed by"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the scope the rule applies to (the operation's scope; the tenant when empty)"
+   },
+   "ruleKind": {
+    "type": "string",
+    "enum": [
+     "signal",
+     "relationship"
+    ]
+   },
+   "signal": {
+    "type": "string",
+    "enum": [
+     "excessiveQrActivations",
+     "multipleActiveSessions",
+     "credentialCopied",
+     "excessiveRefreshAttempts",
+     "invalidSignature",
+     "expiredCredential",
+     "revokedCredential",
+     "screenshotReplayAttempt",
+     "abnormalTransferFrequency",
+     "repeatedFailedValidation",
+     "newDevice",
+     "multipleDevices",
+     "deviceBindingMismatch",
+     "rootedCompromisedDevice",
+     "abnormalDeviceChanges",
+     "impossibleDeviceMovement",
+     "suspiciousScannerDeviceActivity",
+     "duplicateEntry",
+     "simultaneousUse",
+     "antiPassbackViolations",
+     "unusualReEntry",
+     "unusualCrossover",
+     "excessiveAttractionUse",
+     "repeatedWrongGateAttempts",
+     "abnormalFastPassConsumption",
+     "faceMismatch",
+     "unusualFaceChange",
+     "multipleIdentitiesLinked",
+     "suspiciousCompanionChanges",
+     "podNannyRelationshipAnomalies"
+    ],
+    "nullable": true,
+    "description": "signal rules"
+   },
+   "signalCategory": {
+    "type": "string",
+    "enum": [
+     "credential",
+     "device",
+     "access",
+     "identity"
+    ],
+    "nullable": true
+   },
+   "relationshipRuleType": {
+    "type": "string",
+    "enum": [
+     "companionChangedDuringVisit",
+     "nannyCredentialWithoutPrimaryGuest",
+     "childWithUnauthorizedAdult",
+     "companionLinkedToMultiplePrimaries",
+     "excessiveRelationshipChanges",
+     "groupLeaderAcrossUnrelatedGroups"
+    ],
+    "nullable": true,
+    "description": "relationship rules (the list's ruleType)"
+   },
+   "relationshipType": {
+    "type": "string",
+    "enum": [
+     "childAdult",
+     "podCompanion",
+     "guestNanny",
+     "groupLeaderGroup",
+     "membershipDependent"
+    ],
+    "nullable": true,
+    "description": "relationship rules"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "weight": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Contribution to the access risk score"
+   },
+   "threshold": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "signal rules. Occurrences within timeWindow that fire the rule"
+   },
+   "timeWindow": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "signal rules. Minutes"
+   },
+   "applicableCredentialTypes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "applicableVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "The operation's applicableVenues"
+   },
+   "offlineAvailability": {
+    "type": "boolean",
+    "default": false,
+    "description": "Evaluated on the gate when offline"
+   },
+   "response": {
+    "type": "string",
+    "enum": [
+     "alertOnly",
+     "increaseRiskScore",
+     "requireAdditionalVerification",
+     "requireSupervisor",
+     "temporarilyLock",
+     "fullIdentityLock",
+     "blacklist"
+    ],
+    "nullable": true,
+    "description": "signal rules; alertOnly on a new rule"
+   },
+   "relationshipResponses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "yellowIntervention",
+      "supervisorVerification",
+      "idVerification",
+      "biometricVerification",
+      "securityEscalation",
+      "accessDenial"
+     ]
+    },
+    "description": "relationship rules (the list's responses)"
+   },
+   "enabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessIdentityLock": {
+  "type": "object",
+  "x-ticvai-persistence": "access.identity_lock",
+  "description": "One lock on an identity - its scope, duration, reason, the credentials linked to it, where it has propagated and whether it is still active (declared 29 September, data-model close-out DM1). Written by lockIdentity and releaseIdentityLock, by the fraud detection job where a rule's response is temporarilyLock or fullIdentityLock, and released by a timer for endOfDay and nHours locks (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "scopePath",
+   "subjectId",
+   "lockScope",
+   "lockDuration",
+   "lockReason",
+   "status",
+   "lockedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The lockId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set when lockScope is venue"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The locked identity (the list's identityId, pii.subject)"
+   },
+   "lockScope": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "mediaOnly",
+     "entitlement",
+     "venue",
+     "allVenueAccess",
+     "fullIdentity"
+    ]
+   },
+   "lockDuration": {
+    "type": "string",
+    "enum": [
+     "untilManuallyReleased",
+     "endOfDay",
+     "nHours",
+     "untilInvestigationComplete",
+     "permanent"
+    ]
+   },
+   "lockHours": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Used when lockDuration is nHours"
+   },
+   "lockReason": {
+    "type": "string",
+    "enum": [
+     "credentialSharing",
+     "fraudSuspected",
+     "securityIncident",
+     "identityMismatch",
+     "stolenCredential",
+     "guestRemoval"
+    ]
+   },
+   "associatedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "description": "The linked credentials (the list's associatedCredentialIds)"
+   },
+   "associatedCredentialTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticket",
+      "rfidWristband",
+      "dynamicQr",
+      "walletCredential",
+      "facePass",
+      "membership",
+      "fastPass"
+     ]
+    }
+   },
+   "propagatedTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "venueEdge",
+      "onlineGates",
+      "offlineRevocationPackage",
+      "mobileDevices"
+     ]
+    },
+    "description": "Channels the lock has reached"
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The investigation an untilInvestigationComplete lock waits for"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "released"
+    ],
+    "default": "active"
+   },
+   "lockedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lockedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "releasedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "AccessRiskScoringConfig": {
+  "type": "object",
+  "x-ticvai-persistence": "access.risk_scoring_config",
+  "description": "The access risk scoring configuration of a scope - the score thresholds of the medium, high and critical bands and the context factors the score uses; per-signal weights live on access.fraud_rule (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "mediumThreshold",
+   "highThreshold",
+   "criticalThreshold"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node; one row per scope"
+   },
+   "mediumThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Score from which risk is medium (pack 30)"
+   },
+   "highThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Score from which risk is high (pack 60)"
+   },
+   "criticalThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Score from which risk is critical (pack 80)"
+   },
+   "riskFactors": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "venue",
+      "product",
+      "ticketValue",
+      "event",
+      "accessZone",
+      "time",
+      "credentialType",
+      "historicalBehavior"
+     ]
+    },
+    "description": "Context the score may depend on"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessRiskScoringDecisionEngineView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -33,6 +539,144 @@
    "criticalThreshold": {
     "type": "integer",
     "description": "Score from which risk is critical (pack: 80)"
+   }
+  }
+ },
+ "AccessSecurityAlert": {
+  "type": "object",
+  "x-ticvai-persistence": "access.security_alert",
+  "description": "One access security or fraud alert - severity, what was detected, where and on which credential, identity or device - including biometric anomalies and edge security events (certificate, credential or package-signature failures, unauthorised connections, device authorisation and revocation). Merges the proposed access.security_alert and access.edge_security_event (declared 29 September, data-model close-out DM1). Created `open` by the detection jobs (fraud rules, sharing detection, biometric anomaly, edge security events) and moved by updateSecurityAlert; the lifecycle is states/access-security-alert.yaml (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "scopePath",
+   "category",
+   "severity",
+   "status",
+   "detectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The alertId / anomalyId the lists show"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "fraudSignal",
+     "credentialSharing",
+     "duplicateAccess",
+     "blacklist",
+     "biometric",
+     "companion",
+     "edgeSecurity"
+    ]
+   },
+   "alertType": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "The kind within the category - for fraudSignal the fraud rule's signal; for biometric one of faceChanged, reEnrollment, repeatedFaceMismatch, multipleFacesOneCredential, oneFaceMultipleCredentials, suspiciousEnrollmentFrequency, unusualVerificationFailures; for edgeSecurity one of certificateFailure, credentialFailure, packageSignatureFailure, unauthorizedConnection, deviceAuthorized, deviceRevoked"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "e.g. Credential attempted simultaneous entry at two gates"
+   },
+   "fraudRuleId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The access fraud rule that raised the alert, if one did"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The credential (the list's credentialId)"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity concerned, where known"
+   },
+   "zoneId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The gate (the list's gateId)"
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The device concerned, for device-sharing and edge events"
+   },
+   "faceReenrolmentAttemptId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Biometric alerts raised on a re-enrolment; the attempt holds the old and new references, operator, reason and review"
+   },
+   "faceProfileReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "Biometric alerts. Opaque Face Pass reference; never a template"
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "acknowledged",
+     "resolved",
+     "dismissed"
+    ],
+    "default": "open"
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    }
   }
  },
@@ -282,6 +926,78 @@
    "signal"
   ]
  },
+ "IdentityLockInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; written as access.identity_lock (declared 29 September, writers pass)",
+  "required": [
+   "subjectId",
+   "lockScope",
+   "lockDuration",
+   "lockReason"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for a venue lock; null for allVenueAccess and fullIdentity"
+   },
+   "lockScope": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "mediaOnly",
+     "entitlement",
+     "venue",
+     "allVenueAccess",
+     "fullIdentity"
+    ]
+   },
+   "lockDuration": {
+    "type": "string",
+    "enum": [
+     "untilManuallyReleased",
+     "endOfDay",
+     "nHours",
+     "untilInvestigationComplete",
+     "permanent"
+    ]
+   },
+   "lockHours": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 720,
+    "nullable": true
+   },
+   "lockReason": {
+    "type": "string",
+    "enum": [
+     "credentialSharing",
+     "fraudSuspected",
+     "securityIncident",
+     "identityMismatch",
+     "stolenCredential",
+     "guestRemoval"
+    ]
+   },
+   "associatedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -476,6 +1192,87 @@
    "ruleId",
    "ruleType"
   ]
+ },
+ "RelationshipFraudRuleInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; written as a relationship row of access.fraud_rule (declared 29 September, writers pass)",
+  "required": [
+   "relationshipRuleType",
+   "severity",
+   "relationshipResponses"
+  ],
+  "properties": {
+   "ruleId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates a rule"
+   },
+   "relationshipRuleType": {
+    "type": "string",
+    "enum": [
+     "companionChangedDuringVisit",
+     "nannyCredentialWithoutPrimaryGuest",
+     "childWithUnauthorizedAdult",
+     "companionLinkedToMultiplePrimaries",
+     "excessiveRelationshipChanges",
+     "groupLeaderAcrossUnrelatedGroups"
+    ],
+    "description": "relationship rules (the list's ruleType)"
+   },
+   "relationshipType": {
+    "type": "string",
+    "enum": [
+     "childAdult",
+     "podCompanion",
+     "guestNanny",
+     "groupLeaderGroup",
+     "membershipDependent"
+    ],
+    "nullable": true,
+    "description": "relationship rules"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "weight": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true
+   },
+   "relationshipResponses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "yellowIntervention",
+      "supervisorVerification",
+      "idVerification",
+      "biometricVerification",
+      "securityEscalation",
+      "accessDenial"
+     ]
+    },
+    "description": "relationship rules (the list's responses)"
+   },
+   "applicableVenues": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "enabled": {
+    "type": "boolean",
+    "default": true
+   }
+  }
  },
  "SecurityAnalyticsAiDetectionGovernanceView": {
   "type": "object",

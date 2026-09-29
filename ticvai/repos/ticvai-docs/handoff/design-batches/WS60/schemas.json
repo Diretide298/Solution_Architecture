@@ -1,4 +1,136 @@
 {
+ "AccessMediaTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "access.media_template",
+  "description": "One media design template (QR/barcode, PDF/print/POS, Apple Wallet, Google Wallet, RFID/NFC card or wristband, digital card or membership) with its design document, status and effective range (declared 29 September, data-model close-out DM1). A designer write on a template `pendingApproval` or `scheduled` is refused `409 template-in-flight`; archiveMediaTemplate archives one (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "name",
+   "designer",
+   "mediaType",
+   "status",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The templateId of the designer operations"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "designer": {
+    "type": "string",
+    "enum": [
+     "digitalBarcode",
+     "pdfPrintablePos",
+     "appleWallet",
+     "googleWallet",
+     "rfidNfcCard",
+     "digitalCardMembership"
+    ],
+    "description": "Which designer owns the design document"
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "qrTicket",
+     "dynamicQrTicket",
+     "barcodeTicket",
+     "mobileTicket",
+     "pdf",
+     "a4A5",
+     "thermal",
+     "pos",
+     "customPrint",
+     "appleWallet",
+     "googleWallet",
+     "rfidCard",
+     "rfidWristband",
+     "nfcCard",
+     "nfcWristband",
+     "membershipCard",
+     "customWearable"
+    ]
+   },
+   "brandId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "nullable": true
+   },
+   "language": {
+    "type": "string",
+    "maxLength": 35,
+    "nullable": true,
+    "description": "BCP 47 tag"
+   },
+   "design": {
+    "type": "object",
+    "description": "The working design document - the writable body of the designer operation named by designer, less templateId (jsonb)"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "scheduled",
+     "published",
+     "archived"
+    ],
+    "default": "draft"
+   },
+   "currentVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Latest published version (access.media_template_version)"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AppleWalletPassDesignerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

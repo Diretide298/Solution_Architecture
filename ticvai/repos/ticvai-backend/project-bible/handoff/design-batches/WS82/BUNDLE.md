@@ -2182,6 +2182,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isActive": {
     "type": "boolean"
+   },
+   "dynamicPricingStrategyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `catalogue.dynamic_pricing_strategy` a dynamic rule belongs to (29 September, data model DM3). Null for a static pricing rule."
+   },
+   "ruleType": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "description": "Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`."
+   },
+   "inputMetric": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "conditionLogic": {
+    "type": "string",
+    "enum": [
+     "all",
+     "any"
+    ],
+    "default": "all"
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minimumDurationMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "exitThresholdOffset": {
+    "type": "number",
+    "nullable": true
+   },
+   "rangeMinPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "rangeMaxPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "isProtected": {
+    "type": "boolean",
+    "default": false,
+    "description": "A protected segment or channel: dynamic adjustments never apply."
    }
   }
  },

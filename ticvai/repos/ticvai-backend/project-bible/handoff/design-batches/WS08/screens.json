@@ -205,6 +205,20 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 101 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save journey profile",
+       "operation": "setJourneyProfile",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind the Guest Journey Command Center** (BO-214): a named journey (e.g.",
+       "provenance": "contract access.yaml PUT /journey-profiles"
+      }
+     ]
     }
    ]
   },
@@ -231,6 +245,15 @@
     "invalidates": [
      "listGuestJourney"
     ]
+   },
+   {
+    "operationId": "setJourneyProfile",
+    "contract": "access",
+    "purpose": "Create or replace a guest journey profile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestJourney"
+    ]
    }
   ],
   "entryState": {
@@ -250,6 +273,33 @@
    "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-214"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 101. 10 of 10 labels bound to a contract property; 10 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetJourneyProfile",
+    "component": "modal",
+    "trigger": "Save journey profile",
+    "body": "**Collects what `setJourneyProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessJourneyProfile",
+    "confirm": {
+     "label": "Save journey profile",
+     "operation": "setJourneyProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "name",
+      "status",
+      "venueId",
+      "journeyType",
+      "credentialType",
+      "steps"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /journey-profiles"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1195,6 +1245,14 @@
        "label": "Save Fast Pass settings",
        "operation": "updateQueue",
        "provenance": "contract queue.yaml PATCH /queues/{queueId} (decided 29 September, VM close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save fast pass profile",
+       "operation": "setFastPassProfile",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Fast Pass & Attraction Access Journey** (BO-221): a Fast Pass profile (e.g.",
+       "provenance": "contract access.yaml PUT /fast-pass-profiles"
       }
      ]
     }
@@ -1224,6 +1282,16 @@
     "contract": "queue",
     "purpose": "Save Fast Pass settings",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "setFastPassProfile",
+    "contract": "access",
+    "purpose": "Create or replace a Fast Pass profile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFastPassAttraction",
+     "listQueues"
+    ]
    }
   ],
   "wireframe": {
@@ -1241,6 +1309,34 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetFastPassProfile",
+    "component": "modal",
+    "trigger": "Save fast pass profile",
+    "body": "**Collects what `setFastPassProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`, `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessFastPassProfile",
+    "confirm": {
+     "label": "Save fast pass profile",
+     "operation": "setFastPassProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "name",
+      "unlimited",
+      "venueId",
+      "totalUses",
+      "consumptionPerValidation",
+      "onePerRide",
+      "eligibleAttractionCategories"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /fast-pass-profiles"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1323,6 +1419,20 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 110 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save operating calendar entry",
+       "operation": "setOperatingCalendarEntry",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Operating Calendar & Special Access Days** (BO-152) and Special Event, Free View & Alternative Admission (BO-222): one dated entry (a holiday, private event, free-entry day, special event and so on), whether tickets must be validated, and for a free-view or special-event window its admission type.",
+       "provenance": "contract access.yaml PUT /operating-calendar-entries"
+      }
+     ]
     }
    ]
   },
@@ -1358,6 +1468,15 @@
     "invalidates": [
      "listSpecialEventFree"
     ]
+   },
+   {
+    "operationId": "setOperatingCalendarEntry",
+    "contract": "access",
+    "purpose": "Create or replace an operating calendar entry",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSpecialEventFree"
+    ]
    }
   ],
   "wireframe": {
@@ -1367,6 +1486,36 @@
    "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-222"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 110. 0 of 0 labels bound to a contract property; 2 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetOperatingCalendarEntry",
+    "component": "modal",
+    "trigger": "Save operating calendar entry",
+    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessOperatingCalendarEntry",
+    "confirm": {
+     "label": "Save operating calendar entry",
+     "operation": "setOperatingCalendarEntry"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "dayType",
+      "startsAt",
+      "endsAt",
+      "scopePath",
+      "name",
+      "ticketValidationRequired",
+      "admissionType",
+      "attractionValidation",
+      "manualAttendanceRequired"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /operating-calendar-entries"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

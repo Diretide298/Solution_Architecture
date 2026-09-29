@@ -639,6 +639,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save verification method policy",
+       "operation": "setVerificationMethodPolicy",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Verification Method Selection & Locking** (BO-177): the methods a guest may choose for one product (dynamic QR, card, RFID, Face Pass, Face Tag), whether the method locks on first successful access, who may change it after lock and the reasons allowed.",
+       "provenance": "contract access.yaml PUT /verification-method-policies"
+      }
+     ]
     }
    ]
   },
@@ -655,6 +669,15 @@
     "contract": "access",
     "purpose": "Verification Method Selection & Locking",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVerificationMethodPolicy",
+    "contract": "access",
+    "purpose": "Set the verification method policy of a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "listVerificationMethodSelection"
+    ]
    }
   ],
   "entryState": {
@@ -669,6 +692,32 @@
    "workshopBoard": "wireframes/WS21 Access Control Board 4.dc.html#bo-177"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 47. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetVerificationMethodPolicy",
+    "component": "modal",
+    "trigger": "Save verification method policy",
+    "body": "**Collects what `setVerificationMethodPolicy` sends before it is called.** Required: `id`, `productId`, `availableMethods`, `lockOnFirstSuccessfulAccess`, `changeAfterLock`, `scopePath`. Optional: `reasonCodes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessVerificationMethodPolicy",
+    "confirm": {
+     "label": "Save verification method policy",
+     "operation": "setVerificationMethodPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "productId",
+      "availableMethods",
+      "lockOnFirstSuccessfulAccess",
+      "changeAfterLock",
+      "scopePath",
+      "reasonCodes"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /verification-method-policies"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

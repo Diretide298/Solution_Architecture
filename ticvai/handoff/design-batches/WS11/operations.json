@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccessRiskScoringDecisionEngineView"
  },
@@ -113,7 +119,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FraudDetectionRuleSignalLibraryView"
  },
@@ -126,7 +138,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "RelationshipCompanionFraudMonitoringView"
  },
@@ -140,6 +158,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "venue",
     "in": "query",
@@ -223,6 +246,63 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "lockIdentity": {
+  "method": "POST",
+  "path": "/identity-locks",
+  "contract": "access",
+  "summary": "Lock an identity",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IdentityLockInput",
+  "responds": "AccessIdentityLock"
+ },
+ "releaseIdentityLock": {
+  "method": "POST",
+  "path": "/identity-locks/{lockId}/release",
+  "contract": "access",
+  "summary": "Release an identity lock",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessIdentityLock"
+ },
+ "reviewFaceReenrolment": {
+  "method": "POST",
+  "path": "/face-reenrolment-attempts/{attemptId}/review",
+  "contract": "access",
+  "summary": "Review a blocked Face Pass re-enrolment",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessFaceReenrolmentAttempt"
+ },
  "setFraudDetectionRule": {
   "method": "PUT",
   "path": "/fraud-detection-rule",
@@ -261,6 +341,44 @@
   "requestBody": "RealTimeSecurityResponsePlaybookBuilderInput",
   "responds": "RealTimeSecurityResponsePlaybookBuilderView"
  },
+ "setRelationshipFraudRule": {
+  "method": "PUT",
+  "path": "/relationship-fraud-rules",
+  "contract": "access",
+  "summary": "Create or replace a relationship / companion fraud rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RelationshipFraudRuleInput",
+  "responds": "AccessFraudRule"
+ },
+ "setRiskScoringConfig": {
+  "method": "PUT",
+  "path": "/risk-scoring-config",
+  "contract": "access",
+  "summary": "Set the access risk scoring bands",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessRiskScoringConfig",
+  "responds": "AccessRiskScoringConfig"
+ },
  "setSecurityInvestigationEvidence": {
   "method": "PUT",
   "path": "/security-investigation-evidence",
@@ -279,5 +397,24 @@
   ],
   "requestBody": "SecurityInvestigationEvidenceWorkspaceInput",
   "responds": "SecurityInvestigationEvidenceWorkspaceView"
+ },
+ "updateSecurityAlert": {
+  "method": "POST",
+  "path": "/security-alerts/{alertId}/status",
+  "contract": "access",
+  "summary": "Acknowledge, resolve or dismiss a security alert",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessSecurityAlert"
  }
 }

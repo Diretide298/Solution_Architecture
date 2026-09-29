@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CredentialActivationDisplayRulesView"
  },
@@ -21,7 +27,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CredentialRevocationLifecycleEventsView"
  },
@@ -97,7 +109,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CredentialTransferRebindingView"
  },
@@ -158,9 +176,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OfflineCryptographicValidationProfileView"
+ },
+ "releaseCredentialDevice": {
+  "method": "POST",
+  "path": "/device-bindings/{bindingId}/release",
+  "contract": "access",
+  "summary": "Release a credential from a device",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessDeviceBinding"
  },
  "setBleBeaconGeofence": {
   "method": "PUT",
@@ -200,6 +243,44 @@
   "requestBody": "CredentialActivationDisplayRulesInput",
   "responds": "CredentialActivationDisplayRulesView"
  },
+ "setCredentialEventPropagationRule": {
+  "method": "PUT",
+  "path": "/credential-event-propagation-rules",
+  "contract": "access",
+  "summary": "Set how a ticket lifecycle event propagates to the credential",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessCredentialEventPropagationRule",
+  "responds": "AccessCredentialEventPropagationRule"
+ },
+ "setDeviceBindingPolicy": {
+  "method": "PUT",
+  "path": "/device-binding-policy",
+  "contract": "access",
+  "summary": "Set the device binding policy of a venue",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceBindingPolicyInput",
+  "responds": "AccessCredentialPolicy"
+ },
  "setDynamicSecurityProfile": {
   "method": "PUT",
   "path": "/dynamic-security-profile",
@@ -237,5 +318,43 @@
   ],
   "requestBody": "EmbeddedEntitlementPayloadDesignerInput",
   "responds": "EmbeddedEntitlementPayloadDesignerView"
+ },
+ "setGateOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policies",
+  "contract": "access",
+  "summary": "Set the offline policy of a venue",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessOfflinePolicy",
+  "responds": "AccessOfflinePolicy"
+ },
+ "setOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policy",
+  "contract": "tenancy",
+  "summary": "What a workstation may do with no network, and for how long",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OfflinePolicy",
+  "responds": "OfflinePolicy"
  }
 }

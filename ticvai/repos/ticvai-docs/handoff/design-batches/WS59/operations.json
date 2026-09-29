@@ -1,4 +1,23 @@
 {
+ "deleteMediaBindingRule": {
+  "method": "DELETE",
+  "path": "/media-binding-rules/{ruleId}",
+  "contract": "access",
+  "summary": "Delete a multi-media binding rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listCredentialIdentityToken": {
   "method": "GET",
   "path": "/credential-identity-token",
@@ -47,7 +66,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "EntitlementCrossMediaSynchronizationRulesView"
  },
@@ -60,7 +85,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaActivationPriorityFallbackRulesView"
  },
@@ -73,7 +104,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaReplacementRevocationRebindingRulesView"
  },
@@ -86,7 +123,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaTypeCredentialTechnologyRegistryView"
  },
@@ -99,7 +142,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaTypeTechnologyLibraryView"
  },
@@ -112,7 +161,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MultiMediaBindingAssociationRulesView"
  },
@@ -243,9 +298,53 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "VirtualTicketStatusLifecycleModelView"
+ },
+ "setCredentialEventPropagationRule": {
+  "method": "PUT",
+  "path": "/credential-event-propagation-rules",
+  "contract": "access",
+  "summary": "Set how a ticket lifecycle event propagates to the credential",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessCredentialEventPropagationRule",
+  "responds": "AccessCredentialEventPropagationRule"
+ },
+ "setMediaBindingRule": {
+  "method": "PUT",
+  "path": "/media-binding-rules",
+  "contract": "access",
+  "summary": "Create or replace a multi-media binding rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessMediaBindingRule",
+  "responds": "AccessMediaBindingRule"
  },
  "setMediaReplacementRevocation": {
   "method": "PUT",
@@ -265,6 +364,25 @@
   ],
   "requestBody": "MediaReplacementRevocationRebindingRulesInput",
   "responds": "MediaReplacementRevocationRebindingRulesView"
+ },
+ "setTicketStatusTransition": {
+  "method": "PUT",
+  "path": "/ticket-status-transitions",
+  "contract": "access",
+  "summary": "Set a Virtual Ticket status transition rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessTicketStatusTransition",
+  "responds": "AccessTicketStatusTransition"
  },
  "setVirtualTicketIdentity": {
   "method": "PUT",

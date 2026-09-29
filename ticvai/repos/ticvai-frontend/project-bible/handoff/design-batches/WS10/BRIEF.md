@@ -1,6 +1,6 @@
 # WS10 — Access Control board 10
 
-**10 screens · 18 operations · 27 schemas · 6 permissions**
+**10 screens · 19 operations · 28 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -67,10 +67,10 @@ convincingly. It is never a caption.
 | `BO-238` | Identity, Membership & Accreditation Policies | listDetail | 3 | 0 | — |
 | `BO-239` | Policy Scope, Hierarchy & Inheritance | configEditor | 2 | 0 | — |
 | `BO-240` | Authorization Governance & Temporary Access | listDetail | 1 | 0 | — |
-| `BO-241` | Policy Evaluation Architecture & Offline Distribution | listDetail | 3 | 0 | — |
+| `BO-241` | Policy Evaluation Architecture & Offline Distribution | listDetail | 4 | 1 | — |
 | `BO-242` | Policy Simulation, Conflict & Impact Analysis | listDetail | 1 | 0 | — |
 | `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | listDetail | 5 | 1 | — |
 
 ## Thin screens in this batch
 
-**BO-235, BO-236, BO-237, BO-238, BO-240, BO-241, BO-242 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-235, BO-236, BO-237, BO-238, BO-240, BO-242 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -1,6 +1,6 @@
 # WS06 — Access Control board 6
 
-**10 screens · 14 operations · 25 schemas · 5 permissions**
+**10 screens · 18 operations · 28 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,14 +60,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-194` | Device & Gate Command Center | listDetail | 4 | 0 | — |
-| `BO-195` | Device Type & Hardware Library | listDetail | 1 | 0 | — |
-| `BO-196` | Physical Device Registration & Provisioning | configEditor | 1 | 0 | — |
+| `BO-194` | Device & Gate Command Center | listDetail | 5 | 1 | — |
+| `BO-195` | Device Type & Hardware Library | listDetail | 2 | 1 | — |
+| `BO-196` | Physical Device Registration & Provisioning | configEditor | 3 | 2 | — |
 | `BO-197` | Turnstile & Lane Behavior Configuration | configEditor | 1 | 0 | — |
 | `BO-198` | Validation Outcome & Guest Feedback Designer | configEditor | 1 | 0 | — |
 | `BO-199` | Reader, Scanner & Peripheral Configuration | listDetail | 1 | 0 | — |
 | `BO-200` | Handheld & Mobile Access Device Configuration | configEditor | 1 | 1 | — |
-| `BO-201` | Gate Modes, Free Spin & Emergency Controls | configEditor | 1 | 0 | — |
+| `BO-201` | Gate Modes, Free Spin & Emergency Controls | configEditor | 2 | 1 | — |
 | `BO-202` | Device Software, Content & Remote Configuration | configEditor | 1 | 0 | — |
 | `BO-203` | Hardware Compatibility, Health, Testing & Deployment | listDetail | 2 | 0 | — |
 
@@ -336,6 +336,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 70 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save access device",
+       "operation": "updateAccessDevice",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "Changes where a registered device sits and what it is: name, hardware model, area, access point, lane, group label, network references, capabilities and `isActive`.",
+       "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+      }
+     ]
     }
    ]
   },
@@ -375,6 +389,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "The gates and turnstiles whose mode is set",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateAccessDevice",
+    "contract": "access",
+    "purpose": "Replace a registered device's registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDeviceGate",
+     "listAccessPoints"
+    ]
    }
   ],
   "entryState": {
@@ -390,6 +414,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "accessPointId",
      "from": "navigation"
+    },
+    {
+     "name": "deviceId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
@@ -400,6 +429,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-194"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 70. 21 of 21 labels bound to a contract property; 21 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateAccessDevice",
+    "component": "modal",
+    "trigger": "Save access device",
+    "body": "**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`, `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`, `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`, `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessAccessDevice",
+    "confirm": {
+     "label": "Save access device",
+     "operation": "updateAccessDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "hardwareType",
+      "provisioningStage",
+      "isActive",
+      "scopePath",
+      "hardwareModelId",
+      "name",
+      "serialNumber",
+      "accessAreaId",
+      "accessPointId",
+      "gateLaneId",
+      "deviceGroupId",
+      "ipNetworkReference",
+      "controllerReference",
+      "installationDate",
+      "lifecycleStatus",
+      "capabilities"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -489,6 +555,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save hardware model",
+       "operation": "setHardwareModel",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "**The write behind Device Type & Hardware Library** (BO-195): one hardware model (manufacturer, model, category, type, technologies, connectivity, capability flags, firmware), independent of the devices deployed.",
+       "provenance": "contract access.yaml PUT /hardware-models"
+      }
+     ]
     }
    ]
   },
@@ -505,6 +585,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Device Type & Hardware Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setHardwareModel",
+    "contract": "access",
+    "purpose": "Create or replace a hardware model in the library",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDeviceTypeHardware"
+    ]
    }
   ],
   "entryState": {
@@ -519,6 +608,40 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-195"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 72. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetHardwareModel",
+    "component": "modal",
+    "trigger": "Save hardware model",
+    "body": "**Collects what `setHardwareModel` sends before it is called.** Required: `id`, `manufacturer`, `model`, `deviceCategory`, `hardwareType`, `scopePath`. Optional: `supportedTechnologies`, `connectivity`, `offlineCapability`, `screenCapability`, `soundCapability`, `lightCapability`, `relayControllerSupport`, `paymentCapability`, `firmwareSoftwareInformation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessHardwareModel",
+    "confirm": {
+     "label": "Save hardware model",
+     "operation": "setHardwareModel"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "manufacturer",
+      "model",
+      "deviceCategory",
+      "hardwareType",
+      "scopePath",
+      "supportedTechnologies",
+      "connectivity",
+      "offlineCapability",
+      "screenCapability",
+      "soundCapability",
+      "lightCapability",
+      "relayControllerSupport",
+      "paymentCapability",
+      "firmwareSoftwareInformation"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /hardware-models"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -576,7 +699,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F116 step 4→5",
      "operation": "listPhysicalDeviceRegistration",
      "carries": [
-      "accessPointId"
+      "accessPointId",
+      "deviceId"
      ]
     }
    ]
@@ -654,6 +778,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 73 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Register access device",
+       "operation": "registerAccessDevice",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "**The write behind Physical Device Registration & Provisioning** (BO-196): registers one deployed device (a turnstile, reader, handheld, podium unit or beacon) against a hardware model and places it in the topology.",
+       "provenance": "contract access.yaml POST /access-devices"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save access device",
+       "operation": "updateAccessDevice",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "Changes where a registered device sits and what it is: name, hardware model, area, access point, lane, group label, network references, capabilities and `isActive`.",
+       "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+      }
+     ]
     }
    ]
   },
@@ -669,6 +815,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Physical Device Registration & Provisioning",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "registerAccessDevice",
+    "contract": "access",
+    "purpose": "Register a physical access-control device",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPhysicalDeviceRegistration"
+    ]
+   },
+   {
+    "operationId": "updateAccessDevice",
+    "contract": "access",
+    "purpose": "Replace a registered device's registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPhysicalDeviceRegistration"
+    ]
    }
   ],
   "wireframe": {
@@ -678,6 +842,86 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-196"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 73. 0 of 0 labels bound to a contract property; 12 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formRegisterAccessDevice",
+    "component": "modal",
+    "trigger": "Register access device",
+    "body": "**Collects what `registerAccessDevice` sends before it is called.** Required: `id`, `venueId`, `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`, `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`, `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessAccessDevice",
+    "confirm": {
+     "label": "Register access device",
+     "operation": "registerAccessDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "hardwareType",
+      "provisioningStage",
+      "isActive",
+      "scopePath",
+      "hardwareModelId",
+      "name",
+      "serialNumber",
+      "accessAreaId",
+      "accessPointId",
+      "gateLaneId",
+      "deviceGroupId",
+      "ipNetworkReference",
+      "controllerReference",
+      "installationDate",
+      "lifecycleStatus",
+      "capabilities"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access-devices"
+   },
+   {
+    "id": "formUpdateAccessDevice",
+    "component": "modal",
+    "trigger": "Save access device",
+    "body": "**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`, `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`, `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`, `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessAccessDevice",
+    "confirm": {
+     "label": "Save access device",
+     "operation": "updateAccessDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "hardwareType",
+      "provisioningStage",
+      "isActive",
+      "scopePath",
+      "hardwareModelId",
+      "name",
+      "serialNumber",
+      "accessAreaId",
+      "accessPointId",
+      "gateLaneId",
+      "deviceGroupId",
+      "ipNetworkReference",
+      "controllerReference",
+      "installationDate",
+      "lifecycleStatus",
+      "capabilities"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1438,6 +1682,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save gate mode policy",
+       "operation": "setGateModePolicy",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Gate Modes, Free Spin & Emergency Controls** (BO-201): for `freeFlow` or `dropArm` (R221 vocabulary), who may activate it, on which gate group, whether a reason is required, the emergency code, notification and whether activation opens an incident.",
+       "provenance": "contract access.yaml PUT /gate-mode-policies"
+      }
+     ]
     }
    ]
   },
@@ -1453,6 +1711,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Gate Modes, Free Spin & Emergency Controls",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGateModePolicy",
+    "contract": "access",
+    "purpose": "Set a policy for a non-standard gate mode",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGateModeFree"
+    ]
    }
   ],
   "wireframe": {
@@ -1462,6 +1729,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-201"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 79. 0 of 0 labels bound to a contract property; 6 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetGateModePolicy",
+    "component": "modal",
+    "trigger": "Save gate mode policy",
+    "body": "**Collects what `setGateModePolicy` sends before it is called.** Required: `id`, `venueId`, `mode`, `scopePath`. Optional: `whoCanActivate`, `accessPointGroupId`, `reasonRequired`, `emergencyCode`, `automaticNotification`, `createsIncident`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessGateModePolicy",
+    "confirm": {
+     "label": "Save gate mode policy",
+     "operation": "setGateModePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "mode",
+      "scopePath",
+      "whoCanActivate",
+      "accessPointGroupId",
+      "reasonRequired",
+      "emergencyCode",
+      "automaticNotification",
+      "createsIncident"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /gate-mode-policies"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1653,7 +1949,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-194",
      "trigger": "Device & Gate Command Center",
-     "provenance": "derived — BO-194 declares entryState.params accessPointId and BO-203 holds none of them, so the edge carries nothing and BO-194 opens cold"
+     "carries": [
+      "deviceId"
+     ],
+     "provenance": "derived — BO-194 declares entryState.params accessPointId, deviceId and BO-203 holds deviceId, so an edge into it carries them"
     }
    ]
   },
@@ -1839,7 +2138,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "DeviceTypeHardwareLibraryView"
  },
@@ -1852,7 +2157,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GateModesFreeSpinEmergencyControlsView"
  },
@@ -1923,6 +2234,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "HardwareDeploymentInput",
   "responds": "HardwareDeploymentView"
  },
+ "registerAccessDevice": {
+  "method": "POST",
+  "path": "/access-devices",
+  "contract": "access",
+  "summary": "Register a physical access-control device",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessAccessDevice",
+  "responds": "AccessAccessDevice"
+ },
  "registerDevice": {
   "method": "POST",
   "path": "/devices",
@@ -1961,6 +2291,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "DeviceSoftwareContentRemoteConfigurationInput",
   "responds": "DeviceSoftwareContentRemoteConfigurationView"
  },
+ "setGateModePolicy": {
+  "method": "PUT",
+  "path": "/gate-mode-policies",
+  "contract": "access",
+  "summary": "Set a policy for a non-standard gate mode",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessGateModePolicy",
+  "responds": "AccessGateModePolicy"
+ },
  "setHandheldMobileAccess": {
   "method": "PUT",
   "path": "/handheld-mobile-access",
@@ -1979,6 +2328,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "HandheldMobileAccessDeviceConfigurationInput",
   "responds": "HandheldMobileAccessDeviceConfigurationView"
+ },
+ "setHardwareModel": {
+  "method": "PUT",
+  "path": "/hardware-models",
+  "contract": "access",
+  "summary": "Create or replace a hardware model in the library",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessHardwareModel",
+  "responds": "AccessHardwareModel"
  },
  "setReaderScannerPeripheral": {
   "method": "PUT",
@@ -2055,6 +2423,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "ValidationOutcomeGuestFeedbackDesignerInput",
   "responds": "ValidationOutcomeGuestFeedbackDesignerView"
+ },
+ "updateAccessDevice": {
+  "method": "PUT",
+  "path": "/access-devices/{deviceId}",
+  "contract": "access",
+  "summary": "Replace a registered device's registration",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessAccessDevice",
+  "responds": "AccessAccessDevice"
  }
 }
 ```
@@ -2065,6 +2452,413 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessAccessDevice": {
+  "type": "object",
+  "x-ticvai-persistence": "access.access_device",
+  "description": "One physical access-control device registered in a venue: a turnstile, reader, handheld, podium unit or BLE beacon, with its model, location, network references, reported versions and health, and provisioning stage. Merges access.gate_device and access.ble_beacon (a beacon is a device with a proximity threshold) (declared 29 September, data-model close-out DM1) Registered with registerAccessDevice and changed with updateAccessDevice; provisioning stage, versions and health are reported by the device; deviceGroupId is a free deployment label, not a key (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "venueId",
+   "hardwareType",
+   "provisioningStage",
+   "isActive",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "hardwareModelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Model from the hardware library (access.hardware_model)"
+   },
+   "hardwareType": {
+    "type": "string",
+    "enum": [
+     "standardTurnstile",
+     "fullHeightTurnstile",
+     "tripodTurnstile",
+     "speedGate",
+     "wideLane",
+     "accessiblePodGate",
+     "buggyGate",
+     "vipGate",
+     "staffGate",
+     "androidHandheld",
+     "iosDevice",
+     "tablet",
+     "qrBarcodeReader",
+     "rfidReader",
+     "nfcReader",
+     "multiTechnologyReader",
+     "biometricReader",
+     "podium",
+     "counter",
+     "beacon",
+     "cameraController",
+     "externalAccessDevice"
+    ],
+    "description": "Specific hardware type, as in the hardware library"
+   },
+   "name": {
+    "type": "string",
+    "nullable": true,
+    "description": "Device or beacon name, e.g. Gate A, HH-01"
+   },
+   "serialNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "accessAreaId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Most specific park, zone or attraction the device sits in (access.access_area)"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Access point (gate) the device serves"
+   },
+   "gateLaneId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Lane the device is mounted on (access.gate_lane)"
+   },
+   "deviceGroupId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Device group the device belongs to, as targeted by hardware deployments and device configurations"
+   },
+   "ipNetworkReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "controllerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "installationDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "provisioningStage": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "hardwareProfileAssigned",
+     "locationAssigned",
+     "authenticated",
+     "configurationDownloaded",
+     "securityPackageDownloaded",
+     "connectivityTested",
+     "active"
+    ],
+    "default": "registered"
+   },
+   "lifecycleStatus": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "configured",
+     "tested",
+     "approved",
+     "production"
+    ],
+    "default": "registered",
+    "description": "Certification stage; no device enters production until validated"
+   },
+   "capabilities": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicQr",
+      "rfid",
+      "nfc",
+      "facePass",
+      "offline",
+      "heightCheck"
+     ]
+    },
+    "description": "Capabilities this device supports, from the compatibility matrix"
+   },
+   "proximityThresholdMeters": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Beacons only: activation distance in metres"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true,
+    "description": "Active/inactive as configured (beacons: activeInactive)"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "active",
+     "degraded",
+     "offline",
+     "localMode"
+    ],
+    "nullable": true,
+    "description": "Health as reported by the device or vendor; TICVAI does not detect it"
+   },
+   "connectivity": {
+    "type": "string",
+    "nullable": true,
+    "description": "Reported connectivity"
+   },
+   "scannerHealth": {
+    "type": "string",
+    "nullable": true
+   },
+   "controllerHealth": {
+    "type": "string",
+    "nullable": true
+   },
+   "cameraHealth": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the device has a camera"
+   },
+   "configurationVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "Configuration version the device reports running"
+   },
+   "localRuleVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "credentialSecurityPackageVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Last heartbeat or, for a beacon, last detected"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessGateModePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.gate_mode_policy",
+  "description": "One policy for a non-standard gate mode (free spin or count only as freeFlow, emergency as dropArm): who may activate it, on which gate group, whether a reason is required, emergency code, notification and incident creation (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "mode",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "freeFlow",
+     "dropArm"
+    ],
+    "description": "Non-standard operating mode governed (R221 vocabulary)"
+   },
+   "whoCanActivate": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Roles allowed to activate this mode"
+   },
+   "accessPointGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Gate group the policy applies to (access.access_point_group); null for the whole venue"
+   },
+   "reasonRequired": {
+    "type": "boolean",
+    "default": true
+   },
+   "emergencyCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "automaticNotification": {
+    "type": "boolean",
+    "default": false
+   },
+   "createsIncident": {
+    "type": "boolean",
+    "default": false,
+    "description": "Activation creates an incident record"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessHardwareModel": {
+  "type": "object",
+  "x-ticvai-persistence": "access.hardware_model",
+  "description": "One hardware model in the reusable library, independent of deployed devices: manufacturer, model, category and type, supported technologies, connectivity, capability flags and firmware information (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "manufacturer",
+   "model",
+   "deviceCategory",
+   "hardwareType",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "manufacturer": {
+    "type": "string"
+   },
+   "model": {
+    "type": "string"
+   },
+   "deviceCategory": {
+    "type": "string",
+    "enum": [
+     "turnstile",
+     "specialGate",
+     "mobile",
+     "reader",
+     "other"
+    ]
+   },
+   "hardwareType": {
+    "type": "string",
+    "enum": [
+     "standardTurnstile",
+     "fullHeightTurnstile",
+     "tripodTurnstile",
+     "speedGate",
+     "wideLane",
+     "accessiblePodGate",
+     "buggyGate",
+     "vipGate",
+     "staffGate",
+     "androidHandheld",
+     "iosDevice",
+     "tablet",
+     "qrBarcodeReader",
+     "rfidReader",
+     "nfcReader",
+     "multiTechnologyReader",
+     "biometricReader",
+     "podium",
+     "counter",
+     "beacon",
+     "cameraController",
+     "externalAccessDevice"
+    ]
+   },
+   "supportedTechnologies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "connectivity": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "offlineCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "screenCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "soundCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "lightCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "relayControllerSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "paymentCapability": {
+    "type": "boolean",
+    "default": false,
+    "description": "Payment capability where available"
+   },
+   "firmwareSoftwareInformation": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessPoint": {
   "x-ticvai-persistence": "access.access_point",
   "type": "object",

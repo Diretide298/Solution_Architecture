@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ExternalPartnerCredentialMappingView"
  },
@@ -21,7 +27,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "HotelWalletExternalMediaIntegrationView"
  },
@@ -93,7 +105,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaIssuanceEncodingProfileView"
  },
@@ -130,7 +148,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaTypeCredentialTechnologyRegistryView"
  },
@@ -143,7 +167,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaTypeTechnologyLibraryView"
  },
@@ -156,7 +186,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "VerificationMethodSelectionLockingView"
  },
@@ -297,5 +333,24 @@
   ],
   "requestBody": "RfidNfcCardWristbandMediaDesignerInput",
   "responds": "RfidNfcCardWristbandMediaDesignerView"
+ },
+ "setVerificationMethodPolicy": {
+  "method": "PUT",
+  "path": "/verification-method-policies",
+  "contract": "access",
+  "summary": "Set the verification method policy of a product",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessVerificationMethodPolicy",
+  "responds": "AccessVerificationMethodPolicy"
  }
 }

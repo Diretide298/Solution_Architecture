@@ -738,6 +738,14 @@
        "kind": "primaryButton",
        "label": "Accept | Modify | Reject | Schedule",
        "provenance": "pack Rental_Management.pdf, page 42 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transition dynamic pricing strategy",
+       "operation": "transitionDynamicPricingStrategy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The strategy's status moves, as calls** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
       }
      ]
     },
@@ -768,6 +776,15 @@
     "purpose": "Dynamic pricing",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "transitionDynamicPricingStrategy",
+    "contract": "catalogue",
+    "purpose": "Activate, pause, resume or retire a dynamic pricing strategy",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDynamicPricingStrategy"
+    ]
    }
   ],
   "wireframe": {
@@ -776,6 +793,35 @@
    "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-528"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 42. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Accept | Modify | Reject | Schedule dropped (AI design pending review (accept/modify/reject/schedule acts on AI pricing recommendations; would bind ai decideProposedAction)).",
+  "overlays": [
+   {
+    "id": "formTransitionDynamicPricingStrategy",
+    "component": "modal",
+    "trigger": "Transition dynamic pricing strategy",
+    "body": "**Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transition dynamic pricing strategy",
+     "operation": "transitionDynamicPricingStrategy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "strategyId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

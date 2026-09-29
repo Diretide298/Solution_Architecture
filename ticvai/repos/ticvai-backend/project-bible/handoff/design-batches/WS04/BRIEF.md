@@ -1,6 +1,6 @@
 # WS04 — Access Control board 4
 
-**10 screens · 15 operations · 16 schemas · 2 permissions**
+**10 screens · 16 operations · 17 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -63,7 +63,7 @@ convincingly. It is never a caption.
 | `BO-174` | Media & Credential Command Center | listDetail | 3 | 0 | — |
 | `BO-175` | Media Type & Technology Library | configEditor | 2 | 0 | — |
 | `BO-176` | Virtual Credential & Media Association | listDetail | 1 | 0 | — |
-| `BO-177` | Verification Method Selection & Locking | listDetail | 1 | 0 | — |
+| `BO-177` | Verification Method Selection & Locking | listDetail | 2 | 1 | — |
 | `BO-178` | Media Issuance & Encoding Profile | listDetail | 2 | 0 | — |
 | `BO-179` | Media Swap & Replacement | listDetail | 1 | 0 | — |
 | `BO-180` | RFID & NFC Configuration | configEditor | 2 | 0 | — |

@@ -48,12 +48,6 @@
      "operation": "listGroupBooking"
     },
     {
-     "to": "BO-280",
-     "trigger": "Works in Group Arrival, Check-In & Admission Operations",
-     "provenance": "flow F137 step 11→12",
-     "operation": "listGroupBooking"
-    },
-    {
      "to": "BO-282",
      "trigger": "Works in Group Booking Reconciliation, Closure & Performance",
      "provenance": "flow F137 step 15→16",
@@ -96,6 +90,15 @@
      "to": "BO-279",
      "trigger": "Works in Group Ticket Fulfillment & Distribution",
      "provenance": "flow F137 step 9→10",
+     "operation": "listGroupBooking",
+     "carries": [
+      "groupBookingId"
+     ]
+    },
+    {
+     "to": "BO-280",
+     "trigger": "Works in Group Arrival, Check-In & Admission Operations",
+     "provenance": "flow F137 step 11→12",
      "operation": "listGroupBooking",
      "carries": [
       "groupBookingId"
@@ -1318,6 +1321,20 @@
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 29 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Record group check in",
+       "operation": "recordGroupCheckIn",
+       "permission": "ORDER_MODIFY",
+       "notes": "**Group check-in is a status distinct from the access scan** (MoM 31 Aug Key Decisions).",
+       "provenance": "contract orders.yaml POST /group-bookings/{groupBookingId}/check-in"
+      }
+     ]
     }
    ]
   },
@@ -1334,6 +1351,15 @@
     "contract": "orders",
     "purpose": "Group Arrival, Check-In & Admission Operations",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordGroupCheckIn",
+    "contract": "orders",
+    "purpose": "Record a group's arrival at the venue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGroupArrivalCheck"
+    ]
    }
   ],
   "entryState": {
@@ -1344,6 +1370,13 @@
     "GroupArrivalCheckInAdmissionOperationsView.groupSize",
     "GroupArrivalCheckInAdmissionOperationsView.checkedIn",
     "GroupArrivalCheckInAdmissionOperationsView.remaining"
+   ],
+   "params": [
+    {
+     "name": "groupBookingId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -1353,6 +1386,31 @@
    "workshopBoard": "wireframes/WS69 Group Sales   Corporate Booking Management Board 2.dc.html#bo-280"
   },
   "apisNote": "Regenerated 9 September 2026 from Group_Sales___Corporate_Booking_Management_Reference.pdf page 29. 10 of 10 labels bound to a contract property; 16 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formRecordGroupCheckIn",
+    "component": "modal",
+    "trigger": "Record group check in",
+    "body": "**Collects what `recordGroupCheckIn` sends before it is called.** Required: `arrivedCount`. Optional: `additionalGuests`, `staffLeadersCount`, `arrivalGateId`, `actualArrivalAt`, `checkInIssues`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "GroupCheckInRequest",
+    "confirm": {
+     "label": "Record group check in",
+     "operation": "recordGroupCheckIn"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "arrivedCount",
+      "additionalGuests",
+      "staffLeadersCount",
+      "arrivalGateId",
+      "actualArrivalAt",
+      "checkInIssues"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /group-bookings/{groupBookingId}/check-in"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

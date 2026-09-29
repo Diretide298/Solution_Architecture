@@ -113,6 +113,76 @@
    "category"
   ]
  },
+ "AccessPolicyEvaluationSetting": {
+  "type": "object",
+  "x-ticvai-persistence": "access.policy_evaluation_setting",
+  "description": "Where and how one policy category is evaluated - evaluation mode, supported locations, offline behaviour and the oldest cached data an offline evaluation may use (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "policyCategory",
+   "evaluationMode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "policyCategory": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "e.g. Ticket Status, Time Rule, Membership Tier, Live Occupancy, Live Fraud AI. Unique per scope"
+   },
+   "evaluationMode": {
+    "type": "string",
+    "enum": [
+     "central",
+     "edge",
+     "device",
+     "hybrid"
+    ]
+   },
+   "supportedLocations": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "central",
+      "edge",
+      "device"
+     ]
+    }
+   },
+   "offlineBehaviour": {
+    "type": "string",
+    "enum": [
+     "available",
+     "conditional",
+     "unavailable"
+    ],
+    "nullable": true
+   },
+   "maxDataAgeMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessProfile": {
   "type": "object",
   "x-ticvai-persistence": "accreditation.access_profile",

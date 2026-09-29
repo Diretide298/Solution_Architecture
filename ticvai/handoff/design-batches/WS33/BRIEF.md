@@ -1,6 +1,6 @@
 # WS33 — Order   Reservation Management board 3
 
-**10 screens · 15 operations · 14 schemas · 7 permissions**
+**10 screens · 19 operations · 22 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,11 +62,11 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-324` | Payment & Order Financial Command Center | listDetail | 1 | 0 | — |
 | `BO-325` | Order Payment Detail & Transaction Ledger | listDetail | 1 | 1 | — |
-| `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | configEditor | 1 | 0 | — |
+| `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | configEditor | 2 | 0 | — |
 | `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | listDetail | 5 | 1 | — |
-| `BO-328` | Order Split, Merge & Transaction Relationship Management | listDetail | 2 | 0 | — |
+| `BO-328` | Order Split, Merge & Transaction Relationship Management | listDetail | 3 | 1 | — |
 | `BO-329` | Related Order & Transaction Relationship Explorer | listDetail | 1 | 0 | — |
-| `BO-330` | External Payment, Partner & Settlement Reference Mapping | configEditor | 1 | 0 | — |
+| `BO-330` | External Payment, Partner & Settlement Reference Mapping | configEditor | 3 | 1 | — |
 | `BO-331` | Payment Reconciliation & Exception Management | listDetail | 1 | 0 | — |
 | `BO-332` | Financial Traceability, Control & Audit Explorer | configEditor | 1 | 0 | — |
 | `BO-333` | Order Financial Analytics & AI Reconciliation Intelligence | listDetail | 1 | 0 | — |

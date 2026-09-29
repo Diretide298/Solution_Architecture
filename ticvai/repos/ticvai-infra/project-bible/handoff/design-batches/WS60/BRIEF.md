@@ -1,6 +1,6 @@
 # WS60 — Ticket Media   Credential Management board 2
 
-**10 screens · 17 operations · 24 schemas · 5 permissions**
+**10 screens · 18 operations · 25 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-344` | Media Design Studio Command Center | commandCentre | 4 | 0 | — |
+| `BO-344` | Media Design Studio Command Center | commandCentre | 5 | 1 | — |
 | `BO-345` | Digital QR & Barcode Ticket Designer | configEditor | 1 | 0 | — |
 | `BO-346` | PDF, Printable & POS Ticket Designer | configEditor | 5 | 0 | — |
 | `BO-347` | Apple Wallet Pass Designer | configEditor | 1 | 0 | — |

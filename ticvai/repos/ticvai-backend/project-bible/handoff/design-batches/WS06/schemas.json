@@ -1,4 +1,411 @@
 {
+ "AccessAccessDevice": {
+  "type": "object",
+  "x-ticvai-persistence": "access.access_device",
+  "description": "One physical access-control device registered in a venue: a turnstile, reader, handheld, podium unit or BLE beacon, with its model, location, network references, reported versions and health, and provisioning stage. Merges access.gate_device and access.ble_beacon (a beacon is a device with a proximity threshold) (declared 29 September, data-model close-out DM1) Registered with registerAccessDevice and changed with updateAccessDevice; provisioning stage, versions and health are reported by the device; deviceGroupId is a free deployment label, not a key (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "venueId",
+   "hardwareType",
+   "provisioningStage",
+   "isActive",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "hardwareModelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Model from the hardware library (access.hardware_model)"
+   },
+   "hardwareType": {
+    "type": "string",
+    "enum": [
+     "standardTurnstile",
+     "fullHeightTurnstile",
+     "tripodTurnstile",
+     "speedGate",
+     "wideLane",
+     "accessiblePodGate",
+     "buggyGate",
+     "vipGate",
+     "staffGate",
+     "androidHandheld",
+     "iosDevice",
+     "tablet",
+     "qrBarcodeReader",
+     "rfidReader",
+     "nfcReader",
+     "multiTechnologyReader",
+     "biometricReader",
+     "podium",
+     "counter",
+     "beacon",
+     "cameraController",
+     "externalAccessDevice"
+    ],
+    "description": "Specific hardware type, as in the hardware library"
+   },
+   "name": {
+    "type": "string",
+    "nullable": true,
+    "description": "Device or beacon name, e.g. Gate A, HH-01"
+   },
+   "serialNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "accessAreaId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Most specific park, zone or attraction the device sits in (access.access_area)"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Access point (gate) the device serves"
+   },
+   "gateLaneId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Lane the device is mounted on (access.gate_lane)"
+   },
+   "deviceGroupId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Device group the device belongs to, as targeted by hardware deployments and device configurations"
+   },
+   "ipNetworkReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "controllerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "installationDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "provisioningStage": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "hardwareProfileAssigned",
+     "locationAssigned",
+     "authenticated",
+     "configurationDownloaded",
+     "securityPackageDownloaded",
+     "connectivityTested",
+     "active"
+    ],
+    "default": "registered"
+   },
+   "lifecycleStatus": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "configured",
+     "tested",
+     "approved",
+     "production"
+    ],
+    "default": "registered",
+    "description": "Certification stage; no device enters production until validated"
+   },
+   "capabilities": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicQr",
+      "rfid",
+      "nfc",
+      "facePass",
+      "offline",
+      "heightCheck"
+     ]
+    },
+    "description": "Capabilities this device supports, from the compatibility matrix"
+   },
+   "proximityThresholdMeters": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Beacons only: activation distance in metres"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true,
+    "description": "Active/inactive as configured (beacons: activeInactive)"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "active",
+     "degraded",
+     "offline",
+     "localMode"
+    ],
+    "nullable": true,
+    "description": "Health as reported by the device or vendor; TICVAI does not detect it"
+   },
+   "connectivity": {
+    "type": "string",
+    "nullable": true,
+    "description": "Reported connectivity"
+   },
+   "scannerHealth": {
+    "type": "string",
+    "nullable": true
+   },
+   "controllerHealth": {
+    "type": "string",
+    "nullable": true
+   },
+   "cameraHealth": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the device has a camera"
+   },
+   "configurationVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "Configuration version the device reports running"
+   },
+   "localRuleVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "credentialSecurityPackageVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Last heartbeat or, for a beacon, last detected"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessGateModePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.gate_mode_policy",
+  "description": "One policy for a non-standard gate mode (free spin or count only as freeFlow, emergency as dropArm): who may activate it, on which gate group, whether a reason is required, emergency code, notification and incident creation (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "mode",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "freeFlow",
+     "dropArm"
+    ],
+    "description": "Non-standard operating mode governed (R221 vocabulary)"
+   },
+   "whoCanActivate": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Roles allowed to activate this mode"
+   },
+   "accessPointGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Gate group the policy applies to (access.access_point_group); null for the whole venue"
+   },
+   "reasonRequired": {
+    "type": "boolean",
+    "default": true
+   },
+   "emergencyCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "automaticNotification": {
+    "type": "boolean",
+    "default": false
+   },
+   "createsIncident": {
+    "type": "boolean",
+    "default": false,
+    "description": "Activation creates an incident record"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessHardwareModel": {
+  "type": "object",
+  "x-ticvai-persistence": "access.hardware_model",
+  "description": "One hardware model in the reusable library, independent of deployed devices: manufacturer, model, category and type, supported technologies, connectivity, capability flags and firmware information (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "manufacturer",
+   "model",
+   "deviceCategory",
+   "hardwareType",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "manufacturer": {
+    "type": "string"
+   },
+   "model": {
+    "type": "string"
+   },
+   "deviceCategory": {
+    "type": "string",
+    "enum": [
+     "turnstile",
+     "specialGate",
+     "mobile",
+     "reader",
+     "other"
+    ]
+   },
+   "hardwareType": {
+    "type": "string",
+    "enum": [
+     "standardTurnstile",
+     "fullHeightTurnstile",
+     "tripodTurnstile",
+     "speedGate",
+     "wideLane",
+     "accessiblePodGate",
+     "buggyGate",
+     "vipGate",
+     "staffGate",
+     "androidHandheld",
+     "iosDevice",
+     "tablet",
+     "qrBarcodeReader",
+     "rfidReader",
+     "nfcReader",
+     "multiTechnologyReader",
+     "biometricReader",
+     "podium",
+     "counter",
+     "beacon",
+     "cameraController",
+     "externalAccessDevice"
+    ]
+   },
+   "supportedTechnologies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "connectivity": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "offlineCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "screenCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "soundCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "lightCapability": {
+    "type": "boolean",
+    "default": false
+   },
+   "relayControllerSupport": {
+    "type": "boolean",
+    "default": false
+   },
+   "paymentCapability": {
+    "type": "boolean",
+    "default": false,
+    "description": "Payment capability where available"
+   },
+   "firmwareSoftwareInformation": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessPoint": {
   "x-ticvai-persistence": "access.access_point",
   "type": "object",

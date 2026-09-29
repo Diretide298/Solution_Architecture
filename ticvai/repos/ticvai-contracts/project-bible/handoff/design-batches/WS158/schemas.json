@@ -150,6 +150,60 @@
    }
   }
  },
+ "LabourBudget": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.labour_budget",
+  "description": "**The labour budget a general manager is held to, per venue, department and period** (resource board 4.9; data model for the agreed operations, 29 September). `getLabourCost` compares rostered and actual cost against it (`LabourCostRow.budget`). A null `departmentId` is the whole venue's budget. Periods for one venue and department do not overlap. Written by `setLabourBudget`, listed by `listLabourBudgets` (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "venueId",
+   "periodStart",
+   "periodEnd",
+   "budgetAmount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date",
+    "description": "First day of the period, in the Region's time zone"
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date",
+    "description": "Last day of the period, in the Region's time zone"
+   },
+   "budgetAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "LabourCostRow": {
   "type": "object",
   "description": "Resource board 4.9. **Rostered and actual diverge every day.**",

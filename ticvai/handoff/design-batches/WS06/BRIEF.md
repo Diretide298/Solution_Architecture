@@ -1,6 +1,6 @@
 # WS06 — Access Control board 6
 
-**10 screens · 14 operations · 25 schemas · 5 permissions**
+**10 screens · 18 operations · 28 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,14 +60,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-194` | Device & Gate Command Center | listDetail | 4 | 0 | — |
-| `BO-195` | Device Type & Hardware Library | listDetail | 1 | 0 | — |
-| `BO-196` | Physical Device Registration & Provisioning | configEditor | 1 | 0 | — |
+| `BO-194` | Device & Gate Command Center | listDetail | 5 | 1 | — |
+| `BO-195` | Device Type & Hardware Library | listDetail | 2 | 1 | — |
+| `BO-196` | Physical Device Registration & Provisioning | configEditor | 3 | 2 | — |
 | `BO-197` | Turnstile & Lane Behavior Configuration | configEditor | 1 | 0 | — |
 | `BO-198` | Validation Outcome & Guest Feedback Designer | configEditor | 1 | 0 | — |
 | `BO-199` | Reader, Scanner & Peripheral Configuration | listDetail | 1 | 0 | — |
 | `BO-200` | Handheld & Mobile Access Device Configuration | configEditor | 1 | 1 | — |
-| `BO-201` | Gate Modes, Free Spin & Emergency Controls | configEditor | 1 | 0 | — |
+| `BO-201` | Gate Modes, Free Spin & Emergency Controls | configEditor | 2 | 1 | — |
 | `BO-202` | Device Software, Content & Remote Configuration | configEditor | 1 | 0 | — |
 | `BO-203` | Hardware Compatibility, Health, Testing & Deployment | listDetail | 2 | 0 | — |
 

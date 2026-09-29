@@ -18,6 +18,25 @@
   "requestBody": "MultiMediaPreviewTestingApprovalPublicationInput",
   "responds": "MultiMediaPreviewTestingApprovalPublicationView"
  },
+ "archiveMediaTemplate": {
+  "method": "POST",
+  "path": "/media-templates/{templateId}/archive",
+  "contract": "access",
+  "summary": "Archive a media template",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessMediaTemplate"
+ },
  "cloneTicketTemplate": {
   "method": "POST",
   "path": "/ticket-templates/{templateId}/clone",
@@ -84,7 +103,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BrandingLocalizationTemplateInheritanceView"
  },

@@ -280,6 +280,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "brandId",
     "in": "query",
     "required": false

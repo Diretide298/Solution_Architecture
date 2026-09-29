@@ -1,4 +1,84 @@
 {
+ "AccessVerificationMethodPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.verification_method_policy",
+  "description": "The verification method selection and locking policy for one product - methods the guest may choose, lock on first successful access, who may change it after lock and the reason vocabulary (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "productId",
+   "availableMethods",
+   "lockOnFirstSuccessfulAccess",
+   "changeAfterLock",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The policyId of listVerificationMethodSelection"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Unique per scope"
+   },
+   "availableMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicQr",
+      "physicalCard",
+      "rfid",
+      "facePass",
+      "faceTag"
+     ]
+    }
+   },
+   "lockOnFirstSuccessfulAccess": {
+    "type": "boolean",
+    "default": true
+   },
+   "changeAfterLock": {
+    "type": "string",
+    "enum": [
+     "notAllowed",
+     "supervisorApproval"
+    ],
+    "default": "supervisorApproval",
+    "description": "Who may change the method once locked; guests may not"
+   },
+   "reasonCodes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "lostPhone",
+      "damagedWristband",
+      "accessibility",
+      "deviceFailure",
+      "guestService",
+      "other"
+     ]
+    },
+    "description": "Reason vocabulary for a method change after lock"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "ExternalPartnerCredentialMappingView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

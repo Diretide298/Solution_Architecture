@@ -61,7 +61,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "DeviceTypeHardwareLibraryView"
  },
@@ -74,7 +80,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GateModesFreeSpinEmergencyControlsView"
  },
@@ -145,6 +157,25 @@
   "requestBody": "HardwareDeploymentInput",
   "responds": "HardwareDeploymentView"
  },
+ "registerAccessDevice": {
+  "method": "POST",
+  "path": "/access-devices",
+  "contract": "access",
+  "summary": "Register a physical access-control device",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessAccessDevice",
+  "responds": "AccessAccessDevice"
+ },
  "registerDevice": {
   "method": "POST",
   "path": "/devices",
@@ -183,6 +214,25 @@
   "requestBody": "DeviceSoftwareContentRemoteConfigurationInput",
   "responds": "DeviceSoftwareContentRemoteConfigurationView"
  },
+ "setGateModePolicy": {
+  "method": "PUT",
+  "path": "/gate-mode-policies",
+  "contract": "access",
+  "summary": "Set a policy for a non-standard gate mode",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessGateModePolicy",
+  "responds": "AccessGateModePolicy"
+ },
  "setHandheldMobileAccess": {
   "method": "PUT",
   "path": "/handheld-mobile-access",
@@ -201,6 +251,25 @@
   ],
   "requestBody": "HandheldMobileAccessDeviceConfigurationInput",
   "responds": "HandheldMobileAccessDeviceConfigurationView"
+ },
+ "setHardwareModel": {
+  "method": "PUT",
+  "path": "/hardware-models",
+  "contract": "access",
+  "summary": "Create or replace a hardware model in the library",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessHardwareModel",
+  "responds": "AccessHardwareModel"
  },
  "setReaderScannerPeripheral": {
   "method": "PUT",
@@ -277,5 +346,24 @@
   ],
   "requestBody": "ValidationOutcomeGuestFeedbackDesignerInput",
   "responds": "ValidationOutcomeGuestFeedbackDesignerView"
+ },
+ "updateAccessDevice": {
+  "method": "PUT",
+  "path": "/access-devices/{deviceId}",
+  "contract": "access",
+  "summary": "Replace a registered device's registration",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessAccessDevice",
+  "responds": "AccessAccessDevice"
  }
 }

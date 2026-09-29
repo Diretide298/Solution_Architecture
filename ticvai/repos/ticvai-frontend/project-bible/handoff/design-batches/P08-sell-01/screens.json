@@ -1172,6 +1172,53 @@
        "impliedBy": "publishPromotion",
        "notes": "Declares `publishPromotion`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     },
@@ -1745,6 +1792,18 @@
      "analysePromotionConflicts",
      "getPromotion"
     ]
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -1864,7 +1923,10 @@
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-011 holds none of them, so the edge carries nothing and BO-009 opens cold"
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-011 holds priceListId, so an edge into it carries them"
     },
     {
      "to": "ANL-009",
@@ -1914,6 +1976,53 @@
        "impliedBy": "publishBundle",
        "notes": "Declares `publishBundle`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     },
@@ -2011,6 +2120,14 @@
        "label": "Save group package definition",
        "operation": "setGroupPackageDefinition",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/group-package"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save package pricing definition",
+       "operation": "setPackagePricingDefinition",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The pricing model of a package, bundle or add-on** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /package-pricing"
       }
      ]
     }
@@ -2095,6 +2212,23 @@
     "purpose": "Amend a bundle",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPackagePricingDefinition",
+    "contract": "catalogue",
+    "purpose": "Set how a package, bundle or add-on is priced",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCatalogueBundles",
+     "getLatestBundle",
+     "listCommercialCampaigns"
+    ]
    }
   ],
   "entryState": {
@@ -2228,6 +2362,35 @@
      ]
     },
     "provenance": "contract promotions.yaml POST /bundles"
+   },
+   {
+    "id": "formSetPackagePricingDefinition",
+    "component": "modal",
+    "trigger": "Save package pricing definition",
+    "body": "**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`, `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PackagePricing",
+    "confirm": {
+     "label": "Save package pricing definition",
+     "operation": "setPackagePricingDefinition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "productId",
+      "recordKind",
+      "pricingModel",
+      "status",
+      "name",
+      "priceListId",
+      "addOnType",
+      "packagePrice",
+      "components",
+      "componentPriceVisibility"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /package-pricing"
    }
   ],
   "_platform": {

@@ -1,6 +1,6 @@
 # WS91 — Rental Management board 4
 
-**10 screens · 10 operations · 8 schemas · 4 permissions**
+**10 screens · 11 operations · 9 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `PRODUCT_VIEW, RENTAL_OVERRIDE, RENTAL_PRICE, RENTAL_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `PRICE_CONFIGURE, PRODUCT_VIEW, RENTAL_OVERRIDE, RENTAL_PRICE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -64,7 +64,7 @@ convincingly. It is never a caption.
 | `BO-525` | Pricing Profile Builder | configEditor | 2 | 0 | — |
 | `BO-526` | Duration & Tiered Pricing Configuration | configEditor | 1 | 0 | — |
 | `BO-527` | Calendar, Peak & Seasonal Pricing | listDetail | 1 | 0 | — |
-| `BO-528` | Dynamic Pricing & AI Recommendation | listDetail | 1 | 0 | — |
+| `BO-528` | Dynamic Pricing & AI Recommendation | listDetail | 2 | 1 | — |
 | `BO-529` | Deposit & Security Hold Policy | listDetail | 1 | 0 | — |
 | `BO-530` | Deposit Lifecycle & Settlement Rules | configEditor | 1 | 0 | — |
 | `BO-531` | Late Fee, Grace Period & Extension Pricing | configEditor | 1 | 0 | — |
@@ -822,6 +822,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Accept | Modify | Reject | Schedule",
        "provenance": "pack Rental_Management.pdf, page 42 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transition dynamic pricing strategy",
+       "operation": "transitionDynamicPricingStrategy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The strategy's status moves, as calls** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
       }
      ]
     },
@@ -852,6 +860,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Dynamic pricing",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "transitionDynamicPricingStrategy",
+    "contract": "catalogue",
+    "purpose": "Activate, pause, resume or retire a dynamic pricing strategy",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDynamicPricingStrategy"
+    ]
    }
   ],
   "wireframe": {
@@ -860,6 +877,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS119 Rental Management Board 4.dc.html#bo-528"
   },
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 42. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Accept | Modify | Reject | Schedule dropped (AI design pending review (accept/modify/reject/schedule acts on AI pricing recommendations; would bind ai decideProposedAction)).",
+  "overlays": [
+   {
+    "id": "formTransitionDynamicPricingStrategy",
+    "component": "modal",
+    "trigger": "Transition dynamic pricing strategy",
+    "body": "**Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transition dynamic pricing strategy",
+     "operation": "transitionDynamicPricingStrategy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "strategyId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1800,6 +1846,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "RentalQuoteRequest",
   "responds": null
  },
+ "transitionDynamicPricingStrategy": {
+  "method": "POST",
+  "path": "/dynamic-pricing-strategies/{strategyId}/lifecycle",
+  "contract": "catalogue",
+  "summary": "Activate, pause, resume or retire a dynamic pricing strategy",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DynamicPricingStrategy"
+ },
  "updateRentalPricingProfile": {
   "method": "PUT",
   "path": "/rental-pricing-profiles/{profileId}",
@@ -1828,6 +1893,194 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "DynamicPricingStrategy": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.dynamic_pricing_strategy",
+  "description": "**A dynamic pricing strategy: what it prices, from which base and how often** (29 September, data model DM3). ADM-088 and ADM-089. Its rules are `pricing.dynamic_price_rule` rows naming it; its ladder `catalogue.price_ladder`; its limits and automation `catalogue.dynamic_pricing_control`. **Rules-based now; AI factors inform, never replace, the rules** (MoM 19 Aug 2026).",
+  "required": [
+   "id",
+   "scopePath",
+   "code",
+   "name",
+   "strategyType",
+   "scopeType",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 40
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "strategyType": {
+    "type": "string",
+    "enum": [
+     "demandBased",
+     "occupancyBased",
+     "availabilityBased",
+     "inventoryBased",
+     "bookingVelocity",
+     "timeToEvent",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "channel",
+     "segment",
+     "location",
+     "hybrid"
+    ]
+   },
+   "scopeType": {
+    "type": "string",
+    "enum": [
+     "singleProduct",
+     "productFamily",
+     "event",
+     "multiplePerformances",
+     "venue",
+     "selectedTimeslots",
+     "selectedPriceCategories"
+    ]
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productFamily": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "timeslotIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "priceCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "businessUnit": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "basePriceSource": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "The price list or rate the adjustments start from."
+   },
+   "evaluationFrequency": {
+    "type": "string",
+    "enum": [
+     "every15Minutes",
+     "every30Minutes",
+     "hourly",
+     "daily",
+     "onInventoryChange",
+     "onThresholdTrigger"
+    ],
+    "default": "hourly"
+   },
+   "combinationMode": {
+    "type": "string",
+    "enum": [
+     "independent",
+     "combinable",
+     "exclusive",
+     "fallback"
+    ],
+    "default": "independent"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "clonedFromStrategyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "frozen",
+     "expired",
+     "retired"
+    ],
+    "default": "draft"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2326,7 +2579,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "RentalQuote": {
   "type": "object",
   "x-ticvai-persistence": "rental.quote",
-  "description": "Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n",
+  "description": "Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n**Consumed by `acceptedQuoteId`** on `createRentalBooking` and the extension. A quote is not deleted when it is used or expires: a nightly job removes quotes 30 days past `expiresAt` that no booking references, so a booking can always show the quote it was priced at (decided 29 September, writers pass; DM4).\n",
   "required": [
    "quoteId",
    "productId",

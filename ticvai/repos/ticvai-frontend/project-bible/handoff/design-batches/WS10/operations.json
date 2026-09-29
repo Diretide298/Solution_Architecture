@@ -46,7 +46,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccessAttributeCatalogView"
  },
@@ -107,7 +113,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "IdentityMembershipAccreditationPoliciesView"
  },
@@ -144,7 +156,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "PolicyEvaluationArchitectureOfflineDistributionView"
  },
@@ -157,7 +175,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "PolicyScopeHierarchyInheritanceView"
  },
@@ -274,6 +298,25 @@
   ],
   "requestBody": "OfflinePolicy",
   "responds": "OfflinePolicy"
+ },
+ "setPolicyEvaluationSetting": {
+  "method": "PUT",
+  "path": "/policy-evaluation-settings",
+  "contract": "access",
+  "summary": "Set where and how a policy category is evaluated",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessPolicyEvaluationSetting",
+  "responds": "AccessPolicyEvaluationSetting"
  },
  "setPolicyScopeHierarchy": {
   "method": "PUT",

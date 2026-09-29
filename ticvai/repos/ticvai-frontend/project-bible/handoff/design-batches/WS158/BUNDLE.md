@@ -1,6 +1,6 @@
 # WS158 — Resource Management Configuration board 4
 
-**10 screens · 11 operations · 10 schemas · 3 permissions**
+**10 screens · 13 operations · 11 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -68,12 +68,12 @@ convincingly. It is never a caption.
 | `BO-888` | Attendance & Live Workforce Command Center | listDetail | 1 | 0 | — |
 | `BO-889` | Staff Check-In, Check-Out & Attendance Exceptions | configEditor | 2 | 0 | — |
 | `BO-890` | Workforce Compliance Validation Center | listDetail | 1 | 0 | — |
-| `BO-891` | Labor Cost & Staffing Budget Control | listDetail | 1 | 0 | — |
+| `BO-891` | Labor Cost & Staffing Budget Control | listDetail | 3 | 1 | — |
 | `BO-892` | AI Workforce Planner & Roster Optimization | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-883, BO-884, BO-887, BO-888, BO-890, BO-891 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-883, BO-884, BO-887, BO-888, BO-890 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -1499,6 +1499,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listLabourBudgets",
+       "notes": "Sends `?venueId=` to `listLabourBudgets`.",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
+      },
+      {
+       "kind": "textField",
+       "label": "Department id",
+       "operation": "listLabourBudgets",
+       "notes": "Sends `?departmentId=` to `listLabourBudgets`.",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listLabourBudgets",
+       "notes": "Sends `?from=` to `listLabourBudgets`.",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listLabourBudgets",
+       "notes": "Sends `?to=` to `listLabourBudgets`.",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every labour budget",
+       "bindsTo": "LabourBudget",
+       "columns": [
+        "LabourBudget.id",
+        "LabourBudget.venueId",
+        "LabourBudget.departmentId",
+        "LabourBudget.periodStart",
+        "LabourBudget.periodEnd",
+        "LabourBudget.budgetAmount",
+        "LabourBudget.scopePath"
+       ],
+       "operation": "listLabourBudgets",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
       }
      ]
     },
@@ -1521,6 +1565,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save labour budget",
+       "operation": "setLabourBudget",
+       "permission": "WORKFORCE_MANAGE",
+       "notes": "**Writes `workforce.labour_budget`** (decided 29 September, writers pass), keyed by venue, department and `periodStart`: a PUT for a key that exists replaces its `periodEnd` and amount, any other creates a budget.",
+       "provenance": "contract workforce.yaml PUT /labour-budgets"
+      }
+     ]
     }
    ]
   },
@@ -1538,6 +1596,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Cost against budget",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listLabourBudgets",
+    "contract": "workforce",
+    "purpose": "Labour budgets, per venue, department and period",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setLabourBudget",
+    "contract": "workforce",
+    "purpose": "Set the labour budget for a venue, department and period",
+    "trigger": "onAction",
+    "invalidates": [
+     "getLabourCost",
+     "listLabourBudgets"
+    ]
    }
   ],
   "entryState": {
@@ -1555,6 +1629,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-891"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 59. 0 of 5 labels bound to a contract property; 5 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetLabourBudget",
+    "component": "modal",
+    "trigger": "Save labour budget",
+    "body": "**Collects what `setLabourBudget` sends before it is called.** Required: `id`, `venueId`, `periodStart`, `periodEnd`, `budgetAmount`. Optional: `departmentId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LabourBudget",
+    "confirm": {
+     "label": "Save labour budget",
+     "operation": "setLabourBudget"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "periodStart",
+      "periodEnd",
+      "budgetAmount",
+      "departmentId",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract workforce.yaml PUT /labour-budgets"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1967,6 +2067,50 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "AttendanceRecord"
  },
+ "listLabourBudgets": {
+  "method": "GET",
+  "path": "/labour-budgets",
+  "contract": "workforce",
+  "summary": "Labour budgets, per venue, department and period",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "departmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listOpenShifts": {
   "method": "GET",
   "path": "/shift-marketplace",
@@ -2042,6 +2186,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "AttendanceRecord"
+ },
+ "setLabourBudget": {
+  "method": "PUT",
+  "path": "/labour-budgets",
+  "contract": "workforce",
+  "summary": "Set the labour budget for a venue, department and period",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LabourBudget",
+  "responds": "LabourBudget"
  },
  "setStaffingRules": {
   "method": "PUT",
@@ -2243,6 +2406,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "unscheduled"
     ],
     "description": "Computed against the rota. Null where the record matches what was expected."
+   }
+  }
+ },
+ "LabourBudget": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.labour_budget",
+  "description": "**The labour budget a general manager is held to, per venue, department and period** (resource board 4.9; data model for the agreed operations, 29 September). `getLabourCost` compares rostered and actual cost against it (`LabourCostRow.budget`). A null `departmentId` is the whole venue's budget. Periods for one venue and department do not overlap. Written by `setLabourBudget`, listed by `listLabourBudgets` (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "venueId",
+   "periodStart",
+   "periodEnd",
+   "budgetAmount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date",
+    "description": "First day of the period, in the Region's time zone"
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date",
+    "description": "Last day of the period, in the Region's time zone"
+   },
+   "budgetAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },

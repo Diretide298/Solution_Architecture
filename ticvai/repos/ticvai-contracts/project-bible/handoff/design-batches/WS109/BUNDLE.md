@@ -1087,6 +1087,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "provenance": "contract accreditation.yaml POST /accreditation-identity-conflicts/{conflictId}/resolve"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conflictId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

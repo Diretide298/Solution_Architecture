@@ -1,6 +1,6 @@
 # WS29 — Membership   Annual Pass Management board 1
 
-**10 screens · 17 operations · 22 schemas · 6 permissions**
+**10 screens · 19 operations · 26 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,14 +60,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-284` | Membership & Annual Pass Command Center | listDetail | 1 | 0 | — |
+| `BO-284` | Membership & Annual Pass Command Center | listDetail | 2 | 1 | — |
 | `BO-285` | Membership Product & Tier Builder | configEditor | 2 | 0 | — |
 | `BO-286` | Membership Eligibility & Qualification Rule Builder | configEditor | 1 | 0 | — |
 | `BO-287` | Validity, Activation & Expiry Configuration | listDetail | 1 | 0 | — |
 | `BO-288` | Membership Entitlement & Admission Benefit Builder | configEditor | 4 | 0 | — |
-| `BO-289` | Membership Usage, Visit & Consumption Rules | listDetail | 3 | 0 | — |
+| `BO-289` | Membership Usage, Visit & Consumption Rules | listDetail | 4 | 1 | — |
 | `BO-290` | Family, Household & Dependent Membership Configuration | configEditor | 1 | 0 | — |
-| `BO-291` | Membership Commercial, Pricing & Channel Association | configEditor | 4 | 0 | — |
+| `BO-291` | Membership Commercial, Pricing & Channel Association | configEditor | 5 | 1 | — |
 | `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | configEditor | 1 | 0 | — |
 | `BO-293` | Membership Product Validation, Approval, Publication & Versioning | configEditor | 1 | 0 | — |
 

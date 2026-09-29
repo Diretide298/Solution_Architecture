@@ -18,6 +18,25 @@
   "requestBody": "AdmissionRules",
   "responds": "AdmissionRules"
  },
+ "deleteJourneySequenceRule": {
+  "method": "DELETE",
+  "path": "/journey-sequence-rules/{ruleId}",
+  "contract": "access",
+  "summary": "Delete a journey sequence rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "getProductEligibilityRule": {
   "method": "GET",
   "path": "/products/{productId}/eligibility-rule",
@@ -110,7 +129,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccessValidityTimeRulesView"
  },
@@ -147,7 +172,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AntiPassbackJourneySequenceView"
  },
@@ -160,7 +191,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "EntitlementConsumptionEngineView"
  },
@@ -173,7 +210,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "EntryExitReEntryRulesView"
  },
@@ -186,7 +229,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupAdmissionQuantityValidationView"
  },
@@ -199,7 +248,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GuestCompanionEligibilityRulesView"
  },
@@ -212,7 +267,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MultiParkCrossoverRulesView"
  },
@@ -253,6 +314,25 @@
   ],
   "requestBody": "EntitlementConsumptionEngineInput",
   "responds": "EntitlementConsumptionEngineView"
+ },
+ "setJourneySequenceRule": {
+  "method": "PUT",
+  "path": "/journey-sequence-rules",
+  "contract": "access",
+  "summary": "Create or replace an anti-passback / journey sequence rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessJourneySequenceRule",
+  "responds": "AccessJourneySequenceRule"
  },
  "setProductEligibilityRule": {
   "method": "PUT",

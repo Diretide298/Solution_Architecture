@@ -1,6 +1,6 @@
 # WS11 — Access Control board 11
 
-**10 screens · 11 operations · 10 schemas · 3 permissions**
+**10 screens · 17 operations · 17 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, REPORT_VIEW_VENUE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, GUEST_MANAGE, INCIDENT_MANAGE, REPORT_VIEW_VENUE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-244` | Access Security & Fraud Command Center | listDetail | 1 | 0 | — |
+| `BO-244` | Access Security & Fraud Command Center | listDetail | 3 | 2 | — |
 | `BO-245` | Fraud Detection Rule & Signal Library | listDetail | 2 | 0 | — |
-| `BO-246` | Credential Sharing & Concurrent Usage Detection | listDetail | 1 | 0 | — |
-| `BO-247` | Unified Identity & Credential Lock Manager | listDetail | 1 | 0 | — |
-| `BO-248` | Biometric & Identity Integrity Monitoring | listDetail | 2 | 0 | — |
-| `BO-249` | Relationship & Companion Fraud Monitoring | configEditor | 1 | 0 | — |
-| `BO-250` | Access Risk Scoring & Decision Engine | listDetail | 1 | 0 | — |
+| `BO-246` | Credential Sharing & Concurrent Usage Detection | listDetail | 2 | 1 | — |
+| `BO-247` | Unified Identity & Credential Lock Manager | listDetail | 3 | 2 | — |
+| `BO-248` | Biometric & Identity Integrity Monitoring | listDetail | 4 | 2 | — |
+| `BO-249` | Relationship & Companion Fraud Monitoring | configEditor | 2 | 1 | — |
+| `BO-250` | Access Risk Scoring & Decision Engine | listDetail | 2 | 1 | — |
 | `BO-251` | Real-Time Security Response & Playbook Builder | listDetail | 1 | 0 | — |
 | `BO-252` | Security Investigation & Evidence Workspace | listDetail | 1 | 0 | — |
-| `BO-253` | Security Analytics, AI Detection & Governance | listDetail | 1 | 0 | — |
+| `BO-253` | Security Analytics, AI Detection & Governance | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
-**BO-245, BO-246, BO-247, BO-248, BO-250, BO-252 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-245, BO-246, BO-250, BO-252 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -132,21 +132,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listAccessSecurityFraud"
     },
     {
-     "to": "BO-246",
-     "trigger": "Works in Credential Sharing & Concurrent Usage Detection",
-     "provenance": "flow F121 step 3→4",
-     "operation": "listAccessSecurityFraud"
-    },
-    {
      "to": "BO-247",
      "trigger": "Works in Unified Identity & Credential Lock Manager",
      "provenance": "flow F121 step 5→6",
-     "operation": "listAccessSecurityFraud"
-    },
-    {
-     "to": "BO-248",
-     "trigger": "Works in Biometric & Identity Integrity Monitoring",
-     "provenance": "flow F121 step 7→8",
      "operation": "listAccessSecurityFraud"
     },
     {
@@ -174,10 +162,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listAccessSecurityFraud"
     },
     {
+     "to": "BO-246",
+     "trigger": "Works in Credential Sharing & Concurrent Usage Detection",
+     "provenance": "flow F121 step 3→4",
+     "operation": "listAccessSecurityFraud",
+     "carries": [
+      "alertId"
+     ]
+    },
+    {
+     "to": "BO-248",
+     "trigger": "Works in Biometric & Identity Integrity Monitoring",
+     "provenance": "flow F121 step 7→8",
+     "operation": "listAccessSecurityFraud",
+     "carries": [
+      "alertId"
+     ]
+    },
+    {
      "to": "BO-253",
      "trigger": "Works in Security Analytics, AI Detection & Governance",
      "provenance": "flow F121 step 17→18",
-     "operation": "listAccessSecurityFraud"
+     "operation": "listAccessSecurityFraud",
+     "carries": [
+      "alertId"
+     ]
     }
    ]
   },
@@ -317,6 +326,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 151 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lock identity",
+       "operation": "lockIdentity",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The write behind the Unified Identity & Credential Lock Manager** (BO-247): locks one identity at a scope (one credential, a medium, an entitlement, a venue, every venue, or the full identity), for a duration, for a reason.",
+       "provenance": "contract access.yaml POST /identity-locks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      }
+     ]
     }
    ]
   },
@@ -333,6 +364,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Access Security & Fraud Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "lockIdentity",
+    "contract": "access",
+    "purpose": "Lock an identity",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessSecurityFraud"
+    ]
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessSecurityFraud"
+    ]
    }
   ],
   "entryState": {
@@ -343,6 +392,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "AccessSecurityFraudCommandCenterViewSummary.suspiciousQrActivity",
     "AccessSecurityFraudCommandCenterViewSummary.deviceSharingAlerts",
     "AccessSecurityFraudCommandCenterViewSummary.biometricAlerts"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -352,6 +408,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-244"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 151. 13 of 14 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formLockIdentity",
+    "component": "modal",
+    "trigger": "Lock identity",
+    "body": "**Collects what `lockIdentity` sends before it is called.** Required: `subjectId`, `lockScope`, `lockDuration`, `lockReason`. Optional: `venueId`, `lockHours`, `associatedEntitlementIds`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "IdentityLockInput",
+    "confirm": {
+     "label": "Lock identity",
+     "operation": "lockIdentity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "lockScope",
+      "lockDuration",
+      "lockReason",
+      "venueId",
+      "lockHours",
+      "associatedEntitlementIds",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /identity-locks"
+   },
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -544,7 +646,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-244",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F121 step 4→5",
-     "operation": "listCredentialSharingConcurrent"
+     "operation": "listCredentialSharingConcurrent",
+     "carries": [
+      "alertId"
+     ]
     }
    ]
   },
@@ -578,6 +683,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      }
+     ]
     }
    ]
   },
@@ -594,6 +713,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Credential Sharing & Concurrent Usage Detection",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCredentialSharingConcurrent"
+    ]
    }
   ],
   "entryState": {
@@ -601,6 +729,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "CredentialSharingConcurrentUsageDetectionView.additionalDevices",
     "CredentialSharingConcurrentUsageDetectionView.maximumActiveDevices",
     "CredentialSharingConcurrentUsageDetectionView.responseActions"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -610,6 +745,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-246"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 154. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -674,13 +830,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide the single security lock required by the matrix so suspicious activity can immediately stop all access associated with an identity.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Unified Identity & Credential Lock Manager declares no operation that writes anything** — its only declared call is `listUnifiedIdentityCredential`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -715,6 +864,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 155 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lock identity",
+       "operation": "lockIdentity",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The write behind the Unified Identity & Credential Lock Manager** (BO-247): locks one identity at a scope (one credential, a medium, an entitlement, a venue, every venue, or the full identity), for a duration, for a reason.",
+       "provenance": "contract access.yaml POST /identity-locks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release identity lock",
+       "operation": "releaseIdentityLock",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "Releases an active lock: `status: released`, with who and when.",
+       "provenance": "contract access.yaml POST /identity-locks/{lockId}/release"
+      }
+     ]
     }
    ]
   },
@@ -731,11 +902,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Unified Identity & Credential Lock Manager",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "lockIdentity",
+    "contract": "access",
+    "purpose": "Lock an identity",
+    "trigger": "onAction",
+    "invalidates": [
+     "listUnifiedIdentityCredential"
+    ]
+   },
+   {
+    "operationId": "releaseIdentityLock",
+    "contract": "access",
+    "purpose": "Release an identity lock",
+    "trigger": "onAction",
+    "invalidates": [
+     "listUnifiedIdentityCredential"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
     "UnifiedIdentityCredentialLockManagerView.propagatedTo"
+   ],
+   "params": [
+    {
+     "name": "lockId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -745,6 +940,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-247"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 155. 5 of 5 labels bound to a contract property; 9 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formLockIdentity",
+    "component": "modal",
+    "trigger": "Lock identity",
+    "body": "**Collects what `lockIdentity` sends before it is called.** Required: `subjectId`, `lockScope`, `lockDuration`, `lockReason`. Optional: `venueId`, `lockHours`, `associatedEntitlementIds`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "IdentityLockInput",
+    "confirm": {
+     "label": "Lock identity",
+     "operation": "lockIdentity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "lockScope",
+      "lockDuration",
+      "lockReason",
+      "venueId",
+      "lockHours",
+      "associatedEntitlementIds",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /identity-locks"
+   },
+   {
+    "id": "formReleaseIdentityLock",
+    "component": "modal",
+    "trigger": "Release identity lock",
+    "body": "**Collects what `releaseIdentityLock` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release identity lock",
+     "operation": "releaseIdentityLock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml POST /identity-locks/{lockId}/release"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -800,7 +1039,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-244",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F121 step 8→9",
-     "operation": "listBiometricIdentityIntegrity"
+     "operation": "listBiometricIdentityIntegrity",
+     "carries": [
+      "alertId"
+     ]
     }
    ]
   },
@@ -847,6 +1089,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 156 §Monitor"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Review face reenrolment",
+       "operation": "reviewFaceReenrolment",
+       "permission": "GUEST_MANAGE",
+       "provenance": "contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review"
+      }
+     ]
     }
    ]
   },
@@ -873,6 +1136,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listBiometricIdentityIntegrity"
     ]
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBiometricIdentityIntegrity"
+    ]
+   },
+   {
+    "operationId": "reviewFaceReenrolment",
+    "contract": "access",
+    "purpose": "Review a blocked Face Pass re-enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBiometricIdentityIntegrity"
+    ]
    }
   ],
   "entryState": {
@@ -880,6 +1161,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "BiometricIdentityIntegrityMonitoringView.anomalyType",
     "multiple faces associated with one credential",
     "one face associated with multiple credentials"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    },
+    {
+     "name": "attemptId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -889,6 +1182,45 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-248"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 156. 4 of 6 labels bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   },
+   {
+    "id": "formReviewFaceReenrolment",
+    "component": "modal",
+    "trigger": "Review face reenrolment",
+    "body": "**Collects what `reviewFaceReenrolment` sends before it is called.** Required: `decision`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Review face reenrolment",
+     "operation": "reviewFaceReenrolment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "note"
+     ]
+    },
+    "provenance": "contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -981,6 +1313,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 158 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save relationship fraud rule",
+       "operation": "setRelationshipFraudRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Relationship & Companion Fraud Monitoring** (BO-249): a rule on the people a credential travels with (a companion changed during the visit, a nanny credential without its primary guest, a child with an unauthorised adult and so on), its severity, weight and responses.",
+       "provenance": "contract access.yaml PUT /relationship-fraud-rules"
+      }
+     ]
     }
    ]
   },
@@ -996,6 +1342,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Relationship & Companion Fraud Monitoring",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setRelationshipFraudRule",
+    "contract": "access",
+    "purpose": "Create or replace a relationship / companion fraud rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRelationshipCompanionFraud"
+    ]
    }
   ],
   "wireframe": {
@@ -1005,6 +1360,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-249"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 158. 0 of 0 labels bound to a contract property; 4 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetRelationshipFraudRule",
+    "component": "modal",
+    "trigger": "Save relationship fraud rule",
+    "body": "**Collects what `setRelationshipFraudRule` sends before it is called.** Required: `relationshipRuleType`, `severity`, `relationshipResponses`. Optional: `ruleId`, `relationshipType`, `weight`, `applicableVenues`, `enabled`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RelationshipFraudRuleInput",
+    "confirm": {
+     "label": "Save relationship fraud rule",
+     "operation": "setRelationshipFraudRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "relationshipRuleType",
+      "severity",
+      "relationshipResponses",
+      "ruleId",
+      "relationshipType",
+      "weight",
+      "applicableVenues",
+      "enabled"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /relationship-fraud-rules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1094,6 +1476,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save risk scoring config",
+       "operation": "setRiskScoringConfig",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Access Risk Scoring & Decision Engine** (BO-250): the score thresholds of the medium, high and critical bands and the context factors the score uses.",
+       "provenance": "contract access.yaml PUT /risk-scoring-config"
+      }
+     ]
     }
    ]
   },
@@ -1110,6 +1506,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Access Risk Scoring & Decision Engine",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setRiskScoringConfig",
+    "contract": "access",
+    "purpose": "Set the access risk scoring bands",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessRiskScoring"
+    ]
    }
   ],
   "entryState": {
@@ -1122,6 +1527,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-250"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 159. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetRiskScoringConfig",
+    "component": "modal",
+    "trigger": "Save risk scoring config",
+    "body": "**Collects what `setRiskScoringConfig` sends before it is called.** Required: `id`, `scopePath`, `mediumThreshold`, `highThreshold`, `criticalThreshold`. Optional: `riskFactors`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessRiskScoringConfig",
+    "confirm": {
+     "label": "Save risk scoring config",
+     "operation": "setRiskScoringConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "mediumThreshold",
+      "highThreshold",
+      "criticalThreshold",
+      "riskFactors"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /risk-scoring-config"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1450,7 +1880,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "BO-244"
    ],
    "inferred": false,
-   "notes": "**Reached from BO-244, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from BO-244, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-244",
+     "trigger": "Access Security & Fraud Command Center",
+     "carries": [
+      "alertId"
+     ],
+     "provenance": "derived — BO-244 declares entryState.params alertId and BO-253 holds alertId, so an edge into it carries them"
+    }
+   ]
   },
   "density": "compact",
   "purposeNote": "Board 11 — Final 10-Screen Structure # Backend Screen Main Responsibility 11.1 Access Security & Fraud Command Center Real-time security posture 11.2 Fraud Detection Rule & Signal Library Configure fraud indicators 11.3 Credential Sharing & Concurrent Usage Detection Detect credential/device sharing 11.4 Unified Identity & Credential Lock Manager Immediately restrict compromised identities 11.5 Biometric & Identity Integrity Monitoring Detect biometric/identity anomalies 11.6 Relationship & Companion Fraud Monitoring Protect child/POD/nanny/group relationships 11.7 Access Risk Scoring & Decisi",
@@ -1550,6 +1990,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 164 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      }
+     ]
     }
    ]
   },
@@ -1566,6 +2020,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Security Analytics, AI Detection & Governance",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSecurityDetectionGovernance"
+    ]
    }
   ],
   "entryState": {
@@ -1576,6 +2039,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Duplicate Usage",
     "SecurityAnalyticsAiDetectionGovernanceView.biometricAlerts",
     "SecurityAnalyticsAiDetectionGovernanceView.deviceBindingViolations"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -1585,6 +2055,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS28 Access Control Board 11.dc.html#bo-253"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 164. 15 of 26 labels bound to a contract property; 26 of 93 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1626,7 +2117,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccessRiskScoringDecisionEngineView"
  },
@@ -1731,7 +2228,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FraudDetectionRuleSignalLibraryView"
  },
@@ -1744,7 +2247,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "RelationshipCompanionFraudMonitoringView"
  },
@@ -1758,6 +2267,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "venue",
     "in": "query",
@@ -1841,6 +2355,63 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "lockIdentity": {
+  "method": "POST",
+  "path": "/identity-locks",
+  "contract": "access",
+  "summary": "Lock an identity",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IdentityLockInput",
+  "responds": "AccessIdentityLock"
+ },
+ "releaseIdentityLock": {
+  "method": "POST",
+  "path": "/identity-locks/{lockId}/release",
+  "contract": "access",
+  "summary": "Release an identity lock",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessIdentityLock"
+ },
+ "reviewFaceReenrolment": {
+  "method": "POST",
+  "path": "/face-reenrolment-attempts/{attemptId}/review",
+  "contract": "access",
+  "summary": "Review a blocked Face Pass re-enrolment",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessFaceReenrolmentAttempt"
+ },
  "setFraudDetectionRule": {
   "method": "PUT",
   "path": "/fraud-detection-rule",
@@ -1879,6 +2450,44 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "RealTimeSecurityResponsePlaybookBuilderInput",
   "responds": "RealTimeSecurityResponsePlaybookBuilderView"
  },
+ "setRelationshipFraudRule": {
+  "method": "PUT",
+  "path": "/relationship-fraud-rules",
+  "contract": "access",
+  "summary": "Create or replace a relationship / companion fraud rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RelationshipFraudRuleInput",
+  "responds": "AccessFraudRule"
+ },
+ "setRiskScoringConfig": {
+  "method": "PUT",
+  "path": "/risk-scoring-config",
+  "contract": "access",
+  "summary": "Set the access risk scoring bands",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessRiskScoringConfig",
+  "responds": "AccessRiskScoringConfig"
+ },
  "setSecurityInvestigationEvidence": {
   "method": "PUT",
   "path": "/security-investigation-evidence",
@@ -1897,6 +2506,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "SecurityInvestigationEvidenceWorkspaceInput",
   "responds": "SecurityInvestigationEvidenceWorkspaceView"
+ },
+ "updateSecurityAlert": {
+  "method": "POST",
+  "path": "/security-alerts/{alertId}/status",
+  "contract": "access",
+  "summary": "Acknowledge, resolve or dismiss a security alert",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessSecurityAlert"
  }
 }
 ```
@@ -1907,6 +2535,512 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessFaceReenrolmentAttempt": {
+  "type": "object",
+  "x-ticvai-persistence": "access.face_reenrolment_attempt",
+  "description": "One Face Pass re-enrolment attempt - the existing and new capture references (opaque, never templates), the match result, the reason, the operator and the outcome, with the review of a blocked change (declared 29 September, data-model close-out DM1). Written by enrolFacePass when the subject already has a Face Pass; a pendingReview attempt is decided by reviewFaceReenrolment (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "subjectId",
+   "existingProfileReference",
+   "newCaptureReference",
+   "matchResult",
+   "outcome",
+   "attemptedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The attemptId the list shows"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The guest (pii.subject)"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The credential the Face Pass belongs to"
+   },
+   "existingProfileReference": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Opaque reference to the prior enrolment (pii.subject_biometric)"
+   },
+   "newCaptureReference": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Opaque reference to the new capture"
+   },
+   "matchResult": {
+    "type": "string",
+    "enum": [
+     "withinPolicy",
+     "significantDifference"
+    ]
+   },
+   "reasonForReEnrollment": {
+    "type": "string",
+    "enum": [
+     "appearanceChange",
+     "poorOriginalCapture",
+     "technicalIssue",
+     "guestRequest",
+     "recovery",
+     "other"
+    ],
+    "nullable": true
+   },
+   "verificationProcess": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "How the guest was verified for the change"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "updated",
+     "blocked",
+     "pendingReview"
+    ]
+   },
+   "reviewedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Security or guest service reviewer of a blocked change (the integrity screen's approval)"
+   },
+   "reviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "attemptedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AccessFraudRule": {
+  "type": "object",
+  "x-ticvai-persistence": "access.fraud_rule",
+  "description": "One access fraud rule (not payment fraud, which is orders) - either a signal rule with its severity, weight, threshold, window, credential types, venues, offline availability and response, or a relationship/companion rule with its rule type, relationship and responses; ruleKind tells them apart (declared 29 September, data-model close-out DM1). Signal rows are written by setFraudDetectionRule and relationship rows by setRelationshipFraudRule (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "scopePath",
+   "ruleKind",
+   "severity",
+   "enabled"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The ruleId setFraudDetectionRule is keyed by"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the scope the rule applies to (the operation's scope; the tenant when empty)"
+   },
+   "ruleKind": {
+    "type": "string",
+    "enum": [
+     "signal",
+     "relationship"
+    ]
+   },
+   "signal": {
+    "type": "string",
+    "enum": [
+     "excessiveQrActivations",
+     "multipleActiveSessions",
+     "credentialCopied",
+     "excessiveRefreshAttempts",
+     "invalidSignature",
+     "expiredCredential",
+     "revokedCredential",
+     "screenshotReplayAttempt",
+     "abnormalTransferFrequency",
+     "repeatedFailedValidation",
+     "newDevice",
+     "multipleDevices",
+     "deviceBindingMismatch",
+     "rootedCompromisedDevice",
+     "abnormalDeviceChanges",
+     "impossibleDeviceMovement",
+     "suspiciousScannerDeviceActivity",
+     "duplicateEntry",
+     "simultaneousUse",
+     "antiPassbackViolations",
+     "unusualReEntry",
+     "unusualCrossover",
+     "excessiveAttractionUse",
+     "repeatedWrongGateAttempts",
+     "abnormalFastPassConsumption",
+     "faceMismatch",
+     "unusualFaceChange",
+     "multipleIdentitiesLinked",
+     "suspiciousCompanionChanges",
+     "podNannyRelationshipAnomalies"
+    ],
+    "nullable": true,
+    "description": "signal rules"
+   },
+   "signalCategory": {
+    "type": "string",
+    "enum": [
+     "credential",
+     "device",
+     "access",
+     "identity"
+    ],
+    "nullable": true
+   },
+   "relationshipRuleType": {
+    "type": "string",
+    "enum": [
+     "companionChangedDuringVisit",
+     "nannyCredentialWithoutPrimaryGuest",
+     "childWithUnauthorizedAdult",
+     "companionLinkedToMultiplePrimaries",
+     "excessiveRelationshipChanges",
+     "groupLeaderAcrossUnrelatedGroups"
+    ],
+    "nullable": true,
+    "description": "relationship rules (the list's ruleType)"
+   },
+   "relationshipType": {
+    "type": "string",
+    "enum": [
+     "childAdult",
+     "podCompanion",
+     "guestNanny",
+     "groupLeaderGroup",
+     "membershipDependent"
+    ],
+    "nullable": true,
+    "description": "relationship rules"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "weight": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Contribution to the access risk score"
+   },
+   "threshold": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "signal rules. Occurrences within timeWindow that fire the rule"
+   },
+   "timeWindow": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "signal rules. Minutes"
+   },
+   "applicableCredentialTypes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "applicableVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "The operation's applicableVenues"
+   },
+   "offlineAvailability": {
+    "type": "boolean",
+    "default": false,
+    "description": "Evaluated on the gate when offline"
+   },
+   "response": {
+    "type": "string",
+    "enum": [
+     "alertOnly",
+     "increaseRiskScore",
+     "requireAdditionalVerification",
+     "requireSupervisor",
+     "temporarilyLock",
+     "fullIdentityLock",
+     "blacklist"
+    ],
+    "nullable": true,
+    "description": "signal rules; alertOnly on a new rule"
+   },
+   "relationshipResponses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "yellowIntervention",
+      "supervisorVerification",
+      "idVerification",
+      "biometricVerification",
+      "securityEscalation",
+      "accessDenial"
+     ]
+    },
+    "description": "relationship rules (the list's responses)"
+   },
+   "enabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessIdentityLock": {
+  "type": "object",
+  "x-ticvai-persistence": "access.identity_lock",
+  "description": "One lock on an identity - its scope, duration, reason, the credentials linked to it, where it has propagated and whether it is still active (declared 29 September, data-model close-out DM1). Written by lockIdentity and releaseIdentityLock, by the fraud detection job where a rule's response is temporarilyLock or fullIdentityLock, and released by a timer for endOfDay and nHours locks (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "scopePath",
+   "subjectId",
+   "lockScope",
+   "lockDuration",
+   "lockReason",
+   "status",
+   "lockedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The lockId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set when lockScope is venue"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The locked identity (the list's identityId, pii.subject)"
+   },
+   "lockScope": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "mediaOnly",
+     "entitlement",
+     "venue",
+     "allVenueAccess",
+     "fullIdentity"
+    ]
+   },
+   "lockDuration": {
+    "type": "string",
+    "enum": [
+     "untilManuallyReleased",
+     "endOfDay",
+     "nHours",
+     "untilInvestigationComplete",
+     "permanent"
+    ]
+   },
+   "lockHours": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Used when lockDuration is nHours"
+   },
+   "lockReason": {
+    "type": "string",
+    "enum": [
+     "credentialSharing",
+     "fraudSuspected",
+     "securityIncident",
+     "identityMismatch",
+     "stolenCredential",
+     "guestRemoval"
+    ]
+   },
+   "associatedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "description": "The linked credentials (the list's associatedCredentialIds)"
+   },
+   "associatedCredentialTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticket",
+      "rfidWristband",
+      "dynamicQr",
+      "walletCredential",
+      "facePass",
+      "membership",
+      "fastPass"
+     ]
+    }
+   },
+   "propagatedTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "venueEdge",
+      "onlineGates",
+      "offlineRevocationPackage",
+      "mobileDevices"
+     ]
+    },
+    "description": "Channels the lock has reached"
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The investigation an untilInvestigationComplete lock waits for"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "released"
+    ],
+    "default": "active"
+   },
+   "lockedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lockedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "releasedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "AccessRiskScoringConfig": {
+  "type": "object",
+  "x-ticvai-persistence": "access.risk_scoring_config",
+  "description": "The access risk scoring configuration of a scope - the score thresholds of the medium, high and critical bands and the context factors the score uses; per-signal weights live on access.fraud_rule (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "mediumThreshold",
+   "highThreshold",
+   "criticalThreshold"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node; one row per scope"
+   },
+   "mediumThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Score from which risk is medium (pack 30)"
+   },
+   "highThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Score from which risk is high (pack 60)"
+   },
+   "criticalThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Score from which risk is critical (pack 80)"
+   },
+   "riskFactors": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "venue",
+      "product",
+      "ticketValue",
+      "event",
+      "accessZone",
+      "time",
+      "credentialType",
+      "historicalBehavior"
+     ]
+    },
+    "description": "Context the score may depend on"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessRiskScoringDecisionEngineView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -1941,6 +3075,144 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "criticalThreshold": {
     "type": "integer",
     "description": "Score from which risk is critical (pack: 80)"
+   }
+  }
+ },
+ "AccessSecurityAlert": {
+  "type": "object",
+  "x-ticvai-persistence": "access.security_alert",
+  "description": "One access security or fraud alert - severity, what was detected, where and on which credential, identity or device - including biometric anomalies and edge security events (certificate, credential or package-signature failures, unauthorised connections, device authorisation and revocation). Merges the proposed access.security_alert and access.edge_security_event (declared 29 September, data-model close-out DM1). Created `open` by the detection jobs (fraud rules, sharing detection, biometric anomaly, edge security events) and moved by updateSecurityAlert; the lifecycle is states/access-security-alert.yaml (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "scopePath",
+   "category",
+   "severity",
+   "status",
+   "detectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The alertId / anomalyId the lists show"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "fraudSignal",
+     "credentialSharing",
+     "duplicateAccess",
+     "blacklist",
+     "biometric",
+     "companion",
+     "edgeSecurity"
+    ]
+   },
+   "alertType": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "The kind within the category - for fraudSignal the fraud rule's signal; for biometric one of faceChanged, reEnrollment, repeatedFaceMismatch, multipleFacesOneCredential, oneFaceMultipleCredentials, suspiciousEnrollmentFrequency, unusualVerificationFailures; for edgeSecurity one of certificateFailure, credentialFailure, packageSignatureFailure, unauthorizedConnection, deviceAuthorized, deviceRevoked"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "e.g. Credential attempted simultaneous entry at two gates"
+   },
+   "fraudRuleId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The access fraud rule that raised the alert, if one did"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The credential (the list's credentialId)"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity concerned, where known"
+   },
+   "zoneId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The gate (the list's gateId)"
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The device concerned, for device-sharing and edge events"
+   },
+   "faceReenrolmentAttemptId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Biometric alerts raised on a re-enrolment; the attempt holds the old and new references, operator, reason and review"
+   },
+   "faceProfileReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "Biometric alerts. Opaque Face Pass reference; never a template"
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "acknowledged",
+     "resolved",
+     "dismissed"
+    ],
+    "default": "open"
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    }
   }
  },
@@ -2190,6 +3462,78 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "signal"
   ]
  },
+ "IdentityLockInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; written as access.identity_lock (declared 29 September, writers pass)",
+  "required": [
+   "subjectId",
+   "lockScope",
+   "lockDuration",
+   "lockReason"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for a venue lock; null for allVenueAccess and fullIdentity"
+   },
+   "lockScope": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "mediaOnly",
+     "entitlement",
+     "venue",
+     "allVenueAccess",
+     "fullIdentity"
+    ]
+   },
+   "lockDuration": {
+    "type": "string",
+    "enum": [
+     "untilManuallyReleased",
+     "endOfDay",
+     "nHours",
+     "untilInvestigationComplete",
+     "permanent"
+    ]
+   },
+   "lockHours": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 720,
+    "nullable": true
+   },
+   "lockReason": {
+    "type": "string",
+    "enum": [
+     "credentialSharing",
+     "fraudSuspected",
+     "securityIncident",
+     "identityMismatch",
+     "stolenCredential",
+     "guestRemoval"
+    ]
+   },
+   "associatedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2384,6 +3728,87 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "ruleId",
    "ruleType"
   ]
+ },
+ "RelationshipFraudRuleInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; written as a relationship row of access.fraud_rule (declared 29 September, writers pass)",
+  "required": [
+   "relationshipRuleType",
+   "severity",
+   "relationshipResponses"
+  ],
+  "properties": {
+   "ruleId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Absent creates a rule"
+   },
+   "relationshipRuleType": {
+    "type": "string",
+    "enum": [
+     "companionChangedDuringVisit",
+     "nannyCredentialWithoutPrimaryGuest",
+     "childWithUnauthorizedAdult",
+     "companionLinkedToMultiplePrimaries",
+     "excessiveRelationshipChanges",
+     "groupLeaderAcrossUnrelatedGroups"
+    ],
+    "description": "relationship rules (the list's ruleType)"
+   },
+   "relationshipType": {
+    "type": "string",
+    "enum": [
+     "childAdult",
+     "podCompanion",
+     "guestNanny",
+     "groupLeaderGroup",
+     "membershipDependent"
+    ],
+    "nullable": true,
+    "description": "relationship rules"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "weight": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true
+   },
+   "relationshipResponses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "yellowIntervention",
+      "supervisorVerification",
+      "idVerification",
+      "biometricVerification",
+      "securityEscalation",
+      "accessDenial"
+     ]
+    },
+    "description": "relationship rules (the list's responses)"
+   },
+   "applicableVenues": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "enabled": {
+    "type": "boolean",
+    "default": true
+   }
+  }
  },
  "SecurityAnalyticsAiDetectionGovernanceView": {
   "type": "object",

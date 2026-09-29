@@ -1,6 +1,6 @@
 # WS07 — Access Control board 7
 
-**10 screens · 13 operations · 12 schemas · 4 permissions**
+**10 screens · 15 operations · 14 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, ACCESS_VALIDATE, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, ACCESS_VALIDATE, INCIDENT_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -64,12 +64,12 @@ convincingly. It is never a caption.
 | `BO-205` | Edge Node & Local Processing Configuration | configEditor | 1 | 0 | — |
 | `BO-206` | Offline Validation Policy Builder | listDetail | 1 | 0 | — |
 | `BO-207` | Edge Package & Data Distribution | configEditor | 3 | 0 | — |
-| `BO-208` | Offline Credential & Revocation Cache | listDetail | 1 | 0 | — |
+| `BO-208` | Offline Credential & Revocation Cache | listDetail | 3 | 1 | — |
 | `BO-209` | Offline Entitlement & Usage Ledger | listDetail | 1 | 0 | — |
-| `BO-210` | Connectivity Failure & Degraded Mode Policy | listDetail | 3 | 0 | — |
+| `BO-210` | Connectivity Failure & Degraded Mode Policy | listDetail | 4 | 0 | — |
 | `BO-211` | Reconnection, Synchronization & Conflict Resolution | listDetail | 1 | 0 | — |
 | `BO-212` | Offline Simulation & Resilience Testing | listDetail | 1 | 0 | — |
-| `BO-213` | Edge Security, Audit & Deployment | listDetail | 1 | 0 | — |
+| `BO-213` | Edge Security, Audit & Deployment | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
@@ -858,6 +858,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save offline policy",
+       "operation": "setOfflinePolicy",
+       "permission": "TENANT_CONFIGURE",
+       "notes": "Board 5 of the client's POS set, and **one of only two things in 36 board screens the package could not do.** ADR-0013 makes the POS local-first and nothing configured the policy.",
+       "provenance": "contract tenancy.yaml PUT /offline-policy"
+      }
+     ]
     }
    ]
   },
@@ -870,10 +884,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "setGateOfflinePolicy",
+    "purpose": "Save the gate offline validation, revocation cache and degraded-mode policy (writers pass, 29 September)",
+    "contract": "access"
+   },
+   {
     "operationId": "listOfflineCredentialRevocation",
     "contract": "access",
     "purpose": "Offline Credential & Revocation Cache",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setOfflinePolicy",
+    "contract": "tenancy",
+    "purpose": "What a workstation may do with no network, and for how long",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOfflineCredentialRevocation"
+    ]
    }
   ],
   "entryState": {
@@ -888,6 +916,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-208"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 90. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetOfflinePolicy",
+    "component": "modal",
+    "trigger": "Save offline policy",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "OfflinePolicy",
+    "confirm": {
+     "label": "Save offline policy",
+     "operation": "setOfflinePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scopePath",
+      "id",
+      "maxOfflineHours",
+      "allowedOffline",
+      "offlineValueCeiling",
+      "offlineTransactionCeiling",
+      "onCeilingBreach",
+      "requiresManagerToExtend"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /offline-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1122,6 +1177,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "setGateOfflinePolicy",
+    "purpose": "Save the gate offline validation, revocation cache and degraded-mode policy (writers pass, 29 September)",
+    "contract": "access"
+   },
    {
     "operationId": "listConnectivityFailureDegraded",
     "contract": "access",
@@ -1538,6 +1598,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 96 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save security alert",
+       "operation": "updateSecurityAlert",
+       "permission": "INCIDENT_MANAGE",
+       "notes": "**The action on the security command centres** (BO-244, BO-246, BO-248, BO-213, BO-253): moves one alert raised by the detection jobs.",
+       "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+      }
+     ]
     }
    ]
   },
@@ -1554,6 +1628,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Edge Security, Audit & Deployment",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateSecurityAlert",
+    "contract": "access",
+    "purpose": "Acknowledge, resolve or dismiss a security alert",
+    "trigger": "onAction",
+    "invalidates": [
+     "listEdgeSecurityDeployment"
+    ]
    }
   ],
   "entryState": {
@@ -1564,6 +1647,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "EdgeSecurityAuditDeploymentViewSummary.revokedDevices",
     "EdgeSecurityAuditDeploymentViewSummary.failedPackageValidation",
     "EdgeSecurityAuditDeploymentViewSummary.unauthorizedConnectionAttempts"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -1573,6 +1663,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS24 Access Control Board 7.dc.html#bo-213"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 96. 6 of 7 labels bound to a contract property; 7 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateSecurityAlert",
+    "component": "modal",
+    "trigger": "Save security alert",
+    "body": "**Collects what `updateSecurityAlert` sends before it is called.** Required: `status`. Optional: `note`, `securityInvestigationId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save security alert",
+     "operation": "updateSecurityAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "note",
+      "securityInvestigationId"
+     ]
+    },
+    "provenance": "contract access.yaml POST /security-alerts/{alertId}/status"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1643,7 +1754,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ConnectivityFailureDegradedModePolicyView"
  },
@@ -1704,7 +1821,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OfflineCredentialRevocationCacheView"
  },
@@ -1837,6 +1960,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "EdgeNodeLocalProcessingConfigurationInput",
   "responds": "EdgeNodeLocalProcessingConfigurationView"
  },
+ "setGateOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policies",
+  "contract": "access",
+  "summary": "Set the offline policy of a venue",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessOfflinePolicy",
+  "responds": "AccessOfflinePolicy"
+ },
  "setOfflinePolicy": {
   "method": "PUT",
   "path": "/offline-policy",
@@ -1874,6 +2016,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "OfflineSimulationResilienceTestingInput",
   "responds": "OfflineSimulationResilienceTestingView"
+ },
+ "updateSecurityAlert": {
+  "method": "POST",
+  "path": "/security-alerts/{alertId}/status",
+  "contract": "access",
+  "summary": "Acknowledge, resolve or dismiss a security alert",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessSecurityAlert"
  }
 }
 ```
@@ -1884,6 +2045,287 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessOfflinePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.offline_policy",
+  "description": "The offline policy of one venue: what gates validate locally and for how long, how old the revocation cache may get, and how devices step down through degraded modes. Merges access.offline_validation_profile, access.revocation_cache_policy and access.degraded_mode_policy (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "maxOfflineDurationHours": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Hours a gate may validate offline"
+   },
+   "offlineChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "credentialAuthenticity",
+      "digitalSignature",
+      "ticketId",
+      "venue",
+      "park",
+      "zone",
+      "visitDate",
+      "timeWindow",
+      "credentialStatusSnapshot",
+      "ticketType",
+      "guestCategory",
+      "seat",
+      "timeslot",
+      "reservation",
+      "entitlements",
+      "reEntryPermissions",
+      "validityPeriod"
+     ]
+    },
+    "description": "What a gate may validate locally"
+   },
+   "afterThresholdBehavior": {
+    "type": "string",
+    "enum": [
+     "continueRestrictedValidation",
+     "operatorWarning",
+     "supervisorMode",
+     "failClosed",
+     "fallback"
+    ],
+    "nullable": true
+   },
+   "revocationTriggerEvents": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fraudLock",
+      "refund",
+      "cancellation",
+      "lostCredential",
+      "transfer",
+      "reissue",
+      "manualInvalidation"
+     ]
+    },
+    "description": "Events that push an invalidation into the offline cache"
+   },
+   "revocationMaxAllowedAgeMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Maximum allowed revocation cache age"
+   },
+   "revocationStalenessAction": {
+    "type": "string",
+    "enum": [
+     "continue",
+     "continueWithWarning",
+     "restrictedProductsOnly",
+     "supervisorMode",
+     "denySelectedCredentialClasses",
+     "failClosed"
+    ],
+    "nullable": true,
+    "description": "What devices do when the cache is older than the maximum allowed age"
+   },
+   "operatingModes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "online",
+      "degraded",
+      "edgeMode",
+      "localOffline",
+      "unsafeExpired"
+     ]
+    },
+    "description": "Operating modes a device moves through as connectivity fails"
+   },
+   "centralUnavailableAfterSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Seconds without central services before switching to edge mode"
+   },
+   "edgeUnavailableAfterSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Seconds without the venue edge before switching to local offline"
+   },
+   "automaticSwitch": {
+    "type": "boolean",
+    "default": true,
+    "description": "Switch modes automatically without stopping guest flow"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessSecurityAlert": {
+  "type": "object",
+  "x-ticvai-persistence": "access.security_alert",
+  "description": "One access security or fraud alert - severity, what was detected, where and on which credential, identity or device - including biometric anomalies and edge security events (certificate, credential or package-signature failures, unauthorised connections, device authorisation and revocation). Merges the proposed access.security_alert and access.edge_security_event (declared 29 September, data-model close-out DM1). Created `open` by the detection jobs (fraud rules, sharing detection, biometric anomaly, edge security events) and moved by updateSecurityAlert; the lifecycle is states/access-security-alert.yaml (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "scopePath",
+   "category",
+   "severity",
+   "status",
+   "detectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The alertId / anomalyId the lists show"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "fraudSignal",
+     "credentialSharing",
+     "duplicateAccess",
+     "blacklist",
+     "biometric",
+     "companion",
+     "edgeSecurity"
+    ]
+   },
+   "alertType": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "The kind within the category - for fraudSignal the fraud rule's signal; for biometric one of faceChanged, reEnrollment, repeatedFaceMismatch, multipleFacesOneCredential, oneFaceMultipleCredentials, suspiciousEnrollmentFrequency, unusualVerificationFailures; for edgeSecurity one of certificateFailure, credentialFailure, packageSignatureFailure, unauthorizedConnection, deviceAuthorized, deviceRevoked"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "e.g. Credential attempted simultaneous entry at two gates"
+   },
+   "fraudRuleId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The access fraud rule that raised the alert, if one did"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The credential (the list's credentialId)"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity concerned, where known"
+   },
+   "zoneId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The gate (the list's gateId)"
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The device concerned, for device-sharing and edge events"
+   },
+   "faceReenrolmentAttemptId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Biometric alerts raised on a re-enrolment; the attempt holds the old and new references, operator, reason and review"
+   },
+   "faceProfileReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "Biometric alerts. Opaque Face Pass reference; never a template"
+   },
+   "securityInvestigationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "acknowledged",
+     "resolved",
+     "dismissed"
+    ],
+    "default": "open"
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
  "ConnectivityFailureDegradedModePolicyView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

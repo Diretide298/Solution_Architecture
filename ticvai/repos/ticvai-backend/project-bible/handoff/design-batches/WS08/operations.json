@@ -51,7 +51,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ReEntryTemporaryExitJourneyView"
  },
@@ -64,7 +70,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FamilyChildPodCompanionJourneyView"
  },
@@ -77,7 +89,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FastPassAttractionAccessJourneyView"
  },
@@ -186,7 +204,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MultiParkCrossoverRulesView"
  },
@@ -257,7 +281,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "SpecialEventFreeViewAlternativeAdmissionView"
  },
@@ -279,6 +309,25 @@
   ],
   "requestBody": "ContextTimeEventCapacityPolicyBuilderInput",
   "responds": "ContextTimeEventCapacityPolicyBuilderView"
+ },
+ "setFastPassProfile": {
+  "method": "PUT",
+  "path": "/fast-pass-profiles",
+  "contract": "access",
+  "summary": "Create or replace a Fast Pass profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessFastPassProfile",
+  "responds": "AccessFastPassProfile"
  },
  "setGroupAdmissionProfile": {
   "method": "PUT",
@@ -317,6 +366,44 @@
   ],
   "requestBody": "GuestCompanionEligibilityRulesInput",
   "responds": "GuestCompanionEligibilityRulesView"
+ },
+ "setJourneyProfile": {
+  "method": "PUT",
+  "path": "/journey-profiles",
+  "contract": "access",
+  "summary": "Create or replace a guest journey profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessJourneyProfile",
+  "responds": "AccessJourneyProfile"
+ },
+ "setOperatingCalendarEntry": {
+  "method": "PUT",
+  "path": "/operating-calendar-entries",
+  "contract": "access",
+  "summary": "Create or replace an operating calendar entry",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessOperatingCalendarEntry",
+  "responds": "AccessOperatingCalendarEntry"
  },
  "simulateGuestJourney": {
   "method": "POST",

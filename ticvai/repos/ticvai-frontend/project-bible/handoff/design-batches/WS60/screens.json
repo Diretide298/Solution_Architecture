@@ -105,13 +105,6 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each template should show) — counts over a population, then the population",
   "purpose": "Provide administrators with the central workspace for creating and managing all ticket and credential media templates. This should be the entry point for the entire no-code Media Design Studio.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Media Design Studio Command Center declares no operation that writes anything** — its only declared call is `listMediaDesign`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -286,6 +279,14 @@
        "label": "Import supported template definition",
        "operation": "importTicketTemplate",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Archive media template",
+       "operation": "archiveMediaTemplate",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**Retires a media template** (Media Design Studio Command Center, BO-344, and the designers BO-345 to BO-349): `status: archived`.",
+       "provenance": "contract access.yaml POST /media-templates/{templateId}/archive"
       }
      ]
     }
@@ -322,6 +323,16 @@
     "contract": "orders",
     "purpose": "Import",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "archiveMediaTemplate",
+    "contract": "access",
+    "purpose": "Archive a media template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMediaDesign",
+     "listTicketTemplates"
+    ]
    }
   ],
   "wireframe": {
@@ -339,6 +350,15 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmArchiveMediaTemplate",
+    "component": "confirmDialog",
+    "trigger": "Archive media template",
+    "body": "**Names what `archiveMediaTemplate` changes and what it leaves alone**, in the consequence rather than the verb. A access media template this affects should be identified in the dialog, not just counted. **Collects what `archiveMediaTemplate` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
+    "provenance": "contract access.yaml POST /media-templates/{templateId}/archive"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

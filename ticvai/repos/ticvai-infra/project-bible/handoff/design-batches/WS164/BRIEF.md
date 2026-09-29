@@ -1,6 +1,6 @@
 # WS164 — Resource Management Configuration board 10
 
-**10 screens · 9 operations · 8 schemas · 5 permissions**
+**10 screens · 12 operations · 9 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `PLATFORM_TENANT_VIEW, PRODUCT_VIEW, REPORT_VIEW_TENANT, RESOURCE_CONFIGURE, RESOURCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `PLATFORM_TENANT_VIEW, PRODUCT_VIEW, REPORT_VIEW_TENANT, RESOURCE_CONFIGURE, RESOURCE_MANAGE, RESOURCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-943` | Resource Analytics Command Center | listDetail | 2 | 0 | — |
 | `BO-944` | Resource Utilization & Capacity Analytics | listDetail | 1 | 0 | — |
-| `BO-945` | Resource Cost, Revenue & Efficiency Analytics | listDetail | 2 | 0 | — |
+| `BO-945` | Resource Cost, Revenue & Efficiency Analytics | listDetail | 5 | 2 | — |
 | `BO-946` | Demand Forecast Accuracy & Planning Performance | commandCentre | 1 | 0 | — |
 | `BO-947` | Resource KPI, SLA & Performance Framework | listDetail | 1 | 0 | — |
 | `BO-948` | Resource Governance & Policy Center | listDetail | 2 | 0 | — |
@@ -73,4 +73,4 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-945, BO-947, BO-948, BO-949, BO-951 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-947, BO-948, BO-949, BO-951 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

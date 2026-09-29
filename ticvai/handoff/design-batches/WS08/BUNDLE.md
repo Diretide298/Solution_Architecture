@@ -1,6 +1,6 @@
 # WS08 — Access Control board 8
 
-**10 screens · 19 operations · 20 schemas · 5 permissions**
+**10 screens · 22 operations · 24 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,15 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-214` | Guest Journey Command Center | listDetail | 2 | 0 | — |
+| `BO-214` | Guest Journey Command Center | listDetail | 3 | 1 | — |
 | `BO-215` | Group & B2B Admission Profile Builder | configEditor | 1 | 0 | — |
 | `BO-216` | Group Leader & Fast B2B Validation | listDetail | 1 | 0 | — |
 | `BO-217` | Group Attendance & Partial Entry Manager | listDetail | 1 | 0 | — |
 | `BO-218` | Family, Child, POD & Companion Journey | configEditor | 2 | 0 | — |
 | `BO-219` | Re-entry & Temporary Exit Journey | configEditor | 3 | 0 | — |
 | `BO-220` | Multi-Park & Crossover Journey Orchestrator | listDetail | 4 | 0 | — |
-| `BO-221` | Fast Pass & Attraction Access Journey | configEditor | 3 | 0 | — |
-| `BO-222` | Special Event, Free View & Alternative Admission | configEditor | 3 | 0 | — |
+| `BO-221` | Fast Pass & Attraction Access Journey | configEditor | 4 | 1 | — |
+| `BO-222` | Special Event, Free View & Alternative Admission | configEditor | 4 | 1 | — |
 | `BO-223` | Journey Simulation, Audit & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
@@ -289,6 +289,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 101 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save journey profile",
+       "operation": "setJourneyProfile",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind the Guest Journey Command Center** (BO-214): a named journey (e.g.",
+       "provenance": "contract access.yaml PUT /journey-profiles"
+      }
+     ]
     }
    ]
   },
@@ -315,6 +329,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listGuestJourney"
     ]
+   },
+   {
+    "operationId": "setJourneyProfile",
+    "contract": "access",
+    "purpose": "Create or replace a guest journey profile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestJourney"
+    ]
    }
   ],
   "entryState": {
@@ -334,6 +357,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-214"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 101. 10 of 10 labels bound to a contract property; 10 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetJourneyProfile",
+    "component": "modal",
+    "trigger": "Save journey profile",
+    "body": "**Collects what `setJourneyProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `status`. Optional: `venueId`, `journeyType`, `credentialType`, `steps`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessJourneyProfile",
+    "confirm": {
+     "label": "Save journey profile",
+     "operation": "setJourneyProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "name",
+      "status",
+      "venueId",
+      "journeyType",
+      "credentialType",
+      "steps"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /journey-profiles"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1279,6 +1329,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Save Fast Pass settings",
        "operation": "updateQueue",
        "provenance": "contract queue.yaml PATCH /queues/{queueId} (decided 29 September, VM close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save fast pass profile",
+       "operation": "setFastPassProfile",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Fast Pass & Attraction Access Journey** (BO-221): a Fast Pass profile (e.g.",
+       "provenance": "contract access.yaml PUT /fast-pass-profiles"
       }
      ]
     }
@@ -1308,6 +1366,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "queue",
     "purpose": "Save Fast Pass settings",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "setFastPassProfile",
+    "contract": "access",
+    "purpose": "Create or replace a Fast Pass profile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFastPassAttraction",
+     "listQueues"
+    ]
    }
   ],
   "wireframe": {
@@ -1325,6 +1393,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetFastPassProfile",
+    "component": "modal",
+    "trigger": "Save fast pass profile",
+    "body": "**Collects what `setFastPassProfile` sends before it is called.** Required: `id`, `scopePath`, `name`, `unlimited`. Optional: `venueId`, `totalUses`, `consumptionPerValidation`, `onePerRide`, `eligibleAttractionCategories`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessFastPassProfile",
+    "confirm": {
+     "label": "Save fast pass profile",
+     "operation": "setFastPassProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "name",
+      "unlimited",
+      "venueId",
+      "totalUses",
+      "consumptionPerValidation",
+      "onePerRide",
+      "eligibleAttractionCategories"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /fast-pass-profiles"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1407,6 +1503,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 110 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save operating calendar entry",
+       "operation": "setOperatingCalendarEntry",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Operating Calendar & Special Access Days** (BO-152) and Special Event, Free View & Alternative Admission (BO-222): one dated entry (a holiday, private event, free-entry day, special event and so on), whether tickets must be validated, and for a free-view or special-event window its admission type.",
+       "provenance": "contract access.yaml PUT /operating-calendar-entries"
+      }
+     ]
     }
    ]
   },
@@ -1442,6 +1552,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listSpecialEventFree"
     ]
+   },
+   {
+    "operationId": "setOperatingCalendarEntry",
+    "contract": "access",
+    "purpose": "Create or replace an operating calendar entry",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSpecialEventFree"
+    ]
    }
   ],
   "wireframe": {
@@ -1451,6 +1570,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-222"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 110. 0 of 0 labels bound to a contract property; 2 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetOperatingCalendarEntry",
+    "component": "modal",
+    "trigger": "Save operating calendar entry",
+    "body": "**Collects what `setOperatingCalendarEntry` sends before it is called.** Required: `id`, `venueId`, `dayType`, `startsAt`, `endsAt`, `scopePath`. Optional: `name`, `ticketValidationRequired`, `admissionType`, `attractionValidation`, `manualAttendanceRequired`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessOperatingCalendarEntry",
+    "confirm": {
+     "label": "Save operating calendar entry",
+     "operation": "setOperatingCalendarEntry"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "dayType",
+      "startsAt",
+      "endsAt",
+      "scopePath",
+      "name",
+      "ticketValidationRequired",
+      "admissionType",
+      "attractionValidation",
+      "manualAttendanceRequired"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /operating-calendar-entries"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1693,7 +1842,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ReEntryTemporaryExitJourneyView"
  },
@@ -1706,7 +1861,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FamilyChildPodCompanionJourneyView"
  },
@@ -1719,7 +1880,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FastPassAttractionAccessJourneyView"
  },
@@ -1828,7 +1995,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MultiParkCrossoverRulesView"
  },
@@ -1899,7 +2072,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "SpecialEventFreeViewAlternativeAdmissionView"
  },
@@ -1921,6 +2100,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "ContextTimeEventCapacityPolicyBuilderInput",
   "responds": "ContextTimeEventCapacityPolicyBuilderView"
+ },
+ "setFastPassProfile": {
+  "method": "PUT",
+  "path": "/fast-pass-profiles",
+  "contract": "access",
+  "summary": "Create or replace a Fast Pass profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessFastPassProfile",
+  "responds": "AccessFastPassProfile"
  },
  "setGroupAdmissionProfile": {
   "method": "PUT",
@@ -1959,6 +2157,44 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "GuestCompanionEligibilityRulesInput",
   "responds": "GuestCompanionEligibilityRulesView"
+ },
+ "setJourneyProfile": {
+  "method": "PUT",
+  "path": "/journey-profiles",
+  "contract": "access",
+  "summary": "Create or replace a guest journey profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessJourneyProfile",
+  "responds": "AccessJourneyProfile"
+ },
+ "setOperatingCalendarEntry": {
+  "method": "PUT",
+  "path": "/operating-calendar-entries",
+  "contract": "access",
+  "summary": "Create or replace an operating calendar entry",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessOperatingCalendarEntry",
+  "responds": "AccessOperatingCalendarEntry"
  },
  "simulateGuestJourney": {
   "method": "POST",
@@ -2026,6 +2262,242 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessFastPassProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "access.fast_pass_profile",
+  "description": "One Fast Pass profile (e.g. Silver, Gold) - total uses or unlimited, uses consumed per validation, the one-access-per-ride restriction and the eligible attraction categories (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "name",
+   "unlimited"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The profileId the list shows"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "unlimited": {
+    "type": "boolean",
+    "default": false
+   },
+   "totalUses": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Null when unlimited"
+   },
+   "consumptionPerValidation": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1
+   },
+   "onePerRide": {
+    "type": "boolean",
+    "default": false
+   },
+   "eligibleAttractionCategories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "The list's eligibleType, e.g. rollerCoaster, dropTower, waterRide, adventureRide"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessJourneyProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "access.journey_profile",
+  "description": "One guest access journey profile (e.g. School Group Entry) - type, venue, credential used, status and the ordered steps a simulation walks (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "name",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The journeyProfileId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null is every park of the tenant"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "journeyType": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "e.g. B2B group, family"
+   },
+   "credentialType": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "e.g. group QR, mixed"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active"
+   },
+   "steps": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessJsonList"
+     }
+    ],
+    "description": "Ordered journey steps, each an accessPointId with a direction (entry or exit) and an optional local time HH:MM, as GuestJourneySimulationInput.steps"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessJsonList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the row that holds it.** A short list of structured entries read with its row and never queried on its own (thresholds, per-language messages, field mappings, steps), so a child table would add a join for nothing. The property that uses it says what an entry holds (declared 29 September, data-model close-out DM1).",
+  "items": {
+   "type": "object"
+  }
+ },
+ "AccessOperatingCalendarEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "access.operating_calendar_entry",
+  "description": "One dated entry in a venue operating calendar (normal day, holiday, private event, free-entry day, special event and so on), with whether tickets must be validated. Merges access.special_admission_window, whose free-view and special-event windows are entries carrying an admission type (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "dayType",
+   "startsAt",
+   "endsAt",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dayType": {
+    "type": "string",
+    "enum": [
+     "normalOperatingDay",
+     "weekend",
+     "holiday",
+     "seasonalSchedule",
+     "privateEvent",
+     "freeEntryDay",
+     "maintenancePeriod",
+     "specialEvent",
+     "ladiesOnlySession",
+     "schoolGroupSession",
+     "afterHoursEvent"
+    ],
+    "description": "Kind of calendar entry"
+   },
+   "name": {
+    "type": "string",
+    "nullable": true
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "ticketValidationRequired": {
+    "type": "boolean",
+    "default": true,
+    "description": "False on free-entry days"
+   },
+   "admissionType": {
+    "type": "string",
+    "enum": [
+     "freeViewDay",
+     "specialEvent"
+    ],
+    "nullable": true,
+    "description": "Set on special admission windows only"
+   },
+   "attractionValidation": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "Special windows: attraction gates keep validating tickets"
+   },
+   "manualAttendanceRequired": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "Special windows: operator enters attendance count"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AdmissionRules": {
   "x-ticvai-persistence": "access.admission_rules",
   "type": "object",
@@ -2378,6 +2850,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "restrictThresholdPercent": {
     "type": "integer",
     "description": "Occupancy percent at which the band becomes Restrict"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active",
+    "description": "`inactive` switches the policy off at once; `active` on a new or inactive policy submits it for approval (`pendingApproval`) (decided 29 September, writers pass)"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Start of validity; null for at once (decided 29 September, writers pass)"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "End of validity: after it a timer moves the policy to `expired` (decided 29 September, writers pass)"
    }
   },
   "required": [
@@ -2706,7 +3199,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "profileId": {
     "type": "string",
-    "description": "Group admission profile identifier"
+    "description": "The rule row's key (access.group_admission_rule.id); absent creates one (decided 29 September, writers pass)",
+    "format": "uuid"
    },
    "groupSegments": {
     "type": "array",

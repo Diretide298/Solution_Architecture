@@ -1,4 +1,192 @@
 {
+ "DynamicPricingStrategy": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.dynamic_pricing_strategy",
+  "description": "**A dynamic pricing strategy: what it prices, from which base and how often** (29 September, data model DM3). ADM-088 and ADM-089. Its rules are `pricing.dynamic_price_rule` rows naming it; its ladder `catalogue.price_ladder`; its limits and automation `catalogue.dynamic_pricing_control`. **Rules-based now; AI factors inform, never replace, the rules** (MoM 19 Aug 2026).",
+  "required": [
+   "id",
+   "scopePath",
+   "code",
+   "name",
+   "strategyType",
+   "scopeType",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 40
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "strategyType": {
+    "type": "string",
+    "enum": [
+     "demandBased",
+     "occupancyBased",
+     "availabilityBased",
+     "inventoryBased",
+     "bookingVelocity",
+     "timeToEvent",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "channel",
+     "segment",
+     "location",
+     "hybrid"
+    ]
+   },
+   "scopeType": {
+    "type": "string",
+    "enum": [
+     "singleProduct",
+     "productFamily",
+     "event",
+     "multiplePerformances",
+     "venue",
+     "selectedTimeslots",
+     "selectedPriceCategories"
+    ]
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productFamily": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "timeslotIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "priceCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "businessUnit": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "basePriceSource": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "The price list or rate the adjustments start from."
+   },
+   "evaluationFrequency": {
+    "type": "string",
+    "enum": [
+     "every15Minutes",
+     "every30Minutes",
+     "hourly",
+     "daily",
+     "onInventoryChange",
+     "onThresholdTrigger"
+    ],
+    "default": "hourly"
+   },
+   "combinationMode": {
+    "type": "string",
+    "enum": [
+     "independent",
+     "combinable",
+     "exclusive",
+     "fallback"
+    ],
+    "default": "independent"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "clonedFromStrategyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "frozen",
+     "expired",
+     "retired"
+    ],
+    "default": "draft"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -497,7 +685,7 @@
  "RentalQuote": {
   "type": "object",
   "x-ticvai-persistence": "rental.quote",
-  "description": "Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n",
+  "description": "Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n**Consumed by `acceptedQuoteId`** on `createRentalBooking` and the extension. A quote is not deleted when it is used or expires: a nightly job removes quotes 30 days past `expiresAt` that no booking references, so a booking can always show the quote it was priced at (decided 29 September, writers pass; DM4).\n",
   "required": [
    "quoteId",
    "productId",

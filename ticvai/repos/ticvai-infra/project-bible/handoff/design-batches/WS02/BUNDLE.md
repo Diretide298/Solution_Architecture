@@ -1,6 +1,6 @@
 # WS02 — Access Control board 2
 
-**10 screens · 16 operations · 16 schemas · 4 permissions**
+**10 screens · 18 operations · 17 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -63,7 +63,7 @@ convincingly. It is never a caption.
 | `BO-154` | Access Rule Command Center | commandCentre | 3 | 0 | — |
 | `BO-155` | Visual Access Rule Builder | listDetail | 1 | 0 | — |
 | `BO-156` | Entry, Exit & Re-entry Rules | listDetail | 3 | 0 | — |
-| `BO-157` | Anti-Passback & Journey Sequence | configEditor | 1 | 0 | — |
+| `BO-157` | Anti-Passback & Journey Sequence | configEditor | 3 | 2 | — |
 | `BO-158` | Access Validity & Time Rules | configEditor | 3 | 3 | — |
 | `BO-159` | Entitlement Consumption Engine | listDetail | 2 | 0 | — |
 | `BO-160` | Multi-Park & Crossover Rules | listDetail | 3 | 0 | — |
@@ -73,7 +73,7 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-155, BO-156, BO-157, BO-160, BO-162 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-155, BO-156, BO-160, BO-162 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -138,12 +138,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listAccessRule"
     },
     {
-     "to": "BO-157",
-     "trigger": "Works in Anti-Passback & Journey Sequence",
-     "provenance": "flow F112 step 5→6",
-     "operation": "listAccessRule"
-    },
-    {
      "to": "BO-158",
      "trigger": "Works in Access Validity & Time Rules",
      "provenance": "flow F112 step 7→8",
@@ -172,6 +166,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Works in Rule Simulation, Conflict Check & Publication",
      "provenance": "flow F112 step 17→18",
      "operation": "listAccessRule"
+    },
+    {
+     "to": "BO-157",
+     "trigger": "Works in Anti-Passback & Journey Sequence",
+     "provenance": "flow F112 step 5→6",
+     "operation": "listAccessRule",
+     "carries": [
+      "ruleId"
+     ]
     },
     {
      "to": "BO-161",
@@ -712,6 +715,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 20 §Configure required sequences such as"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save journey sequence rule",
+       "operation": "setJourneySequenceRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Anti-Passback & Journey Sequence** (BO-157): the level a rule applies at (credential, guest, gate, attraction, park, venue), the time window, the required order of scans and what a violation leads to.",
+       "provenance": "contract access.yaml PUT /journey-sequence-rules"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete journey sequence rule",
+       "operation": "deleteJourneySequenceRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "Deletes a journey sequence rule.",
+       "provenance": "contract access.yaml DELETE /journey-sequence-rules/{ruleId}"
+      }
+     ]
     }
    ]
   },
@@ -727,6 +752,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Anti-Passback & Journey Sequence",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setJourneySequenceRule",
+    "contract": "access",
+    "purpose": "Create or replace an anti-passback / journey sequence rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAntiPassbackJourney"
+    ]
+   },
+   {
+    "operationId": "deleteJourneySequenceRule",
+    "contract": "access",
+    "purpose": "Delete a journey sequence rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAntiPassbackJourney"
+    ]
    }
   ],
   "wireframe": {
@@ -736,6 +779,48 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-157"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 20. 0 of 0 labels bound to a contract property; 3 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetJourneySequenceRule",
+    "component": "modal",
+    "trigger": "Save journey sequence rule",
+    "body": "**Collects what `setJourneySequenceRule` sends before it is called.** Required: `id`, `scopePath`, `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessJourneySequenceRule",
+    "confirm": {
+     "label": "Save journey sequence rule",
+     "operation": "setJourneySequenceRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "scope",
+      "venueId",
+      "name",
+      "windowMinutes",
+      "requiredSequence",
+      "violationResponses"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /journey-sequence-rules"
+   },
+   {
+    "id": "confirmDeleteJourneySequenceRule",
+    "component": "confirmDialog",
+    "trigger": "Delete journey sequence rule",
+    "body": "**Names what `deleteJourneySequenceRule` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /journey-sequence-rules/{ruleId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1773,6 +1858,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "AdmissionRules",
   "responds": "AdmissionRules"
  },
+ "deleteJourneySequenceRule": {
+  "method": "DELETE",
+  "path": "/journey-sequence-rules/{ruleId}",
+  "contract": "access",
+  "summary": "Delete a journey sequence rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "getProductEligibilityRule": {
   "method": "GET",
   "path": "/products/{productId}/eligibility-rule",
@@ -1865,7 +1969,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccessValidityTimeRulesView"
  },
@@ -1902,7 +2012,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AntiPassbackJourneySequenceView"
  },
@@ -1915,7 +2031,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "EntitlementConsumptionEngineView"
  },
@@ -1928,7 +2050,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "EntryExitReEntryRulesView"
  },
@@ -1941,7 +2069,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GroupAdmissionQuantityValidationView"
  },
@@ -1954,7 +2088,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "GuestCompanionEligibilityRulesView"
  },
@@ -1967,7 +2107,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MultiParkCrossoverRulesView"
  },
@@ -2008,6 +2154,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "EntitlementConsumptionEngineInput",
   "responds": "EntitlementConsumptionEngineView"
+ },
+ "setJourneySequenceRule": {
+  "method": "PUT",
+  "path": "/journey-sequence-rules",
+  "contract": "access",
+  "summary": "Create or replace an anti-passback / journey sequence rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessJourneySequenceRule",
+  "responds": "AccessJourneySequenceRule"
  },
  "setProductEligibilityRule": {
   "method": "PUT",
@@ -2080,6 +2245,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessJourneySequenceRule": {
+  "type": "object",
+  "x-ticvai-persistence": "access.journey_sequence_rule",
+  "description": "One anti-passback / journey sequence rule - the level it applies at, the time window, the required order of scans and what a violation leads to (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "scope"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "credential",
+     "guest",
+     "gate",
+     "attraction",
+     "park",
+     "venue"
+    ],
+    "description": "Level the anti-passback check applies at"
+   },
+   "windowMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "requiredSequence": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Ordered steps, e.g. entry, exit, reEntry"
+   },
+   "violationResponses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "deny",
+      "warning",
+      "referToOperator",
+      "requireSupervisor",
+      "allowOverride",
+      "triggerSecurityAlert"
+     ]
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessValidityTimeRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

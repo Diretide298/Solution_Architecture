@@ -1,6 +1,6 @@
 # WS59 — Ticket Media   Credential Management board 1
 
-**10 screens · 12 operations · 11 schemas · 3 permissions**
+**10 screens · 16 operations · 14 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,11 +62,11 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-334` | Virtual Ticket Command Center | commandCentre | 3 | 0 | — |
 | `BO-335` | Virtual Ticket Identity & Master Record Configuration | configEditor | 1 | 0 | — |
-| `BO-336` | Virtual Ticket Status & Lifecycle Model | listDetail | 1 | 0 | — |
+| `BO-336` | Virtual Ticket Status & Lifecycle Model | listDetail | 2 | 1 | — |
 | `BO-337` | Media Type & Credential Technology Registry | configEditor | 2 | 0 | — |
-| `BO-338` | Multi-Media Binding & Association Rules | configEditor | 1 | 0 | — |
+| `BO-338` | Multi-Media Binding & Association Rules | configEditor | 3 | 2 | — |
 | `BO-339` | Credential Identity, Token & Reference Mapping | listDetail | 1 | 0 | — |
-| `BO-340` | Entitlement & Cross-Media Synchronization Rules | listDetail | 1 | 0 | — |
+| `BO-340` | Entitlement & Cross-Media Synchronization Rules | listDetail | 2 | 1 | — |
 | `BO-341` | Media Activation, Priority & Fallback Rules | configEditor | 1 | 0 | — |
 | `BO-342` | Media Replacement, Revocation & Rebinding Rules | configEditor | 2 | 2 | — |
 | `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | configEditor | 1 | 0 | — |
@@ -649,6 +649,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save ticket status transition",
+       "operation": "setTicketStatusTransition",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Virtual Ticket Status & Lifecycle Model** (BO-336): for one move between Virtual Ticket statuses, whether it is allowed, whether it needs an authorised exception and where it may originate.",
+       "provenance": "contract access.yaml PUT /ticket-status-transitions"
+      }
+     ]
     }
    ]
   },
@@ -665,6 +679,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Virtual Ticket Status & Lifecycle Model",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setTicketStatusTransition",
+    "contract": "access",
+    "purpose": "Set a Virtual Ticket status transition rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listVirtualTicketStatus"
+    ]
    }
   ],
   "entryState": {
@@ -679,6 +702,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-336"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 11 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetTicketStatusTransition",
+    "component": "modal",
+    "trigger": "Save ticket status transition",
+    "body": "**Collects what `setTicketStatusTransition` sends before it is called.** Required: `id`, `fromStatus`, `toStatus`, `allowed`, `requiresAuthorizedException`, `scopePath`. Optional: `originatingSources`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessTicketStatusTransition",
+    "confirm": {
+     "label": "Save ticket status transition",
+     "operation": "setTicketStatusTransition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "fromStatus",
+      "toStatus",
+      "allowed",
+      "requiresAuthorizedException",
+      "scopePath",
+      "originatingSources"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /ticket-status-transitions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1003,6 +1052,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save media binding rule",
+       "operation": "setMediaBindingRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "provenance": "contract access.yaml PUT /media-binding-rules"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete media binding rule",
+       "operation": "deleteMediaBindingRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "Deletes a binding rule.",
+       "provenance": "contract access.yaml DELETE /media-binding-rules/{ruleId}"
+      }
+     ]
     }
    ]
   },
@@ -1018,6 +1088,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Multi-Media Binding & Association Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMediaBindingRule",
+    "contract": "access",
+    "purpose": "Create or replace a multi-media binding rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMultiMediaBinding"
+    ]
+   },
+   {
+    "operationId": "deleteMediaBindingRule",
+    "contract": "access",
+    "purpose": "Delete a multi-media binding rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMultiMediaBinding"
+    ]
    }
   ],
   "wireframe": {
@@ -1027,6 +1115,58 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-338"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 12 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetMediaBindingRule",
+    "component": "modal",
+    "trigger": "Save media binding rule",
+    "body": "**Collects what `setMediaBindingRule` sends before it is called.** Required: `id`, `scopePath`. Optional: `allowedMediaTypeIds`, `mandatoryMediaTypeIds`, `optionalMediaTypeIds`, `primaryMediaTypeId`, `secondaryMediaTypeIds`, `backupMediaTypeIds`, `temporaryMediaTypeIds`, `minimumMediaRequired`, `maximumActiveMedia`, `mediaCombinations`, `simultaneousActivation`, `exclusiveActivation` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessMediaBindingRule",
+    "confirm": {
+     "label": "Save media binding rule",
+     "operation": "setMediaBindingRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "allowedMediaTypeIds",
+      "mandatoryMediaTypeIds",
+      "optionalMediaTypeIds",
+      "primaryMediaTypeId",
+      "secondaryMediaTypeIds",
+      "backupMediaTypeIds",
+      "temporaryMediaTypeIds",
+      "minimumMediaRequired",
+      "maximumActiveMedia",
+      "mediaCombinations",
+      "simultaneousActivation",
+      "exclusiveActivation",
+      "productId",
+      "ticketType",
+      "eventId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /media-binding-rules"
+   },
+   {
+    "id": "confirmDeleteMediaBindingRule",
+    "component": "confirmDialog",
+    "trigger": "Delete media binding rule",
+    "body": "**Names what `deleteMediaBindingRule` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /media-binding-rules/{ruleId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1253,6 +1393,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 14 §Detect"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save credential event propagation rule",
+       "operation": "setCredentialEventPropagationRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "provenance": "contract access.yaml PUT /credential-event-propagation-rules"
+      }
+     ]
     }
    ]
   },
@@ -1269,6 +1422,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Entitlement & Cross-Media Synchronization Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCredentialEventPropagationRule",
+    "contract": "access",
+    "purpose": "Set how a ticket lifecycle event propagates to the credential",
+    "trigger": "onAction",
+    "invalidates": [
+     "listEntitlementCrossMedia"
+    ]
    }
   ],
   "entryState": {
@@ -1283,6 +1445,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-340"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 14. 5 of 5 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetCredentialEventPropagationRule",
+    "component": "modal",
+    "trigger": "Save credential event propagation rule",
+    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessCredentialEventPropagationRule",
+    "confirm": {
+     "label": "Save credential event propagation rule",
+     "operation": "setCredentialEventPropagationRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "triggerEvent",
+      "scopePath",
+      "revocationAction",
+      "propagationTargets",
+      "monitoredConditions",
+      "propagation"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /credential-event-propagation-rules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1805,6 +1993,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "deleteMediaBindingRule": {
+  "method": "DELETE",
+  "path": "/media-binding-rules/{ruleId}",
+  "contract": "access",
+  "summary": "Delete a multi-media binding rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "listCredentialIdentityToken": {
   "method": "GET",
   "path": "/credential-identity-token",
@@ -1853,7 +2060,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "EntitlementCrossMediaSynchronizationRulesView"
  },
@@ -1866,7 +2079,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaActivationPriorityFallbackRulesView"
  },
@@ -1879,7 +2098,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaReplacementRevocationRebindingRulesView"
  },
@@ -1892,7 +2117,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaTypeCredentialTechnologyRegistryView"
  },
@@ -1905,7 +2136,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MediaTypeTechnologyLibraryView"
  },
@@ -1918,7 +2155,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MultiMediaBindingAssociationRulesView"
  },
@@ -2049,9 +2292,53 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "VirtualTicketStatusLifecycleModelView"
+ },
+ "setCredentialEventPropagationRule": {
+  "method": "PUT",
+  "path": "/credential-event-propagation-rules",
+  "contract": "access",
+  "summary": "Set how a ticket lifecycle event propagates to the credential",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessCredentialEventPropagationRule",
+  "responds": "AccessCredentialEventPropagationRule"
+ },
+ "setMediaBindingRule": {
+  "method": "PUT",
+  "path": "/media-binding-rules",
+  "contract": "access",
+  "summary": "Create or replace a multi-media binding rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessMediaBindingRule",
+  "responds": "AccessMediaBindingRule"
  },
  "setMediaReplacementRevocation": {
   "method": "PUT",
@@ -2071,6 +2358,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "MediaReplacementRevocationRebindingRulesInput",
   "responds": "MediaReplacementRevocationRebindingRulesView"
+ },
+ "setTicketStatusTransition": {
+  "method": "PUT",
+  "path": "/ticket-status-transitions",
+  "contract": "access",
+  "summary": "Set a Virtual Ticket status transition rule",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessTicketStatusTransition",
+  "responds": "AccessTicketStatusTransition"
  },
  "setVirtualTicketIdentity": {
   "method": "PUT",
@@ -2100,6 +2406,355 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessCredentialEventPropagationRule": {
+  "type": "object",
+  "x-ticvai-persistence": "access.credential_event_propagation_rule",
+  "description": "For one ticket lifecycle event, the revocation action on the credential and how the change propagates to every bound medium, with the conditions monitored (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "triggerEvent",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "triggerEvent": {
+    "type": "string",
+    "enum": [
+     "entry",
+     "exit",
+     "redemption",
+     "partialConsumption",
+     "cancellation",
+     "refund",
+     "suspension",
+     "reactivation",
+     "transfer",
+     "exchange",
+     "upgrade",
+     "reissue",
+     "expiry",
+     "replacement",
+     "manualInvalidation",
+     "fraudLock",
+     "accountSuspension"
+    ],
+    "description": "Unique per scope; one vocabulary for both screens that read it (decided 29 September, writers pass)"
+   },
+   "revocationAction": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "invalidate",
+     "suspend",
+     "replace"
+    ],
+    "description": "What happens to the credential; refund, exchange and reissue always revoke"
+   },
+   "propagationTargets": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "mobileApp",
+      "gateNetwork",
+      "offlineRevocationPackage",
+      "walletCredentialService"
+     ]
+    }
+   },
+   "monitoredConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "delayedUpdates",
+      "conflictingStates",
+      "offlineTransactionsPendingSynchronization",
+      "providerUpdateFailures",
+      "staleWalletCredentials"
+     ]
+    }
+   },
+   "propagation": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "How the Virtual Ticket state change reaches every bound medium"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessMediaBindingRule": {
+  "type": "object",
+  "x-ticvai-persistence": "access.media_binding_rule",
+  "description": "One multi-media binding rule - which media a Virtual Ticket may, must or may optionally carry, in which roles and combinations - for the scope named by its conditions (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "allowedMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "mandatoryMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "optionalMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "primaryMediaTypeId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "secondaryMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "backupMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "temporaryMediaTypeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "minimumMediaRequired": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "maximumActiveMedia": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "mediaCombinations": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Permitted media combinations"
+   },
+   "simultaneousActivation": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media that may be active at the same time, e.g. face with RFID"
+   },
+   "exclusiveActivation": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media whose activation revokes another, e.g. RFID activated revokes temporary paper"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketType": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "customerType": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "membership": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "channel": {
+    "type": "string",
+    "maxLength": 50,
+    "nullable": true
+   },
+   "ageCategory": {
+    "type": "string",
+    "maxLength": 50,
+    "nullable": true
+   },
+   "country": {
+    "type": "string",
+    "maxLength": 2,
+    "nullable": true,
+    "description": "ISO 3166-1 alpha-2"
+   },
+   "accessEnvironment": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessTicketStatusTransition": {
+  "type": "object",
+  "x-ticvai-persistence": "access.ticket_status_transition",
+  "description": "One Virtual Ticket lifecycle transition rule - from status, to status, whether allowed, whether it needs an authorised exception and where it may originate (declared 29 September, data-model close-out DM1). Seeded from states/entitlement-status.yaml when a venue is created; setTicketStatusTransition may narrow a move, never add one (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "fromStatus",
+   "toStatus",
+   "allowed",
+   "requiresAuthorizedException",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "fromStatus": {
+    "type": "string",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ]
+   },
+   "toStatus": {
+    "type": "string",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "Unique with fromStatus per scope"
+   },
+   "allowed": {
+    "type": "boolean"
+   },
+   "requiresAuthorizedException": {
+    "type": "boolean",
+    "default": false,
+    "description": "Allowed only with an authorised exception, e.g. used to active"
+   },
+   "originatingSources": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "orderManagement",
+      "cancellation",
+      "refund",
+      "upgradeConversion",
+      "ticketTransfer",
+      "membership",
+      "expiry",
+      "accessUsage",
+      "authorizedOperator",
+      "api",
+      "scheduledProcess"
+     ]
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "EntitlementCrossMediaSynchronizationRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -2222,15 +2877,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "replacementReason": {
     "type": "string",
     "enum": [
-     "lostRfidCard",
-     "damagedWristband",
-     "compromisedQr",
-     "newMobileDevice",
-     "walletCredentialReplacement",
+     "lost",
+     "stolen",
+     "damaged",
+     "compromised",
+     "customerChangedPhone",
+     "rfidFailure",
+     "wristbandReplacement",
+     "qrCompromise",
+     "walletReplacement",
      "faceReEnrollment",
-     "printedTicketReplacement",
-     "incorrectCredentialAssignment"
-    ]
+     "incorrectAssignment"
+    ],
+    "description": "The reason this rule is for, in the vocabulary of `replaceCredential`, so the rule a replacement reads is keyed the way the replacement names it (decided 29 September, writers pass). The old keys map: lostRfidCard to lost or rfidFailure, damagedWristband to wristbandReplacement, compromisedQr to qrCompromise, newMobileDevice to customerChangedPhone, walletCredentialReplacement to walletReplacement, faceReEnrollment unchanged, printedTicketReplacement to damaged, incorrectCredentialAssignment to incorrectAssignment."
    },
    "outcome": {
     "type": "string",
@@ -2308,16 +2967,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "replacementReason": {
     "type": "string",
     "enum": [
-     "lostRfidCard",
-     "damagedWristband",
-     "compromisedQr",
-     "newMobileDevice",
-     "walletCredentialReplacement",
+     "lost",
+     "stolen",
+     "damaged",
+     "compromised",
+     "customerChangedPhone",
+     "rfidFailure",
+     "wristbandReplacement",
+     "qrCompromise",
+     "walletReplacement",
      "faceReEnrollment",
-     "printedTicketReplacement",
-     "incorrectCredentialAssignment"
+     "incorrectAssignment"
     ],
-    "description": "Replacement case this policy covers"
+    "description": "The reason this rule is for, in the vocabulary of `replaceCredential`, so the rule a replacement reads is keyed the way the replacement names it (decided 29 September, writers pass). The old keys map: lostRfidCard to lost or rfidFailure, damagedWristband to wristbandReplacement, compromisedQr to qrCompromise, newMobileDevice to customerChangedPhone, walletCredentialReplacement to walletReplacement, faceReEnrollment unchanged, printedTicketReplacement to damaged, incorrectCredentialAssignment to incorrectAssignment."
    },
    "numberOfReplacements": {
     "type": "integer",

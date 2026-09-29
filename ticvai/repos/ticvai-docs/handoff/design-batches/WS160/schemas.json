@@ -1529,6 +1529,69 @@
    "noShow"
   ]
  },
+ "ResourceCostEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_cost",
+  "description": "**One cost booked against a resource**: a transfer between locations, an operating cost or a replacement. `getResourceCostAnalytics` sums these per group and window (decided 29 September, data model DM4).\n",
+  "required": [
+   "id",
+   "resourceId",
+   "kind",
+   "amount",
+   "incurredOn"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "transfer",
+     "operating",
+     "replacement"
+    ]
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "incurredOn": {
+    "type": "string",
+    "format": "date"
+   },
+   "fromVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `transfer` only, with `toVenueId`."
+   },
+   "toVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005), written at `venue` scope."
+   }
+  }
+ },
  "ResourceKind": {
   "type": "string",
   "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",

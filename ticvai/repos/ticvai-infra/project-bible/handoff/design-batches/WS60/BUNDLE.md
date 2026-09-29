@@ -1,6 +1,6 @@
 # WS60 — Ticket Media   Credential Management board 2
 
-**10 screens · 17 operations · 24 schemas · 5 permissions**
+**10 screens · 18 operations · 25 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-344` | Media Design Studio Command Center | commandCentre | 4 | 0 | — |
+| `BO-344` | Media Design Studio Command Center | commandCentre | 5 | 1 | — |
 | `BO-345` | Digital QR & Barcode Ticket Designer | configEditor | 1 | 0 | — |
 | `BO-346` | PDF, Printable & POS Ticket Designer | configEditor | 5 | 0 | — |
 | `BO-347` | Apple Wallet Pass Designer | configEditor | 1 | 0 | — |
@@ -185,13 +185,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each template should show) — counts over a population, then the population",
   "purpose": "Provide administrators with the central workspace for creating and managing all ticket and credential media templates. This should be the entry point for the entire no-code Media Design Studio.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Media Design Studio Command Center declares no operation that writes anything** — its only declared call is `listMediaDesign`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -366,6 +359,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Import supported template definition",
        "operation": "importTicketTemplate",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Archive media template",
+       "operation": "archiveMediaTemplate",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**Retires a media template** (Media Design Studio Command Center, BO-344, and the designers BO-345 to BO-349): `status: archived`.",
+       "provenance": "contract access.yaml POST /media-templates/{templateId}/archive"
       }
      ]
     }
@@ -402,6 +403,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Import",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "archiveMediaTemplate",
+    "contract": "access",
+    "purpose": "Archive a media template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMediaDesign",
+     "listTicketTemplates"
+    ]
    }
   ],
   "wireframe": {
@@ -419,6 +430,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "confirmArchiveMediaTemplate",
+    "component": "confirmDialog",
+    "trigger": "Archive media template",
+    "body": "**Names what `archiveMediaTemplate` changes and what it leaves alone**, in the consequence rather than the verb. A access media template this affects should be identified in the dialog, not just counted. **Collects what `archiveMediaTemplate` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
+    "provenance": "contract access.yaml POST /media-templates/{templateId}/archive"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2211,6 +2231,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "MultiMediaPreviewTestingApprovalPublicationInput",
   "responds": "MultiMediaPreviewTestingApprovalPublicationView"
  },
+ "archiveMediaTemplate": {
+  "method": "POST",
+  "path": "/media-templates/{templateId}/archive",
+  "contract": "access",
+  "summary": "Archive a media template",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessMediaTemplate"
+ },
  "cloneTicketTemplate": {
   "method": "POST",
   "path": "/ticket-templates/{templateId}/clone",
@@ -2277,7 +2316,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BrandingLocalizationTemplateInheritanceView"
  },
@@ -2558,6 +2603,138 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessMediaTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "access.media_template",
+  "description": "One media design template (QR/barcode, PDF/print/POS, Apple Wallet, Google Wallet, RFID/NFC card or wristband, digital card or membership) with its design document, status and effective range (declared 29 September, data-model close-out DM1). A designer write on a template `pendingApproval` or `scheduled` is refused `409 template-in-flight`; archiveMediaTemplate archives one (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "name",
+   "designer",
+   "mediaType",
+   "status",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The templateId of the designer operations"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "designer": {
+    "type": "string",
+    "enum": [
+     "digitalBarcode",
+     "pdfPrintablePos",
+     "appleWallet",
+     "googleWallet",
+     "rfidNfcCard",
+     "digitalCardMembership"
+    ],
+    "description": "Which designer owns the design document"
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "qrTicket",
+     "dynamicQrTicket",
+     "barcodeTicket",
+     "mobileTicket",
+     "pdf",
+     "a4A5",
+     "thermal",
+     "pos",
+     "customPrint",
+     "appleWallet",
+     "googleWallet",
+     "rfidCard",
+     "rfidWristband",
+     "nfcCard",
+     "nfcWristband",
+     "membershipCard",
+     "customWearable"
+    ]
+   },
+   "brandId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "nullable": true
+   },
+   "language": {
+    "type": "string",
+    "maxLength": 35,
+    "nullable": true,
+    "description": "BCP 47 tag"
+   },
+   "design": {
+    "type": "object",
+    "description": "The working design document - the writable body of the designer operation named by designer, less templateId (jsonb)"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "scheduled",
+     "published",
+     "archived"
+    ],
+    "default": "draft"
+   },
+   "currentVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Latest published version (access.media_template_version)"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AppleWalletPassDesignerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

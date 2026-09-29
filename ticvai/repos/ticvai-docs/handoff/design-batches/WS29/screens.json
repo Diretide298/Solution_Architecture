@@ -282,6 +282,22 @@
        "kind": "secondaryButton",
        "label": "Custom Membership",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend membership product",
+       "operation": "approveMembershipProductValidation",
+       "permission": "PLATFORM_CELL_MANAGE",
+       "notes": "Quick action: sends `action: suspend` with a `reason`. Allowed only on an `active` version; selling stops on every channel at once and members already holding it keep their entitlements until their own expiry (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /membership-product-validation"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reinstate membership product",
+       "operation": "approveMembershipProductValidation",
+       "permission": "PLATFORM_CELL_MANAGE",
+       "notes": "Quick action: sends `action: reinstate`, moving a `suspended` version back to `active`; refused once its `effectiveTo` has passed (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /membership-product-validation"
       }
      ]
     }
@@ -300,6 +316,15 @@
     "contract": "subscription",
     "purpose": "Membership & Annual Pass Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "approveMembershipProductValidation",
+    "contract": "subscription",
+    "purpose": "Membership Product Validation, Approval, Publication & Versioning",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMembershipAnnualPass"
+    ]
    }
   ],
   "entryState": {
@@ -319,6 +344,16 @@
    "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-284"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 4. 29 of 29 labels bound to a contract property; 45 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Monthly Membership, Fixed-Term Membership, Corporate Membership, Family Membership, Individual Membership, Student Membership, VIP Membership, Custom Membership … are choices sent by `listMembershipAnnualPass`.",
+  "overlays": [
+   {
+    "id": "confirmSuspendMembershipProduct",
+    "component": "confirmDialog",
+    "trigger": "Suspend membership product",
+    "body": "**Names what suspending stops and what it leaves alone**: the membership product and version, every channel it stops selling on, and that members already holding it keep their entitlements until their own expiry. **Collects what `approveMembershipProductValidation` sends before it is called.** Required: `membershipCode`, `action` (`suspend`), `reason`.",
+    "bindsTo": "MembershipProductValidationApprovalPublicationVersioInput",
+    "provenance": "contract subscription.yaml PUT /membership-product-validation"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1167,6 +1202,20 @@
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 11 §Maintain counters such as"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save membership usage policy",
+       "operation": "setMembershipUsagePolicy",
+       "permission": "PLATFORM_CELL_MANAGE",
+       "notes": "The writer for the rules BO-289 shows through listMembershipUsageVisit: visit and admission limits, re-entry, reservations, no-show treatment, cancellations and guest usage for one membership product version, one row of subscription.membership_usage_policy per version (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /membership-usage-policy"
+      }
+     ]
     }
    ]
   },
@@ -1196,6 +1245,16 @@
     "contract": "catalogue",
     "purpose": "The membership plan templates whose usage rules are set",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMembershipUsagePolicy",
+    "contract": "subscription",
+    "purpose": "Save a membership product's usage, visit and consumption rules",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMembershipUsageVisit",
+     "listEntitlementTemplates"
+    ]
    }
   ],
   "entryState": {
@@ -1214,6 +1273,43 @@
    "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-289"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 11. 1 of 1 labels bound to a contract property; 20 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetMembershipUsagePolicy",
+    "component": "modal",
+    "trigger": "Save membership usage policy",
+    "body": "**Collects what `setMembershipUsagePolicy` sends before it is called.** Required: `membershipCode`, `reEntryPolicy`, `reservationRequirement`. Optional: `tier`, `maximumVisitsPerDay`, `maximumAdmissionsPerPeriod`, `admissionPeriod`, `reEntryCooldownMinutes`, `walkInAllowed`, `maximumAdvanceBookingDays`, `maximumActiveFutureReservations`, `concurrentReservations`, `noShowTreatment`, `noShowThreshold`, `noShowWindowDays` and 4 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MembershipUsagePolicyInput",
+    "confirm": {
+     "label": "Save membership usage policy",
+     "operation": "setMembershipUsagePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "membershipCode",
+      "reEntryPolicy",
+      "reservationRequirement",
+      "tier",
+      "maximumVisitsPerDay",
+      "maximumAdmissionsPerPeriod",
+      "admissionPeriod",
+      "reEntryCooldownMinutes",
+      "walkInAllowed",
+      "maximumAdvanceBookingDays",
+      "maximumActiveFutureReservations",
+      "concurrentReservations",
+      "noShowTreatment",
+      "noShowThreshold",
+      "noShowWindowDays",
+      "noShowRestrictionDays",
+      "cancellationLimit",
+      "guestUsage"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /membership-usage-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1584,6 +1680,14 @@
        "operation": "publishChannelAvailability",
        "notes": "**Names the membership products, the channels they go on or come off, and from when**, before it runs. A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "contract catalogue.yaml PUT /channel-availability (authored: required by check-screens)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save membership commercial config",
+       "operation": "setMembershipCommercialConfig",
+       "permission": "PLATFORM_CELL_MANAGE",
+       "notes": "The writer for the commercial columns BO-291 shows through listMembershipCommercialPricing: `basePricingProfile`, `taxProfile`, `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`, `paymentTerms` and `salesPeriod` on subscription.membership_product (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /membership-commercial-config"
       }
      ]
     }
@@ -1621,6 +1725,16 @@
     "contract": "catalogue",
     "purpose": "The price lists a membership is priced on",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMembershipCommercialConfig",
+    "contract": "subscription",
+    "purpose": "Save a membership product's commercial references, payment eligibility and sales period",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMembershipCommercialPricing",
+     "listPriceLists"
+    ]
    }
   ],
   "wireframe": {
@@ -1638,6 +1752,33 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetMembershipCommercialConfig",
+    "component": "modal",
+    "trigger": "Save membership commercial config",
+    "body": "**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`, `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MembershipCommercialConfigInput",
+    "confirm": {
+     "label": "Save membership commercial config",
+     "operation": "setMembershipCommercialConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "membershipCode",
+      "basePricingProfile",
+      "taxProfile",
+      "salesPeriod",
+      "feeProfile",
+      "upgradePricePolicy",
+      "promotionalPricingEligibility",
+      "paymentTerms"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /membership-commercial-config"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

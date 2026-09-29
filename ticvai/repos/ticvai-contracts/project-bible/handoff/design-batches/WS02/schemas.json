@@ -1,4 +1,82 @@
 {
+ "AccessJourneySequenceRule": {
+  "type": "object",
+  "x-ticvai-persistence": "access.journey_sequence_rule",
+  "description": "One anti-passback / journey sequence rule - the level it applies at, the time window, the required order of scans and what a violation leads to (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "scope"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "credential",
+     "guest",
+     "gate",
+     "attraction",
+     "park",
+     "venue"
+    ],
+    "description": "Level the anti-passback check applies at"
+   },
+   "windowMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "requiredSequence": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Ordered steps, e.g. entry, exit, reEntry"
+   },
+   "violationResponses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "deny",
+      "warning",
+      "referToOperator",
+      "requireSupervisor",
+      "allowOverride",
+      "triggerSecurityAlert"
+     ]
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessValidityTimeRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

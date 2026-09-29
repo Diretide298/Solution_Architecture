@@ -1,6 +1,6 @@
 # WS03 — Access Control board 3
 
-**10 screens · 12 operations · 12 schemas · 3 permissions**
+**10 screens · 17 operations · 18 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, GUEST_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-164` | Digital Credential Security Command Center | commandCentre | 3 | 0 | — |
+| `BO-164` | Digital Credential Security Command Center | commandCentre | 4 | 1 | — |
 | `BO-165` | Dynamic QR Security Profile Builder | configEditor | 1 | 0 | — |
 | `BO-166` | Credential Activation & Display Rules | listDetail | 2 | 0 | — |
-| `BO-167` | Device Binding & Session Security | listDetail | 1 | 0 | — |
+| `BO-167` | Device Binding & Session Security | listDetail | 3 | 2 | — |
 | `BO-168` | BLE Beacon & Geofence Configuration | configEditor | 1 | 0 | — |
-| `BO-169` | Credential Transfer & Rebinding | configEditor | 1 | 0 | — |
-| `BO-170` | Credential Revocation & Lifecycle Events | listDetail | 1 | 0 | — |
-| `BO-171` | Offline Cryptographic Validation Profile | listDetail | 1 | 0 | — |
+| `BO-169` | Credential Transfer & Rebinding | configEditor | 2 | 1 | — |
+| `BO-170` | Credential Revocation & Lifecycle Events | listDetail | 2 | 1 | — |
+| `BO-171` | Offline Cryptographic Validation Profile | listDetail | 3 | 1 | — |
 | `BO-172` | Embedded Entitlement Payload Designer | listDetail | 1 | 0 | — |
 | `BO-173` | Credential Security Simulation, Audit & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-166, BO-167, BO-170, BO-171, BO-172, BO-173 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-166, BO-170, BO-171, BO-172, BO-173 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -279,6 +279,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save device binding policy",
+       "operation": "setDeviceBindingPolicy",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Device Binding & Session Security** (BO-167): how many devices a mobile credential may be active on, how many concurrent sessions, and what a device change needs.",
+       "provenance": "contract access.yaml PUT /device-binding-policy"
+      }
+     ]
     }
    ]
   },
@@ -312,6 +326,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "listDigitalCredentialSecurity",
      "listCredentialSecurity"
     ]
+   },
+   {
+    "operationId": "setDeviceBindingPolicy",
+    "contract": "access",
+    "purpose": "Set the device binding policy of a venue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDigitalCredentialSecurity",
+     "listCredentialSecurity"
+    ]
    }
   ],
   "entryState": {
@@ -326,6 +350,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-164"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 29. 15 of 15 labels bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDeviceBindingPolicy",
+    "component": "modal",
+    "trigger": "Save device binding policy",
+    "body": "**Collects what `setDeviceBindingPolicy` sends before it is called.** Required: `venueId`. Optional: `maximumActiveDevices`, `concurrentSessions`, `deviceChangePolicy`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DeviceBindingPolicyInput",
+    "confirm": {
+     "label": "Save device binding policy",
+     "operation": "setDeviceBindingPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "maximumActiveDevices",
+      "concurrentSessions",
+      "deviceChangePolicy"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /device-binding-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -747,6 +794,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 33 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save device binding policy",
+       "operation": "setDeviceBindingPolicy",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Device Binding & Session Security** (BO-167): how many devices a mobile credential may be active on, how many concurrent sessions, and what a device change needs.",
+       "provenance": "contract access.yaml PUT /device-binding-policy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release credential device",
+       "operation": "releaseCredentialDevice",
+       "permission": "GUEST_MANAGE",
+       "notes": "**A service agent frees a credential from a device** (a lost phone, a device change that needs an operator or supervisor under the policy): sets `deactivatedAt` on the binding, so the guest can bind the credential on another device.",
+       "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
+      }
+     ]
     }
    ]
   },
@@ -763,6 +832,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Device Binding & Session Security",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDeviceBindingPolicy",
+    "contract": "access",
+    "purpose": "Set the device binding policy of a venue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDeviceBindingSession"
+    ]
+   },
+   {
+    "operationId": "releaseCredentialDevice",
+    "contract": "access",
+    "purpose": "Release a credential from a device",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDeviceBindingSession"
+    ]
    }
   ],
   "entryState": {
@@ -773,6 +860,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "DeviceBindingSessionSecurityView.appInstallation",
     "DeviceBindingSessionSecurityView.os",
     "DeviceBindingSessionSecurityView.registrationDate"
+   ],
+   "params": [
+    {
+     "name": "bindingId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -782,6 +876,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-167"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 33. 7 of 8 labels bound to a contract property; 8 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDeviceBindingPolicy",
+    "component": "modal",
+    "trigger": "Save device binding policy",
+    "body": "**Collects what `setDeviceBindingPolicy` sends before it is called.** Required: `venueId`. Optional: `maximumActiveDevices`, `concurrentSessions`, `deviceChangePolicy`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DeviceBindingPolicyInput",
+    "confirm": {
+     "label": "Save device binding policy",
+     "operation": "setDeviceBindingPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "maximumActiveDevices",
+      "concurrentSessions",
+      "deviceChangePolicy"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /device-binding-policy"
+   },
+   {
+    "id": "formReleaseCredentialDevice",
+    "component": "modal",
+    "trigger": "Release credential device",
+    "body": "**Collects what `releaseCredentialDevice` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release credential device",
+     "operation": "releaseCredentialDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1056,6 +1190,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 35 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Release credential device",
+       "operation": "releaseCredentialDevice",
+       "permission": "GUEST_MANAGE",
+       "notes": "**A service agent frees a credential from a device** (a lost phone, a device change that needs an operator or supervisor under the policy): sets `deactivatedAt` on the binding, so the guest can bind the credential on another device.",
+       "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
+      }
+     ]
     }
    ]
   },
@@ -1071,6 +1219,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Credential Transfer & Rebinding",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "releaseCredentialDevice",
+    "contract": "access",
+    "purpose": "Release a credential from a device",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCredentialTransferRebinding"
+    ]
    }
   ],
   "wireframe": {
@@ -1080,6 +1237,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-169"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 35. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formReleaseCredentialDevice",
+    "component": "modal",
+    "trigger": "Release credential device",
+    "body": "**Collects what `releaseCredentialDevice` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release credential device",
+     "operation": "releaseCredentialDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "bindingId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1178,6 +1363,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 36 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save credential event propagation rule",
+       "operation": "setCredentialEventPropagationRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "provenance": "contract access.yaml PUT /credential-event-propagation-rules"
+      }
+     ]
     }
    ]
   },
@@ -1194,6 +1392,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Credential Revocation & Lifecycle Events",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCredentialEventPropagationRule",
+    "contract": "access",
+    "purpose": "Set how a ticket lifecycle event propagates to the credential",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCredentialRevocationLifecycle"
+    ]
    }
   ],
   "entryState": {
@@ -1208,6 +1415,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-170"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 36. 5 of 5 labels bound to a contract property; 14 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetCredentialEventPropagationRule",
+    "component": "modal",
+    "trigger": "Save credential event propagation rule",
+    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessCredentialEventPropagationRule",
+    "confirm": {
+     "label": "Save credential event propagation rule",
+     "operation": "setCredentialEventPropagationRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "triggerEvent",
+      "scopePath",
+      "revocationAction",
+      "propagationTargets",
+      "monitoredConditions",
+      "propagation"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /credential-event-propagation-rules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1297,6 +1530,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save offline policy",
+       "operation": "setOfflinePolicy",
+       "permission": "TENANT_CONFIGURE",
+       "notes": "Board 5 of the client's POS set, and **one of only two things in 36 board screens the package could not do.** ADR-0013 makes the POS local-first and nothing configured the policy.",
+       "provenance": "contract tenancy.yaml PUT /offline-policy"
+      }
+     ]
     }
    ]
   },
@@ -1309,10 +1556,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "setGateOfflinePolicy",
+    "purpose": "Save the gate offline validation, revocation cache and degraded-mode policy (writers pass, 29 September)",
+    "contract": "access"
+   },
+   {
     "operationId": "listOfflineCryptographicValidation",
     "contract": "access",
     "purpose": "Offline Cryptographic Validation Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setOfflinePolicy",
+    "contract": "tenancy",
+    "purpose": "What a workstation may do with no network, and for how long",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOfflineCryptographicValidation"
+    ]
    }
   ],
   "entryState": {
@@ -1327,6 +1588,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-171"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetOfflinePolicy",
+    "component": "modal",
+    "trigger": "Save offline policy",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "OfflinePolicy",
+    "confirm": {
+     "label": "Save offline policy",
+     "operation": "setOfflinePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scopePath",
+      "id",
+      "maxOfflineHours",
+      "allowedOffline",
+      "offlineValueCeiling",
+      "offlineTransactionCeiling",
+      "onCeilingBreach",
+      "requiresManagerToExtend"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /offline-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1612,7 +1900,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CredentialActivationDisplayRulesView"
  },
@@ -1625,7 +1919,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CredentialRevocationLifecycleEventsView"
  },
@@ -1701,7 +2001,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CredentialTransferRebindingView"
  },
@@ -1762,9 +2068,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OfflineCryptographicValidationProfileView"
+ },
+ "releaseCredentialDevice": {
+  "method": "POST",
+  "path": "/device-bindings/{bindingId}/release",
+  "contract": "access",
+  "summary": "Release a credential from a device",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessDeviceBinding"
  },
  "setBleBeaconGeofence": {
   "method": "PUT",
@@ -1804,6 +2135,44 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "CredentialActivationDisplayRulesInput",
   "responds": "CredentialActivationDisplayRulesView"
  },
+ "setCredentialEventPropagationRule": {
+  "method": "PUT",
+  "path": "/credential-event-propagation-rules",
+  "contract": "access",
+  "summary": "Set how a ticket lifecycle event propagates to the credential",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessCredentialEventPropagationRule",
+  "responds": "AccessCredentialEventPropagationRule"
+ },
+ "setDeviceBindingPolicy": {
+  "method": "PUT",
+  "path": "/device-binding-policy",
+  "contract": "access",
+  "summary": "Set the device binding policy of a venue",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceBindingPolicyInput",
+  "responds": "AccessCredentialPolicy"
+ },
  "setDynamicSecurityProfile": {
   "method": "PUT",
   "path": "/dynamic-security-profile",
@@ -1841,6 +2210,44 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "EmbeddedEntitlementPayloadDesignerInput",
   "responds": "EmbeddedEntitlementPayloadDesignerView"
+ },
+ "setGateOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policies",
+  "contract": "access",
+  "summary": "Set the offline policy of a venue",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessOfflinePolicy",
+  "responds": "AccessOfflinePolicy"
+ },
+ "setOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policy",
+  "contract": "tenancy",
+  "summary": "What a workstation may do with no network, and for how long",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OfflinePolicy",
+  "responds": "OfflinePolicy"
  }
 }
 ```
@@ -1851,6 +2258,544 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessCredentialEventPropagationRule": {
+  "type": "object",
+  "x-ticvai-persistence": "access.credential_event_propagation_rule",
+  "description": "For one ticket lifecycle event, the revocation action on the credential and how the change propagates to every bound medium, with the conditions monitored (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "triggerEvent",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "triggerEvent": {
+    "type": "string",
+    "enum": [
+     "entry",
+     "exit",
+     "redemption",
+     "partialConsumption",
+     "cancellation",
+     "refund",
+     "suspension",
+     "reactivation",
+     "transfer",
+     "exchange",
+     "upgrade",
+     "reissue",
+     "expiry",
+     "replacement",
+     "manualInvalidation",
+     "fraudLock",
+     "accountSuspension"
+    ],
+    "description": "Unique per scope; one vocabulary for both screens that read it (decided 29 September, writers pass)"
+   },
+   "revocationAction": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "invalidate",
+     "suspend",
+     "replace"
+    ],
+    "description": "What happens to the credential; refund, exchange and reissue always revoke"
+   },
+   "propagationTargets": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "mobileApp",
+      "gateNetwork",
+      "offlineRevocationPackage",
+      "walletCredentialService"
+     ]
+    }
+   },
+   "monitoredConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "delayedUpdates",
+      "conflictingStates",
+      "offlineTransactionsPendingSynchronization",
+      "providerUpdateFailures",
+      "staleWalletCredentials"
+     ]
+    }
+   },
+   "propagation": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "How the Virtual Ticket state change reaches every bound medium"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessCredentialPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.credential_policy",
+  "description": "One credential policy of one kind for a venue - activation and display rule, transfer policy, Virtual Ticket identity configuration or device binding policy; merges the proposed credential_display_rule, transfer_policy and virtual_ticket_config (declared 29 September, data-model close-out DM1). The deviceBinding row is written by setDeviceBindingPolicy (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "kind",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The ruleId (display rule) or policyId (transfer policy) of the operations"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "activationDisplay",
+     "transfer",
+     "virtualTicketIdentity",
+     "deviceBinding"
+    ],
+    "description": "Which policy this row is; the columns of the other kinds stay null"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for activationDisplay and virtualTicketIdentity (one virtualTicketIdentity row per venue)"
+   },
+   "beforeActivationDisplay": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "hideQr",
+      "blurQr",
+      "showCountdown",
+      "showAvailableAtVenue",
+      "showVenueDirections"
+     ]
+    },
+    "description": "activationDisplay - what the guest sees before the credential activates"
+   },
+   "activeDisplay": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicQr",
+      "activationTimer",
+      "credentialStatus",
+      "remainingEntitlements"
+     ]
+    },
+    "description": "activationDisplay - what the guest sees once it is active"
+   },
+   "activationTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "activationDisplay - what activates the credential, e.g. beacon proximity, geofence entry, time before admission"
+   },
+   "transferAllowed": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "transfer"
+   },
+   "numberOfTransfers": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "transfer"
+   },
+   "beforeFirstValidationOnly": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "transfer"
+   },
+   "requireRecipientAccount": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "transfer"
+   },
+   "requireOtp": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "transfer"
+   },
+   "requireAcceptance": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "transfer"
+   },
+   "returnToSender": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "transfer"
+   },
+   "transferDeadlineHours": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "transfer - hours before the visit after which transfer closes"
+   },
+   "cancelPendingAllowed": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "transfer"
+   },
+   "transferAuditRequired": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "transfer"
+   },
+   "idGenerationPattern": {
+    "type": "string",
+    "nullable": true,
+    "description": "virtualTicketIdentity - Virtual Ticket ID format: prefix, suffix and length"
+   },
+   "ticketClassification": {
+    "type": "string",
+    "nullable": true,
+    "description": "virtualTicketIdentity"
+   },
+   "ticketOwnershipModel": {
+    "type": "string",
+    "nullable": true,
+    "description": "virtualTicketIdentity"
+   },
+   "holderAssignmentRequirements": {
+    "type": "string",
+    "nullable": true,
+    "description": "virtualTicketIdentity"
+   },
+   "transferabilityReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "virtualTicketIdentity"
+   },
+   "validityModel": {
+    "type": "string",
+    "nullable": true,
+    "description": "virtualTicketIdentity"
+   },
+   "consumptionModel": {
+    "type": "string",
+    "nullable": true,
+    "description": "virtualTicketIdentity"
+   },
+   "entitlementModel": {
+    "type": "string",
+    "nullable": true,
+    "description": "virtualTicketIdentity"
+   },
+   "mediaRequirements": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "virtualTicketIdentity - media types a ticket of this configuration must carry"
+   },
+   "maximumActiveDevices": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "deviceBinding"
+   },
+   "concurrentSessions": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "deviceBinding"
+   },
+   "deviceChangePolicy": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "notAllowed",
+     "allowedBeforeFirstUse",
+     "otpVerificationRequired",
+     "operatorApprovalRequired",
+     "supervisorApprovalRequired"
+    ],
+    "description": "deviceBinding"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessDeviceBinding": {
+  "type": "object",
+  "x-ticvai-persistence": "access.device_binding",
+  "description": "One guest device bound to a credential, with its registration, last activation and security status; the binding policy in force is a deviceBinding row of access.credential_policy (declared 29 September, data-model close-out DM1). Written by bindCredentialDevice (the guest app) and releaseCredentialDevice; securityStatus is set by the sharing detection job (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "entitlementId",
+   "deviceId",
+   "registeredAt",
+   "securityStatus",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest (pii.subject)"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "credentialBindingId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "deviceReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "appInstallationId": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "os": {
+    "type": "string",
+    "maxLength": 50,
+    "nullable": true
+   },
+   "registeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastActivatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastKnownVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "securityStatus": {
+    "type": "string",
+    "enum": [
+     "normal",
+     "suspicious",
+     "blocked"
+    ],
+    "default": "normal"
+   },
+   "deactivatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Set when the binding is removed (deactivation, or a transfer of the credential)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessOfflinePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.offline_policy",
+  "description": "The offline policy of one venue: what gates validate locally and for how long, how old the revocation cache may get, and how devices step down through degraded modes. Merges access.offline_validation_profile, access.revocation_cache_policy and access.degraded_mode_policy (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "maxOfflineDurationHours": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Hours a gate may validate offline"
+   },
+   "offlineChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "credentialAuthenticity",
+      "digitalSignature",
+      "ticketId",
+      "venue",
+      "park",
+      "zone",
+      "visitDate",
+      "timeWindow",
+      "credentialStatusSnapshot",
+      "ticketType",
+      "guestCategory",
+      "seat",
+      "timeslot",
+      "reservation",
+      "entitlements",
+      "reEntryPermissions",
+      "validityPeriod"
+     ]
+    },
+    "description": "What a gate may validate locally"
+   },
+   "afterThresholdBehavior": {
+    "type": "string",
+    "enum": [
+     "continueRestrictedValidation",
+     "operatorWarning",
+     "supervisorMode",
+     "failClosed",
+     "fallback"
+    ],
+    "nullable": true
+   },
+   "revocationTriggerEvents": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fraudLock",
+      "refund",
+      "cancellation",
+      "lostCredential",
+      "transfer",
+      "reissue",
+      "manualInvalidation"
+     ]
+    },
+    "description": "Events that push an invalidation into the offline cache"
+   },
+   "revocationMaxAllowedAgeMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Maximum allowed revocation cache age"
+   },
+   "revocationStalenessAction": {
+    "type": "string",
+    "enum": [
+     "continue",
+     "continueWithWarning",
+     "restrictedProductsOnly",
+     "supervisorMode",
+     "denySelectedCredentialClasses",
+     "failClosed"
+    ],
+    "nullable": true,
+    "description": "What devices do when the cache is older than the maximum allowed age"
+   },
+   "operatingModes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "online",
+      "degraded",
+      "edgeMode",
+      "localOffline",
+      "unsafeExpired"
+     ]
+    },
+    "description": "Operating modes a device moves through as connectivity fails"
+   },
+   "centralUnavailableAfterSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Seconds without central services before switching to edge mode"
+   },
+   "edgeUnavailableAfterSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Seconds without the venue edge before switching to local offline"
+   },
+   "automaticSwitch": {
+    "type": "boolean",
+    "default": true,
+    "description": "Switch modes automatically without stopping guest flow"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "BleBeaconGeofenceConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -2221,6 +3166,41 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "transferAllowed"
   ]
  },
+ "DeviceBindingPolicyInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; written as the deviceBinding row of access.credential_policy (declared 29 September, writers pass)",
+  "required": [
+   "venueId"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "maximumActiveDevices": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "Devices the credential may be active on at once"
+   },
+   "concurrentSessions": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1
+   },
+   "deviceChangePolicy": {
+    "type": "string",
+    "enum": [
+     "notAllowed",
+     "allowedBeforeFirstUse",
+     "otpVerificationRequired",
+     "operatorApprovalRequired",
+     "supervisorApprovalRequired"
+    ],
+    "default": "otpVerificationRequired"
+   }
+  }
+ },
  "DynamicQrSecurityProfileBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -2474,6 +3454,82 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "maxOfflineDurationHours",
    "afterThresholdBehavior"
   ]
+ },
+ "OfflinePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.offline_policy",
+  "description": "Board 5 of the client's POS set. **ADR-0013 makes the POS local-first and nothing configured the policy** — one of only two things in 36 board screens the package genuinely could not do.\nCF-115 reframed offline into three data classes: catalogue and policy always local, contended inventory leased, transactional facts journalled. **This is where a venue says how far that goes for them.**\n**One per scope node, keyed on `scopePath`** (pull audit R162). `id` is server-owned and absent where `getOfflinePolicy` returns the defaults for a node with nothing saved.\n**The `minimum` and `maximum` on each field are proposed, client to correct (decided 28 September, audit R129).** A value outside them is refused `400`, `errors[]` naming the field.\n",
+  "required": [
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
+    "description": "**The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body names its target here, because the path does not.\n"
+   },
+   "maxOfflineHours": {
+    "type": "integer",
+    "default": 24,
+    "minimum": 1,
+    "maximum": 72,
+    "description": "**After which the workstation refuses to sell rather than keep journalling.** A till three days offline holding 900 unsynced sales is a reconciliation nobody can do and a fraud nobody can detect. Bounds 1 to 72 hours: proposed, client to correct (audit R129).\n"
+   },
+   "allowedOffline": {
+    "type": "array",
+    "description": "**What may happen with no network**, by data class. Selling from a cached catalogue is safe; issuing a refund is not, because the original sale cannot be verified.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "sale",
+      "refund",
+      "exchange",
+      "entitlementIssue",
+      "entitlementValidate",
+      "loyaltyAccrual",
+      "loyaltyRedemption",
+      "walletSpend",
+      "priceOverride",
+      "discount",
+      "voidLine",
+      "noSale"
+     ]
+    }
+   },
+   "offlineValueCeiling": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above zero, and in the currency of the venue the policy resolves to; a ceiling in another currency is refused `400` (decided 28 September, audit R129).\n"
+   },
+   "offlineTransactionCeiling": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "maximum": 5000,
+    "description": "**A ceiling on count as well as value.** Nine hundred small sales and one large one are different risks, and a value ceiling alone catches only the second. Bounds 1 to 5,000: proposed, client to correct (audit R129).\n"
+   },
+   "onCeilingBreach": {
+    "type": "string",
+    "enum": [
+     "warn",
+     "blockNewSales",
+     "blockAll"
+    ],
+    "default": "blockNewSales"
+   },
+   "requiresManagerToExtend": {
+    "type": "boolean",
+    "default": true
+   }
+  }
  },
  "Page": {
   "type": "object",

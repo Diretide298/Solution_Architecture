@@ -252,6 +252,20 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 70 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save access device",
+       "operation": "updateAccessDevice",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "Changes where a registered device sits and what it is: name, hardware model, area, access point, lane, group label, network references, capabilities and `isActive`.",
+       "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+      }
+     ]
     }
    ]
   },
@@ -291,6 +305,16 @@
     "contract": "access",
     "purpose": "The gates and turnstiles whose mode is set",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateAccessDevice",
+    "contract": "access",
+    "purpose": "Replace a registered device's registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDeviceGate",
+     "listAccessPoints"
+    ]
    }
   ],
   "entryState": {
@@ -306,6 +330,11 @@
     {
      "name": "accessPointId",
      "from": "navigation"
+    },
+    {
+     "name": "deviceId",
+     "from": "navigation",
+     "optional": true
     }
    ]
   },
@@ -316,6 +345,43 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-194"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 70. 21 of 21 labels bound to a contract property; 21 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateAccessDevice",
+    "component": "modal",
+    "trigger": "Save access device",
+    "body": "**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`, `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`, `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`, `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessAccessDevice",
+    "confirm": {
+     "label": "Save access device",
+     "operation": "updateAccessDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "hardwareType",
+      "provisioningStage",
+      "isActive",
+      "scopePath",
+      "hardwareModelId",
+      "name",
+      "serialNumber",
+      "accessAreaId",
+      "accessPointId",
+      "gateLaneId",
+      "deviceGroupId",
+      "ipNetworkReference",
+      "controllerReference",
+      "installationDate",
+      "lifecycleStatus",
+      "capabilities"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -405,6 +471,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save hardware model",
+       "operation": "setHardwareModel",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "**The write behind Device Type & Hardware Library** (BO-195): one hardware model (manufacturer, model, category, type, technologies, connectivity, capability flags, firmware), independent of the devices deployed.",
+       "provenance": "contract access.yaml PUT /hardware-models"
+      }
+     ]
     }
    ]
   },
@@ -421,6 +501,15 @@
     "contract": "access",
     "purpose": "Device Type & Hardware Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setHardwareModel",
+    "contract": "access",
+    "purpose": "Create or replace a hardware model in the library",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDeviceTypeHardware"
+    ]
    }
   ],
   "entryState": {
@@ -435,6 +524,40 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-195"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 72. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetHardwareModel",
+    "component": "modal",
+    "trigger": "Save hardware model",
+    "body": "**Collects what `setHardwareModel` sends before it is called.** Required: `id`, `manufacturer`, `model`, `deviceCategory`, `hardwareType`, `scopePath`. Optional: `supportedTechnologies`, `connectivity`, `offlineCapability`, `screenCapability`, `soundCapability`, `lightCapability`, `relayControllerSupport`, `paymentCapability`, `firmwareSoftwareInformation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessHardwareModel",
+    "confirm": {
+     "label": "Save hardware model",
+     "operation": "setHardwareModel"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "manufacturer",
+      "model",
+      "deviceCategory",
+      "hardwareType",
+      "scopePath",
+      "supportedTechnologies",
+      "connectivity",
+      "offlineCapability",
+      "screenCapability",
+      "soundCapability",
+      "lightCapability",
+      "relayControllerSupport",
+      "paymentCapability",
+      "firmwareSoftwareInformation"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /hardware-models"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -492,7 +615,8 @@
      "provenance": "flow F116 step 4→5",
      "operation": "listPhysicalDeviceRegistration",
      "carries": [
-      "accessPointId"
+      "accessPointId",
+      "deviceId"
      ]
     }
    ]
@@ -570,6 +694,28 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 73 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Register access device",
+       "operation": "registerAccessDevice",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "**The write behind Physical Device Registration & Provisioning** (BO-196): registers one deployed device (a turnstile, reader, handheld, podium unit or beacon) against a hardware model and places it in the topology.",
+       "provenance": "contract access.yaml POST /access-devices"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save access device",
+       "operation": "updateAccessDevice",
+       "permission": "DEVICE_CONFIGURE",
+       "notes": "Changes where a registered device sits and what it is: name, hardware model, area, access point, lane, group label, network references, capabilities and `isActive`.",
+       "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+      }
+     ]
     }
    ]
   },
@@ -585,6 +731,24 @@
     "contract": "access",
     "purpose": "Physical Device Registration & Provisioning",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "registerAccessDevice",
+    "contract": "access",
+    "purpose": "Register a physical access-control device",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPhysicalDeviceRegistration"
+    ]
+   },
+   {
+    "operationId": "updateAccessDevice",
+    "contract": "access",
+    "purpose": "Replace a registered device's registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPhysicalDeviceRegistration"
+    ]
    }
   ],
   "wireframe": {
@@ -594,6 +758,86 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-196"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 73. 0 of 0 labels bound to a contract property; 12 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formRegisterAccessDevice",
+    "component": "modal",
+    "trigger": "Register access device",
+    "body": "**Collects what `registerAccessDevice` sends before it is called.** Required: `id`, `venueId`, `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`, `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`, `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessAccessDevice",
+    "confirm": {
+     "label": "Register access device",
+     "operation": "registerAccessDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "hardwareType",
+      "provisioningStage",
+      "isActive",
+      "scopePath",
+      "hardwareModelId",
+      "name",
+      "serialNumber",
+      "accessAreaId",
+      "accessPointId",
+      "gateLaneId",
+      "deviceGroupId",
+      "ipNetworkReference",
+      "controllerReference",
+      "installationDate",
+      "lifecycleStatus",
+      "capabilities"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access-devices"
+   },
+   {
+    "id": "formUpdateAccessDevice",
+    "component": "modal",
+    "trigger": "Save access device",
+    "body": "**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`, `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`, `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`, `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessAccessDevice",
+    "confirm": {
+     "label": "Save access device",
+     "operation": "updateAccessDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "hardwareType",
+      "provisioningStage",
+      "isActive",
+      "scopePath",
+      "hardwareModelId",
+      "name",
+      "serialNumber",
+      "accessAreaId",
+      "accessPointId",
+      "gateLaneId",
+      "deviceGroupId",
+      "ipNetworkReference",
+      "controllerReference",
+      "installationDate",
+      "lifecycleStatus",
+      "capabilities"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /access-devices/{deviceId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1354,6 +1598,20 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 79 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save gate mode policy",
+       "operation": "setGateModePolicy",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Gate Modes, Free Spin & Emergency Controls** (BO-201): for `freeFlow` or `dropArm` (R221 vocabulary), who may activate it, on which gate group, whether a reason is required, the emergency code, notification and whether activation opens an incident.",
+       "provenance": "contract access.yaml PUT /gate-mode-policies"
+      }
+     ]
     }
    ]
   },
@@ -1369,6 +1627,15 @@
     "contract": "access",
     "purpose": "Gate Modes, Free Spin & Emergency Controls",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setGateModePolicy",
+    "contract": "access",
+    "purpose": "Set a policy for a non-standard gate mode",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGateModeFree"
+    ]
    }
   ],
   "wireframe": {
@@ -1378,6 +1645,35 @@
    "workshopBoard": "wireframes/WS23 Access Control Board 6.dc.html#bo-201"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 79. 0 of 0 labels bound to a contract property; 6 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetGateModePolicy",
+    "component": "modal",
+    "trigger": "Save gate mode policy",
+    "body": "**Collects what `setGateModePolicy` sends before it is called.** Required: `id`, `venueId`, `mode`, `scopePath`. Optional: `whoCanActivate`, `accessPointGroupId`, `reasonRequired`, `emergencyCode`, `automaticNotification`, `createsIncident`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessGateModePolicy",
+    "confirm": {
+     "label": "Save gate mode policy",
+     "operation": "setGateModePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "mode",
+      "scopePath",
+      "whoCanActivate",
+      "accessPointGroupId",
+      "reasonRequired",
+      "emergencyCode",
+      "automaticNotification",
+      "createsIncident"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /gate-mode-policies"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1569,7 +1865,10 @@
     {
      "to": "BO-194",
      "trigger": "Device & Gate Command Center",
-     "provenance": "derived — BO-194 declares entryState.params accessPointId and BO-203 holds none of them, so the edge carries nothing and BO-194 opens cold"
+     "carries": [
+      "deviceId"
+     ],
+     "provenance": "derived — BO-194 declares entryState.params accessPointId, deviceId and BO-203 holds deviceId, so an edge into it carries them"
     }
    ]
   },

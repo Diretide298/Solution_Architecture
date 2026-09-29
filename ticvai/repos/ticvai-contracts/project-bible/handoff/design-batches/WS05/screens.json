@@ -1064,6 +1064,19 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 63 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Review face reenrolment",
+       "operation": "reviewFaceReenrolment",
+       "permission": "GUEST_MANAGE",
+       "provenance": "contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review"
+      }
+     ]
     }
    ]
   },
@@ -1080,6 +1093,15 @@
     "contract": "access",
     "purpose": "Face Change, Re-enrollment & Identity Protection",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "reviewFaceReenrolment",
+    "contract": "access",
+    "purpose": "Review a blocked Face Pass re-enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFaceChangeEnrollment"
+    ]
    }
   ],
   "entryState": {
@@ -1090,6 +1112,13 @@
     "FaceChangeReEnrollmentIdentityProtectionView.credentialId",
     "FaceChangeReEnrollmentIdentityProtectionView.guestId",
     "FaceChangeReEnrollmentIdentityProtectionView.reasonForReEnrollment"
+   ],
+   "params": [
+    {
+     "name": "attemptId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -1099,6 +1128,26 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-190"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 63. 8 of 8 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formReviewFaceReenrolment",
+    "component": "modal",
+    "trigger": "Review face reenrolment",
+    "body": "**Collects what `reviewFaceReenrolment` sends before it is called.** Required: `decision`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Review face reenrolment",
+     "operation": "reviewFaceReenrolment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "note"
+     ]
+    },
+    "provenance": "contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

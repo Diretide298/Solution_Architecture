@@ -1,6 +1,6 @@
 # WS28 — Group Sales   Corporate Booking Management board 2
 
-**10 screens · 18 operations · 27 schemas · 4 permissions**
+**10 screens · 19 operations · 29 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -66,7 +66,7 @@ convincingly. It is never a caption.
 | `BO-277` | Group Payment, Deposit & Balance Management | listDetail | 2 | 0 | — |
 | `BO-278` | Group Ticket, Seat & Entitlement Allocation | listDetail | 2 | 0 | — |
 | `BO-279` | Group Ticket Fulfillment & Distribution | listDetail | 2 | 0 | — |
-| `BO-280` | Group Arrival, Check-In & Admission Operations | listDetail | 1 | 0 | — |
+| `BO-280` | Group Arrival, Check-In & Admission Operations | listDetail | 2 | 1 | — |
 | `BO-281` | Group Amendments, Cancellation & Refund Operations | listDetail | 4 | 0 | — |
 | `BO-282` | Group Booking Reconciliation, Closure & Performance | listDetail | 1 | 0 | — |
 | `BO-283` | Group Sales Analytics & AI Intelligence Center | listDetail | 2 | 0 | — |

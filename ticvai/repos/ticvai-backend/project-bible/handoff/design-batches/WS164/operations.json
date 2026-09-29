@@ -1,4 +1,42 @@
 {
+ "createResourceCost": {
+  "method": "POST",
+  "path": "/resource-costs",
+  "contract": "resources",
+  "summary": "Book a transfer, operating or replacement cost against a resource",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResourceCostEntry",
+  "responds": "ResourceCostEntry"
+ },
+ "deleteResourceCost": {
+  "method": "DELETE",
+  "path": "/resource-costs/{costId}",
+  "contract": "resources",
+  "summary": "Remove a cost entry booked in error",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "getResourceAllocationPolicy": {
   "method": "GET",
   "path": "/resource-allocation-policy",
@@ -184,6 +222,50 @@
     "name": "membershipId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listResourceCosts": {
+  "method": "GET",
+  "path": "/resource-costs",
+  "contract": "resources",
+  "summary": "Cost entries booked against resources",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "resourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
    },
    {
     "name": null,

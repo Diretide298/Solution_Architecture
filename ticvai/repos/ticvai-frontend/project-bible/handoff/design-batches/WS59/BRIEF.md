@@ -1,6 +1,6 @@
 # WS59 — Ticket Media   Credential Management board 1
 
-**10 screens · 12 operations · 11 schemas · 3 permissions**
+**10 screens · 16 operations · 14 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,11 +62,11 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-334` | Virtual Ticket Command Center | commandCentre | 3 | 0 | — |
 | `BO-335` | Virtual Ticket Identity & Master Record Configuration | configEditor | 1 | 0 | — |
-| `BO-336` | Virtual Ticket Status & Lifecycle Model | listDetail | 1 | 0 | — |
+| `BO-336` | Virtual Ticket Status & Lifecycle Model | listDetail | 2 | 1 | — |
 | `BO-337` | Media Type & Credential Technology Registry | configEditor | 2 | 0 | — |
-| `BO-338` | Multi-Media Binding & Association Rules | configEditor | 1 | 0 | — |
+| `BO-338` | Multi-Media Binding & Association Rules | configEditor | 3 | 2 | — |
 | `BO-339` | Credential Identity, Token & Reference Mapping | listDetail | 1 | 0 | — |
-| `BO-340` | Entitlement & Cross-Media Synchronization Rules | listDetail | 1 | 0 | — |
+| `BO-340` | Entitlement & Cross-Media Synchronization Rules | listDetail | 2 | 1 | — |
 | `BO-341` | Media Activation, Priority & Fallback Rules | configEditor | 1 | 0 | — |
 | `BO-342` | Media Replacement, Revocation & Rebinding Rules | configEditor | 2 | 2 | — |
 | `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | configEditor | 1 | 0 | — |

@@ -1978,6 +1978,11 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "venue",
     "in": "query",
     "required": false
@@ -2042,6 +2047,11 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "venue",
     "in": "query",
     "required": false
@@ -2089,7 +2099,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "VoidReversalSameDayCorrectionManagementView"
  },
@@ -2477,7 +2493,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "AmendmentEligibilityPolicyRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; lands in the amendment columns of `orders.after_sale_policy` (DM5, 29 September)",
   "description": "**What Amendment Eligibility & Policy Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "tenant": {
@@ -2834,7 +2850,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "ApprovalExceptionServiceRecoveryManagementInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is orders.cash_movement at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; lands in `orders.after_sale_request` (DM5, 29 September)",
   "description": "**What Approval, Exception & Service Recovery Management submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "requestedAction": {
@@ -2978,7 +2994,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "CancellationPartialCancellationPolicyConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; lands in `orders.after_sale_policy` and its `orders.after_sale_policy_window` rows (DM5, 29 September)",
   "description": "**What Cancellation & Partial Cancellation Policy Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "permittedScopes": {
@@ -3544,7 +3560,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "OrderAmendmentWorkspaceInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_capacity at 5%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; lands in `orders.after_sale_request`, and the change itself in the order lines (DM5, 29 September)",
   "description": "**What Order Amendment Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "visitDate": {

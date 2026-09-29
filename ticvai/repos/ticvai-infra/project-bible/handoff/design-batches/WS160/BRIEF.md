@@ -1,6 +1,6 @@
 # WS160 — Resource Management Configuration board 6
 
-**10 screens · 22 operations · 31 schemas · 11 permissions**
+**10 screens · 24 operations · 32 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-903` | Equipment & Asset Command Center | listDetail | 2 | 0 | — |
+| `BO-903` | Equipment & Asset Command Center | listDetail | 4 | 1 | — |
 | `BO-904` | Rental Resource Configuration | configEditor | 2 | 0 | — |
 | `BO-905` | Rental Inventory & Availability Control | configEditor | 2 | 0 | — |
 | `BO-906` | Resource Checkout Workspace | configEditor | 2 | 0 | — |
 | `BO-907` | Guest & Resource Assignment | listDetail | 2 | 0 | — |
 | `BO-908` | Rental Duration, Extension & Return Management | listDetail | 2 | 0 | — |
 | `BO-909` | Deposit & Rental Financial Control | listDetail | 2 | 0 | — |
-| `BO-910` | Maintenance & Resource Blocking | configEditor | 3 | 0 | — |
+| `BO-910` | Maintenance & Resource Blocking | configEditor | 4 | 1 | — |
 | `BO-911` | Inspection, Condition & Compliance Management | listDetail | 3 | 0 | — |
-| `BO-912` | Asset Lifecycle, Depreciation & Retirement | listDetail | 2 | 0 | — |
+| `BO-912` | Asset Lifecycle, Depreciation & Retirement | listDetail | 4 | 1 | — |
 
 ## Thin screens in this batch
 
-**BO-903, BO-907, BO-908, BO-909 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-907, BO-908, BO-909 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

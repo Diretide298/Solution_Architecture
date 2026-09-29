@@ -37,7 +37,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ConnectivityFailureDegradedModePolicyView"
  },
@@ -98,7 +104,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OfflineCredentialRevocationCacheView"
  },
@@ -231,6 +243,25 @@
   "requestBody": "EdgeNodeLocalProcessingConfigurationInput",
   "responds": "EdgeNodeLocalProcessingConfigurationView"
  },
+ "setGateOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policies",
+  "contract": "access",
+  "summary": "Set the offline policy of a venue",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccessOfflinePolicy",
+  "responds": "AccessOfflinePolicy"
+ },
  "setOfflinePolicy": {
   "method": "PUT",
   "path": "/offline-policy",
@@ -268,5 +299,24 @@
   ],
   "requestBody": "OfflineSimulationResilienceTestingInput",
   "responds": "OfflineSimulationResilienceTestingView"
+ },
+ "updateSecurityAlert": {
+  "method": "POST",
+  "path": "/security-alerts/{alertId}/status",
+  "contract": "access",
+  "summary": "Acknowledge, resolve or dismiss a security alert",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessSecurityAlert"
  }
 }

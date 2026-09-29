@@ -78,7 +78,10 @@
     {
      "to": "BO-391",
      "trigger": "Live Escalation Operations Center",
-     "provenance": "structural — pack board 5 wiring, 9 September 2026"
+     "provenance": "structural — pack board 5 wiring, 9 September 2026",
+     "carries": [
+      "instanceId"
+     ]
     },
     {
      "to": "BO-392",
@@ -139,6 +142,20 @@
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 40 §KPI Cards"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Act on workflow instance",
+       "operation": "actOnWorkflowInstance",
+       "permission": "APPROVAL_ACT",
+       "notes": "**The monitors' action buttons, as one operation** (decided 29 September, writers pass).",
+       "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+      }
+     ]
     }
    ]
   },
@@ -163,6 +180,16 @@
     "purpose": "Live escalations",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "actOnWorkflowInstance",
+    "contract": "approvals",
+    "purpose": "An operator's intervention in a running workflow",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalDelegations",
+     "listSlaEscalationBottleneck"
+    ]
    }
   ],
   "entryState": {
@@ -173,6 +200,13 @@
     "SLA At Risk",
     "SLA Breached",
     "Escalated Today"
+   ],
+   "params": [
+    {
+     "name": "instanceId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -181,6 +215,34 @@
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-384"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 8 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnWorkflowInstance",
+    "component": "modal",
+    "trigger": "Act on workflow instance",
+    "body": "**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`. Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`, `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "WorkflowInstanceActionInput",
+    "confirm": {
+     "label": "Act on workflow instance",
+     "operation": "actOnWorkflowInstance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason",
+      "workflowStepExecutionId",
+      "workflowExceptionId",
+      "assigneePrincipalId",
+      "alternativeNodeId",
+      "correctedInput",
+      "extendByMinutes",
+      "priority"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1035,7 +1097,10 @@
      "to": "BO-384",
      "trigger": "Back to Delegation & Escalation Command Center",
      "provenance": "structural — pack board 5 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "instanceId"
+     ]
     }
    ]
   },
@@ -1068,6 +1133,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Act on workflow instance",
+       "operation": "actOnWorkflowInstance",
+       "permission": "APPROVAL_ACT",
+       "notes": "**The monitors' action buttons, as one operation** (decided 29 September, writers pass).",
+       "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+      }
+     ]
     }
    ]
   },
@@ -1085,6 +1164,15 @@
     "purpose": "What is escalating now",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "actOnWorkflowInstance",
+    "contract": "approvals",
+    "purpose": "An operator's intervention in a running workflow",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSlaEscalationBottleneck"
+    ]
    }
   ],
   "wireframe": {
@@ -1093,6 +1181,43 @@
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-391"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnWorkflowInstance",
+    "component": "modal",
+    "trigger": "Act on workflow instance",
+    "body": "**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`. Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`, `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "WorkflowInstanceActionInput",
+    "confirm": {
+     "label": "Act on workflow instance",
+     "operation": "actOnWorkflowInstance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason",
+      "workflowStepExecutionId",
+      "workflowExceptionId",
+      "assigneePrincipalId",
+      "alternativeNodeId",
+      "correctedInput",
+      "extendByMinutes",
+      "priority"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "instanceId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

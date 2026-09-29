@@ -466,6 +466,23 @@
     },
     "description": "Empty means any access point in the venue."
    },
+   "reEntryVerification": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "credentialUvStamp",
+     "credentialFace",
+     "credentialOperator",
+     "custom"
+    ],
+    "default": "credentialOnly",
+    "description": "What a re-entering guest must show besides the credential, as `listEntryTemporaryExit` returns it (added 29 September, data-model close-out DM1)."
+   },
+   "ruleConditions": {
+    "type": "object",
+    "nullable": true,
+    "description": "The visual rule builder body `setVisualAccessRule` writes: `appliesTo` (products or credential types), `conditions`, `logic` (AND / OR / NOT over the conditions), `decision` (allow, deny, referToOperator, overrideEligible) and `consequences`. **One `jsonb` column on the rule row**, read with the rule and never queried on its own; the locations stay in `access.entry_rule_point` (added 29 September, data-model close-out DM1)."
+   },
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
@@ -753,7 +770,7 @@
    "mediaCode": {
     "type": "string",
     "x-ticvai-unique": "tenant",
-    "description": "**Unique within the tenant** (decided 28 September, audit R108): one entry per code. `addBlacklistEntry` refuses a second entry with `409 duplicate-code`."
+    "description": "**Unique within the tenant** (decided 28 September, audit R108): one entry per code. `addBlacklistEntry` refuses a second entry with `409 duplicate-code`. **One code space for both lists** (decided 29 September, writers pass): a code on the blacklist cannot also be whitelisted; adding it to the other list is the same `409 duplicate-code`. Move a code between lists by removing and re-adding it."
    },
    "reason": {
     "type": "string"
@@ -770,6 +787,41 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "listType": {
+    "type": "string",
+    "enum": [
+     "blacklist",
+     "whitelist"
+    ],
+    "default": "blacklist",
+    "description": "A blacklist entry refuses the media; a whitelist entry is an approved exception to a restriction (added 29 September, data-model close-out DM1)."
+   },
+   "disableScope": {
+    "type": "string",
+    "enum": [
+     "entireCredential",
+     "venueAccess",
+     "attractionAccess",
+     "reEntry",
+     "fastPass",
+     "specificEntitlement"
+    ],
+    "default": "entireCredential",
+    "description": "What the entry disables (added 29 September, data-model close-out DM1)."
+   },
+   "distributedTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "venueEdge",
+      "onlineGates",
+      "offlineRevocationPackage"
+     ]
+    },
+    "description": "Where the restriction has been distributed so far, as `listCredentialDisableBlacklist` returns it (added 29 September, data-model close-out DM1)."
    },
    "scopePath": {
     "type": "string",

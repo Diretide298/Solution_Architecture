@@ -666,6 +666,50 @@
   "requestBody": null,
   "responds": "ChannelListing"
  },
+ "listCommercialCampaigns": {
+  "method": "GET",
+  "path": "/commercial-campaigns",
+  "contract": "promotions",
+  "summary": "List commercial campaigns",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "q",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCouponCampaigns": {
   "method": "GET",
   "path": "/coupon-campaigns",
@@ -1207,6 +1251,25 @@
   "requestBody": "SeatRecommendationRequest",
   "responds": null
  },
+ "recordDashboardView": {
+  "method": "POST",
+  "path": "/dashboards/{dashboardId}/views",
+  "contract": "reporting",
+  "summary": "Record that a dashboard was opened",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "relinquishChannelAllocation": {
   "method": "POST",
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
@@ -1430,6 +1493,25 @@
   ],
   "requestBody": null,
   "responds": "MenuItem"
+ },
+ "setPackagePricingDefinition": {
+  "method": "PUT",
+  "path": "/package-pricing",
+  "contract": "catalogue",
+  "summary": "Set how a package, bundle or add-on is priced",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PackagePricing",
+  "responds": "PackagePricing"
  },
  "setPerformanceTemplate": {
   "method": "PUT",

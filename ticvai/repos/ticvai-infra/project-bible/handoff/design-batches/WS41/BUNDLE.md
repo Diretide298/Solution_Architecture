@@ -1,6 +1,6 @@
 # WS41 — Privacy  Consent   Preference Management board 1
 
-**10 screens · 11 operations · 16 schemas · 3 permissions**
+**10 screens · 12 operations · 17 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -67,9 +67,9 @@ convincingly. It is never a caption.
 | `CMS-025` | Cookie, Tracking & Digital Technology Registry | listDetail | 1 | 0 | — |
 | `CMS-026` | Cookie Banner & Preference Center Designer | configEditor | 1 | 0 | — |
 | `CMS-027` | Consent Capture Point & Customer Journey Configuration | configEditor | 1 | 0 | — |
-| `CMS-028` | Privacy Notice, Policy & Terms Version Management | listDetail | 1 | 0 | — |
+| `CMS-028` | Privacy Notice, Policy & Terms Version Management | listDetail | 2 | 1 | — |
 | `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | configEditor | 1 | 0 | — |
-| `CMS-030` | Privacy Configuration Testing, Approval & Publication | configEditor | 1 | 0 | — |
+| `CMS-030` | Privacy Configuration Testing, Approval & Publication | configEditor | 2 | 1 | — |
 
 ## Thin screens in this batch
 
@@ -1517,6 +1517,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "No Customer Action",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 14 §Allow changes to be marked"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save privacy notice policy governance",
+       "operation": "setPrivacyNoticePolicyGovernance",
+       "permission": "GUEST_MANAGE",
+       "notes": "**An upsert keyed on `policyId`: one row per version of one privacy document.** The document itself is white-label's `Policy` (`setPolicy`, never overwritten); this row is what the privacy administrator decides about that version, and is what `listPrivacyNoticePolicy` shows beside it.",
+       "provenance": "contract marketing-crm.yaml PUT /privacy-notice-policy"
       }
      ]
     },
@@ -1539,6 +1547,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Privacy Notice, Policy & Terms Version Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPrivacyNoticePolicyGovernance",
+    "contract": "marketing-crm",
+    "purpose": "Set the privacy governance of one version of a privacy document",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrivacyNoticePolicy"
+    ]
    }
   ],
   "entryState": {
@@ -1553,6 +1570,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-028"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 2 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPrivacyNoticePolicyGovernance",
+    "component": "modal",
+    "trigger": "Save privacy notice policy governance",
+    "body": "**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`, `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PrivacyNoticeGovernance",
+    "confirm": {
+     "label": "Save privacy notice policy governance",
+     "operation": "setPrivacyNoticePolicyGovernance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "policyId",
+      "documentType",
+      "status",
+      "changeClassification",
+      "requiresReAcceptance",
+      "requiresNotification",
+      "ownerPrincipalId",
+      "approvedByPrincipalId",
+      "approvalRequestId",
+      "approvedAt",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /privacy-notice-policy"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1759,7 +1807,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule Publication, Selected Tenant, Selected Brand, Selected Country, Selected Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen; 2 are served since the writers pass (29 September): Publish Now, Schedule Publication by `setPrivacyNoticePolicyGovernance`.** Still unserved: Selected Tenant, Selected Brand, Selected Country, Selected Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
    }
   ],
@@ -1955,6 +2003,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Selected Channel",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save privacy notice policy governance",
+       "operation": "setPrivacyNoticePolicyGovernance",
+       "permission": "GUEST_MANAGE",
+       "notes": "**An upsert keyed on `policyId`: one row per version of one privacy document.** The document itself is white-label's `Policy` (`setPolicy`, never overwritten); this row is what the privacy administrator decides about that version, and is what `listPrivacyNoticePolicy` shows beside it.",
+       "provenance": "contract marketing-crm.yaml PUT /privacy-notice-policy"
       }
      ]
     }
@@ -1972,6 +2028,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Privacy Configuration Testing, Approval & Publication",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "setPrivacyNoticePolicyGovernance",
+    "contract": "marketing-crm",
+    "purpose": "Set the privacy governance of one version of a privacy document",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
@@ -1981,6 +2043,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS102 Privacy  Consent   Preference Management Board 1.dc.html#cms-030"
   },
   "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 40 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPrivacyNoticePolicyGovernance",
+    "component": "modal",
+    "trigger": "Save privacy notice policy governance",
+    "body": "**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`, `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PrivacyNoticeGovernance",
+    "confirm": {
+     "label": "Save privacy notice policy governance",
+     "operation": "setPrivacyNoticePolicyGovernance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "policyId",
+      "documentType",
+      "status",
+      "changeClassification",
+      "requiresReAcceptance",
+      "requiresNotification",
+      "ownerPrincipalId",
+      "approvedByPrincipalId",
+      "approvalRequestId",
+      "approvedAt",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /privacy-notice-policy"
+   }
+  ],
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -2131,6 +2224,11 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "subjectId",
     "in": "query",
     "required": true
@@ -2188,6 +2286,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "brandId",
     "in": "query",
@@ -2356,6 +2459,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "MinorGuardianAgeBasedPrivacyConfigurationInput",
   "responds": "MinorGuardianAgeBasedPrivacyConfigurationView"
+ },
+ "setPrivacyNoticePolicyGovernance": {
+  "method": "PUT",
+  "path": "/privacy-notice-policy",
+  "contract": "marketing-crm",
+  "summary": "Set the privacy governance of one version of a privacy document",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PrivacyNoticeGovernance",
+  "responds": "PrivacyNoticeGovernance"
  }
 }
 ```
@@ -3768,6 +3890,109 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "PrivacyNoticeGovernance": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.privacy_notice_governance",
+  "description": "**The privacy governance of one version of one privacy document.** The document itself is white-label's `Policy` (`setPolicy`, never overwritten); this row adds what the privacy administrator decides about it: lifecycle status, the change classification (set by an authorised user, **never by AI**), re-acceptance and notification, owner and approval. One row per policy version. Read by `listPrivacyNoticePolicy`; written by `setPrivacyNoticePolicyGovernance` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n",
+  "required": [
+   "id",
+   "policyId",
+   "documentType",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "policyId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The white-label `Policy` version this governs (`documentId` on the view)."
+   },
+   "documentType": {
+    "type": "string",
+    "enum": [
+     "privacyPolicy",
+     "privacyNotice",
+     "cookieNotice",
+     "marketingNotice",
+     "biometricPrivacyNotice",
+     "childrensPrivacyNotice",
+     "locationServicesNotice",
+     "other"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "review",
+     "approved",
+     "scheduled",
+     "published",
+     "superseded",
+     "archived"
+    ],
+    "default": "draft"
+   },
+   "changeClassification": {
+    "type": "string",
+    "enum": [
+     "minor",
+     "material"
+    ],
+    "nullable": true,
+    "description": "Set by an authorised user, never by AI."
+   },
+   "requiresReAcceptance": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresNotification": {
+    "type": "boolean",
+    "default": false
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approvals request raised when the row entered `review` (`setPrivacyNoticePolicyGovernance`); its decision stamps `approvedByPrincipalId` and `approvedAt`. (decided 29 September, writers pass)"
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  }

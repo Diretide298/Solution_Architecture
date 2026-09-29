@@ -1,6 +1,6 @@
 # WS05 — Access Control board 5
 
-**10 screens · 14 operations · 14 schemas · 3 permissions**
+**10 screens · 15 operations · 15 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, GUEST_MANAGE, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -66,7 +66,7 @@ convincingly. It is never a caption.
 | `BO-187` | Biometric Consent & Guardian Management | configEditor | 1 | 0 | — |
 | `BO-188` | Face Tag Temporary Enrollment | configEditor | 2 | 0 | — |
 | `BO-189` | Face Matching & Verification Thresholds | configEditor | 2 | 0 | — |
-| `BO-190` | Face Change, Re-enrollment & Identity Protection | listDetail | 1 | 0 | — |
+| `BO-190` | Face Change, Re-enrollment & Identity Protection | listDetail | 2 | 1 | — |
 | `BO-191` | Biometric Validation at Gate | listDetail | 2 | 0 | — |
 | `BO-192` | Biometric Lifecycle, Retention & Deletion | configEditor | 2 | 0 | — |
 | `BO-193` | Biometric Simulation, Audit & Publication | listDetail | 2 | 0 | — |
@@ -1148,6 +1148,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Access Control Module_Reference.pdf, page 63 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Review face reenrolment",
+       "operation": "reviewFaceReenrolment",
+       "permission": "GUEST_MANAGE",
+       "provenance": "contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review"
+      }
+     ]
     }
    ]
   },
@@ -1164,6 +1177,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Face Change, Re-enrollment & Identity Protection",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "reviewFaceReenrolment",
+    "contract": "access",
+    "purpose": "Review a blocked Face Pass re-enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFaceChangeEnrollment"
+    ]
    }
   ],
   "entryState": {
@@ -1174,6 +1196,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "FaceChangeReEnrollmentIdentityProtectionView.credentialId",
     "FaceChangeReEnrollmentIdentityProtectionView.guestId",
     "FaceChangeReEnrollmentIdentityProtectionView.reasonForReEnrollment"
+   ],
+   "params": [
+    {
+     "name": "attemptId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -1183,6 +1212,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-190"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 63. 8 of 8 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formReviewFaceReenrolment",
+    "component": "modal",
+    "trigger": "Review face reenrolment",
+    "body": "**Collects what `reviewFaceReenrolment` sends before it is called.** Required: `decision`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Review face reenrolment",
+     "operation": "reviewFaceReenrolment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "note"
+     ]
+    },
+    "provenance": "contract access.yaml POST /face-reenrolment-attempts/{attemptId}/review"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1805,7 +1854,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BiometricValidationAtGateView"
  },
@@ -1842,7 +1897,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FaceMatchingVerificationThresholdsView"
  },
@@ -1855,9 +1916,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FaceTagTemporaryEnrollmentView"
+ },
+ "reviewFaceReenrolment": {
+  "method": "POST",
+  "path": "/face-reenrolment-attempts/{attemptId}/review",
+  "contract": "access",
+  "summary": "Review a blocked Face Pass re-enrolment",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessFaceReenrolmentAttempt"
  },
  "setBiometricLifecycleRetention": {
   "method": "PUT",
@@ -1982,6 +2068,111 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessFaceReenrolmentAttempt": {
+  "type": "object",
+  "x-ticvai-persistence": "access.face_reenrolment_attempt",
+  "description": "One Face Pass re-enrolment attempt - the existing and new capture references (opaque, never templates), the match result, the reason, the operator and the outcome, with the review of a blocked change (declared 29 September, data-model close-out DM1). Written by enrolFacePass when the subject already has a Face Pass; a pendingReview attempt is decided by reviewFaceReenrolment (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "subjectId",
+   "existingProfileReference",
+   "newCaptureReference",
+   "matchResult",
+   "outcome",
+   "attemptedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The attemptId the list shows"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The guest (pii.subject)"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The credential the Face Pass belongs to"
+   },
+   "existingProfileReference": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Opaque reference to the prior enrolment (pii.subject_biometric)"
+   },
+   "newCaptureReference": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Opaque reference to the new capture"
+   },
+   "matchResult": {
+    "type": "string",
+    "enum": [
+     "withinPolicy",
+     "significantDifference"
+    ]
+   },
+   "reasonForReEnrollment": {
+    "type": "string",
+    "enum": [
+     "appearanceChange",
+     "poorOriginalCapture",
+     "technicalIssue",
+     "guestRequest",
+     "recovery",
+     "other"
+    ],
+    "nullable": true
+   },
+   "verificationProcess": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "How the guest was verified for the change"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "updated",
+     "blocked",
+     "pendingReview"
+    ]
+   },
+   "reviewedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Security or guest service reviewer of a blocked change (the integrity screen's approval)"
+   },
+   "reviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "attemptedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "BiometricLifecycleRetentionDeletionInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
@@ -2253,7 +2444,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "profileId": {
     "type": "string",
-    "description": "Biometric verification profile identifier"
+    "description": "The profile row's key (access.biometric_profile.id, a ULID); absent creates one (decided 29 September, writers pass)",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "selectType": {
     "type": "string",
@@ -2292,6 +2484,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "name": {
     "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active",
+    "description": "Switches the profile on or off; an inactive profile is not applied at any gate and stays for reuse (decided 29 September, writers pass)"
    }
   },
   "required": [
@@ -2457,6 +2658,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean",
     "default": true,
     "description": "Review-range results go to operator verification"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active",
+    "description": "Switches the profile on or off; an inactive profile is not applied at any gate and stays for reuse (decided 29 September, writers pass)"
    }
   }
  },
@@ -2578,6 +2788,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "duplicateFaceDetection": {
     "type": "boolean",
     "description": "Block a face already associated with another annual pass"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active",
+    "description": "Switches the profile on or off; an inactive profile is not applied at any gate and stays for reuse (decided 29 September, writers pass)"
    }
   },
   "required": [
@@ -2707,6 +2926,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "minimum": 1,
     "description": "Used only when deletionTrigger is operationalRetentionThreshold, and then required. **No default and no maximum here on purpose**: the longest lawful period is the client counsel's value (make-or-break (a), see the operation)"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active",
+    "description": "Switches the profile on or off; an inactive profile is not applied at any gate and stays for reuse (decided 29 September, writers pass)"
    }
   }
  },

@@ -54,12 +54,6 @@
      "operation": "listAccessRule"
     },
     {
-     "to": "BO-157",
-     "trigger": "Works in Anti-Passback & Journey Sequence",
-     "provenance": "flow F112 step 5→6",
-     "operation": "listAccessRule"
-    },
-    {
      "to": "BO-158",
      "trigger": "Works in Access Validity & Time Rules",
      "provenance": "flow F112 step 7→8",
@@ -88,6 +82,15 @@
      "trigger": "Works in Rule Simulation, Conflict Check & Publication",
      "provenance": "flow F112 step 17→18",
      "operation": "listAccessRule"
+    },
+    {
+     "to": "BO-157",
+     "trigger": "Works in Anti-Passback & Journey Sequence",
+     "provenance": "flow F112 step 5→6",
+     "operation": "listAccessRule",
+     "carries": [
+      "ruleId"
+     ]
     },
     {
      "to": "BO-161",
@@ -628,6 +631,28 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 20 §Configure required sequences such as"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save journey sequence rule",
+       "operation": "setJourneySequenceRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Anti-Passback & Journey Sequence** (BO-157): the level a rule applies at (credential, guest, gate, attraction, park, venue), the time window, the required order of scans and what a violation leads to.",
+       "provenance": "contract access.yaml PUT /journey-sequence-rules"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete journey sequence rule",
+       "operation": "deleteJourneySequenceRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "Deletes a journey sequence rule.",
+       "provenance": "contract access.yaml DELETE /journey-sequence-rules/{ruleId}"
+      }
+     ]
     }
    ]
   },
@@ -643,6 +668,24 @@
     "contract": "access",
     "purpose": "Anti-Passback & Journey Sequence",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setJourneySequenceRule",
+    "contract": "access",
+    "purpose": "Create or replace an anti-passback / journey sequence rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAntiPassbackJourney"
+    ]
+   },
+   {
+    "operationId": "deleteJourneySequenceRule",
+    "contract": "access",
+    "purpose": "Delete a journey sequence rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAntiPassbackJourney"
+    ]
    }
   ],
   "wireframe": {
@@ -652,6 +695,48 @@
    "workshopBoard": "wireframes/WS19 Access Control Board 2.dc.html#bo-157"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 20. 0 of 0 labels bound to a contract property; 3 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetJourneySequenceRule",
+    "component": "modal",
+    "trigger": "Save journey sequence rule",
+    "body": "**Collects what `setJourneySequenceRule` sends before it is called.** Required: `id`, `scopePath`, `scope`. Optional: `venueId`, `name`, `windowMinutes`, `requiredSequence`, `violationResponses`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessJourneySequenceRule",
+    "confirm": {
+     "label": "Save journey sequence rule",
+     "operation": "setJourneySequenceRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "scope",
+      "venueId",
+      "name",
+      "windowMinutes",
+      "requiredSequence",
+      "violationResponses"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /journey-sequence-rules"
+   },
+   {
+    "id": "confirmDeleteJourneySequenceRule",
+    "component": "confirmDialog",
+    "trigger": "Delete journey sequence rule",
+    "body": "**Names what `deleteJourneySequenceRule` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /journey-sequence-rules/{ruleId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

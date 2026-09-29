@@ -244,6 +244,25 @@
   "requestBody": "CatalogueMembershipBenefit",
   "responds": "CatalogueMembershipBenefit"
  },
+ "setMembershipCommercialConfig": {
+  "method": "PUT",
+  "path": "/membership-commercial-config",
+  "contract": "subscription",
+  "summary": "Save a membership product's commercial references, payment eligibility and sales period",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipCommercialConfigInput",
+  "responds": "MembershipCommercialPricingChannelAssociationView"
+ },
  "setMembershipEligibilityQualification": {
   "method": "PUT",
   "path": "/membership-eligibility-qualification",
@@ -319,6 +338,25 @@
   ],
   "requestBody": "CatalogueMembershipProgramme",
   "responds": "CatalogueMembershipProgramme"
+ },
+ "setMembershipUsagePolicy": {
+  "method": "PUT",
+  "path": "/membership-usage-policy",
+  "contract": "subscription",
+  "summary": "Save a membership product's usage, visit and consumption rules",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipUsagePolicyInput",
+  "responds": "MembershipUsageVisitConsumptionRulesView"
  },
  "setPlanBenefits": {
   "method": "PUT",

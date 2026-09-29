@@ -3076,6 +3076,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "string"
     }
    },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
+   },
    "venueId": {
     "type": "string",
     "format": "uuid",

@@ -1415,6 +1415,50 @@
        "bindsTo": null,
        "operation": null,
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listLabourBudgets",
+       "notes": "Sends `?venueId=` to `listLabourBudgets`.",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
+      },
+      {
+       "kind": "textField",
+       "label": "Department id",
+       "operation": "listLabourBudgets",
+       "notes": "Sends `?departmentId=` to `listLabourBudgets`.",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listLabourBudgets",
+       "notes": "Sends `?from=` to `listLabourBudgets`.",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listLabourBudgets",
+       "notes": "Sends `?to=` to `listLabourBudgets`.",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every labour budget",
+       "bindsTo": "LabourBudget",
+       "columns": [
+        "LabourBudget.id",
+        "LabourBudget.venueId",
+        "LabourBudget.departmentId",
+        "LabourBudget.periodStart",
+        "LabourBudget.periodEnd",
+        "LabourBudget.budgetAmount",
+        "LabourBudget.scopePath"
+       ],
+       "operation": "listLabourBudgets",
+       "provenance": "contract workforce.yaml GET /labour-budgets"
       }
      ]
     },
@@ -1437,6 +1481,20 @@
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save labour budget",
+       "operation": "setLabourBudget",
+       "permission": "WORKFORCE_MANAGE",
+       "notes": "**Writes `workforce.labour_budget`** (decided 29 September, writers pass), keyed by venue, department and `periodStart`: a PUT for a key that exists replaces its `periodEnd` and amount, any other creates a budget.",
+       "provenance": "contract workforce.yaml PUT /labour-budgets"
+      }
+     ]
     }
    ]
   },
@@ -1454,6 +1512,22 @@
     "purpose": "Cost against budget",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listLabourBudgets",
+    "contract": "workforce",
+    "purpose": "Labour budgets, per venue, department and period",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setLabourBudget",
+    "contract": "workforce",
+    "purpose": "Set the labour budget for a venue, department and period",
+    "trigger": "onAction",
+    "invalidates": [
+     "getLabourCost",
+     "listLabourBudgets"
+    ]
    }
   ],
   "entryState": {
@@ -1471,6 +1545,32 @@
    "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-891"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 59. 0 of 5 labels bound to a contract property; 5 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetLabourBudget",
+    "component": "modal",
+    "trigger": "Save labour budget",
+    "body": "**Collects what `setLabourBudget` sends before it is called.** Required: `id`, `venueId`, `periodStart`, `periodEnd`, `budgetAmount`. Optional: `departmentId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LabourBudget",
+    "confirm": {
+     "label": "Save labour budget",
+     "operation": "setLabourBudget"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "periodStart",
+      "periodEnd",
+      "budgetAmount",
+      "departmentId",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract workforce.yaml PUT /labour-budgets"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

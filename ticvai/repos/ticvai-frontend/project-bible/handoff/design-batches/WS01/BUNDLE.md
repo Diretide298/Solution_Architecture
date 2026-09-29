@@ -1275,6 +1275,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "provenance": "contract access.yaml DELETE /access-point-groups/{groupId}"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "groupId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1498,6 +1506,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "provenance": "contract access.yaml DELETE /operating-calendar-entries/{entryId}"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entryId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1773,7 +1789,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccessControlCommandCenterView"
  },
@@ -1786,7 +1808,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccessLocationGroupingView"
  },
@@ -1828,7 +1856,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OperatingCalendarSpecialAccessDaysView"
  },
@@ -1880,7 +1914,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "VenueParkAccessStructureView"
  },

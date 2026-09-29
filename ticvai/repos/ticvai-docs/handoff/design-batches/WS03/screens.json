@@ -195,6 +195,20 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 29 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save device binding policy",
+       "operation": "setDeviceBindingPolicy",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Device Binding & Session Security** (BO-167): how many devices a mobile credential may be active on, how many concurrent sessions, and what a device change needs.",
+       "provenance": "contract access.yaml PUT /device-binding-policy"
+      }
+     ]
     }
    ]
   },
@@ -228,6 +242,16 @@
      "listDigitalCredentialSecurity",
      "listCredentialSecurity"
     ]
+   },
+   {
+    "operationId": "setDeviceBindingPolicy",
+    "contract": "access",
+    "purpose": "Set the device binding policy of a venue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDigitalCredentialSecurity",
+     "listCredentialSecurity"
+    ]
    }
   ],
   "entryState": {
@@ -242,6 +266,29 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-164"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 29. 15 of 15 labels bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDeviceBindingPolicy",
+    "component": "modal",
+    "trigger": "Save device binding policy",
+    "body": "**Collects what `setDeviceBindingPolicy` sends before it is called.** Required: `venueId`. Optional: `maximumActiveDevices`, `concurrentSessions`, `deviceChangePolicy`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DeviceBindingPolicyInput",
+    "confirm": {
+     "label": "Save device binding policy",
+     "operation": "setDeviceBindingPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "maximumActiveDevices",
+      "concurrentSessions",
+      "deviceChangePolicy"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /device-binding-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -663,6 +710,28 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 33 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save device binding policy",
+       "operation": "setDeviceBindingPolicy",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "notes": "**The write behind Device Binding & Session Security** (BO-167): how many devices a mobile credential may be active on, how many concurrent sessions, and what a device change needs.",
+       "provenance": "contract access.yaml PUT /device-binding-policy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release credential device",
+       "operation": "releaseCredentialDevice",
+       "permission": "GUEST_MANAGE",
+       "notes": "**A service agent frees a credential from a device** (a lost phone, a device change that needs an operator or supervisor under the policy): sets `deactivatedAt` on the binding, so the guest can bind the credential on another device.",
+       "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
+      }
+     ]
     }
    ]
   },
@@ -679,6 +748,24 @@
     "contract": "access",
     "purpose": "Device Binding & Session Security",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDeviceBindingPolicy",
+    "contract": "access",
+    "purpose": "Set the device binding policy of a venue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDeviceBindingSession"
+    ]
+   },
+   {
+    "operationId": "releaseCredentialDevice",
+    "contract": "access",
+    "purpose": "Release a credential from a device",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDeviceBindingSession"
+    ]
    }
   ],
   "entryState": {
@@ -689,6 +776,13 @@
     "DeviceBindingSessionSecurityView.appInstallation",
     "DeviceBindingSessionSecurityView.os",
     "DeviceBindingSessionSecurityView.registrationDate"
+   ],
+   "params": [
+    {
+     "name": "bindingId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -698,6 +792,46 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-167"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 33. 7 of 8 labels bound to a contract property; 8 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDeviceBindingPolicy",
+    "component": "modal",
+    "trigger": "Save device binding policy",
+    "body": "**Collects what `setDeviceBindingPolicy` sends before it is called.** Required: `venueId`. Optional: `maximumActiveDevices`, `concurrentSessions`, `deviceChangePolicy`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DeviceBindingPolicyInput",
+    "confirm": {
+     "label": "Save device binding policy",
+     "operation": "setDeviceBindingPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "maximumActiveDevices",
+      "concurrentSessions",
+      "deviceChangePolicy"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /device-binding-policy"
+   },
+   {
+    "id": "formReleaseCredentialDevice",
+    "component": "modal",
+    "trigger": "Release credential device",
+    "body": "**Collects what `releaseCredentialDevice` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release credential device",
+     "operation": "releaseCredentialDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -972,6 +1106,20 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 35 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Release credential device",
+       "operation": "releaseCredentialDevice",
+       "permission": "GUEST_MANAGE",
+       "notes": "**A service agent frees a credential from a device** (a lost phone, a device change that needs an operator or supervisor under the policy): sets `deactivatedAt` on the binding, so the guest can bind the credential on another device.",
+       "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
+      }
+     ]
     }
    ]
   },
@@ -987,6 +1135,15 @@
     "contract": "access",
     "purpose": "Credential Transfer & Rebinding",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "releaseCredentialDevice",
+    "contract": "access",
+    "purpose": "Release a credential from a device",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCredentialTransferRebinding"
+    ]
    }
   ],
   "wireframe": {
@@ -996,6 +1153,34 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-169"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 35. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formReleaseCredentialDevice",
+    "component": "modal",
+    "trigger": "Release credential device",
+    "body": "**Collects what `releaseCredentialDevice` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release credential device",
+     "operation": "releaseCredentialDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract access.yaml POST /device-bindings/{bindingId}/release"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "bindingId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1094,6 +1279,19 @@
        "provenance": "pack Access Control Module_Reference.pdf, page 36 §Show"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save credential event propagation rule",
+       "operation": "setCredentialEventPropagationRule",
+       "permission": "ACCESS_POINT_CONFIGURE",
+       "provenance": "contract access.yaml PUT /credential-event-propagation-rules"
+      }
+     ]
     }
    ]
   },
@@ -1110,6 +1308,15 @@
     "contract": "access",
     "purpose": "Credential Revocation & Lifecycle Events",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCredentialEventPropagationRule",
+    "contract": "access",
+    "purpose": "Set how a ticket lifecycle event propagates to the credential",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCredentialRevocationLifecycle"
+    ]
    }
   ],
   "entryState": {
@@ -1124,6 +1331,32 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-170"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 36. 5 of 5 labels bound to a contract property; 14 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetCredentialEventPropagationRule",
+    "component": "modal",
+    "trigger": "Save credential event propagation rule",
+    "body": "**Collects what `setCredentialEventPropagationRule` sends before it is called.** Required: `id`, `triggerEvent`, `scopePath`. Optional: `revocationAction`, `propagationTargets`, `monitoredConditions`, `propagation`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AccessCredentialEventPropagationRule",
+    "confirm": {
+     "label": "Save credential event propagation rule",
+     "operation": "setCredentialEventPropagationRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "triggerEvent",
+      "scopePath",
+      "revocationAction",
+      "propagationTargets",
+      "monitoredConditions",
+      "propagation"
+     ]
+    },
+    "provenance": "contract access.yaml PUT /credential-event-propagation-rules"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1213,6 +1446,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save offline policy",
+       "operation": "setOfflinePolicy",
+       "permission": "TENANT_CONFIGURE",
+       "notes": "Board 5 of the client's POS set, and **one of only two things in 36 board screens the package could not do.** ADR-0013 makes the POS local-first and nothing configured the policy.",
+       "provenance": "contract tenancy.yaml PUT /offline-policy"
+      }
+     ]
     }
    ]
   },
@@ -1225,10 +1472,24 @@
   },
   "apis": [
    {
+    "operationId": "setGateOfflinePolicy",
+    "purpose": "Save the gate offline validation, revocation cache and degraded-mode policy (writers pass, 29 September)",
+    "contract": "access"
+   },
+   {
     "operationId": "listOfflineCryptographicValidation",
     "contract": "access",
     "purpose": "Offline Cryptographic Validation Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setOfflinePolicy",
+    "contract": "tenancy",
+    "purpose": "What a workstation may do with no network, and for how long",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOfflineCryptographicValidation"
+    ]
    }
   ],
   "entryState": {
@@ -1243,6 +1504,33 @@
    "workshopBoard": "wireframes/WS20 Access Control Board 3.dc.html#bo-171"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetOfflinePolicy",
+    "component": "modal",
+    "trigger": "Save offline policy",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "OfflinePolicy",
+    "confirm": {
+     "label": "Save offline policy",
+     "operation": "setOfflinePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "scopePath",
+      "id",
+      "maxOfflineHours",
+      "allowedOffline",
+      "offlineValueCeiling",
+      "offlineTransactionCeiling",
+      "onCeilingBreach",
+      "requiresManagerToExtend"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /offline-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

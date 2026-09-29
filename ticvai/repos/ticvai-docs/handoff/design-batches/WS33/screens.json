@@ -66,12 +66,6 @@
      "operation": "listPaymentOrderFinancial"
     },
     {
-     "to": "BO-330",
-     "trigger": "Works in External Payment, Partner & Settlement Reference Mapping",
-     "provenance": "flow F142 step 11→12",
-     "operation": "listPaymentOrderFinancial"
-    },
-    {
      "to": "BO-331",
      "trigger": "Works in Payment Reconciliation & Exception Management",
      "provenance": "flow F142 step 13→14",
@@ -93,6 +87,15 @@
      "to": "BO-328",
      "trigger": "Works in Order Split, Merge & Transaction Relationship Management",
      "provenance": "flow F142 step 7→8",
+     "operation": "listPaymentOrderFinancial",
+     "carries": [
+      "orderId"
+     ]
+    },
+    {
+     "to": "BO-330",
+     "trigger": "Works in External Payment, Partner & Settlement Reference Mapping",
+     "provenance": "flow F142 step 11→12",
      "operation": "listPaymentOrderFinancial",
      "carries": [
       "orderId"
@@ -605,6 +608,52 @@
        "kind": "selectField",
        "label": "Deposit",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 43 §Configure whether payment is allocated"
+      },
+      {
+       "kind": "textField",
+       "label": "Channel",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?channel=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "textField",
+       "label": "Terminal id",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?terminalId=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "textField",
+       "label": "Product id",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?productId=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?isActive=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every payment allocation rule",
+       "bindsTo": "PaymentAllocationRule",
+       "columns": [
+        "PaymentAllocationRule.id",
+        "PaymentAllocationRule.channel",
+        "PaymentAllocationRule.terminalId",
+        "PaymentAllocationRule.productId",
+        "PaymentAllocationRule.orderType",
+        "PaymentAllocationRule.customerType",
+        "PaymentAllocationRule.allocationLevel",
+        "PaymentAllocationRule.isActive",
+        "PaymentAllocationRule.scopePath"
+       ],
+       "operation": "listPaymentAllocationRules",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
       }
      ]
     },
@@ -633,6 +682,12 @@
     "contract": "orders",
     "purpose": "Multi-Payment, Split Tender & Payment Allocation Configuration",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listPaymentAllocationRules",
+    "contract": "orders",
+    "purpose": "The venue's split-tender allocation rules",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
@@ -1008,6 +1063,14 @@
        "kind": "secondaryButton",
        "label": "Payment Responsibility",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Merge orders",
+       "operation": "mergeOrders",
+       "permission": "ORDER_MODIFY",
+       "notes": "**The other half of `splitOrder`** (pack Order & Reservation Management p.46, BO-328 Order Split, Merge & Transaction Relationship Management).",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/merge"
       }
      ]
     },
@@ -1040,6 +1103,15 @@
     "invalidates": [
      "listOrderSplitMerge"
     ]
+   },
+   {
+    "operationId": "mergeOrders",
+    "contract": "orders",
+    "purpose": "Merge orders into one",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrderSplitMerge"
+    ]
    }
   ],
   "entryState": {
@@ -1061,6 +1133,15 @@
    "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-328"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 4 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Ticket, Product, Payment Responsibility: `splitOrder`.",
+  "overlays": [
+   {
+    "id": "confirmMergeOrders",
+    "component": "confirmDialog",
+    "trigger": "Merge orders",
+    "body": "**Names what `mergeOrders` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted. **Collects what `mergeOrders` sends before it is called.** Required: `sourceOrderIds`. Optional: `reason`.",
+    "provenance": "contract orders.yaml POST /orders/{orderId}/merge"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1360,6 +1441,27 @@
        "kind": "selectField",
        "label": "Amount",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 49 §Capture"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every external reference mapping",
+       "bindsTo": "ExternalReferenceMapping",
+       "columns": [
+        "ExternalReferenceMapping.id",
+        "ExternalReferenceMapping.orderId",
+        "ExternalReferenceMapping.paymentId",
+        "ExternalReferenceMapping.refundId",
+        "ExternalReferenceMapping.sourceSystem",
+        "ExternalReferenceMapping.provider",
+        "ExternalReferenceMapping.merchantId",
+        "ExternalReferenceMapping.externalTransactionId",
+        "ExternalReferenceMapping.authorizationCode",
+        "ExternalReferenceMapping.partnerOrderId",
+        "ExternalReferenceMapping.settlementBatch",
+        "ExternalReferenceMapping.settlementDate"
+       ],
+       "operation": "listExternalReferenceMappings",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/external-references"
       }
      ]
     },
@@ -1386,6 +1488,14 @@
        "kind": "secondaryButton",
        "label": "Wallet Providers",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 49 §Support references from"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record external reference",
+       "operation": "recordExternalReference",
+       "permission": "ORDER_MODIFY",
+       "notes": "**The manual mapping `orders.external_reference_mapping` had no writer for** (DM5 open item).",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/external-references"
       }
      ]
     }
@@ -1403,6 +1513,22 @@
     "contract": "orders",
     "purpose": "External Payment, Partner & Settlement Reference Mapping",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listExternalReferenceMappings",
+    "contract": "orders",
+    "purpose": "The references other systems hold for this order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordExternalReference",
+    "contract": "orders",
+    "purpose": "Map an order to a reference another system holds, by hand",
+    "trigger": "onAction",
+    "invalidates": [
+     "listExternalPaymentPartner",
+     "listExternalReferenceMappings"
+    ]
    }
   ],
   "wireframe": {
@@ -1412,6 +1538,47 @@
    "workshopBoard": "wireframes/WS86 Order   Reservation Management Board 3.dc.html#bo-330"
   },
   "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 16 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** POS Terminals, Finance Systems, Wallet Providers are choices sent by `listExternalPaymentPartner`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formRecordExternalReference",
+    "component": "modal",
+    "trigger": "Record external reference",
+    "body": "**Collects what `recordExternalReference` sends before it is called.** Required: `sourceSystem`, `reason`. Optional: `paymentId`, `refundId`, `provider`, `merchantId`, `externalTransactionId`, `authorizationCode`, `partnerOrderId`, `settlementBatch`, `settlementDate`, `erpReference`, `amount`, `approvalReference`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateExternalReferenceMappingRequest",
+    "confirm": {
+     "label": "Record external reference",
+     "operation": "recordExternalReference"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sourceSystem",
+      "reason",
+      "paymentId",
+      "refundId",
+      "provider",
+      "merchantId",
+      "externalTransactionId",
+      "authorizationCode",
+      "partnerOrderId",
+      "settlementBatch",
+      "settlementDate",
+      "erpReference",
+      "amount",
+      "approvalReference"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/external-references"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

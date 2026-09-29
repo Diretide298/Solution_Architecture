@@ -1,4 +1,240 @@
 {
+ "AccessFastPassProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "access.fast_pass_profile",
+  "description": "One Fast Pass profile (e.g. Silver, Gold) - total uses or unlimited, uses consumed per validation, the one-access-per-ride restriction and the eligible attraction categories (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "name",
+   "unlimited"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The profileId the list shows"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "unlimited": {
+    "type": "boolean",
+    "default": false
+   },
+   "totalUses": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Null when unlimited"
+   },
+   "consumptionPerValidation": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1
+   },
+   "onePerRide": {
+    "type": "boolean",
+    "default": false
+   },
+   "eligibleAttractionCategories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "The list's eligibleType, e.g. rollerCoaster, dropTower, waterRide, adventureRide"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessJourneyProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "access.journey_profile",
+  "description": "One guest access journey profile (e.g. School Group Entry) - type, venue, credential used, status and the ordered steps a simulation walks (declared 29 September, data-model close-out DM1).",
+  "required": [
+   "id",
+   "scopePath",
+   "name",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The journeyProfileId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null is every park of the tenant"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "journeyType": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "e.g. B2B group, family"
+   },
+   "credentialType": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "e.g. group QR, mixed"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active"
+   },
+   "steps": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessJsonList"
+     }
+    ],
+    "description": "Ordered journey steps, each an accessPointId with a direction (entry or exit) and an optional local time HH:MM, as GuestJourneySimulationInput.steps"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessJsonList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the row that holds it.** A short list of structured entries read with its row and never queried on its own (thresholds, per-language messages, field mappings, steps), so a child table would add a join for nothing. The property that uses it says what an entry holds (declared 29 September, data-model close-out DM1).",
+  "items": {
+   "type": "object"
+  }
+ },
+ "AccessOperatingCalendarEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "access.operating_calendar_entry",
+  "description": "One dated entry in a venue operating calendar (normal day, holiday, private event, free-entry day, special event and so on), with whether tickets must be validated. Merges access.special_admission_window, whose free-view and special-event windows are entries carrying an admission type (declared 29 September, data-model close-out DM1)",
+  "required": [
+   "id",
+   "venueId",
+   "dayType",
+   "startsAt",
+   "endsAt",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dayType": {
+    "type": "string",
+    "enum": [
+     "normalOperatingDay",
+     "weekend",
+     "holiday",
+     "seasonalSchedule",
+     "privateEvent",
+     "freeEntryDay",
+     "maintenancePeriod",
+     "specialEvent",
+     "ladiesOnlySession",
+     "schoolGroupSession",
+     "afterHoursEvent"
+    ],
+    "description": "Kind of calendar entry"
+   },
+   "name": {
+    "type": "string",
+    "nullable": true
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "ticketValidationRequired": {
+    "type": "boolean",
+    "default": true,
+    "description": "False on free-entry days"
+   },
+   "admissionType": {
+    "type": "string",
+    "enum": [
+     "freeViewDay",
+     "specialEvent"
+    ],
+    "nullable": true,
+    "description": "Set on special admission windows only"
+   },
+   "attractionValidation": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "Special windows: attraction gates keep validating tickets"
+   },
+   "manualAttendanceRequired": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "Special windows: operator enters attendance count"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AdmissionRules": {
   "x-ticvai-persistence": "access.admission_rules",
   "type": "object",
@@ -351,6 +587,27 @@
    "restrictThresholdPercent": {
     "type": "integer",
     "description": "Occupancy percent at which the band becomes Restrict"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active",
+    "description": "`inactive` switches the policy off at once; `active` on a new or inactive policy submits it for approval (`pendingApproval`) (decided 29 September, writers pass)"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Start of validity; null for at once (decided 29 September, writers pass)"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "End of validity: after it a timer moves the policy to `expired` (decided 29 September, writers pass)"
    }
   },
   "required": [
@@ -679,7 +936,8 @@
    },
    "profileId": {
     "type": "string",
-    "description": "Group admission profile identifier"
+    "description": "The rule row's key (access.group_admission_rule.id); absent creates one (decided 29 September, writers pass)",
+    "format": "uuid"
    },
    "groupSegments": {
     "type": "array",

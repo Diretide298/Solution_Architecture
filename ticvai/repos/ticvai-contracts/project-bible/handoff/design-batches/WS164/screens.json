@@ -539,12 +539,75 @@
        "kind": "secondaryButton",
        "label": "Resource replacement cost",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 156 §Support analysis of"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create resource cost",
+       "operation": "createResourceCost",
+       "permission": "RESOURCE_MANAGE",
+       "notes": "**The writer of `resources.resource_cost`** (decided 29 September, writers pass).",
+       "provenance": "contract resources.yaml POST /resource-costs"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete resource cost",
+       "operation": "deleteResourceCost",
+       "permission": "RESOURCE_MANAGE",
+       "notes": "Removes one `resources.resource_cost` row (decided 29 September, writers pass).",
+       "provenance": "contract resources.yaml DELETE /resource-costs/{costId}"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Resource id",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?resourceId=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?kind=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?from=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listResourceCosts",
+       "notes": "Sends `?to=` to `listResourceCosts`.",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every resource cost entry",
+       "bindsTo": "ResourceCostEntry",
+       "columns": [
+        "ResourceCostEntry.id",
+        "ResourceCostEntry.resourceId",
+        "ResourceCostEntry.kind",
+        "ResourceCostEntry.amount",
+        "ResourceCostEntry.incurredOn",
+        "ResourceCostEntry.fromVenueId",
+        "ResourceCostEntry.toVenueId",
+        "ResourceCostEntry.note",
+        "ResourceCostEntry.scopePath"
+       ],
+       "operation": "listResourceCosts",
+       "provenance": "contract resources.yaml GET /resource-costs"
+      }
+     ]
     }
    ]
   },
@@ -568,6 +631,34 @@
     "contract": "resources",
     "purpose": "What resources cost and earn, grouped",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listResourceCosts",
+    "contract": "resources",
+    "purpose": "Cost entries booked against resources",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createResourceCost",
+    "contract": "resources",
+    "purpose": "Book a transfer, operating or replacement cost against a resource",
+    "trigger": "onAction",
+    "invalidates": [
+     "getResourceUtilisation",
+     "getResourceCostAnalytics",
+     "listResourceCosts"
+    ]
+   },
+   {
+    "operationId": "deleteResourceCost",
+    "contract": "resources",
+    "purpose": "Remove a cost entry booked in error",
+    "trigger": "onAction",
+    "invalidates": [
+     "getResourceUtilisation",
+     "getResourceCostAnalytics",
+     "listResourceCosts"
+    ]
    }
   ],
   "wireframe": {
@@ -576,6 +667,49 @@
    "workshopBoard": "wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-945"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 156. 0 of 0 labels bound to a contract property; 3 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `getResourceCostAnalytics`.",
+  "overlays": [
+   {
+    "id": "formCreateResourceCost",
+    "component": "modal",
+    "trigger": "Create resource cost",
+    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ResourceCostEntry",
+    "confirm": {
+     "label": "Create resource cost",
+     "operation": "createResourceCost"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "resourceId",
+      "kind",
+      "amount",
+      "incurredOn",
+      "fromVenueId",
+      "toVenueId",
+      "note",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract resources.yaml POST /resource-costs"
+   },
+   {
+    "id": "confirmDeleteResourceCost",
+    "component": "confirmDialog",
+    "trigger": "Delete resource cost",
+    "body": "**Names what `deleteResourceCost` changes and what it leaves alone**, in the consequence rather than the verb. A record this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract resources.yaml DELETE /resource-costs/{costId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "costId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

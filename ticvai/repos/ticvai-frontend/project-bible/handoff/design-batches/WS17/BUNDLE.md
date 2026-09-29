@@ -1,6 +1,6 @@
 # WS17 — Approval Workflows and Governance board 5
 
-**10 screens · 8 operations · 6 schemas · 4 permissions**
+**10 screens · 9 operations · 11 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,14 +60,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-384` | Delegation & Escalation Command Center | commandCentre | 2 | 0 | — |
+| `BO-384` | Delegation & Escalation Command Center | commandCentre | 3 | 1 | — |
 | `BO-385` | Delegation Management | configEditor | 4 | 0 | — |
 | `BO-386` | Temporary Delegation & Availability Calendar | listDetail | 2 | 0 | — |
 | `BO-387` | Out-of-Office & Substitute Routing | configEditor | 1 | 0 | — |
 | `BO-388` | Approval SLA Policy Configuration | configEditor | 1 | 0 | — |
 | `BO-389` | Reminder & Breach Notification Rules | listDetail | 1 | 0 | — |
 | `BO-390` | Escalation Policy Builder | listDetail | 1 | 0 | — |
-| `BO-391` | Live Escalation Operations Center | listDetail | 1 | 0 | — |
+| `BO-391` | Live Escalation Operations Center | listDetail | 2 | 1 | — |
 | `BO-392` | SLA & Escalation Performance Analytics | listDetail | 1 | 0 | — |
 | `BO-393` | AI SLA & Escalation Advisor | listDetail | 1 | 0 | — |
 
@@ -162,7 +162,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-391",
      "trigger": "Live Escalation Operations Center",
-     "provenance": "structural — pack board 5 wiring, 9 September 2026"
+     "provenance": "structural — pack board 5 wiring, 9 September 2026",
+     "carries": [
+      "instanceId"
+     ]
     },
     {
      "to": "BO-392",
@@ -223,6 +226,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 40 §KPI Cards"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Act on workflow instance",
+       "operation": "actOnWorkflowInstance",
+       "permission": "APPROVAL_ACT",
+       "notes": "**The monitors' action buttons, as one operation** (decided 29 September, writers pass).",
+       "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+      }
+     ]
     }
    ]
   },
@@ -247,6 +264,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Live escalations",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "actOnWorkflowInstance",
+    "contract": "approvals",
+    "purpose": "An operator's intervention in a running workflow",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalDelegations",
+     "listSlaEscalationBottleneck"
+    ]
    }
   ],
   "entryState": {
@@ -257,6 +284,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "SLA At Risk",
     "SLA Breached",
     "Escalated Today"
+   ],
+   "params": [
+    {
+     "name": "instanceId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
@@ -265,6 +299,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-384"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 8 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnWorkflowInstance",
+    "component": "modal",
+    "trigger": "Act on workflow instance",
+    "body": "**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`. Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`, `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "WorkflowInstanceActionInput",
+    "confirm": {
+     "label": "Act on workflow instance",
+     "operation": "actOnWorkflowInstance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason",
+      "workflowStepExecutionId",
+      "workflowExceptionId",
+      "assigneePrincipalId",
+      "alternativeNodeId",
+      "correctedInput",
+      "extendByMinutes",
+      "priority"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1119,7 +1181,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-384",
      "trigger": "Back to Delegation & Escalation Command Center",
      "provenance": "structural — pack board 5 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "instanceId"
+     ]
     }
    ]
   },
@@ -1152,6 +1217,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Act on workflow instance",
+       "operation": "actOnWorkflowInstance",
+       "permission": "APPROVAL_ACT",
+       "notes": "**The monitors' action buttons, as one operation** (decided 29 September, writers pass).",
+       "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+      }
+     ]
     }
    ]
   },
@@ -1169,6 +1248,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "What is escalating now",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "actOnWorkflowInstance",
+    "contract": "approvals",
+    "purpose": "An operator's intervention in a running workflow",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSlaEscalationBottleneck"
+    ]
    }
   ],
   "wireframe": {
@@ -1177,6 +1265,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-391"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnWorkflowInstance",
+    "component": "modal",
+    "trigger": "Act on workflow instance",
+    "body": "**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`. Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`, `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "WorkflowInstanceActionInput",
+    "confirm": {
+     "label": "Act on workflow instance",
+     "operation": "actOnWorkflowInstance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason",
+      "workflowStepExecutionId",
+      "workflowExceptionId",
+      "assigneePrincipalId",
+      "alternativeNodeId",
+      "correctedInput",
+      "extendByMinutes",
+      "priority"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "instanceId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1590,6 +1715,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "actOnWorkflowInstance": {
+  "method": "POST",
+  "path": "/workflow-instances/{instanceId}/actions",
+  "contract": "approvals",
+  "summary": "An operator's intervention in a running workflow",
+  "permission": "APPROVAL_ACT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkflowInstanceActionInput",
+  "responds": "WorkflowInstance"
+ },
  "createApprovalDelegation": {
   "method": "POST",
   "path": "/delegations",
@@ -2091,6 +2235,263 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean"
    }
   }
+ },
+ "WorkflowInstance": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.workflow_instance",
+  "description": "**One running workflow** (pack 13.2.1, 13.2.3 and 13.2.5; data model for the agreed operations, 29 September). Started by a `WorkflowTrigger`, on the version in force at that moment and kept on it to the end (audit R129). Its steps are `WorkflowStepExecution` rows, keyed by the same `correlationId` the participating services trace with. **The SLA clock and its reminder and escalation timestamps are held here**, not in a table of their own: there is one clock per instance, and the SLA, Escalation & Bottleneck Monitor lists instances. Lifecycle in `states/workflow-instance.yaml`. The engine writes this row; an operator changes it only through `actOnWorkflowInstance`, which keeps each change as a `WorkflowIntervention` (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "workflowDefinitionId",
+   "workflowVersionId",
+   "sourceModule",
+   "status",
+   "correlationId",
+   "startedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "workflowDefinitionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workflowVersionId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The version the instance started on; never changes"
+   },
+   "workflowTriggerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceModule": {
+    "$ref": "#/components/schemas/WorkflowModule"
+   },
+   "businessObjectType": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "businessObjectId": {
+    "type": "string",
+    "nullable": true,
+    "description": "**A reference, never a copy**, as `ApprovalRequest.subjectId`"
+   },
+   "initiatedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null when a system event or schedule started it"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priority": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true
+   },
+   "currentNodeId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The node of the version's graph the instance is at"
+   },
+   "status": {
+    "$ref": "#/components/schemas/WorkflowInstanceStatus"
+   },
+   "correlationId": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "The shared correlation id every participating service logs, for distributed tracing"
+   },
+   "slaPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ApprovalSlaPolicy` whose clock runs on this instance"
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean",
+    "default": false
+   },
+   "escalationLevel": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0
+   },
+   "firstReminderAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "secondReminderAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "managerEscalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "executiveEscalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaOutcome": {
+    "type": "string",
+    "enum": [
+     "metWithinTarget",
+     "metAfterReminder",
+     "metAfterEscalation",
+     "breached"
+    ],
+    "nullable": true,
+    "description": "How the instance finished against its SLA; set on completion (the monitor's Final Outcome)"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005). Written at venue scope"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "WorkflowInstanceActionInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; writes approvals.workflow_intervention (schema WorkflowIntervention) (decided 29 September, writers pass)",
+  "description": "One operator action on a running workflow instance (decided 29 September, writers pass).",
+  "required": [
+   "action",
+   "reason"
+  ],
+  "properties": {
+   "action": {
+    "$ref": "#/components/schemas/WorkflowInterventionAction"
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 500,
+    "description": "Mandatory for every action (pack 13.2.5, \"actions capture a mandatory reason\")"
+   },
+   "workflowStepExecutionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The step acted on; for `retryStep` the step to retry from. Defaults to the instance's current step"
+   },
+   "workflowExceptionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The exception the action is taken from; required for `escalateException`"
+   },
+   "assigneePrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for `reassign`, `addBackupApprover` and `escalateException`"
+   },
+   "alternativeNodeId": {
+    "type": "string",
+    "nullable": true,
+    "description": "For `skipStep`, the node to continue at instead of the next one (Use Approved Alternative)"
+   },
+   "correctedInput": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "For `resume`, the corrected input of the failed step (Correct Data)"
+   },
+   "extendByMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 43200,
+    "nullable": true,
+    "description": "Required for `extendSla`"
+   },
+   "priority": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "Required for `changePriority`"
+   }
+  }
+ },
+ "WorkflowInstanceStatus": {
+  "type": "string",
+  "description": "Where one running workflow stands (pack 13.2.1 and 13.2.3; decided 29 September, readiness close-out). Modelled in `states/workflow-instance.yaml`.",
+  "enum": [
+   "running",
+   "waitingApproval",
+   "waitingTask",
+   "waitingSystem",
+   "escalated",
+   "failed",
+   "completed",
+   "cancelled"
+  ]
+ },
+ "WorkflowInterventionAction": {
+  "type": "string",
+  "description": "What an operator did to a running workflow instance (pack 13.2.3, 13.2.4 and 13.2.5; decided 29 September, writers pass). The effect of each is on `actOnWorkflowInstance`.",
+  "enum": [
+   "reassign",
+   "retryStep",
+   "skipStep",
+   "resume",
+   "cancel",
+   "extendSla",
+   "addBackupApprover",
+   "changePriority",
+   "escalateException"
+  ]
+ },
+ "WorkflowModule": {
+  "type": "string",
+  "description": "The module a workflow, rule or automation belongs to and a workflow instance originates from. The same values as `WorkflowOperationsCommandCenterView.module` (decided 29 September, readiness close-out), named so the workflow engine's tables share one vocabulary (data model for the agreed operations, 29 September).",
+  "enum": [
+   "ticketing",
+   "pricing",
+   "finance",
+   "procurement",
+   "crm",
+   "resourceManagement",
+   "fnb",
+   "retail",
+   "groupSales",
+   "customerService",
+   "membership",
+   "wallet",
+   "waiver",
+   "subscriptionLicensing"
+  ]
  }
 }
 ```

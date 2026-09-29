@@ -202,6 +202,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "subjectId",
     "in": "query",
     "required": true

@@ -1,4 +1,23 @@
 {
+ "actOnWorkflowInstance": {
+  "method": "POST",
+  "path": "/workflow-instances/{instanceId}/actions",
+  "contract": "approvals",
+  "summary": "An operator's intervention in a running workflow",
+  "permission": "APPROVAL_ACT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkflowInstanceActionInput",
+  "responds": "WorkflowInstance"
+ },
  "createApprovalDelegation": {
   "method": "POST",
   "path": "/delegations",

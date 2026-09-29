@@ -143,6 +143,50 @@
   "requestBody": null,
   "responds": "AttendanceRecord"
  },
+ "listLabourBudgets": {
+  "method": "GET",
+  "path": "/labour-budgets",
+  "contract": "workforce",
+  "summary": "Labour budgets, per venue, department and period",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "departmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listOpenShifts": {
   "method": "GET",
   "path": "/shift-marketplace",
@@ -218,6 +262,25 @@
   ],
   "requestBody": null,
   "responds": "AttendanceRecord"
+ },
+ "setLabourBudget": {
+  "method": "PUT",
+  "path": "/labour-budgets",
+  "contract": "workforce",
+  "summary": "Set the labour budget for a venue, department and period",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LabourBudget",
+  "responds": "LabourBudget"
  },
  "setStaffingRules": {
   "method": "PUT",

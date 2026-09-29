@@ -1,6 +1,6 @@
 # WS29 — Membership   Annual Pass Management board 1
 
-**10 screens · 17 operations · 22 schemas · 6 permissions**
+**10 screens · 19 operations · 26 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,14 +60,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-284` | Membership & Annual Pass Command Center | listDetail | 1 | 0 | — |
+| `BO-284` | Membership & Annual Pass Command Center | listDetail | 2 | 1 | — |
 | `BO-285` | Membership Product & Tier Builder | configEditor | 2 | 0 | — |
 | `BO-286` | Membership Eligibility & Qualification Rule Builder | configEditor | 1 | 0 | — |
 | `BO-287` | Validity, Activation & Expiry Configuration | listDetail | 1 | 0 | — |
 | `BO-288` | Membership Entitlement & Admission Benefit Builder | configEditor | 4 | 0 | — |
-| `BO-289` | Membership Usage, Visit & Consumption Rules | listDetail | 3 | 0 | — |
+| `BO-289` | Membership Usage, Visit & Consumption Rules | listDetail | 4 | 1 | — |
 | `BO-290` | Family, Household & Dependent Membership Configuration | configEditor | 1 | 0 | — |
-| `BO-291` | Membership Commercial, Pricing & Channel Association | configEditor | 4 | 0 | — |
+| `BO-291` | Membership Commercial, Pricing & Channel Association | configEditor | 5 | 1 | — |
 | `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | configEditor | 1 | 0 | — |
 | `BO-293` | Membership Product Validation, Approval, Publication & Versioning | configEditor | 1 | 0 | — |
 
@@ -366,6 +366,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Custom Membership",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 4 §Support configurable types such as"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend membership product",
+       "operation": "approveMembershipProductValidation",
+       "permission": "PLATFORM_CELL_MANAGE",
+       "notes": "Quick action: sends `action: suspend` with a `reason`. Allowed only on an `active` version; selling stops on every channel at once and members already holding it keep their entitlements until their own expiry (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /membership-product-validation"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reinstate membership product",
+       "operation": "approveMembershipProductValidation",
+       "permission": "PLATFORM_CELL_MANAGE",
+       "notes": "Quick action: sends `action: reinstate`, moving a `suspended` version back to `active`; refused once its `effectiveTo` has passed (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /membership-product-validation"
       }
      ]
     }
@@ -384,6 +400,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Membership & Annual Pass Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "approveMembershipProductValidation",
+    "contract": "subscription",
+    "purpose": "Membership Product Validation, Approval, Publication & Versioning",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMembershipAnnualPass"
+    ]
    }
   ],
   "entryState": {
@@ -403,6 +428,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-284"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 4. 29 of 29 labels bound to a contract property; 45 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Monthly Membership, Fixed-Term Membership, Corporate Membership, Family Membership, Individual Membership, Student Membership, VIP Membership, Custom Membership … are choices sent by `listMembershipAnnualPass`.",
+  "overlays": [
+   {
+    "id": "confirmSuspendMembershipProduct",
+    "component": "confirmDialog",
+    "trigger": "Suspend membership product",
+    "body": "**Names what suspending stops and what it leaves alone**: the membership product and version, every channel it stops selling on, and that members already holding it keep their entitlements until their own expiry. **Collects what `approveMembershipProductValidation` sends before it is called.** Required: `membershipCode`, `action` (`suspend`), `reason`.",
+    "bindsTo": "MembershipProductValidationApprovalPublicationVersioInput",
+    "provenance": "contract subscription.yaml PUT /membership-product-validation"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1251,6 +1286,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 11 §Maintain counters such as"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save membership usage policy",
+       "operation": "setMembershipUsagePolicy",
+       "permission": "PLATFORM_CELL_MANAGE",
+       "notes": "The writer for the rules BO-289 shows through listMembershipUsageVisit: visit and admission limits, re-entry, reservations, no-show treatment, cancellations and guest usage for one membership product version, one row of subscription.membership_usage_policy per version (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /membership-usage-policy"
+      }
+     ]
     }
    ]
   },
@@ -1280,6 +1329,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "The membership plan templates whose usage rules are set",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMembershipUsagePolicy",
+    "contract": "subscription",
+    "purpose": "Save a membership product's usage, visit and consumption rules",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMembershipUsageVisit",
+     "listEntitlementTemplates"
+    ]
    }
   ],
   "entryState": {
@@ -1298,6 +1357,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS82 Membership   Annual Pass Management Board 1.dc.html#bo-289"
   },
   "apisNote": "Regenerated 9 September 2026 from Membership___Annual_Pass_Management_Reference.pdf page 11. 1 of 1 labels bound to a contract property; 20 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetMembershipUsagePolicy",
+    "component": "modal",
+    "trigger": "Save membership usage policy",
+    "body": "**Collects what `setMembershipUsagePolicy` sends before it is called.** Required: `membershipCode`, `reEntryPolicy`, `reservationRequirement`. Optional: `tier`, `maximumVisitsPerDay`, `maximumAdmissionsPerPeriod`, `admissionPeriod`, `reEntryCooldownMinutes`, `walkInAllowed`, `maximumAdvanceBookingDays`, `maximumActiveFutureReservations`, `concurrentReservations`, `noShowTreatment`, `noShowThreshold`, `noShowWindowDays` and 4 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MembershipUsagePolicyInput",
+    "confirm": {
+     "label": "Save membership usage policy",
+     "operation": "setMembershipUsagePolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "membershipCode",
+      "reEntryPolicy",
+      "reservationRequirement",
+      "tier",
+      "maximumVisitsPerDay",
+      "maximumAdmissionsPerPeriod",
+      "admissionPeriod",
+      "reEntryCooldownMinutes",
+      "walkInAllowed",
+      "maximumAdvanceBookingDays",
+      "maximumActiveFutureReservations",
+      "concurrentReservations",
+      "noShowTreatment",
+      "noShowThreshold",
+      "noShowWindowDays",
+      "noShowRestrictionDays",
+      "cancellationLimit",
+      "guestUsage"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /membership-usage-policy"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1668,6 +1764,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "operation": "publishChannelAvailability",
        "notes": "**Names the membership products, the channels they go on or come off, and from when**, before it runs. A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "contract catalogue.yaml PUT /channel-availability (authored: required by check-screens)"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save membership commercial config",
+       "operation": "setMembershipCommercialConfig",
+       "permission": "PLATFORM_CELL_MANAGE",
+       "notes": "The writer for the commercial columns BO-291 shows through listMembershipCommercialPricing: `basePricingProfile`, `taxProfile`, `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`, `paymentTerms` and `salesPeriod` on subscription.membership_product (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /membership-commercial-config"
       }
      ]
     }
@@ -1705,6 +1809,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "The price lists a membership is priced on",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMembershipCommercialConfig",
+    "contract": "subscription",
+    "purpose": "Save a membership product's commercial references, payment eligibility and sales period",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMembershipCommercialPricing",
+     "listPriceLists"
+    ]
    }
   ],
   "wireframe": {
@@ -1722,6 +1836,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formSetMembershipCommercialConfig",
+    "component": "modal",
+    "trigger": "Save membership commercial config",
+    "body": "**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`, `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MembershipCommercialConfigInput",
+    "confirm": {
+     "label": "Save membership commercial config",
+     "operation": "setMembershipCommercialConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "membershipCode",
+      "basePricingProfile",
+      "taxProfile",
+      "salesPeriod",
+      "feeProfile",
+      "upgradePricePolicy",
+      "promotionalPricingEligibility",
+      "paymentTerms"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /membership-commercial-config"
+   }
+  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2315,6 +2456,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "CatalogueMembershipBenefit",
   "responds": "CatalogueMembershipBenefit"
  },
+ "setMembershipCommercialConfig": {
+  "method": "PUT",
+  "path": "/membership-commercial-config",
+  "contract": "subscription",
+  "summary": "Save a membership product's commercial references, payment eligibility and sales period",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipCommercialConfigInput",
+  "responds": "MembershipCommercialPricingChannelAssociationView"
+ },
  "setMembershipEligibilityQualification": {
   "method": "PUT",
   "path": "/membership-eligibility-qualification",
@@ -2390,6 +2550,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "CatalogueMembershipProgramme",
   "responds": "CatalogueMembershipProgramme"
+ },
+ "setMembershipUsagePolicy": {
+  "method": "PUT",
+  "path": "/membership-usage-policy",
+  "contract": "subscription",
+  "summary": "Save a membership product's usage, visit and consumption rules",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MembershipUsagePolicyInput",
+  "responds": "MembershipUsageVisitConsumptionRulesView"
  },
  "setPlanBenefits": {
   "method": "PUT",
@@ -3091,7 +3270,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "FamilyHouseholdDependentMembershipConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_household_policy (MembershipHouseholdPolicy) (decided 29 September, data model DM4)",
   "description": "**What Family, Household & Dependent Membership Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "minimumAge": {
@@ -3378,10 +3557,173 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MembershipCommercialConfigInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; stored as the commercial columns of subscription.membership_product (MembershipProduct: basePricingProfile, taxProfile, feeProfile, upgradePricePolicy, promotionalPricingEligibility, paymentTerms, salesPeriod) (decided 29 September, writers pass; DM4)",
+  "description": "What setMembershipCommercialConfig submits. Prices, channels, the sales window and capacity are catalogue data and are set there (setPrices, publishChannelAvailability, createChannelCapacity/updateChannelCapacity), so none is repeated here (decided 29 September, writers pass; DM4)",
+  "required": [
+   "membershipCode",
+   "basePricingProfile",
+   "taxProfile",
+   "salesPeriod"
+  ],
+  "properties": {
+   "membershipCode": {
+    "type": "string",
+    "description": "The membership product (subscription.membership_product) being associated."
+   },
+   "basePricingProfile": {
+    "type": "string",
+    "description": "Base Pricing Profile id"
+   },
+   "taxProfile": {
+    "type": "string",
+    "description": "Tax Profile id"
+   },
+   "feeProfile": {
+    "type": "string",
+    "nullable": true,
+    "description": "Fee Profile id"
+   },
+   "upgradePricePolicy": {
+    "type": "string",
+    "nullable": true,
+    "description": "Upgrade Price Policy id (pack p.14); pro-rata credit on upgrade per MoM 1 Sep §4.9"
+   },
+   "promotionalPricingEligibility": {
+    "type": "boolean",
+    "default": false,
+    "description": "Promotional Pricing Eligibility: promotions may apply to this membership"
+   },
+   "paymentTerms": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fullPayment",
+      "installments",
+      "corporateCredit",
+      "autoRenewPayment"
+     ]
+    },
+    "description": "Payment Eligibility (pp.14-15); installments only where the payments module supports them"
+   },
+   "salesPeriod": {
+    "type": "string",
+    "enum": [
+     "alwaysAvailable",
+     "fixedSalesWindow",
+     "seasonalSale",
+     "invitationOnly",
+     "capacityLimited"
+    ],
+    "description": "Sales Period (pack p.15); the window itself is the catalogue product's sales window"
+   }
+  }
+ },
+ "MembershipCommercialPricingChannelAssociationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Commercial, Pricing & Channel Association displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "basePricingProfile": {
+    "type": "string",
+    "description": "Base Pricing Profile id"
+   },
+   "membershipTierPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Membership Tier Price, as calculated by the linked pricing profile (read-only)"
+   },
+   "renewalPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Renewal Price, as calculated by the linked renewal pricing (read-only)"
+   },
+   "promotionalPricingEligibility": {
+    "type": "boolean",
+    "description": "Promotional Pricing Eligibility: promotions may apply to this membership"
+   },
+   "taxProfile": {
+    "type": "string",
+    "description": "Tax Profile id"
+   },
+   "feeProfile": {
+    "type": "string",
+    "description": "Fee Profile id",
+    "nullable": true
+   },
+   "salesCapacity": {
+    "type": "integer",
+    "description": "Capacity limit for a capacityLimited sales period",
+    "nullable": true
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "upgradePricePolicy": {
+    "type": "string",
+    "description": "Upgrade Price Policy id (pack p.14); pro-rata credit on upgrade per MoM 1 Sep §4.9",
+    "nullable": true
+   },
+   "availableChannels": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    },
+    "description": "Channel Availability (pack p.14): B2C -> guestWeb, Mobile App -> guestApp, POS and Box Office -> pos, Call Center -> callCentre, Kiosk -> kiosk, B2B and Corporate -> b2b, Reseller -> partner, API -> api"
+   },
+   "paymentTerms": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fullPayment",
+      "installments",
+      "corporateCredit",
+      "autoRenewPayment"
+     ]
+    },
+    "description": "Payment Eligibility (pp.14-15); installments only where the payments module supports them"
+   },
+   "salesPeriod": {
+    "type": "string",
+    "enum": [
+     "alwaysAvailable",
+     "fixedSalesWindow",
+     "seasonalSale",
+     "invitationOnly",
+     "capacityLimited"
+    ],
+    "description": "Sales Period (pack p.15)"
+   },
+   "salesWindowFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Sales window start, for fixedSalesWindow or seasonalSale",
+    "nullable": true
+   },
+   "salesWindowTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Sales window end",
+    "nullable": true
+   }
+  }
+ },
  "MembershipEligibilityQualificationRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_eligibility_rule (MembershipEligibilityRule) for the rules and subscription.membership_product for the product-level switches (decided 29 September, data model DM4)",
   "description": "**What Membership Eligibility & Qualification Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "multipleMembershipsAllowed": {
@@ -3599,7 +3941,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "MembershipEntitlementAdmissionBenefitBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.webhook_delivery at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_entitlement (MembershipEntitlement), one row per entitlement (decided 29 September, data model DM4)",
   "description": "**What Membership Entitlement & Admission Benefit Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "membershipCode": {
@@ -3875,7 +4217,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "MembershipProductTierBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.api_licence at 7%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_product (MembershipProduct), a new version when the product is active (decided 29 September, data model DM4)",
   "description": "**What Membership Product & Tier Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "membershipName": {
@@ -4175,7 +4517,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "MembershipProductValidationApprovalPublicationVersioInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_product (status, approvalStage) with an audit row in subscription.membership_product_history (decided 29 September, data model DM4)",
   "description": "**What Membership Product Validation, Approval, Publication & Versioning submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "migrationPolicy": {
@@ -4204,9 +4546,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "approveOperational",
      "reject",
      "schedule",
-     "publish"
+     "publish",
+     "suspend",
+     "reinstate"
     ],
-    "description": "Decision taken on BO-293"
+    "description": "Decision taken on BO-293; `suspend` (from `active`, reason required) and `reinstate` (from `suspended`) are the BO-284 quick actions (decided 29 September, writers pass; DM4)"
    },
    "effectiveFrom": {
     "type": "string",
@@ -4380,6 +4724,272 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MembershipUsagePolicyInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_usage_policy (MembershipUsagePolicy), one row per product version (decided 29 September, writers pass; DM4)",
+  "description": "What setMembershipUsagePolicy submits for one membership product version; the fields of MembershipUsagePolicy a venue sets. Counters and figures are not sent (decided 29 September, writers pass; DM4)",
+  "required": [
+   "membershipCode",
+   "reEntryPolicy",
+   "reservationRequirement"
+  ],
+  "properties": {
+   "membershipCode": {
+    "type": "string",
+    "description": "The membership product (subscription.membership_product) whose rules these are."
+   },
+   "tier": {
+    "type": "string",
+    "nullable": true,
+    "description": "Tier, where the product code covers several tiers."
+   },
+   "maximumVisitsPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Maximum Visits per Day; empty for unlimited"
+   },
+   "maximumAdmissionsPerPeriod": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Maximum Admissions per admissionPeriod; empty for unlimited"
+   },
+   "admissionPeriod": {
+    "type": "string",
+    "enum": [
+     "perDay",
+     "perWeek",
+     "perMonth",
+     "perMembershipYear"
+    ],
+    "nullable": true,
+    "description": "Period for maximumAdmissionsPerPeriod; required when that is set"
+   },
+   "reEntryPolicy": {
+    "type": "string",
+    "enum": [
+     "unlimitedSameDay",
+     "noReEntry",
+     "afterMinutes",
+     "venueSpecific"
+    ],
+    "description": "Re-entry (pack p.12)"
+   },
+   "reEntryCooldownMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Re-entry Cooldown in minutes; required for reEntryPolicy afterMinutes"
+   },
+   "reservationRequirement": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional"
+    ],
+    "description": "Advance Reservation (pack pp.11-12)"
+   },
+   "walkInAllowed": {
+    "type": "boolean",
+    "default": true,
+    "description": "Walk-In Allowed without a reservation"
+   },
+   "maximumAdvanceBookingDays": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Maximum Advance Booking Days"
+   },
+   "maximumActiveFutureReservations": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Maximum Active Future Reservations"
+   },
+   "concurrentReservations": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "Concurrent Reservations: maximum active reservations per timeslot. Default 1 (decided 29 September, readiness close-out)"
+   },
+   "noShowTreatment": {
+    "type": "string",
+    "enum": [
+     "none",
+     "restrictReservations"
+    ],
+    "default": "none",
+    "description": "No-Show Treatment (pack p.12)"
+   },
+   "noShowThreshold": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "No-shows that trigger the restriction; required for restrictReservations"
+   },
+   "noShowWindowDays": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Window in which no-shows are counted; required for restrictReservations"
+   },
+   "noShowRestrictionDays": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "default": 14,
+    "description": "Days reservation privilege stays restricted. Default 14 (decided 29 September, readiness close-out)"
+   },
+   "cancellationLimit": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Reservation cancellations allowed per 30 days; empty for unlimited"
+   },
+   "guestUsage": {
+    "type": "string",
+    "enum": [
+     "withMemberOnly",
+     "independent"
+    ],
+    "default": "withMemberOnly",
+    "description": "Guest Usage: whether guest tickets need the member present"
+   },
+   "benefitConsumption": {
+    "type": "string",
+    "enum": [
+     "onRedemption",
+     "onValidatedVisit"
+    ],
+    "default": "onRedemption",
+    "description": "Benefit Consumption: when a benefit counter decrements"
+   }
+  }
+ },
+ "MembershipUsageVisitConsumptionRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Usage, Visit & Consumption Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "maximumVisitsPerDay": {
+    "type": "integer",
+    "description": "Maximum Visits per Day; empty for unlimited",
+    "nullable": true
+   },
+   "maximumAdmissionsPerPeriod": {
+    "type": "integer",
+    "description": "Maximum Admissions per admissionPeriod; empty for unlimited",
+    "nullable": true
+   },
+   "reEntryCooldownMinutes": {
+    "type": "integer",
+    "description": "Re-entry Cooldown in minutes, for reEntryPolicy afterMinutes",
+    "nullable": true
+   },
+   "concurrentReservations": {
+    "type": "integer",
+    "description": "Concurrent Reservations: maximum active reservations per timeslot (pack example: one). Default 1 (decided 29 September, readiness close-out)"
+   },
+   "noShowTreatment": {
+    "type": "string",
+    "enum": [
+     "none",
+     "restrictReservations"
+    ],
+    "description": "No-Show Treatment (pack p.12)"
+   },
+   "cancellationLimit": {
+    "type": "integer",
+    "description": "Cancellation Limit: reservation cancellations allowed per 30 days; empty for unlimited (decided 29 September, readiness close-out)",
+    "nullable": true
+   },
+   "guestUsage": {
+    "type": "string",
+    "enum": [
+     "withMemberOnly",
+     "independent"
+    ],
+    "description": "Guest Usage: whether guest tickets need the member present. Default withMemberOnly (decided 29 September, readiness close-out)"
+   },
+   "benefitConsumption": {
+    "type": "string",
+    "enum": [
+     "onRedemption",
+     "onValidatedVisit"
+    ],
+    "description": "Benefit Consumption: when a benefit counter decrements. Default onRedemption (decided 29 September, readiness close-out)"
+   },
+   "walkInAllowed": {
+    "type": "boolean",
+    "description": "Walk-In Allowed without a reservation"
+   },
+   "maximumAdvanceBookingDays": {
+    "type": "integer",
+    "description": "Maximum Advance Booking Days",
+    "nullable": true
+   },
+   "maximumActiveFutureReservations": {
+    "type": "integer",
+    "description": "Maximum Active Future Reservations",
+    "nullable": true
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier",
+    "nullable": true
+   },
+   "admissionPeriod": {
+    "type": "string",
+    "enum": [
+     "perDay",
+     "perWeek",
+     "perMonth",
+     "perMembershipYear"
+    ],
+    "description": "Period for maximumAdmissionsPerPeriod",
+    "nullable": true
+   },
+   "reEntryPolicy": {
+    "type": "string",
+    "enum": [
+     "unlimitedSameDay",
+     "noReEntry",
+     "afterMinutes",
+     "venueSpecific"
+    ],
+    "description": "Re-entry (pack p.12)"
+   },
+   "reservationRequirement": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional"
+    ],
+    "description": "Advance Reservation (pack pp.11-12)"
+   },
+   "noShowThreshold": {
+    "type": "integer",
+    "description": "No-shows that trigger the restriction (pack example: 3)",
+    "nullable": true
+   },
+   "noShowWindowDays": {
+    "type": "integer",
+    "description": "Window in which no-shows are counted (pack example: 30 days)",
+    "nullable": true
+   },
+   "noShowRestrictionDays": {
+    "type": "integer",
+    "description": "Days reservation privilege stays restricted. Default 14 (decided 29 September, readiness close-out)",
+    "nullable": true
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -4402,7 +5012,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "RenewalAutoRenewalMembershipContinuityConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_renewal_policy (MembershipRenewalPolicy) (decided 29 September, data model DM4)",
   "description": "**What Renewal, Auto-Renewal & Membership Continuity Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "autoRenewEligible": {
@@ -4660,7 +5270,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "ValidityActivationExpiryConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; stored as subscription.membership_product (MembershipProduct) (decided 29 September, data model DM4)",
   "description": "**What Validity, Activation & Expiry Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "configuredStart": {

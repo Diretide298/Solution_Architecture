@@ -1,6 +1,6 @@
 # P08-sell-01 — P08 · Sell (1 of 4)
 
-**10 screens · 85 operations · 78 schemas · 10 permissions**
+**10 screens · 88 operations · 80 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,8 +62,8 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-007` | Product Directory | listDetail | 14 | 7 | — |
 | `BO-009` | Pricing Rules | listDetail | 11 | 4 | — |
-| `BO-010` | Promotions & Coupons | listDetail | 24 | 10 | — |
-| `BO-011` | Packages & Bundles | listDetail | 10 | 4 | — |
+| `BO-010` | Promotions & Coupons | listDetail | 26 | 10 | — |
+| `BO-011` | Packages & Bundles | listDetail | 12 | 5 | — |
 | `BO-012` | Membership Products | listDetail | 12 | 6 | — |
 | `BO-013` | Channel & Distribution | listDetail | 10 | 6 | — |
 | `BO-014` | Catalogue Publishing | listDetail | 13 | 7 | — |
