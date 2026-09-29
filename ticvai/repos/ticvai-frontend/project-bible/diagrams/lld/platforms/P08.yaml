@@ -55,7 +55,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 525
+  operationCalls: 526
 - service: CatalogueService
   operationCalls: 396
 - service: TenancyService
@@ -21569,6 +21569,7 @@ screens:
   - cloneResource
   - createResource
   - getResource
+  - getResourceQualifications
   - setResourceLifecycleState
   - updateResource
   states:

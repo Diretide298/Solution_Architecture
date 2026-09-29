@@ -311,7 +311,7 @@ operationsByContract:
     scope: region
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: lookupInventoryItem
     verb: GET
@@ -432,7 +432,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
-    writes: 4
+    writes: 5
 tables:
 - store: cache:idempotency
   kind: cache
@@ -658,7 +658,8 @@ tables:
   columns: 12
   store: postgres
   parent: inventory.supplier
-  writtenBy: []
+  writtenBy:
+  - inventory
   foreignWriters: null
 - table: inventory.transfer
   columns: 15

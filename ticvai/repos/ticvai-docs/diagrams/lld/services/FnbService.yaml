@@ -55,14 +55,14 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: buildProductionPlan
     verb: POST
     path: /production-plans
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 6
+    reads: 7
     writes: 3
   - operation: cancelFnbOrder
     verb: POST
@@ -158,7 +158,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 5
+    reads: 6
     writes: 4
   - operation: createMenu
     verb: POST
@@ -366,7 +366,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listDiningOutlets
     verb: GET
@@ -646,7 +646,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: true
-    reads: 3
+    reads: 4
     writes: 2
   - operation: recordWaste
     verb: POST
@@ -1293,7 +1293,8 @@ tables:
   columns: 5
   store: postgres
   parent: fnb.menu_item
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.menu_schedule
   columns: 9

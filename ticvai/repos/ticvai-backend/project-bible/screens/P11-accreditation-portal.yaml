@@ -180,16 +180,18 @@ screens:
     it — in steps, with a draft that survives leaving.
 
     '
-  apis: []
+  apis:
+  - operationId: createAccreditationApplication
+    contract: accreditation
+    purpose: Register the applicant, the organisation and the coverage requested
+    trigger: onAction
+    provenance: readiness close-out, 29 September 2026
+  - operationId: submitAccreditationDocument
+    contract: accreditation
+    purpose: Each supporting document, against the requirement it satisfies
+    trigger: onAction
+    provenance: readiness close-out, 29 September 2026
   gaps:
-  - operation: createAccreditationApplication
-    why: '**The registration form cannot register.** The screen declared `listApprovalRequests`, which
-      is a reviewer''s read, and nothing that creates an application. Removed 9 September rather than
-      left in place: an operation that is on a screen because it was nearby is the residue pattern this
-      package has now found five times.
-
-      '
-    source: 7 September workshop — accreditation form builder, categories and programme setup
   - operation: saveAccreditationDraft
     why: 'The pattern requires a draft that autosaves. **A four-step form that loses everything to a dropped
       connection is a form people do not come back to**, and the drawn frame offers *"Save and finish
@@ -282,15 +284,17 @@ screens:
     - ACC-003
     - ACC-007
     transitions:
-    - to: ACC-007
-      trigger: A reviewer checks and approves
-      provenance: flow F23 step 1→2
     - to: ACC-003
       trigger: Application Review & Submit
       carries:
       - applicationRef
       provenance: derived — ACC-003 declares entryState.params applicationRef and ACC-002 holds applicationRef,
         so an edge into it carries them
+    - to: ACC-007
+      trigger: A reviewer checks and approves
+      provenance: flow F23 step 1→2
+      carries:
+      - applicationId
   implementation:
     app: accreditation-web
     route: /applicant-journey/registration-form
@@ -321,7 +325,12 @@ screens:
     submit.
 
     '
-  apis: []
+  apis:
+  - operationId: createAccreditationApplication
+    contract: accreditation
+    purpose: Submit the reviewed application
+    trigger: onAction
+    provenance: readiness close-out, 29 September 2026
   gaps:
   - operation: submitAccreditationApplication
     why: '**The submit button has nothing behind it.** The screen declared no operation at all, and submit
@@ -450,7 +459,12 @@ screens:
     a queue position.**
 
     '
-  apis: []
+  apis:
+  - operationId: listAccreditationApplications
+    contract: accreditation
+    purpose: The applicant's own applications and where each one stands
+    trigger: onLoad
+    provenance: readiness close-out, 29 September 2026
   gaps:
   - operation: getAccreditationApplicationByReference
     why: '**A status screen with no status read.** The screen declared no operation. It also cannot use
@@ -579,14 +593,16 @@ screens:
 
     '
   apis:
-  - operationId: listAccreditationBadges
-    contract: approvals
-    purpose: The badges issued against this application
+  - operationId: listAccreditationCredentials
+    contract: accreditation
+    purpose: The credentials issued against this application
     trigger: onLoad
-  - operationId: issueAccreditationBadge
-    contract: approvals
-    purpose: Issue the badge
+    provenance: readiness close-out, 29 September 2026
+  - operationId: issueAccreditationCredential
+    contract: accreditation
+    purpose: Issue the badge or mobile credential
     trigger: onAction
+    provenance: readiness close-out, 29 September 2026
   gaps:
   - operation: getAccreditationBadge
     why: 'The screen shows one badge and the only read is a list. **A holder opening their own badge should
@@ -680,7 +696,7 @@ screens:
     - to: SCN-003
       trigger: A steward scans it at a service gate
       provenance: flow F23 step 3→4
-      operation: issueAccreditationBadge
+      operation: issueAccreditationCredential
       crossesDevice: true
       back: false
   implementation:
@@ -714,10 +730,11 @@ screens:
 
     '
   apis:
-  - operationId: listApprovalRequests
-    contract: approvals
-    purpose: Accreditation applications awaiting a decision
+  - operationId: listAccreditationApplications
+    contract: accreditation
+    purpose: Applications awaiting review, oldest first
     trigger: onLoad
+    provenance: readiness close-out, 29 September 2026
   gaps:
   - operation: getWaitTimes
     removed: true
@@ -796,8 +813,8 @@ screens:
     transitions:
     - to: ACC-007
       trigger: Reviewer Application Detail
-      provenance: derived — ACC-007 declares entryState.params requestId and ACC-006 holds none of them,
-        so the edge carries nothing and ACC-007 opens cold
+      provenance: derived — ACC-007 declares entryState.params applicationId and ACC-006 holds none of
+        them, so the edge carries nothing and ACC-007 opens cold
     - to: ACC-008
       trigger: Credential Register
       provenance: derived — ACC-008 declares entryState.params  and ACC-006 holds none of them, so the
@@ -833,18 +850,24 @@ screens:
 
     '
   apis:
-  - operationId: listApprovalRequests
-    contract: approvals
+  - operationId: listAccreditationApplications
+    contract: accreditation
     purpose: The application under review
     trigger: onLoad
-  - operationId: decideApprovalRequest
-    contract: approvals
-    purpose: Approve or refuse, with a reason
+    provenance: readiness close-out, 29 September 2026
+  - operationId: decideAccreditationApplication
+    contract: accreditation
+    purpose: Approve, reject or return for information
     trigger: onAction
-    invalidates:
-    - listApprovalRequests
-    - listAccreditationBadges
+    provenance: readiness close-out, 29 September 2026
   gaps:
+  - operation: listAccreditationDocuments
+    why: 'The reviewer verifies each document, and nothing reads an application''s documents back, so
+      there is no documentId to act on. `verifyAccreditationDocument` joins this screen when the read
+      exists (BL-180).
+
+      '
+    source: re-trace of 29 September, contract-backlog BL-180
   - operation: getApprovalRequest
     why: 'The screen shows one application and the only read is a list. **A detail screen that fetches
       a collection to find one row is a detail screen that gets slower as the queue grows.**
@@ -915,7 +938,7 @@ screens:
     emptyFirstRun: Nothing selected. The queue is where a reviewer starts.
   entryState:
     params:
-    - name: requestId
+    - name: applicationId
       from: ACC-006
     preloaded:
     - summary
@@ -981,10 +1004,11 @@ screens:
 
     '
   apis:
-  - operationId: listAccreditationBadges
-    contract: approvals
-    purpose: Credentials issued for this programme
+  - operationId: listAccreditationCredentials
+    contract: accreditation
+    purpose: Every credential issued, with its validity
     trigger: onLoad
+    provenance: readiness close-out, 29 September 2026
   gaps:
   - operation: revokeAccreditationBadge
     why: 'The register offers **Revoke** and nothing performs it. `AccreditationBadge.state` and `revokedReason`
@@ -1079,8 +1103,8 @@ screens:
         edge carries nothing and ACC-006 opens cold
     - to: ACC-007
       trigger: Reviewer Application Detail
-      provenance: derived — ACC-007 declares entryState.params requestId and ACC-008 holds none of them,
-        so the edge carries nothing and ACC-007 opens cold
+      provenance: derived — ACC-007 declares entryState.params applicationId and ACC-008 holds none of
+        them, so the edge carries nothing and ACC-007 opens cold
   implementation:
     app: accreditation-web
     route: /reviewer-internal/credential-register

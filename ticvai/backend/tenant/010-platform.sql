@@ -277,7 +277,8 @@ CREATE TABLE IF NOT EXISTS platform.sale_board_page (
 );
 
 -- Child of sale_board_page, which is a child of sale_board. Two levels down, returned nested Hangs
--- off: reaches platform.scope through its keys; references platform.sale_board_page.
+-- off: reaches platform.scope through its keys; references platform.sale_board_page. Reached by: 1
+-- operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS platform.sale_board_tile (
     id                                uuid PRIMARY KEY NOT NULL,
     page_id                           uuid

@@ -37,7 +37,7 @@
 | matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333 … |
 | region | [`updateRegionSettings`](#updateregionsettings) | PUT | `/regions/{regionId}/settings` | setup | 1 | ADM-425, BO-1065 |
 | request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-243 … |
-| request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ACC-007, ADM-145, ADM-249, BO-084, BO-085, BO-133 … |
+| request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ADM-145, ADM-249, BO-084, BO-085, BO-133, BO-243 … |
 | request | [`evaluateApprovalRequirement`](#evaluateapprovalrequirement) | POST | `/approval-requests/evaluate` | core | 1 | ADM-337, BO-085, BO-368, POS-002, POS-004 |
 | rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | core | 1 | BO-055, BO-712, BO-884, BO-917, POS-009, POS-018 |
 | rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 1 | BO-055, BO-882, BO-883, EMP-021, EMP-022, EMP-023 … |
@@ -712,7 +712,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | Conflict policy | serverWins |
 | Reads | `approvals.decision`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.decision`, `approvals.request`, `cache:idempotency`, `control.partner_agreement`, `control.partner_application`, `control.partner_change_request`, `marketing.privacy_notice_governance`, `platform.outbox` |
-| Called by | ACC-007, ADM-145, ADM-249, BO-084, BO-085, BO-133, BO-243, BO-367, BO-377, BO-378, BO-940, POS-020 |
+| Called by | ADM-145, ADM-249, BO-084, BO-085, BO-133, BO-243, BO-367, BO-377, BO-378, BO-940, POS-020 |
 | State model | AccessConfigurationVersion ([states/access-configuration-version.yaml](../../../states/access-configuration-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>AccessDynamicPolicyVersion ([states/access-dynamic-policy-version.yaml](../../../states/access-dynamic-policy-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `rejected`<br/>AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `draft`<br/>AccessMediaTemplateVersion ([states/access-media-template-version.yaml](../../../states/access-media-template-version.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `rejected`<br/>AccessMediaTemplate ([states/access-media-template.yaml](../../../states/access-media-template.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`, `pending` -> `returned`, `escalated` -> `returned`, `pending` -> `informationRequested`, `escalated` -> `informationRequested`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Partner application ([states/partner-application.yaml](../../../states/partner-application.yaml)): moves `inReview` -> `approved`, `inReview` -> `rejected`<br/>Partner change request ([states/partner-change-request.yaml](../../../states/partner-change-request.yaml)): moves `pendingApproval` -> `approved`, `pendingApproval` -> `rejected`<br/>Privacy notice governance ([states/privacy-notice-governance.yaml](../../../states/privacy-notice-governance.yaml)): moves `review` -> `approved`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
 
 **Parameters**
@@ -1773,13 +1773,13 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 |---|---|
 | Permission | `WORKSTATION_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `platform.sale_board` non-empty |
+| Part of slice | setup, makes `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.sale_board` |
-| Writes | `cache:idempotency`, `platform.sale_board` |
+| Writes | `cache:idempotency`, `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Called by | BO-124 |
 
 **Parameters**
@@ -1950,7 +1950,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `platform.sale_board` |
+| Reads | `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Writes | - |
 | Called by | BO-115, BO-116, BO-117, BO-118, BO-122, BO-123, BO-126, POS-002, POS-025 |
 
@@ -2157,13 +2157,13 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 |---|---|
 | Permission | `WORKSTATION_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `platform.sale_board` non-empty |
+| Part of slice | setup, makes `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.sale_board` |
-| Writes | `cache:idempotency`, `platform.sale_board` |
+| Writes | `cache:idempotency`, `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Called by | BO-109, BO-116, BO-117, BO-118, BO-124, BO-125, BO-126 |
 
 **Parameters**
@@ -2417,6 +2417,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_id | uuid | yes |  |
 | kind | text | yes |  |
 | is_active | boolean | no |  |
+
+### `platform.sale_board_page`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| sale_board_id | uuid | yes | The parent row. |
+| name | text | yes |  |
+| sort_order | integer | yes |  |
+| id | uuid | yes | Synthesised key. |
+
+### `platform.sale_board_tile`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| page_id | uuid | no | Points at platform.sale_board_page. |
 
 ### `platform.scope`
 

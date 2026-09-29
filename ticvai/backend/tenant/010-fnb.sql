@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS fnb.delivery_location (
 
 -- join table. Which outlets serve which locations Hangs off: a child of fnb.delivery_location;
 -- reaches fnb.service_order through its keys; references fnb.delivery_location, platform.outlet.
+-- Reached by: 2 operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS fnb.delivery_location_outlet (
     id                                uuid PRIMARY KEY NOT NULL,
     location_id                       uuid,

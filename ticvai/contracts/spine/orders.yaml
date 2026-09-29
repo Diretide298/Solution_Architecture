@@ -3194,7 +3194,7 @@ paths:
         '
       tags:
       - orders
-      x-ticvai-permission: null
+      x-ticvai-permission: ORDER_VIEW
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
@@ -3252,7 +3252,7 @@ paths:
         '
       tags:
       - orders
-      x-ticvai-permission: null
+      x-ticvai-permission: ORDER_VIEW
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica

@@ -271,7 +271,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_VIEW
     offline: false
-    reads: 2
+    reads: 4
     writes: 0
   - operation: getCellCapacity
     verb: GET
@@ -287,7 +287,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_CELL_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getCommissionStatement
     verb: GET
@@ -351,7 +351,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getTenantLicences
     verb: GET
@@ -808,7 +808,7 @@ operationsByContract:
     permission: PLATFORM_CELL_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 4
   - operation: reactivateTenant
     verb: POST
     path: /tenants/{tenantId}/reactivate
@@ -1211,7 +1211,7 @@ operationsByContract:
     permission: PLATFORM_RELEASE_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: getMigrationRun
     verb: GET
     path: /migrations/runs/{runId}
@@ -1234,7 +1234,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_RELEASE_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getRollout
     verb: GET
@@ -1306,7 +1306,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_RELEASE_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listRollouts
     verb: GET
@@ -1354,8 +1354,8 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_MIGRATION_VIEW
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: promoteRelease
     verb: POST
     path: /releases/{reinventoryHoldId}/promote
@@ -1943,7 +1943,8 @@ tables:
   columns: 9
   store: postgres
   parent: control.cell
-  writtenBy: []
+  writtenBy:
+  - subscription
   foreignWriters: null
 - table: control.cell_job
   columns: 10
@@ -1956,7 +1957,8 @@ tables:
   columns: 10
   store: postgres
   parent: control.cell
-  writtenBy: []
+  writtenBy:
+  - subscription
   foreignWriters: null
 - table: control.channel_listing
   columns: 13
@@ -2038,7 +2040,8 @@ tables:
   columns: 10
   store: postgres
   parent: control.migration_plan
-  writtenBy: []
+  writtenBy:
+  - platform-ops
   foreignWriters: null
 - table: control.migration_run
   columns: 14
@@ -2265,7 +2268,8 @@ tables:
   columns: 5
   store: postgres
   parent: control.release
-  writtenBy: []
+  writtenBy:
+  - platform-ops
   foreignWriters: null
 - table: control.rollout
   columns: 13

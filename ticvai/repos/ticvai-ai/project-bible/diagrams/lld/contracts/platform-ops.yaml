@@ -38,6 +38,7 @@ operations:
   writes:
   - cache:idempotency
   - control.release
+  - control.release_component
 - operation: getMigrationRun
   verb: GET
   path: /migrations/runs/{runId}
@@ -74,6 +75,7 @@ operations:
   offline: false
   reads:
   - control.release
+  - control.release_component
   writes: []
 - operation: getRollout
   verb: GET
@@ -175,6 +177,7 @@ operations:
   offline: false
   reads:
   - control.release
+  - control.release_component
   writes: []
 - operation: listRollouts
   verb: GET
@@ -247,9 +250,11 @@ operations:
   reads:
   - cache:idempotency
   - control.migration_plan
+  - control.migration_plan_cell
   writes:
   - cache:idempotency
   - control.migration_plan
+  - control.migration_plan_cell
 - operation: promoteRelease
   verb: POST
   path: /releases/{reinventoryHoldId}/promote

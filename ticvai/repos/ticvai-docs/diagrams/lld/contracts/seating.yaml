@@ -39,6 +39,7 @@ operations:
   - seating.seat_price_band
   - seating.seating_rules
   - seating.section
+  - seating.section_row
   writes:
   - cache:idempotency
   - seating.group_request
@@ -192,6 +193,7 @@ operations:
   - cache:idempotency
   - seating.seat_map
   - seating.section
+  - seating.section_row
 - operation: createSeatMapTemplate
   verb: POST
   path: /seat-map-templates
@@ -410,6 +412,7 @@ operations:
   - cache:idempotency
   - seating.seat_map
   - seating.section
+  - seating.section_row
 - operation: listGroupSeatRequests
   verb: GET
   path: /group-seat-requests
@@ -701,6 +704,7 @@ operations:
   - cache:idempotency
   - seating.seat_map
   - seating.section
+  - seating.section_row
 - operation: updateSeats
   verb: PATCH
   path: /seat-maps/{seatMapId}/seats

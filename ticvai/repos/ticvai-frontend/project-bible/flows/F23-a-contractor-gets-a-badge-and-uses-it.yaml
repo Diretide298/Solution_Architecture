@@ -25,19 +25,19 @@ steps:
   operations: []
   outcome: Identity, company, what access is needed
   operationsNote: '**No operation exists for submitting an accreditation application.** The step named
-    `listApprovalRequests`, which is the reviewer''s call on ACC-006/ACC-007, not the applicant''s.'
+    `listAccreditationApplications`, which is the reviewer''s call on ACC-006/ACC-007, not the applicant''s.'
 - step: 2
   screen: ACC-007
   action: A reviewer checks and approves
   operations:
-  - listApprovalRequests
-  - decideApprovalRequest
+  - listAccreditationApplications
+  - decideAccreditationApplication
   outcome: '**Through `approvals`** — one mechanism, not a fifth'
 - step: 3
   screen: ACC-005
   action: The badge is issued
   operations:
-  - issueAccreditationBadge
+  - issueAccreditationCredential
   outcome: QR, NFC or printed — `MediaKind` already covers all four
 - step: 4
   screen: SCN-003

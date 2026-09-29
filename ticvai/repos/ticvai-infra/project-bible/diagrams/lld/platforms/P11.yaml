@@ -23,7 +23,7 @@ modulesUsed:
   screens: 8
 servicesCalled:
 - service: TenancyService
-  operationCalls: 6
+  operationCalls: 10
 coverage:
   screens: 8
   inAFlow: 3
@@ -58,7 +58,9 @@ screens:
   requiresModule: accreditation
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAccreditationApplication
+  - submitAccreditationDocument
   states:
   - denied
   - emptyFirstRun
@@ -81,7 +83,8 @@ screens:
   requiresModule: accreditation
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createAccreditationApplication
   states:
   - denied
   - emptyFirstRun
@@ -103,7 +106,8 @@ screens:
   requiresModule: accreditation
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAccreditationApplications
   states:
   - denied
   - emptyFirstRun
@@ -126,8 +130,8 @@ screens:
   wave: 3
   density: touchLarge
   operations:
-  - issueAccreditationBadge
-  - listAccreditationBadges
+  - issueAccreditationCredential
+  - listAccreditationCredentials
   states:
   - emptyFirstRun
   - emptyNoResults
@@ -150,7 +154,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listApprovalRequests
+  - listAccreditationApplications
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -173,8 +177,8 @@ screens:
   wave: 3
   density: compact
   operations:
-  - decideApprovalRequest
-  - listApprovalRequests
+  - decideAccreditationApplication
+  - listAccreditationApplications
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -183,7 +187,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - requestId<-ACC-006
+  - applicationId<-ACC-006
   goesTo:
   - ACC-005
   - ACC-006
@@ -199,7 +203,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listAccreditationBadges
+  - listAccreditationCredentials
   states:
   - emptyFirstRun
   - emptyNoAccess

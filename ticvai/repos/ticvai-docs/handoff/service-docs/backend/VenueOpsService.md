@@ -683,7 +683,7 @@ A damaged or lost card. The source moves to status `transferred`, with `transfer
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_collection`, `cache:idempotency` |
-| Writes | `assets.media_collection`, `cache:idempotency` |
+| Writes | `assets.media_collection`, `cache:idempotency`, `assets.media_collection_member` |
 | Called by | CMS-010, CMS-064 |
 
 **Parameters**
@@ -735,7 +735,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `assets.media_collection` |
+| Reads | `assets.media_collection`, `assets.media_collection_member` |
 | Writes | - |
 | Called by | CMS-010, CMS-062, CMS-064 |
 
@@ -4330,6 +4330,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | parent_collection_id | uuid | no |  |
 | asset_count | integer | yes |  |
 | cover_asset_id | uuid | no |  |
+
+### `assets.media_collection_member`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| collection_id | uuid | yes |  |
+| asset_id | uuid | yes |  |
+| added_by_principal_id | uuid | no |  |
+| added_at | timestamptz | no |  |
 
 ### `assets.media_fingerprint`
 

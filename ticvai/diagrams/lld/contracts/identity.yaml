@@ -184,7 +184,8 @@ operations:
   offline: false
   reads:
   - identity.access_decision
-  writes: []
+  writes:
+  - identity.authz_audit
 - operation: exportSubjectData
   verb: POST
   path: /guests/{subjectId}/data-export
@@ -430,6 +431,7 @@ operations:
   offline: false
   reads:
   - identity.access_decision
+  - identity.authz_audit
   writes: []
 - operation: listAccessPolicies
   verb: GET
@@ -674,6 +676,7 @@ operations:
   - identity.role
   writes:
   - cache:idempotency
+  - identity.refresh_token
   - identity.session
 - operation: logout
   verb: POST
@@ -688,6 +691,7 @@ operations:
   - identity.session
   writes:
   - cache:idempotency
+  - identity.refresh_token
   - identity.session
 - operation: openPlatformStaffGrant
   verb: POST
@@ -725,9 +729,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.refresh_token
   - identity.session
   writes:
   - cache:idempotency
+  - identity.refresh_token
   - identity.session
 - operation: registerGuest
   verb: POST

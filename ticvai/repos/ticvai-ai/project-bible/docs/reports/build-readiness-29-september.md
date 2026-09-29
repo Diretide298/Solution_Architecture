@@ -1,6 +1,6 @@
 # TICVAI — build readiness
 
-29 September 2026 · Chinmay Parab · follows the report of 28 September (`docs/reports/build-readiness-28-september.md`)
+29 September 2026, updated that evening · Chinmay Parab · follows the report of 28 September (`docs/reports/build-readiness-28-september.md`)
 
 ## Verdict
 
@@ -14,11 +14,12 @@
 
 |  | 28 Sep | 29 Sep |
 | --- | --: | --: |
+| Requirements specified | 2,650 of 2,788 (95%) | 2,781 of 2,848 (98%) |
 | Operations | 2,135 | 2,405 |
 | Not agreed (provisional) | 577 | 4 |
 | Agreed operations touching no table | 64 | 4 |
 | Tables | 678 | 988 |
-| Screens naming an operation | 2,319 of 2,427 | 2,334 of 2,440 |
+| Screens naming an operation | 2,319 of 2,427 | 2,337 of 2,440 |
 | Screens showing the client's prototype | 0 | 148 |
 | Questions for the client | five sessions and a decision | 14, all make-or-break |
 
@@ -37,20 +38,54 @@ These are the only questions, and they are in `handoff/TICVAI_Readiness_Question
 | Approved dependencies, payment sandbox access, the design reviewer | Names and accounts only they hold |
 | A/B price tests on live customers, cooling-off after auto-renewal | UAE consumer law. **Not blocking**: built as venue-configured policy that a person approves |
 
+## Later on 29 September
+
+Three more pieces of work landed after the morning's close-out.
+
+**The requirements were re-traced.** The trace still said "no contract" for areas that had since been contracted: Accreditation (Domain 12), access policies (ABAC) and device management. 198 rows were checked against the contracts as they now stand, and 174 changed verdict. **2,781 of 2,848 requirements in scope are now specified (98%)**, up from 2,650 of 2,788 (95%). The 67 left are 5 not covered and 62 partly covered, and every one has a contract-backlog entry, so none is untracked:
+
+- **Not covered (5):** a guest tax invoice and a credit memo (F&B), the e-invoicing export (Retail, which depends on the tax invoice), staff verifying a presented accreditation (Staff App), and storefront analytics (Marketing).
+- **Partly covered (62):** mostly cookie consent for anonymous visitors (15), accreditation (13: document reads, credential delivery, renewal, events, export; backlog BL-180), F&B (7) and promotions (7).
+
+The client workbook (`TICVAI - Build Readiness.xlsx`) now shows this per application: one sheet per application listing its requirements with what is left first, and a Requirements sheet with the client's own wording and filters.
+
+**The AI design is decided.** Chinmay answered every question in the AI system design on 29 September, under the same rule as the close-out; none was make-or-break, so **none goes to the client.** The main decisions:
+
+- Rules first, and a trained model per tenant only once a shadow run beats the rule. The admin is alerted, and a person promotes it; nothing switches by itself.
+- TICVAI-managed Azure OpenAI in UAE North, re-billed per token as a line in the module-based subscription. Bring-your-own-key is available when TICVAI enables it for a tenant.
+- All AI data retention is a tenant configuration, 90 days by default for prompts and responses, longer or shorter as the tenant sets it. Only a legal floor refuses a shorter value.
+- Language models never work on data directly: figures are computed first and bound into the text, or the model writes the query and the platform runs it.
+
+The design waits only on Chinmay's final read before it is committed. The record is section 8 of `docs/architecture/ai-system-design.md`.
+
+**Four small leftovers were closed:**
+
+- The Accreditation portal's applicant and reviewer screens call the accreditation operations instead of the approvals placeholders.
+- The last resources operation without a screen, `getResourceQualifications`, is on the resource profile.
+- 19 tables that no operation reached now have their writers named. Most are child tables written by their parent's operation.
+- Staff reading a billing statement need `ORDER_VIEW`.
+
 ## What is left for us
 
 Our work, not the client's. It is also in the workbook, sheet "Our work":
 
 1. **Wireframes for Venue Management:** run the 142 Claude Design batches. Each returns a working file whose screens are captured as frames automatically.
-2. **Six build gaps from the design packs**, sized at about 100 to 170 operations (`docs/active/design-pack-coverage.md`): Event Management, Entitlement Lifecycle (portfolio), Finance Backend, Virtual Queue, and the two AI packs.
-3. **The AI screens:** 88 TICVAI admin (P09) screens name no operation. They wait on the AI system design review (`docs/architecture/ai-system-design.md`, not yet committed).
-4. **Small leftovers:**
+2. **The 67 requirements not yet fully covered**, above. Each is in the workbook's Missing sheet and on its application's sheet, with the operation that would serve it.
+3. **Six build gaps from the design packs**, sized at about 100 to 170 operations (`docs/active/design-pack-coverage.md`): Event Management, Entitlement Lifecycle (portfolio), Finance Backend, Virtual Queue, and the two AI packs.
+4. **The AI contract work**, now that the design is decided:
+   - the 89 new AI operations in `ai.yaml`, then binding the 88 TICVAI admin (P09) screens and the 8 Venue Management AI screens to them;
+   - AI retention as a tenant configuration;
+   - the bring-your-own-key switch on the platform side;
+   - a private-to-tenant flag on subscription plans, so a custom package is not offered to everyone;
+   - the six new ADRs (0049 to 0054) and the four amended ones.
+5. **Small leftovers:**
    - the kitchen SLA table and the F&B stock recount table
    - which partner settings a partner may edit on its own portal
    - rebinding the deprecated partner-agreement fields on four screens
    - a screen for membership case notes
    - a writer for partner compliance documents
    - the support SUP-024 summary tiles
+   - found on 29 September: nothing writes which outlets serve a delivery location; supplier contracts have no operation of their own; nothing reads an accreditation application's documents back, so reviewers cannot yet verify them on screen
 
 ## Where to start
 

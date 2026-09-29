@@ -114271,6 +114271,11 @@ screens:
     purpose: The resource being edited
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getResourceQualifications
+    contract: resources
+    purpose: What the resource is certified to do, and until when
+    trigger: onLoad
+    provenance: readiness close-out, 29 September 2026
   - operationId: createResource
     contract: resources
     purpose: Create it

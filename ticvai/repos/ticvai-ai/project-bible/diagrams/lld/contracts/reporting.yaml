@@ -38,6 +38,7 @@ operations:
   writes:
   - ai.activity
   - cache:idempotency
+  - reporting.natural_language_query
   - reporting.report_column
   - reporting.report_filter
 - operation: cancelReportExecution
@@ -101,6 +102,7 @@ operations:
   - cache:idempotency
   - reporting.report_column
   - reporting.report_definition
+  - reporting.report_definition_version
   - reporting.report_filter
   - reporting.report_parameter
 - operation: createReportSchedule
@@ -267,6 +269,7 @@ operations:
   reads:
   - reporting.report_column
   - reporting.report_definition
+  - reporting.report_definition_version
   - reporting.report_filter
   - reporting.report_parameter
   writes: []
@@ -327,6 +330,7 @@ operations:
   - inventory.movement
   - inventory.purchase_order
   - inventory.supplier
+  - inventory.supplier_contract
   writes: []
 - operation: listAlertRules
   verb: GET
@@ -540,6 +544,7 @@ operations:
   writes:
   - ai.activity
   - cache:idempotency
+  - reporting.natural_language_query
   - reporting.report_column
   - reporting.report_definition
   - reporting.report_filter
@@ -632,6 +637,7 @@ operations:
   - cache:idempotency
   - reporting.report_column
   - reporting.report_definition
+  - reporting.report_definition_version
   - reporting.report_filter
   - reporting.report_parameter
 - operation: updateReportSchedule

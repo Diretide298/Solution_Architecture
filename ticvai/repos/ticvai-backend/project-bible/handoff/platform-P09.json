@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 162
+  "operationsWithNoScreen": 164
  },
  "waves": {
   "wave1": 12,
@@ -178,15 +178,15 @@
    "operations": 7
   },
   {
+   "contract": "cross-region",
+   "operations": 5
+  },
+  {
    "contract": "ai",
    "operations": 5
   },
   {
    "contract": "reporting",
-   "operations": 5
-  },
-  {
-   "contract": "cross-region",
    "operations": 5
   },
   {
@@ -6371,6 +6371,18 @@
     "contract": "approvals",
     "verb": "PUT",
     "summary": "Unified Approval Inbox & Decision Workspace"
+   },
+   {
+    "operation": "issueAccreditationBadge",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Issue a badge"
+   },
+   {
+    "operation": "listAccreditationBadges",
+    "contract": "approvals",
+    "verb": "GET",
+    "summary": "Badges issued and their state"
    },
    {
     "operation": "submitApprovalRequest",

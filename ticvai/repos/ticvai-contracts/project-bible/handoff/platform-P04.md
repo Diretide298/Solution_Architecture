@@ -9,12 +9,12 @@
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 151 |
+| Operations with no screen | 153 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 151 operations with no screen here
+### 153 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -27,6 +27,8 @@
 | `approveMatrixMultiLevel` | approvals | PUT | Approval Matrix & Multi-Level Approval Configuration |
 | `approveRoleAuthorityDelegation` | approvals | PUT | Roles, Authority, Delegation & Approval Limits |
 | `approveUnifiedDecision` | approvals | PUT | Unified Approval Inbox & Decision Workspace |
+| `issueAccreditationBadge` | approvals | POST | Issue a badge |
+| `listAccreditationBadges` | approvals | GET | Badges issued and their state |
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
@@ -58,9 +60,7 @@
 | `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
-| `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
-| `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
-| … | | | 111 more |
+| … | | | 113 more |
 
 ### 2 modules split across waves
 

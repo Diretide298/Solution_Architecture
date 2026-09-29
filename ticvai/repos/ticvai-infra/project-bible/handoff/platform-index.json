@@ -46,7 +46,7 @@
    "contracts": 20,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 151
+   "operationsWithNoScreen": 153
   },
   "waves": {
    "wave1": 27,
@@ -109,11 +109,11 @@
   "operator": "venue",
   "counts": {
    "screens": 1186,
-   "operations": 1361,
+   "operations": 1362,
    "contracts": 32,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 188
+   "operationsWithNoScreen": 189
   },
   "waves": {
    "wave1": 60,
@@ -131,7 +131,7 @@
    "contracts": 19,
    "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 162
+   "operationsWithNoScreen": 164
   },
   "waves": {
    "wave1": 12,
@@ -162,7 +162,7 @@
   "operator": "public",
   "counts": {
    "screens": 8,
-   "operations": 4,
+   "operations": 6,
    "contracts": 1,
    "modules": 2,
    "undrawn": 0,
@@ -249,7 +249,7 @@
    "contracts": 11,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 124
+   "operationsWithNoScreen": 126
   },
   "waves": {
    "wave3": 69

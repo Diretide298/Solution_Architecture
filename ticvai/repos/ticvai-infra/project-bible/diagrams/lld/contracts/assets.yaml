@@ -68,6 +68,7 @@ operations:
   - cache:idempotency
   writes:
   - assets.media_collection
+  - assets.media_collection_member
   - cache:idempotency
 - operation: createMediaShare
   verb: POST
@@ -196,6 +197,7 @@ operations:
   offline: false
   reads:
   - assets.media_collection
+  - assets.media_collection_member
   writes: []
 - operation: listMediaAssetAudit
   verb: GET

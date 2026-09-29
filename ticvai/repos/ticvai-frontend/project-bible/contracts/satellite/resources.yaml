@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Resources
   version: 1.0.0
-  x-ticvai-screen-count: 60
+  x-ticvai-screen-count: 61
   x-ticvai-tier: satellite
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-platforms:
@@ -577,6 +577,8 @@ paths:
         format: uuid
     get:
       operationId: getResourceQualifications
+      x-ticvai-consumed-by:
+        - "P08 BO-857 Resource Creation & Profile"
       summary: What an instructor or staff resource is certified to do, and until when — as saved
       description: '**The read the qualifications screen loads before it edits.** `setResourceQualifications`
         replaces the whole set, so a screen that cannot load the current set can only overwrite it

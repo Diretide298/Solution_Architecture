@@ -29,7 +29,7 @@ tiers:
     - workforce
     - approvals
     - accreditation
-    flowCoverage: 31%
+    flowCoverage: 32%
     scale: Read-heavy and highly cacheable. Config changes are rare.
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml

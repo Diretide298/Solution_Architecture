@@ -40,7 +40,7 @@ operationsByContract:
     permission: REPORT_VIEW_VENUE
     offline: false
     reads: 5
-    writes: 4
+    writes: 5
   - operation: cancelReportExecution
     verb: DELETE
     path: /report-executions/{executionId}
@@ -72,7 +72,7 @@ operationsByContract:
     permission: REPORT_MANAGE
     offline: false
     reads: 5
-    writes: 5
+    writes: 6
   - operation: createReportSchedule
     verb: POST
     path: /report-schedules
@@ -167,7 +167,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
-    reads: 4
+    reads: 5
     writes: 0
   - operation: getReportExecution
     verb: GET
@@ -207,7 +207,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW
     offline: false
-    reads: 4
+    reads: 5
     writes: 0
   - operation: listAlertRules
     verb: GET
@@ -344,7 +344,7 @@ operationsByContract:
     permission: REPORT_MANAGE
     offline: false
     reads: 7
-    writes: 6
+    writes: 7
   - operation: setAlertRule
     verb: PUT
     path: /alert-rules
@@ -392,7 +392,7 @@ operationsByContract:
     permission: REPORT_MANAGE
     offline: false
     reads: 5
-    writes: 5
+    writes: 6
   - operation: updateReportSchedule
     verb: PATCH
     path: /report-schedules/{scheduleId}
@@ -530,7 +530,8 @@ tables:
   columns: 8
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - reporting
   foreignWriters: null
 - table: reporting.pipeline
   columns: 13
@@ -556,7 +557,8 @@ tables:
   columns: 7
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - reporting
   foreignWriters: null
 - table: reporting.report_field
   columns: 2

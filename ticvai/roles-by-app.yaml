@@ -10,7 +10,7 @@ theTwoVocabularies:
   onOperations: 167
   inRolesYaml: 43
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 167 permission keys across 2282 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 167 permission keys across 2284 operations; `roles.yaml`
     grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -81,7 +81,6 @@ apps:
     - endKioskAssist
     - enrolMfaMethod
     - extendCart
-    - getBillingStatement
     - getCart
     - getGameCard
     - getGuestBill
@@ -101,7 +100,8 @@ apps:
     - guestLogout
     - guestPasswordLogin
     - guestSocialLogin
-    operationsWithNoPermissionCount: 88
+    - guestUaePassLogin
+    operationsWithNoPermissionCount: 86
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -111,10 +111,11 @@ apps:
     - P14
     - P17
     screens: 767
-    operations: 722
-    permissions: 81
+    operations: 726
+    permissions: 85
     tiers:
       read:
+      - ACCREDITATION_VIEW
       - AI_AUDIT_VIEW
       - APPROVAL_VIEW
       - CASE_VIEW
@@ -140,6 +141,9 @@ apps:
       - WALLET_VIEW
       - WORKFORCE_VIEW
       operate:
+      - ACCREDITATION_APPLY
+      - ACCREDITATION_APPROVE
+      - ACCREDITATION_ISSUE
       - AI_APPROVE
       - APPROVAL_ACT
       - APPROVAL_DECIDE
@@ -226,7 +230,7 @@ apps:
     - P13
     - P16
     screens: 1383
-    operations: 1502
+    operations: 1503
     permissions: 142
     tiers:
       read:

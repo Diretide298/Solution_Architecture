@@ -9,12 +9,12 @@
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 124 |
+| Operations with no screen | 126 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 124 operations with no screen here
+### 126 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -37,6 +37,8 @@
 | `approveMatrixMultiLevel` | approvals | PUT | Approval Matrix & Multi-Level Approval Configuration |
 | `approveRoleAuthorityDelegation` | approvals | PUT | Roles, Authority, Delegation & Approval Limits |
 | `approveUnifiedDecision` | approvals | PUT | Unified Approval Inbox & Decision Workspace |
+| `issueAccreditationBadge` | approvals | POST | Issue a badge |
+| `listAccreditationBadges` | approvals | GET | Badges issued and their state |
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
@@ -58,9 +60,7 @@
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
-| `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
-| `listStockReservations` | inventory | GET | Soft holds on stock |
-| … | | | 84 more |
+| … | | | 86 more |
 
 ## Modules
 

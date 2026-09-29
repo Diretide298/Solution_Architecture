@@ -19,7 +19,7 @@ packages:
 - design-tokens
 - ui
 contracts:
-- approvals
+- accreditation
 deployment:
   target: browser
   distribution: public, served from the cell

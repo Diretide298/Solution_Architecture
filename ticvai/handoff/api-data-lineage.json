@@ -1435,7 +1435,9 @@
   "verb": "GET",
   "path": "/sale-boards",
   "reads": [
-   "platform.sale_board"
+   "platform.sale_board",
+   "platform.sale_board_page",
+   "platform.sale_board_tile"
   ],
   "writes": [],
   "routing": "replica",
@@ -1462,7 +1464,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "platform.sale_board"
+   "platform.sale_board",
+   "platform.sale_board_page",
+   "platform.sale_board_tile"
   ],
   "routing": "",
   "scope": "venue",
@@ -1489,7 +1493,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "platform.sale_board"
+   "platform.sale_board",
+   "platform.sale_board_page",
+   "platform.sale_board_tile"
   ],
   "routing": "",
   "scope": "venue",
@@ -4029,7 +4035,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.session"
+   "identity.session",
+   "identity.refresh_token"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4082,11 +4089,13 @@
   "path": "/auth/refresh",
   "reads": [
    "cache:idempotency",
-   "identity.session"
+   "identity.session",
+   "identity.refresh_token"
   ],
   "writes": [
    "cache:idempotency",
-   "identity.session"
+   "identity.session",
+   "identity.refresh_token"
   ],
   "routing": "",
   "scope": "tenant",
@@ -4114,7 +4123,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "identity.session"
+   "identity.session",
+   "identity.refresh_token"
   ],
   "routing": "",
   "scope": "workstation",
@@ -6813,7 +6823,8 @@
   "writes": [
    "cache:idempotency",
    "marketing.campaign",
-   "marketing.segment_criterion"
+   "marketing.segment_criterion",
+   "marketing.campaign_target"
   ],
   "routing": "",
   "scope": "venue",
@@ -6836,7 +6847,8 @@
   "path": "/campaigns/{campaignId}",
   "reads": [
    "marketing.campaign",
-   "marketing.segment_criterion"
+   "marketing.segment_criterion",
+   "marketing.campaign_target"
   ],
   "writes": [],
   "routing": "replica",
@@ -6865,7 +6877,8 @@
   "writes": [
    "cache:idempotency",
    "marketing.campaign",
-   "marketing.segment_criterion"
+   "marketing.segment_criterion",
+   "marketing.campaign_target"
   ],
   "routing": "",
   "scope": "venue",
@@ -7453,7 +7466,8 @@
   "verb": "GET",
   "path": "/reviews",
   "reads": [
-   "marketing.review"
+   "marketing.review",
+   "marketing.review_response"
   ],
   "writes": [],
   "routing": "replica",
@@ -7507,7 +7521,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.review"
+   "marketing.review",
+   "marketing.review_response"
   ],
   "routing": "",
   "scope": "venue",
@@ -7580,7 +7595,8 @@
   "reads": [
    "control.cell",
    "subscription.contract",
-   "control.tenant"
+   "control.tenant",
+   "control.cell_tenant"
   ],
   "writes": [],
   "routing": "replica",
@@ -8030,7 +8046,9 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.cell"
+   "control.cell",
+   "control.cell_instance",
+   "control.cell_tenant"
   ],
   "routing": "",
   "scope": "tenant",
@@ -8053,7 +8071,9 @@
   "path": "/cells/{cellId}",
   "reads": [
    "control.cell",
-   "control.cell_job"
+   "control.cell_job",
+   "control.cell_instance",
+   "control.cell_tenant"
   ],
   "writes": [],
   "routing": "replica",
@@ -8330,7 +8350,8 @@
   "verb": "GET",
   "path": "/cells/{cellId}/health",
   "reads": [
-   "control.cell"
+   "control.cell",
+   "control.cell_instance"
   ],
   "writes": [],
   "routing": "replica",
@@ -8633,7 +8654,8 @@
   "verb": "GET",
   "path": "/venues/{venueId}/delivery-locations",
   "reads": [
-   "fnb.delivery_location"
+   "fnb.delivery_location",
+   "fnb.delivery_location_outlet"
   ],
   "writes": [],
   "routing": "replica",
@@ -8684,7 +8706,8 @@
   "reads": [
    "cache:idempotency",
    "fnb.delivery_location",
-   "fnb.service_order"
+   "fnb.service_order",
+   "fnb.delivery_location_outlet"
   ],
   "writes": [
    "cache:idempotency",
@@ -8741,7 +8764,8 @@
    "fnb.location_session",
    "fnb.menu_item",
    "inventory.stock_level",
-   "fnb.delivery_policy"
+   "fnb.delivery_policy",
+   "fnb.menu_item_modifier"
   ],
   "writes": [
    "cache:idempotency",
@@ -9708,7 +9732,8 @@
   "writes": [
    "cache:idempotency",
    "seating.seat_map",
-   "seating.section"
+   "seating.section",
+   "seating.section_row"
   ],
   "routing": "",
   "scope": "venue",
@@ -9760,7 +9785,8 @@
   "writes": [
    "cache:idempotency",
    "seating.seat_map",
-   "seating.section"
+   "seating.section",
+   "seating.section_row"
   ],
   "routing": "",
   "scope": "venue",
@@ -11125,7 +11151,8 @@
   "verb": "GET",
   "path": "/suppliers",
   "reads": [
-   "inventory.supplier"
+   "inventory.supplier",
+   "inventory.supplier_contract"
   ],
   "writes": [],
   "routing": "replica",
@@ -12299,7 +12326,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.asset"
+   "maintenance.asset",
+   "maintenance.asset_status_change"
   ],
   "routing": "",
   "scope": "venue",
@@ -12321,7 +12349,8 @@
   "verb": "GET",
   "path": "/assets/{assetId}/history",
   "reads": [
-   "maintenance.asset"
+   "maintenance.asset",
+   "maintenance.asset_status_change"
   ],
   "writes": [],
   "routing": "analytical",
@@ -13095,7 +13124,8 @@
   "verb": "GET",
   "path": "/media/collections",
   "reads": [
-   "assets.media_collection"
+   "assets.media_collection",
+   "assets.media_collection_member"
   ],
   "writes": [],
   "routing": "replica",
@@ -13122,7 +13152,8 @@
   ],
   "writes": [
    "assets.media_collection",
-   "cache:idempotency"
+   "cache:idempotency",
+   "assets.media_collection_member"
   ],
   "routing": "",
   "scope": "venue",
@@ -13203,7 +13234,8 @@
    "reporting.report_column",
    "reporting.report_definition",
    "reporting.report_filter",
-   "reporting.report_parameter"
+   "reporting.report_parameter",
+   "reporting.report_definition_version"
   ],
   "routing": "",
   "scope": "venue",
@@ -13229,7 +13261,8 @@
    "reporting.report_column",
    "reporting.report_definition",
    "reporting.report_filter",
-   "reporting.report_parameter"
+   "reporting.report_parameter",
+   "reporting.report_definition_version"
   ],
   "writes": [],
   "routing": "analytical",
@@ -13263,7 +13296,8 @@
    "reporting.report_column",
    "reporting.report_definition",
    "reporting.report_filter",
-   "reporting.report_parameter"
+   "reporting.report_parameter",
+   "reporting.report_definition_version"
   ],
   "routing": "",
   "scope": "venue",
@@ -13730,7 +13764,8 @@
    "ai.activity",
    "cache:idempotency",
    "reporting.report_column",
-   "reporting.report_filter"
+   "reporting.report_filter",
+   "reporting.natural_language_query"
   ],
   "routing": "",
   "scope": "venue",
@@ -13768,7 +13803,8 @@
    "reporting.report_column",
    "reporting.report_definition",
    "reporting.report_filter",
-   "reporting.report_parameter"
+   "reporting.report_parameter",
+   "reporting.natural_language_query"
   ],
   "routing": "",
   "scope": "venue",
@@ -13792,7 +13828,8 @@
   "verb": "GET",
   "path": "/releases",
   "reads": [
-   "control.release"
+   "control.release",
+   "control.release_component"
   ],
   "writes": [],
   "routing": "replica",
@@ -13819,7 +13856,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.release"
+   "control.release",
+   "control.release_component"
   ],
   "routing": "",
   "scope": "tenant",
@@ -13944,7 +13982,8 @@
   "verb": "GET",
   "path": "/releases/{reinventoryHoldId}/readiness",
   "reads": [
-   "control.release"
+   "control.release",
+   "control.release_component"
   ],
   "writes": [],
   "routing": "replica",
@@ -14120,11 +14159,13 @@
   "path": "/migrations/plan",
   "reads": [
    "cache:idempotency",
-   "control.migration_plan"
+   "control.migration_plan",
+   "control.migration_plan_cell"
   ],
   "writes": [
    "cache:idempotency",
-   "control.migration_plan"
+   "control.migration_plan",
+   "control.migration_plan_cell"
   ],
   "routing": "",
   "scope": "tenant",
@@ -24909,7 +24950,8 @@
    "inventory.goods_receipt",
    "inventory.movement",
    "inventory.purchase_order",
-   "inventory.supplier"
+   "inventory.supplier",
+   "inventory.supplier_contract"
   ],
   "writes": [],
   "routing": "analytical",
@@ -26454,7 +26496,8 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "fnb.menu_item"
+   "fnb.menu_item",
+   "fnb.menu_item_modifier"
   ],
   "routing": "",
   "scope": "venue",
@@ -27003,7 +27046,8 @@
    "fnb.menu_item",
    "fnb.production_plan",
    "fnb.production_plan_line",
-   "fnb.recipe"
+   "fnb.recipe",
+   "fnb.menu_item_modifier"
   ],
   "writes": [
    "cache:idempotency",
@@ -27126,7 +27170,8 @@
    "cache:idempotency",
    "cache:resolution",
    "inventory.supplier",
-   "platform.audit_record"
+   "platform.audit_record",
+   "inventory.supplier_contract"
   ],
   "routing": "",
   "scope": "tenant",
@@ -27524,7 +27569,8 @@
   "writes": [
    "cache:idempotency",
    "seating.seat_map",
-   "seating.section"
+   "seating.section",
+   "seating.section_row"
   ],
   "routing": "",
   "scope": "venue",
@@ -44686,7 +44732,8 @@
    "seating.seat_hold_item",
    "seating.seat_price_band",
    "seating.seating_rules",
-   "seating.section"
+   "seating.section",
+   "seating.section_row"
   ],
   "writes": [
    "cache:idempotency",
@@ -45900,7 +45947,9 @@
   "reads": [
    "identity.access_decision"
   ],
-  "writes": [],
+  "writes": [
+   "identity.authz_audit"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "PERMISSION_VIEW",
@@ -47665,7 +47714,8 @@
   "verb": "GET",
   "path": "/access-decisions/audit",
   "reads": [
-   "identity.access_decision"
+   "identity.access_decision",
+   "identity.authz_audit"
   ],
   "writes": [],
   "routing": "replica",
@@ -49508,7 +49558,8 @@
    "rental.inspection"
   ],
   "writes": [
-   "rental.inspection"
+   "rental.inspection",
+   "rental.inspection_item"
   ],
   "routing": null,
   "scope": "venue",
@@ -55263,7 +55314,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": null,
+  "perm": "ORDER_VIEW",
   "offline": false,
   "summary": "One statement, with its lines",
   "source": "hand-mapped",
@@ -55311,7 +55362,7 @@
   "writes": [],
   "routing": "replica",
   "scope": "tenant",
-  "perm": null,
+  "perm": "ORDER_VIEW",
   "offline": false,
   "summary": "What was charged, when, and against which agreement",
   "source": "hand-mapped",

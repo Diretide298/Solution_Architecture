@@ -501,7 +501,9 @@ operations:
   offline: false
   reads:
   - control.cell
+  - control.cell_instance
   - control.cell_job
+  - control.cell_tenant
   writes: []
 - operation: getCellCapacity
   verb: GET
@@ -524,6 +526,7 @@ operations:
   offline: false
   reads:
   - control.cell
+  - control.cell_instance
   writes: []
 - operation: getCommissionStatement
   verb: GET
@@ -627,6 +630,7 @@ operations:
   offline: false
   reads:
   - control.cell
+  - control.cell_tenant
   - control.tenant
   - subscription.contract
   writes: []
@@ -1486,6 +1490,8 @@ operations:
   writes:
   - cache:idempotency
   - control.cell
+  - control.cell_instance
+  - control.cell_tenant
 - operation: reactivateTenant
   verb: POST
   path: /tenants/{tenantId}/reactivate

@@ -162,6 +162,7 @@ operations:
   offline: false
   reads:
   - maintenance.asset
+  - maintenance.asset_status_change
   writes: []
 - operation: getDueMaintenance
   verb: GET
@@ -394,6 +395,7 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.asset
+  - maintenance.asset_status_change
 - operation: startWorkOrder
   verb: POST
   path: /work-orders/{workOrderId}/start

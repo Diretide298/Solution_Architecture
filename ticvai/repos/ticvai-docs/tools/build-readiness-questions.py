@@ -197,7 +197,12 @@ def main():
         ("Rev 3 prototype feedback (29 September)", "docs/registers/rev3-decisions.md", ""),
         ("Operations agreed from minutes, packs and build plan (29 September)", "docs/registers/readiness-closeout.md", ""),
         ("Design pack scope (29 September)", "docs/active/design-pack-coverage.md", len(packs_cov)),
+        ("Requirements re-traced against the current contracts (29 September)", "handoff/traceability.json", 198),
+        ("AI system design questions and trade-offs (29 September)",
+         "docs/architecture/ai-system-design.md, section 8 (draft, final read pending)", 16),
     ])
+    trace = json.load(open(os.path.join(ROOT, "handoff", "traceability.json"), encoding="utf-8"))["rows"]
+    left = [r for r in trace if r.get("verdict") in ("GAP_CONTRACT", "CONTRACTED_PARTIAL", "GAP_DECISION")]
     work = [(p["pack"], p.get("verdict", ""), p.get("gap", ""), p.get("estimatedNewOperations", ""), p.get("action", ""))
             for p in packs_cov if "gap" in str(p.get("verdict", "")) or "residual" in str(p.get("verdict", ""))]
     spec = [(c, s["id"], s.get("name", ""), s.get("module", ""),
@@ -207,8 +212,14 @@ def main():
             and not (s.get("deferred") or str(s.get("wave")) == "4")]
     sheet(wb, "Our work", ["Design pack or platform", "Verdict", "Gap", "New operations (estimate)", "Action"],
           [40, 22, 60, 14, 60],
-          work + [(c, "screen names no operation", f"{s['id']} {s.get('name', '')}",
-                   "", "Waits on the AI design review" if c == "P09" else "Specify from its pack")
+          work + [("Requirements", "not covered or partly covered",
+                   f"{len(left)} requirements: {sum(r['verdict'] == 'GAP_CONTRACT' for r in left)} not covered, "
+                   f"{sum(r['verdict'] == 'CONTRACTED_PARTIAL' for r in left)} partly covered. Each is listed in "
+                   "TICVAI - Build Readiness.xlsx (sheet Missing, and its application's sheet)",
+                   "", "Each has a contract-backlog entry naming the operation that would serve it")]
+          + [(c, "screen names no operation", f"{s['id']} {s.get('name', '')}",
+                   "", "Waits on the AI operations in ai.yaml (design decided 29 September)"
+                   if c == "P09" or "AI" in s.get("name", "") else "Specify from its pack")
                   for c, s in scr if not ({a.get("operationId") for a in s.get("apis") or [] if isinstance(a, dict)} - {None})
                   and not (s.get("deferred") or str(s.get("wave")) == "4")])
 

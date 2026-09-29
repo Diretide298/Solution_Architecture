@@ -215,7 +215,7 @@
  ],
  "counts": {
   "core": 400,
-  "setup": 182,
+  "setup": 185,
   "allOperations": 2405
  },
  "services": {
@@ -236,7 +236,7 @@
   },
   "FnbService": {
    "core": 54,
-   "setup": 6,
+   "setup": 7,
    "total": 117
   },
   "IdentityService": {
@@ -271,7 +271,7 @@
   },
   "ReportingService": {
    "core": 9,
-   "setup": 4,
+   "setup": 6,
    "total": 47
   },
   "RetailService": {
@@ -691,6 +691,21 @@
    ],
    "enables": [
     "catalogue.product_media"
+   ]
+  },
+  "attachModifierGroup": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/menu-items/{menuItemId}/modifier-groups",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-045"
+   ],
+   "enables": [
+    "fnb.menu_item_modifier"
    ]
   },
   "bindCredentialDevice": {
@@ -2070,6 +2085,29 @@
    ],
    "enables": []
   },
+  "createReport": {
+   "part": "setup",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "POST",
+   "path": "/reports",
+   "perm": "REPORT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ANL-032",
+    "ANL-054",
+    "BO-029",
+    "BO-058",
+    "BO-059",
+    "BO-060",
+    "BO-1060",
+    "PTR-018",
+    "SUP-008"
+   ],
+   "enables": [
+    "reporting.report_definition_version"
+   ]
+  },
   "createResaleListing": {
    "part": "core",
    "service": "OrderService",
@@ -2237,7 +2275,9 @@
     "BO-124"
    ],
    "enables": [
-    "platform.sale_board"
+    "platform.sale_board",
+    "platform.sale_board_page",
+    "platform.sale_board_tile"
    ]
   },
   "createSeatCategory": {
@@ -2400,7 +2440,6 @@
     "POS"
    ],
    "screens": [
-    "ACC-007",
     "ADM-145",
     "ADM-249",
     "BO-084",
@@ -2925,7 +2964,7 @@
    "contract": "orders",
    "verb": "GET",
    "path": "/billing-statements/{statementId}",
-   "perm": null,
+   "perm": "ORDER_VIEW",
    "platforms": [
     "MOB",
     "WEB"
@@ -5068,7 +5107,7 @@
    "contract": "orders",
    "verb": "GET",
    "path": "/billing-statements",
-   "perm": null,
+   "perm": "ORDER_VIEW",
    "platforms": [
     "MOB",
     "WEB"
@@ -10703,6 +10742,30 @@
     "platform.region_settings"
    ]
   },
+  "updateReport": {
+   "part": "setup",
+   "service": "ReportingService",
+   "contract": "reporting",
+   "verb": "PUT",
+   "path": "/reports/{reportId}",
+   "perm": "REPORT_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ANL-035",
+    "ANL-036",
+    "ANL-037",
+    "ANL-038",
+    "BO-029",
+    "BO-058",
+    "BO-059",
+    "BO-060",
+    "PTR-018",
+    "SUP-008"
+   ],
+   "enables": [
+    "reporting.report_definition_version"
+   ]
+  },
   "updateResource": {
    "part": "setup",
    "service": "VenueOpsService",
@@ -10752,7 +10815,9 @@
     "BO-126"
    ],
    "enables": [
-    "platform.sale_board"
+    "platform.sale_board",
+    "platform.sale_board_page",
+    "platform.sale_board_tile"
    ]
   },
   "updateTableReservation": {
@@ -11057,6 +11122,7 @@
  "noWriter": [
   "ai.chunk_ref",
   "fnb.delivery_location",
+  "fnb.delivery_location_outlet",
   "fnb.sold_out_item",
   "identity.platform_staff_grant",
   "inventory.serialised_item",

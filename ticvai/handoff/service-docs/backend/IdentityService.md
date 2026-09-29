@@ -1317,7 +1317,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.delegated_access`, `identity.mfa_method`, `identity.principal`, `identity.principal_credential`, `identity.role` |
-| Writes | `cache:idempotency`, `identity.session` |
+| Writes | `cache:idempotency`, `identity.session`, `identity.refresh_token` |
 | Called by | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 
 **Parameters**
@@ -1413,8 +1413,8 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.session` |
-| Writes | `cache:idempotency`, `identity.session` |
+| Reads | `cache:idempotency`, `identity.session`, `identity.refresh_token` |
+| Writes | `cache:idempotency`, `identity.session`, `identity.refresh_token` |
 | Called by | GST-042, WEB-016 |
 
 **Parameters**
@@ -2118,6 +2118,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes | Synthesised key. |
 | principal_id | uuid | no | Points at identity.principal. |
+
+### `identity.refresh_token`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | no |  |
+| principal_id | uuid | yes |  |
+| hash | text | yes |  |
+| expires_at | timestamptz | yes |  |
+| created_at | timestamptz | yes |  |
+| created_by_ip | text | no |  |
+| revoked_at | timestamptz | no |  |
+| revoked_by_ip | text | no |  |
+| revocation_reason | text | no |  |
+| replaced_by_token_id | uuid | no |  |
 
 ### `identity.role`
 

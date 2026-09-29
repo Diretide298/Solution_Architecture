@@ -64,6 +64,8 @@ operations:
   writes:
   - cache:idempotency
   - platform.sale_board
+  - platform.sale_board_page
+  - platform.sale_board_tile
 - operation: deployConfigurationProfile
   verb: POST
   path: /configuration-profiles/{profileId}/deploy
@@ -370,6 +372,8 @@ operations:
   offline: true
   reads:
   - platform.sale_board
+  - platform.sale_board_page
+  - platform.sale_board_tile
   writes: []
 - operation: listWorkstations
   verb: GET
@@ -620,3 +624,5 @@ operations:
   writes:
   - cache:idempotency
   - platform.sale_board
+  - platform.sale_board_page
+  - platform.sale_board_tile

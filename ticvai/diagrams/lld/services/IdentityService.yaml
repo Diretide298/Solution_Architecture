@@ -125,7 +125,7 @@ operationsByContract:
     permission: PERMISSION_VIEW
     offline: false
     reads: 1
-    writes: 0
+    writes: 1
   - operation: exportSubjectData
     verb: POST
     path: /guests/{subjectId}/data-export
@@ -268,7 +268,7 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listAccessPolicies
     verb: GET
@@ -429,7 +429,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 6
-    writes: 2
+    writes: 3
   - operation: logout
     verb: POST
     path: /auth/logout
@@ -437,7 +437,7 @@ operationsByContract:
     permission: null
     offline: true
     reads: 2
-    writes: 2
+    writes: 3
   - operation: openPlatformStaffGrant
     verb: POST
     path: /platform-staff-grants
@@ -460,8 +460,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: registerGuest
     verb: POST
     path: /auth/guest/register
@@ -762,7 +762,8 @@ tables:
   columns: 3
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - identity
   foreignWriters: null
 - table: identity.benefit_usage
   columns: 9
@@ -886,7 +887,8 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - identity
   foreignWriters: null
 - table: identity.role
   columns: 8

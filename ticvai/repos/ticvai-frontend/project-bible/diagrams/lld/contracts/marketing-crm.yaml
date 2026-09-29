@@ -238,6 +238,7 @@ operations:
   writes:
   - cache:idempotency
   - marketing.campaign
+  - marketing.campaign_target
   - marketing.segment_criterion
 - operation: createCase
   verb: POST
@@ -518,6 +519,7 @@ operations:
   offline: false
   reads:
   - marketing.campaign
+  - marketing.campaign_target
   - marketing.segment_criterion
   writes: []
 - operation: getCampaignPerformance
@@ -1832,6 +1834,7 @@ operations:
   offline: false
   reads:
   - marketing.review
+  - marketing.review_response
   writes: []
 - operation: listRewardAssignments
   verb: GET
@@ -2409,6 +2412,7 @@ operations:
   writes:
   - cache:idempotency
   - marketing.review
+  - marketing.review_response
 - operation: retryMessageDispatch
   verb: POST
   path: /message-dispatches/{dispatchId}/retry
@@ -3367,6 +3371,7 @@ operations:
   writes:
   - cache:idempotency
   - marketing.campaign
+  - marketing.campaign_target
   - marketing.segment_criterion
 - operation: updateCase
   verb: PATCH

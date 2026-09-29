@@ -7,7 +7,7 @@
   "deployed": 3,
   "operations": 34,
   "ofTotalOperations": 2405,
-  "tables": 56,
+  "tables": 57,
   "ofTotalTables": 983
  },
  "routing": {
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 34,
-    "tables": 56,
+    "tables": 57,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -655,6 +655,17 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**A person who can be authorised** — staff, partner, platform operator. The most referenced table in the package at 122 incoming columns, because almost everything records who did it. **Not a guest**: a guest is a `pii.s"
+  },
+  {
+   "table": "identity.refresh_token",
+   "schema": "identity",
+   "columns": 10,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 10 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "identity.session",
@@ -1383,10 +1394,12 @@
    "contract": "identity",
    "callsPerBuyer": 1,
    "reads": [
-    "identity.session"
+    "identity.session",
+    "identity.refresh_token"
    ],
    "writes": [
-    "identity.session"
+    "identity.session",
+    "identity.refresh_token"
    ],
    "lock": null
   },

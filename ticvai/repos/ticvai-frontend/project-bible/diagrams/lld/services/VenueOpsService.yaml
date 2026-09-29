@@ -45,7 +45,7 @@ schemas:
   tables: 23
   stores:
   - postgres
-  largestTable: games.game
+  largestTable: games.entitlement
 - schema: rental
   tables: 24
   stores:
@@ -750,7 +750,7 @@ operationsByContract:
     permission: RENTAL_OPERATE
     offline: true
     reads: 1
-    writes: 1
+    writes: 2
   - operation: reportRentalIncident
     verb: POST
     path: /rental-incidents
@@ -1307,7 +1307,7 @@ operationsByContract:
     scope: venue
     permission: ASSET_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getDueMaintenance
     verb: GET
@@ -1452,7 +1452,7 @@ operationsByContract:
     permission: ASSET_MANAGE
     offline: true
     reads: 2
-    writes: 2
+    writes: 3
   - operation: startWorkOrder
     verb: POST
     path: /work-orders/{workOrderId}/start
@@ -1794,7 +1794,7 @@ operationsByContract:
     permission: ASSET_LIBRARY_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createMediaShare
     verb: POST
     path: /media-shares
@@ -1873,7 +1873,7 @@ operationsByContract:
     scope: venue
     permission: ASSET_LIBRARY_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listMediaAssetAudit
     verb: GET
@@ -2516,7 +2516,8 @@ tables:
   columns: 5
   store: postgres
   parent: assets.media_collection
-  writtenBy: []
+  writtenBy:
+  - assets
   foreignWriters: null
 - table: assets.media_fingerprint
   columns: 7
@@ -2753,7 +2754,8 @@ tables:
   columns: 10
   store: postgres
   parent: maintenance.asset
-  writtenBy: []
+  writtenBy:
+  - maintenance
   foreignWriters: null
 - table: maintenance.incident
   columns: 26
@@ -2966,7 +2968,8 @@ tables:
   columns: 9
   store: postgres
   parent: rental.inspection
-  writtenBy: []
+  writtenBy:
+  - rental
   foreignWriters: null
 - table: rental.inventory_model
   columns: 10

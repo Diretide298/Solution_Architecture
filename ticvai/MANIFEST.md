@@ -3,7 +3,7 @@
 **10 September 2026. Fifteen of seventeen checks pass; the two that do not are named below.**
 
 ```
-2405 operations · 33 contracts · 983 tables · 2586 relationships
+2405 operations · 33 contracts · 983 tables · 2603 relationships
 186 state models · 30 events · 96 flows · 48 ADRs
 2440 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
 ```

@@ -69,6 +69,7 @@ operations:
   - cache:idempotency
   - cache:resolution
   - fnb.menu_item
+  - fnb.menu_item_modifier
 - operation: buildProductionPlan
   verb: POST
   path: /production-plans
@@ -81,6 +82,7 @@ operations:
   - ai.suggestion
   - cache:idempotency
   - fnb.menu_item
+  - fnb.menu_item_modifier
   - fnb.production_plan
   - fnb.production_plan_line
   - fnb.recipe
@@ -272,6 +274,7 @@ operations:
   - fnb.delivery_policy
   - fnb.location_session
   - fnb.menu_item
+  - fnb.menu_item_modifier
   - inventory.stock_level
   writes:
   - cache:idempotency
@@ -627,6 +630,7 @@ operations:
   offline: true
   reads:
   - fnb.delivery_location
+  - fnb.delivery_location_outlet
   writes: []
 - operation: listDiningOutlets
   verb: GET
@@ -1118,6 +1122,7 @@ operations:
   reads:
   - cache:idempotency
   - fnb.delivery_location
+  - fnb.delivery_location_outlet
   - fnb.service_order
   writes:
   - cache:idempotency

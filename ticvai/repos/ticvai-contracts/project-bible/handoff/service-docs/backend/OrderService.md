@@ -3740,7 +3740,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 
 |  |  |
 |---|---|
-| Permission | `None` |
+| Permission | `ORDER_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
 | Wave | 2 |
@@ -4008,7 +4008,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 |  |  |
 |---|---|
-| Permission | `None` |
+| Permission | `ORDER_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
 | Wave | 2 |

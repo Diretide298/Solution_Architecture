@@ -15,7 +15,7 @@
   "contracts": 20,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 151
+  "operationsWithNoScreen": 153
  },
  "waves": {
   "wave1": 27,
@@ -99,7 +99,7 @@
    "operations": 4
   },
   {
-   "contract": "access",
+   "contract": "queue",
    "operations": 3
   },
   {
@@ -107,7 +107,7 @@
    "operations": 3
   },
   {
-   "contract": "queue",
+   "contract": "access",
    "operations": 3
   },
   {
@@ -127,11 +127,11 @@
    "operations": 1
   },
   {
-   "contract": "wallet",
+   "contract": "inventory",
    "operations": 1
   },
   {
-   "contract": "inventory",
+   "contract": "wallet",
    "operations": 1
   }
  ],
@@ -450,6 +450,18 @@
     "contract": "approvals",
     "verb": "PUT",
     "summary": "Unified Approval Inbox & Decision Workspace"
+   },
+   {
+    "operation": "issueAccreditationBadge",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Issue a badge"
+   },
+   {
+    "operation": "listAccreditationBadges",
+    "contract": "approvals",
+    "verb": "GET",
+    "summary": "Badges issued and their state"
    },
    {
     "operation": "submitApprovalRequest",

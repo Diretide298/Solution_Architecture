@@ -10,7 +10,7 @@
   "foreignKeys": 675,
   "indexes": 2494,
   "tablesWritten": 979,
-  "relationships": 2586,
+  "relationships": 2603,
   "states": 186,
   "events": 30,
   "flows": 96,
@@ -61,9 +61,9 @@
    },
    {
     "name": "Contracts touched by a flow",
-    "done": 29,
+    "done": 30,
     "total": 33,
-    "percent": 88,
+    "percent": 91,
     "note": "Every contract appears in at least one journey."
    },
    {
@@ -82,7 +82,7 @@
    },
    {
     "name": "Screens with operations",
-    "done": 2334,
+    "done": 2337,
     "total": 2440,
     "percent": 96,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
@@ -103,7 +103,7 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 2187,
+    "done": 2186,
     "total": 2405,
     "percent": 91,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."

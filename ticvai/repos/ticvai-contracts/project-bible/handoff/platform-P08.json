@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1186,
-  "operations": 1361,
+  "operations": 1362,
   "contracts": 32,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 188
+  "operationsWithNoScreen": 189
  },
  "waves": {
   "wave1": 60,
@@ -158,7 +158,7 @@
   },
   {
    "contract": "resources",
-   "operations": 54
+   "operations": 55
   },
   {
    "contract": "seating",
@@ -9659,7 +9659,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/resource-creation-profile-bo-857",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -11052,6 +11052,18 @@
     "summary": "Unified Approval Inbox & Decision Workspace"
    },
    {
+    "operation": "issueAccreditationBadge",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Issue a badge"
+   },
+   {
+    "operation": "listAccreditationBadges",
+    "contract": "approvals",
+    "verb": "GET",
+    "summary": "Badges issued and their state"
+   },
+   {
     "operation": "submitApprovalRequest",
     "contract": "approvals",
     "verb": "POST",
@@ -11776,12 +11788,6 @@
     "contract": "reporting",
     "verb": "GET",
     "summary": "What raises an alert, and when"
-   },
-   {
-    "operation": "getResourceQualifications",
-    "contract": "resources",
-    "verb": "GET",
-    "summary": "What an instructor or staff resource is certified to do, and until when \u2014 as saved"
    },
    {
     "operation": "cancelMerchandiseReservation",

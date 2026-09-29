@@ -335,6 +335,7 @@ operations:
   - rental.inspection
   writes:
   - rental.inspection
+  - rental.inspection_item
 - operation: reportRentalIncident
   verb: POST
   path: /rental-incidents

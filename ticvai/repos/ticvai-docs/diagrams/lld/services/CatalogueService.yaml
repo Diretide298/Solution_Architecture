@@ -3177,7 +3177,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 10
+    reads: 11
     writes: 4
   - operation: assignSeats
     verb: POST
@@ -3258,7 +3258,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: createSeatMapTemplate
     verb: POST
     path: /seat-map-templates
@@ -3394,7 +3394,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 2
-    writes: 3
+    writes: 4
   - operation: listGroupSeatRequests
     verb: GET
     path: /group-seat-requests
@@ -3578,7 +3578,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: updateSeats
     verb: PATCH
     path: /seat-maps/{seatMapId}/seats
@@ -4888,7 +4888,8 @@ tables:
   columns: 5
   store: postgres
   parent: seating.section
-  writtenBy: []
+  writtenBy:
+  - seating
   foreignWriters: null
 - table: seating.zone
   columns: 9

@@ -1903,7 +1903,7 @@
   "orders": {
    "title": "2 — Ticketing Sales",
    "capabilityCount": 21,
-   "unguardedOperations": 18,
+   "unguardedOperations": 16,
    "capabilities": [
     {
      "key": "CREDIT_MANAGE",
@@ -2066,14 +2066,14 @@
      "key": "ORDER_VIEW",
      "label": null,
      "group": "Selling",
-     "operationCount": 95,
+     "operationCount": 97,
      "operations": [
       "getB2bCredit",
+      "getBillingStatement",
       "getGroupBooking",
       "getMediaEntitlements",
       "getOrder",
-      "getOrderCalendarEvent",
-      "getOrderStatement"
+      "getOrderCalendarEvent"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -4015,8 +4015,8 @@
    "ORDER_VIEW": [
     "getB2bCredit",
     "getBill",
-    "getEntitlement",
-    "getEntitlementCredential"
+    "getBillingStatement",
+    "getEntitlement"
    ],
    "ORDER_VOID": [
     "cleanupFailedPayment",

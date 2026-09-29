@@ -33,12 +33,12 @@
 | Screens defined | 2,440 |
 | Screens with a board anchor | 2,440 |
 | **Screens with no anchor** | **0** |
-| Screens declaring at least one operation | 2,334 |
-| Screens whose operations resolve to a table | 2,331 |
+| Screens declaring at least one operation | 2,337 |
+| Screens whose operations resolve to a table | 2,334 |
 | Anchored links inside the boards | 5,421 |
 | Cross-platform reaches declared | 6 |
 
-**106 screens declare no operation.** They are real screens with a purpose and nothing specified yet, and `screen-index.json` says so by returning empty arrays rather than guessing. **3 declare operations that reach no table** - mostly configuration reads served from a cache, and navigation screens that only route.
+**103 screens declare no operation.** They are real screens with a purpose and nothing specified yet, and `screen-index.json` says so by returning empty arrays rather than guessing. **3 declare operations that reach no table** - mostly configuration reads served from a cache, and navigation screens that only route.
 
 ## What the checker enforces
 

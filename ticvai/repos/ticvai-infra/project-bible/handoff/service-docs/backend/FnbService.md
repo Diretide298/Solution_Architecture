@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `fnb` |
 | Schemas owned | `fnb` |
-| Operations in the slice | 60 of 117 |
+| Operations in the slice | 61 of 117 |
 | Scale | Write-heavy during service, idle between. Two peaks a day, sharply. |
 | If it is down | Down means the kitchen falls back to paper. Offline-capable by design. |
 
@@ -29,6 +29,7 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | bill | [`closeTableVisit`](#closetablevisit) | POST | `/table-visits/{visitId}/close` | core | 1 | EMP-059, POS-028 |
+| fnb | [`attachModifierGroup`](#attachmodifiergroup) | PUT | `/menu-items/{menuItemId}/modifier-groups` | setup | 2 | BO-045 |
 | fnb | [`chaseStation`](#chasestation) | POST | `/kitchen-stations/{stationId}/chase` | core | 2 | KIT-006 |
 | fnb | [`createTableReservation`](#createtablereservation) | POST | `/table-reservations` | core | 2 | EMP-055, GST-070, WEB-036 |
 | fnb | [`escalateCorrectiveAction`](#escalatecorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/escalate` | setup | 2 | BO-044 |
@@ -186,6 +187,68 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 
 
 ## Group: fnb
+
+### attachModifierGroup
+
+**`PUT /menu-items/{menuItemId}/modifier-groups`**: Give an item its choices
+
+Board 2E. **Attachment is separate from definition** because that is what makes the group reusable — the same *cooked how* group on nine steaks, defined once.
+**Refused where the group adds an allergen the item's claim does not carry.** A modifier that adds cheese to a dish declared dairy-free is a mislabelled dish, and **the refusal belongs here rather than in a training note.**
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `fnb.menu_item_modifier` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `fnb.menu_item`, `fnb.modifier_group` |
+| Writes | `cache:idempotency`, `cache:resolution`, `fnb.menu_item`, `fnb.menu_item_modifier` |
+| Called by | BO-045 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| menuItemId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| groupIds | array of string (uuid) | yes |  |
+
+**Response**: `MenuItem`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| productVariantId | string (uuid) | yes | The catalogue variant this item sells. |
+| name | string | yes |  |
+| description | string |  | (nullable) |
+| price | Money | yes | On the wire this is three fields; in the database it is one column. |
+| price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| sortOrder | integer |  |  |
+| modifierGroupIds | array of string (uuid) |  |  |
+| stationId | string (uuid) |  | (nullable) |
+| menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
+| isStockTracked | boolean |  | True where a recipe exists. |
+| isAvailable | boolean | yes |  |
+| unavailableReason | string |  | (nullable) |
+| restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
+| preparationMinutes | integer |  | (nullable) |
+| allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Attached. |
+| 409 |  | The group adds an allergen the item does not declare. |
 
 ### chaseStation
 
@@ -2031,7 +2094,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.location_session`, `fnb.menu_item`, `inventory.stock_level`, `fnb.delivery_policy` |
+| Reads | `cache:idempotency`, `fnb.location_session`, `fnb.menu_item`, `inventory.stock_level`, `fnb.delivery_policy`, `fnb.menu_item_modifier` |
 | Writes | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.order_fulfilment`, `fnb.service_order` |
 | Called by | GST-024, GST-032, KSK-016, WEB-036 |
 | State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): created as `ordered` |
@@ -2367,7 +2430,7 @@ They are one concept because a runner needs one instruction, and a guest needs o
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `fnb.delivery_location` |
+| Reads | `fnb.delivery_location`, `fnb.delivery_location_outlet` |
 | Writes | - |
 | Called by | BO-062, BO-065, EMP-030, GST-024, GST-029, WEB-036 |
 
@@ -2526,7 +2589,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `fnb.delivery_location`, `fnb.service_order` |
+| Reads | `cache:idempotency`, `fnb.delivery_location`, `fnb.service_order`, `fnb.delivery_location_outlet` |
 | Writes | `cache:idempotency`, `fnb.service_order` |
 | Called by | BO-021, KIT-007, POS-012 |
 | State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): moves `ready` -> `served`, `ready` -> `collected`, `ready` -> `delivered`<br/>Kitchen ticket ([states/kitchen-ticket.yaml](../../../states/kitchen-ticket.yaml)): moves `ready` -> `served` |
@@ -4269,6 +4332,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | unserviceable_reason | text | no |  |
 | walk_time_minutes | integer | no | From the serving outlet. |
 
+### `fnb.delivery_location_outlet`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| location_id | uuid | no | Points at fnb.delivery_location. |
+| outlet_id | uuid | no | Points at platform.outlet. |
+
 ### `fnb.delivery_policy`
 
 | Column | Type | Required | Notes |
@@ -4416,6 +4487,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | restore_at | timestamptz | no | When an unavailable item comes back on its own (setItemAvailability). |
 | preparation_minutes | integer | no |  |
 | allergens | text[] | no |  |
+
+### `fnb.menu_item_modifier`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| item_id | uuid | yes |  |
+| group_id | uuid | yes |  |
+| sort_order | integer | yes |  |
+| is_active | boolean | yes |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `fnb.menu_section`
 
@@ -4641,12 +4722,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-57 operations, added to this service in later releases without changing any of the above.
+56 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | bill | `getBill`, `splitBill` |
-| fnb | `applyMenuActions`, `attachModifierGroup`, `buildProductionPlan`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getAllergenVerification`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionRuns`, `listTemperatureCheckpoints`, `notifyWaitlistParty`, `planProductionRun`, `publishMenu`, `quoteWaitTime`, `reassignServer`, `recordCorrectiveAction`, `releaseProductionPlan`, `requestBill`, `requestRecount`, `resolveBookingConflict`, `rollbackMenu`, `scheduleMenuPublish`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setSectionLayout`, `setServiceStage`, `setSubstitutionRules`, `setTemperatureCheckpoint`, `transferOrderItems`, `transferTableVisit`, `updateTable`, `verifyAllergens` |
+| fnb | `applyMenuActions`, `buildProductionPlan`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getAllergenVerification`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionRuns`, `listTemperatureCheckpoints`, `notifyWaitlistParty`, `planProductionRun`, `publishMenu`, `quoteWaitTime`, `reassignServer`, `recordCorrectiveAction`, `releaseProductionPlan`, `requestBill`, `requestRecount`, `resolveBookingConflict`, `rollbackMenu`, `scheduleMenuPublish`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setSectionLayout`, `setServiceStage`, `setSubstitutionRules`, `setTemperatureCheckpoint`, `transferOrderItems`, `transferTableVisit`, `updateTable`, `verifyAllergens` |
 | menu | `listMenuSchedules`, `listMenuVersions` |
 | order | `amendFnbOrder` |
 | outlet | `listOutletTemplates`, `setOutletTemplate` |

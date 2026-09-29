@@ -164,6 +164,7 @@
     "identity.otp_challenge",
     "identity.principal",
     "identity.principal_credential",
+    "identity.refresh_token",
     "identity.role",
     "identity.session",
     "identity.sso_provider",
@@ -185,7 +186,7 @@
     "screens": 0,
     "flows": 8,
     "contracts": 3,
-    "tables": 31
+    "tables": 32
    }
   },
   "device": {
@@ -738,12 +739,14 @@
     "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
     "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "fnb.delivery_location",
+    "fnb.delivery_location_outlet",
     "fnb.delivery_policy",
     "fnb.dining_table",
     "fnb.kitchen_ticket",
     "fnb.location_session",
     "fnb.menu",
     "fnb.menu_item",
+    "fnb.menu_item_modifier",
     "fnb.modifier_group",
     "fnb.modifier_option",
     "fnb.order_fulfilment",
@@ -770,6 +773,7 @@
     "identity.mfa_recovery_code",
     "identity.otp_challenge",
     "identity.principal",
+    "identity.refresh_token",
     "identity.session",
     "inventory.stock_level",
     "ledger.fx_rate",
@@ -944,7 +948,7 @@
     "screens": 139,
     "flows": 22,
     "contracts": 22,
-    "tables": 250
+    "tables": 253
    }
   },
   "partner": {
@@ -1270,6 +1274,7 @@
     "identity.password_policy",
     "identity.principal",
     "identity.principal_credential",
+    "identity.refresh_token",
     "identity.role",
     "identity.session",
     "identity.sso_provider",
@@ -1312,8 +1317,10 @@
     "promotions.promotion_evaluation_trace",
     "promotions.promotion_rule",
     "reporting.execution",
+    "reporting.natural_language_query",
     "reporting.report_column",
     "reporting.report_definition",
+    "reporting.report_definition_version",
     "reporting.report_filter",
     "reporting.report_parameter",
     "seating.seat_block",
@@ -1326,7 +1333,7 @@
     "screens": 58,
     "flows": 9,
     "contracts": 10,
-    "tables": 112
+    "tables": 115
    }
   },
   "public": {
@@ -1355,13 +1362,9 @@
     "submitOnboardingApplication"
    ],
    "screens": [
-    "ACC-006",
-    "ACC-007",
     "SGN-002"
    ],
-   "flows": [
-    "F23"
-   ],
+   "flows": [],
    "contracts": [
     "approvals",
     "marketing-crm",
@@ -1405,8 +1408,8 @@
    ],
    "counts": {
     "operations": 18,
-    "screens": 3,
-    "flows": 1,
+    "screens": 1,
+    "flows": 0,
     "contracts": 6,
     "tables": 31
    }
@@ -6183,6 +6186,7 @@
     "assets.distribution_channel",
     "assets.media_asset",
     "assets.media_collection",
+    "assets.media_collection_member",
     "assets.media_fingerprint",
     "assets.media_upload",
     "assets.media_usage",
@@ -6282,7 +6286,9 @@
     "control.burst_environment",
     "control.cell",
     "control.cell_cluster",
+    "control.cell_instance",
     "control.cell_job",
+    "control.cell_tenant",
     "control.channel_listing",
     "control.content_block",
     "control.developer_account",
@@ -6294,6 +6300,7 @@
     "control.licence_add_on_limit",
     "control.migration",
     "control.migration_plan",
+    "control.migration_plan_cell",
     "control.migration_run",
     "control.migration_run_cell",
     "control.migration_run_tenant",
@@ -6319,6 +6326,7 @@
     "control.partner_status_history",
     "control.partner_user",
     "control.release",
+    "control.release_component",
     "control.rollout",
     "control.rollout_cell",
     "control.rollout_tenant",
@@ -6346,6 +6354,7 @@
     "fnb.corrective_action",
     "fnb.course_rule",
     "fnb.delivery_location",
+    "fnb.delivery_location_outlet",
     "fnb.delivery_policy",
     "fnb.dining_table",
     "fnb.ingredient_substitute",
@@ -6355,6 +6364,7 @@
     "fnb.kitchen_ticket_line",
     "fnb.menu",
     "fnb.menu_item",
+    "fnb.menu_item_modifier",
     "fnb.menu_schedule",
     "fnb.menu_section",
     "fnb.menu_version",
@@ -6409,6 +6419,7 @@
     "identity.access_override",
     "identity.access_policy",
     "identity.access_policy_version",
+    "identity.authz_audit",
     "identity.benefit_usage",
     "identity.capability_template",
     "identity.customer_membership",
@@ -6424,6 +6435,7 @@
     "identity.platform_staff_grant",
     "identity.principal",
     "identity.principal_credential",
+    "identity.refresh_token",
     "identity.role",
     "identity.role_permission",
     "identity.segregation_rule",
@@ -6448,6 +6460,7 @@
     "inventory.stock_level",
     "inventory.stock_reservation",
     "inventory.supplier",
+    "inventory.supplier_contract",
     "inventory.transfer",
     "inventory.transfer_line",
     "ledger.account",
@@ -6473,6 +6486,7 @@
     "maintenance.asset",
     "maintenance.asset_category",
     "maintenance.asset_document",
+    "maintenance.asset_status_change",
     "maintenance.incident",
     "maintenance.incident_authority_notification",
     "maintenance.incident_investigation_note",
@@ -6493,6 +6507,7 @@
     "marketing.booking_consent_record",
     "marketing.business_event",
     "marketing.campaign",
+    "marketing.campaign_target",
     "marketing.case",
     "marketing.case_category",
     "marketing.case_compensation_request",
@@ -6578,6 +6593,7 @@
     "marketing.retention_policy",
     "marketing.retention_run",
     "marketing.review",
+    "marketing.review_response",
     "marketing.reward",
     "marketing.reward_assignment",
     "marketing.segment",
@@ -6727,6 +6743,8 @@
     "platform.profile_deployment",
     "platform.region_settings",
     "platform.sale_board",
+    "platform.sale_board_page",
+    "platform.sale_board_tile",
     "platform.scope",
     "platform.tenant",
     "platform.venue_settings",
@@ -6785,6 +6803,7 @@
     "rental.fee_policy",
     "rental.incident",
     "rental.inspection",
+    "rental.inspection_item",
     "rental.inventory_model",
     "rental.location_rule",
     "rental.operational_rules",
@@ -6805,9 +6824,11 @@
     "reporting.export",
     "reporting.kpi_definition",
     "reporting.kpi_target",
+    "reporting.natural_language_query",
     "reporting.pipeline",
     "reporting.report_column",
     "reporting.report_definition",
+    "reporting.report_definition_version",
     "reporting.report_field",
     "reporting.report_filter",
     "reporting.report_parameter",
@@ -6869,6 +6890,7 @@
     "seating.seat_rules",
     "seating.seating_rules",
     "seating.section",
+    "seating.section_row",
     "seating.zone",
     "subscription.capacity_pack",
     "subscription.contract",
@@ -6997,7 +7019,7 @@
     "screens": 2095,
     "flows": 135,
     "contracts": 33,
-    "tables": 946
+    "tables": 965
    }
   }
  }

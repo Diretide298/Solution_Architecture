@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `reporting` |
 | Schemas owned | `reporting` |
-| Operations in the slice | 13 of 47 |
+| Operations in the slice | 15 of 47 |
 | Scale | Analytical. Runs against the replica and the analytical store. |
 | If it is down | Down stops dashboards. Nothing operational depends on it. |
 
@@ -26,9 +26,11 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
+| catalogue | [`createReport`](#createreport) | POST | `/reports` | setup | 2 | ANL-032, ANL-054, BO-029, BO-058, BO-059, BO-060 … |
 | catalogue | [`deleteReport`](#deletereport) | DELETE | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
 | catalogue | [`getReport`](#getreport) | GET | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
 | catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 2 | ANL-031, BO-029, BO-058, BO-059, BO-060, BO-262 … |
+| catalogue | [`updateReport`](#updatereport) | PUT | `/reports/{reportId}` | setup | 2 | ANL-035, ANL-036, ANL-037, ANL-038, BO-029, BO-058 … |
 | dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 2 | ADM-031, ANL-021, ANL-022, ANL-053 |
 | dashboard | [`getDashboard`](#getdashboard) | GET | `/dashboards/{dashboardId}` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
 | dashboard | [`recordDashboardView`](#recorddashboardview) | POST | `/dashboards/{dashboardId}/views` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
@@ -41,6 +43,114 @@
 | reporting | [`setAlertRule`](#setalertrule) | PUT | `/alert-rules` | setup | 1 | ANL-009, BO-133 |
 
 ## Group: catalogue
+
+### createReport
+
+**`POST /reports`**: Create a custom report definition
+
+The self-service builder. A definition names its data source, columns, filters, grouping and the permission required to run it.
+**The author cannot grant a permission they do not hold.** A venue user building a report cannot mark it tenant-scoped and thereby see other venues.
+
+|  |  |
+|---|---|
+| Permission | `REPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `reporting.report_definition_version` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
+| Writes | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter`, `reporting.report_definition_version` |
+| Called by | ANL-032, ANL-054, BO-029, BO-058, BO-059, BO-060, BO-1060, PTR-018, SUP-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateReportRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| description | string |  | (max length 1000) |
+| category | ReportCategory: enum (sales, admission, financial, inventory, guest, operations, marketing, workforce, …) | yes |  |
+| dataSource | DataSource: enum (orders, orderLines, payments, refunds, shifts, scanEvents, entitlements, products, …) | yes | What a report may be built over. |
+| columns | array of ReportColumn | yes | (min items 1) |
+| columns[].id | string (uuid) |  | Added 20 August. (read-only) |
+| columns[].field | string | yes |  |
+| columns[].label | string |  |  |
+| columns[].aggregation | object |  | (default none) |
+| columns[].sortOrder | integer |  |  |
+| columns[].sortDirection | enum (asc, desc) |  |  |
+| columns[].format | string |  | (nullable) |
+| filters | array of ReportFilter |  |  |
+| filters[].id | string (uuid) |  | Added 20 August. (read-only) |
+| filters[].field | string | yes |  |
+| filters[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, contains, …) | yes |  |
+| filters[].value | object |  | Open on purpose; its type is the field's. |
+| filters[].values | array of object |  | The values for in and notIn, or exactly two (from, to) for between. |
+| filters[].isParameter | boolean |  | Prompted at run time rather than fixed. (default False) |
+| groupBy | array of string |  |  |
+| parameters | array of ReportParameter |  |  |
+| parameters[].key | string | yes |  |
+| parameters[].label | string | yes |  |
+| parameters[].type | FieldType: enum (string, integer, decimal, money, boolean, date, dateTime, uuid, …) | yes |  |
+| parameters[].isRequired | boolean | yes |  |
+| parameters[].defaultValue | object |  | Open on purpose. |
+| requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
+| maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (min 1; default 366; nullable) |
+
+**Response**: `ReportDefinition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| description | string |  | (max length 1000) |
+| category | ReportCategory: enum (sales, admission, financial, inventory, guest, operations, marketing, workforce, …) | yes |  |
+| dataSource | DataSource: enum (orders, orderLines, payments, refunds, shifts, scanEvents, entitlements, products, …) | yes | What a report may be built over. |
+| columns | array of ReportColumn | yes | (min items 1) |
+| columns[].id | string (uuid) |  | Added 20 August. (read-only) |
+| columns[].field | string | yes |  |
+| columns[].label | string |  |  |
+| columns[].aggregation | object |  | (default none) |
+| columns[].sortOrder | integer |  |  |
+| columns[].sortDirection | enum (asc, desc) |  |  |
+| columns[].format | string |  | (nullable) |
+| filters | array of ReportFilter |  |  |
+| filters[].id | string (uuid) |  | Added 20 August. (read-only) |
+| filters[].field | string | yes |  |
+| filters[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, contains, …) | yes |  |
+| filters[].value | object |  | Open on purpose; its type is the field's. |
+| filters[].values | array of object |  | The values for in and notIn, or exactly two (from, to) for between. |
+| filters[].isParameter | boolean |  | Prompted at run time rather than fixed. (default False) |
+| groupBy | array of string |  |  |
+| parameters | array of ReportParameter |  |  |
+| parameters[].key | string | yes |  |
+| parameters[].label | string | yes |  |
+| parameters[].type | FieldType: enum (string, integer, decimal, money, boolean, date, dateTime, uuid, …) | yes |  |
+| parameters[].isRequired | boolean | yes |  |
+| parameters[].defaultValue | object |  | Open on purpose. |
+| requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
+| maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (min 1; default 366; nullable) |
+| id | string (uuid) | yes |  |
+| version | string | yes | The current version. |
+| isSystem | boolean | yes | Shipped with the platform — seeded at provisioning (BL-053, SeededReport). |
+| isRetired | boolean | yes |  |
+| estimatedCost | enum (low, medium, high) |  | Informs whether it may run inline or must be queued. |
+| createdByPrincipalId | string (uuid) |  | (nullable) |
+| createdAt | string (date-time) | yes |  |
+| lastRunAt | string (date-time) |  | (nullable) |
+| scopePath | string |  | The partition key (ADR-0005). |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created |
+| 400 |  | Unknown field, invalid filter, or estimated cost beyond the limit |
+| 403 |  | Author does not hold the permission they assigned to the report |
 
 ### deleteReport
 
@@ -88,7 +198,7 @@ Retired rather than deleted where executions or paused schedules reference it �
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | analytical |
-| Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
+| Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter`, `reporting.report_definition_version` |
 | Writes | - |
 | Called by | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
@@ -226,6 +336,116 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 |---|---|---|
 | 200 |  | Definitions |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
+### updateReport
+
+**`PUT /reports/{reportId}`**: Publish a new version of a definition
+
+Definitions are versioned. Historic executions keep the version they ran against, so a report produced last quarter remains reproducible after the definition changes.
+**Every publish keeps the version it replaces.** The definition as it stood is written to `reporting.report_definition_version` (`ReportDefinitionVersion`) keyed on the report and its version, and `reporting.report_definition` holds the current one. An execution's `definitionVersion` resolves against that history, which is what makes the promise above true: the live row alone can hold one version only.
+**PUT semantics — a full replace of the definition, never a create.** The body is the whole new definition: columns, filters, grouping and parameters left out of it are not in the new version. An unknown `reportId` is `404`; there is no create-on-PUT, `createReport` makes definitions. The server assigns the new `version`.
+**A system report is refused (decided 28 September, audit R096)**: seeded reports are clone-only, so an `isSystem` definition answers 409 `system-report`. Clone it with `createReport`.
+
+|  |  |
+|---|---|
+| Permission | `REPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `reporting.report_definition_version` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
+| Writes | `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter`, `reporting.report_definition_version` |
+| Called by | ANL-035, ANL-036, ANL-037, ANL-038, BO-029, BO-058, BO-059, BO-060, PTR-018, SUP-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| reportId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateReportRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| description | string |  | (max length 1000) |
+| category | ReportCategory: enum (sales, admission, financial, inventory, guest, operations, marketing, workforce, …) | yes |  |
+| dataSource | DataSource: enum (orders, orderLines, payments, refunds, shifts, scanEvents, entitlements, products, …) | yes | What a report may be built over. |
+| columns | array of ReportColumn | yes | (min items 1) |
+| columns[].id | string (uuid) |  | Added 20 August. (read-only) |
+| columns[].field | string | yes |  |
+| columns[].label | string |  |  |
+| columns[].aggregation | object |  | (default none) |
+| columns[].sortOrder | integer |  |  |
+| columns[].sortDirection | enum (asc, desc) |  |  |
+| columns[].format | string |  | (nullable) |
+| filters | array of ReportFilter |  |  |
+| filters[].id | string (uuid) |  | Added 20 August. (read-only) |
+| filters[].field | string | yes |  |
+| filters[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, contains, …) | yes |  |
+| filters[].value | object |  | Open on purpose; its type is the field's. |
+| filters[].values | array of object |  | The values for in and notIn, or exactly two (from, to) for between. |
+| filters[].isParameter | boolean |  | Prompted at run time rather than fixed. (default False) |
+| groupBy | array of string |  |  |
+| parameters | array of ReportParameter |  |  |
+| parameters[].key | string | yes |  |
+| parameters[].label | string | yes |  |
+| parameters[].type | FieldType: enum (string, integer, decimal, money, boolean, date, dateTime, uuid, …) | yes |  |
+| parameters[].isRequired | boolean | yes |  |
+| parameters[].defaultValue | object |  | Open on purpose. |
+| requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
+| maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (min 1; default 366; nullable) |
+
+**Response**: `ReportDefinition`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string | yes | (max length 200) |
+| description | string |  | (max length 1000) |
+| category | ReportCategory: enum (sales, admission, financial, inventory, guest, operations, marketing, workforce, …) | yes |  |
+| dataSource | DataSource: enum (orders, orderLines, payments, refunds, shifts, scanEvents, entitlements, products, …) | yes | What a report may be built over. |
+| columns | array of ReportColumn | yes | (min items 1) |
+| columns[].id | string (uuid) |  | Added 20 August. (read-only) |
+| columns[].field | string | yes |  |
+| columns[].label | string |  |  |
+| columns[].aggregation | object |  | (default none) |
+| columns[].sortOrder | integer |  |  |
+| columns[].sortDirection | enum (asc, desc) |  |  |
+| columns[].format | string |  | (nullable) |
+| filters | array of ReportFilter |  |  |
+| filters[].id | string (uuid) |  | Added 20 August. (read-only) |
+| filters[].field | string | yes |  |
+| filters[].operator | enum (equals, notEquals, greaterThan, lessThan, between, in, notIn, contains, …) | yes |  |
+| filters[].value | object |  | Open on purpose; its type is the field's. |
+| filters[].values | array of object |  | The values for in and notIn, or exactly two (from, to) for between. |
+| filters[].isParameter | boolean |  | Prompted at run time rather than fixed. (default False) |
+| groupBy | array of string |  |  |
+| parameters | array of ReportParameter |  |  |
+| parameters[].key | string | yes |  |
+| parameters[].label | string | yes |  |
+| parameters[].type | FieldType: enum (string, integer, decimal, money, boolean, date, dateTime, uuid, …) | yes |  |
+| parameters[].isRequired | boolean | yes |  |
+| parameters[].defaultValue | object |  | Open on purpose. |
+| requiredPermission | Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | Permission needed to run this report, from the shared Permission vocabulary. |
+| maxDateRangeDays | integer |  | Guards against a query spanning years of scan events. (min 1; default 366; nullable) |
+| id | string (uuid) | yes |  |
+| version | string | yes | The current version. |
+| isSystem | boolean | yes | Shipped with the platform — seeded at provisioning (BL-053, SeededReport). |
+| isRetired | boolean | yes |  |
+| estimatedCost | enum (low, medium, high) |  | Informs whether it may run inline or must be queued. |
+| createdByPrincipalId | string (uuid) |  | (nullable) |
+| createdAt | string (date-time) | yes |  |
+| lastRunAt | string (date-time) |  | (nullable) |
+| scopePath | string |  | The partition key (ADR-0005). |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | New version published |
+| 409 |  | The report is a system report, which is clone-only (audit R096). |
 
 
 ## Group: dashboard
@@ -594,7 +814,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.report_column`, `reporting.report_filter` |
-| Writes | `ai.activity`, `cache:idempotency`, `reporting.report_column`, `reporting.report_filter` |
+| Writes | `ai.activity`, `cache:idempotency`, `reporting.report_column`, `reporting.report_filter`, `reporting.natural_language_query` |
 | Called by | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029, BO-058, BO-059, BO-060, BO-593, KIT-010, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
@@ -677,7 +897,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
-| Writes | `ai.activity`, `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
+| Writes | `ai.activity`, `cache:idempotency`, `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter`, `reporting.natural_language_query` |
 | Called by | ANL-052, BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
@@ -988,6 +1208,19 @@ Every table this service owns that the slice reads or writes, with its columns a
 | completed_at | timestamptz | no |  |
 | expires_at | timestamptz | no | Results are retained for a limited period, then discarded. |
 
+### `reporting.natural_language_query`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| conversation_id | uuid | yes | The ai.conversation the answer belongs to — NaturalLanguageAnswer.conversationId. |
+| question | text | yes |  |
+| interpretation | text | no |  |
+| generated_query | jsonb | yes | Stored whole. |
+| asked_by_principal_id | uuid | yes |  |
+| asked_at | timestamptz | yes |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `reporting.report_column`
 
 | Column | Type | Required | Notes |
@@ -1022,6 +1255,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | last_run_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
+### `reporting.report_definition_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| report_id | uuid | yes |  |
+| version | text | yes | Matches ReportExecution.definitionVersion for every execution that ran against it. |
+| definition | jsonb | yes | The definition as published — data source, columns, filters, grouping, parameters and required permission. |
+| published_by_principal_id | uuid | no |  |
+| published_at | timestamptz | yes |  |
+| scope_path | text | no | The partition key (ADR-0005), the report's own. |
+
 ### `reporting.report_filter`
 
 | Column | Type | Required | Notes |
@@ -1048,11 +1293,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-34 operations, added to this service in later releases without changing any of the above.
+32 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| catalogue | `createReport`, `listReportFields`, `updateReport` |
+| catalogue | `listReportFields` |
 | dashboard | `getCommandCentre`, `listDashboards` |
 | execution | `cancelReportExecution`, `getReportExecution`, `getReportResult`, `listReportExecutions` |
 | export | `exportReportResult`, `getReportExport` |

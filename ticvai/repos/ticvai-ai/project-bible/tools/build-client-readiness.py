@@ -283,7 +283,8 @@ def main():
         "On 29 September the readiness questions were answered from the client's own minutes, design packs and "
         "boards; only questions a wrong guess would make costly (law, names only you hold, your customers' money) "
         "stay open. They are listed in TICVAI_Readiness_Questions.xlsx. \"Operations ready to build\" counts "
-        "operations only: screens still to specify (mostly the AI console, waiting on its design review), screens "
+        "operations only: screens still to specify (mostly the AI console, whose design was decided on 29 September; "
+        "its operations come next), screens "
         "still to design, and the six design-pack gaps are counted separately above."))
     ws.cell(row=len(rows) + 6, column=1).alignment = Alignment(wrap_text=True)
 

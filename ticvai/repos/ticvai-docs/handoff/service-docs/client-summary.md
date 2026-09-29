@@ -41,8 +41,8 @@ The four parts share 16 back-end services. Each looks after one area of the busi
 | Entry and admission | Tickets and passes at the gate, admission rules and entry validation. | Gates fall back to their local copy of what is valid. |
 | Finance | The financial record of every sale, refund and payment, and currency rates. | Finance postings wait until it returns; trading is not affected. |
 | Wallets and credit | Guest wallets, stored credit, gift cards and membership credit. | Wallet balances cannot be spent until it returns. |
-| Stock | Stock levels, counting and purchasing. | Receiving and counting pause; selling continues. |
 | Food and beverage | Menus, table service, kitchen screens and food orders. | Kitchens fall back to printed tickets. |
+| Stock | Stock levels, counting and purchasing. | Receiving and counting pause; selling continues. |
 | Venue operations | Queues and wait times, maintenance, bookable resources, the venue map and media. | Venue operations degrade; selling and entry continue. |
 | Retail | Merchandise, shop sales, returns and shop-and-drop. | The shop stops; gates and restaurants do not. |
 | Guests and marketing | Guest profiles, consent, loyalty, campaigns, forms and support. | Campaigns and guest look-up pause; trading continues. |

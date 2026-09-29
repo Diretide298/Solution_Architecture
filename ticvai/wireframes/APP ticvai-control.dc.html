@@ -22009,10 +22009,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; createAccreditationApplication · submitAccreditationDocument</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-001">ACC-001</a> <br><a href="#acc-003">ACC-003</a>  &mdash; <i>Application Review &amp; Submit</i> <span class="car">applicationRef</span><br><a href="#acc-007">ACC-007</a>  &mdash; <i>A reviewer checks and approves</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-001">ACC-001</a> <br><a href="#acc-003">ACC-003</a>  &mdash; <i>Application Review &amp; Submit</i> <span class="car">applicationRef</span><br><a href="#acc-007">ACC-007</a>  &mdash; <i>A reviewer checks and approves</i> <span class="car">applicationId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> saveAndExit &middot; <i>Save and finish later</i></div></div>
         </div>
@@ -22041,7 +22041,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; createAccreditationApplication</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · denied · emptyNoResults · emptyFirstRun</span></div>
           <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;ACC-002</div>
           <div><b>GOES TO</b> &middot; <a href="#acc-002">ACC-002</a>  &mdash; <i>Registration Form</i> <span class="car">applicationRef</span><br><a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i> <span class="car">applicationRef</span></div>
@@ -22072,7 +22072,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationApplications</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyNoResults · error · denied · emptyFirstRun</span></div>
           <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#acc-001">ACC-001</a> <br><a href="#acc-005">ACC-005</a>  &mdash; <i>Accreditation Badge</i> <span class="car">applicationRef</span></div>
@@ -22104,7 +22104,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationBadges · issueAccreditationBadge</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationCredentials · issueAccreditationCredential</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyNoResults · error · offline · emptyFirstRun</span></div>
           <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;ACC-004</div>
           <div><b>GOES TO</b> &middot; <a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i> <span class="car">applicationRef</span></div>
@@ -22135,7 +22135,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listApprovalRequests</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationApplications</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; programmeId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
@@ -22167,9 +22167,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationApplications · decideAccreditationApplication</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyNoAccess · emptyNoResults · emptyFirstRun</span></div>
-          <div><b>ARRIVES WITH</b> &middot; requestId&larr;ACC-006</div>
+          <div><b>ARRIVES WITH</b> &middot; applicationId&larr;ACC-006</div>
           <div><b>GOES TO</b> &middot; <a href="#acc-005">ACC-005</a>  &mdash; <i>The badge is issued</i><br><a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> refuse &middot; <i>Refuse</i></div><div class="ov"><b>drawer</b> approveWithConditions &middot; <i>Approve</i></div></div>
@@ -22198,7 +22198,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAccreditationBadges</div>
+          <div><b>OPERATIONS</b> &middot; listAccreditationCredentials</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; programmeId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i><br><a href="#acc-007">ACC-007</a>  &mdash; <i>Reviewer Application Detail</i></div>

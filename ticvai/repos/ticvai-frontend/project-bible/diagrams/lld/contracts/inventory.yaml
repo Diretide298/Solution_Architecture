@@ -486,6 +486,7 @@ operations:
   offline: false
   reads:
   - inventory.supplier
+  - inventory.supplier_contract
   writes: []
 - operation: lookupInventoryItem
   verb: GET
@@ -712,4 +713,5 @@ operations:
   - cache:idempotency
   - cache:resolution
   - inventory.supplier
+  - inventory.supplier_contract
   - platform.audit_record

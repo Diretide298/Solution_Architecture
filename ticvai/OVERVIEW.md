@@ -33,7 +33,7 @@ package has been bitten by that three times.
 | | | |
 |---|---:|---|
 | Requirements contracted | **2,781** of 3,184 | **98% of what is in scope** |
-| Operations reaching a screen | 2187 of 2405 | 91% |
+| Operations reaching a screen | 2186 of 2405 | 91% |
 | Screens reachable from an entry point | 2439 of 2440 | 100% |
 | Screens drawn on a board | 2440 of 2440 | 100% |
 | Screens in a journey | 2122 of 2440 | 87% |

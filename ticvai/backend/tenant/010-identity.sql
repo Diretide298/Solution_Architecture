@@ -69,7 +69,8 @@ CREATE TABLE IF NOT EXISTS identity.access_policy_version (
 );
 
 -- Written by the authorisation layer on every call, not by an operation Hangs off: reaches
--- identity.principal through its keys; references identity.principal.
+-- identity.principal through its keys; references identity.principal. Reached by: 1 operations
+-- read it and 1 write it.
 CREATE TABLE IF NOT EXISTS identity.authz_audit (
     id                                uuid PRIMARY KEY NOT NULL,
     actor_principal_id                uuid,

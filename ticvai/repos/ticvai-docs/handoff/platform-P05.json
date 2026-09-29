@@ -54,19 +54,19 @@
    "operations": 2
   },
   {
-   "contract": "white-label",
-   "operations": 2
-  },
-  {
    "contract": "fnb",
    "operations": 2
   },
   {
-   "contract": "ai",
-   "operations": 1
+   "contract": "white-label",
+   "operations": 2
   },
   {
    "contract": "promotions",
+   "operations": 1
+  },
+  {
+   "contract": "ai",
    "operations": 1
   }
  ],

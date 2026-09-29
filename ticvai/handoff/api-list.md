@@ -268,8 +268,8 @@ One approval mechanism, not five.
 
 | Method | Path | Operation | Permission | Offline | Consumers |
 |---|---|---|---|---|---|
-| GET | `/accreditation-badges` | `listAccreditationBadges` | `APPROVAL_VIEW` | — | accreditation-web |
-| POST | `/accreditation-badges` | `issueAccreditationBadge` | `APPROVAL_ACT` | — | accreditation-web |
+| GET | `/accreditation-badges` | `listAccreditationBadges` | `APPROVAL_VIEW` | — | — |
+| POST | `/accreditation-badges` | `issueAccreditationBadge` | `APPROVAL_ACT` | — | — |
 | GET | `/approval-analytics` | `getApprovalAnalytics` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
 | GET | `/approval-control-policies` | `listApprovalControlPolicies` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
 | PUT | `/approval-control-policies` | `setApprovalControlPolicy` | `APPROVAL_CONFIGURE` | — | ticvai-web, venue-management-web |
@@ -277,10 +277,10 @@ One approval mechanism, not five.
 | POST | `/approval-evidence-packages` | `createApprovalEvidencePackage` | `APPROVAL_VIEW` | — | ticvai-web |
 | GET | `/approval-matrices` | `listApprovalMatrices` | `APPROVAL_CONFIGURE` | — | ticvai-web, venue-management-web |
 | PUT | `/approval-matrices` | `setApprovalMatrix` | `APPROVAL_CONFIGURE` | — | ticvai-web, venue-management-web |
-| GET | `/approval-requests` | `listApprovalRequests` | `APPROVAL_VIEW` | — | accreditation-web, ticvai-web, venue-management-web |
+| GET | `/approval-requests` | `listApprovalRequests` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
 | POST | `/approval-requests` | `createApprovalRequest` | `APPROVAL_REQUEST` | — | ticvai-web, venue-management-web, venue-pos |
 | POST | `/approval-requests/evaluate` | `evaluateApprovalRequirement` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web, venue-pos |
-| POST | `/approval-requests/{requestId}/decide` | `decideApprovalRequest` | `APPROVAL_DECIDE` | — | accreditation-web, ticvai-web, venue-management-web, venue-pos |
+| POST | `/approval-requests/{requestId}/decide` | `decideApprovalRequest` | `APPROVAL_DECIDE` | — | ticvai-web, venue-management-web, venue-pos |
 | POST | `/approval-requests/{requestId}/escalate` | `escalateApprovalRequest` | `APPROVAL_REQUEST` | — | venue-management-web |
 | GET | `/approval-requests/{requestId}/record` | `getApprovalRecord` | `APPROVAL_VIEW` | — | ticvai-web, venue-management-web |
 | POST | `/approval-requests/{requestId}/resubmit` | `resubmitApprovalRequest` | `APPROVAL_REQUEST` | — | venue-management-web |
@@ -745,8 +745,8 @@ Money moves here. One atomic transaction with entitlement and ledger.
 | GET | `/b2b-accounts/{accountId}/credit` | `getB2bCredit` | `ORDER_VIEW` | — | partner-web |
 | PUT | `/b2b-accounts/{accountId}/credit` | `setB2bCreditLimit` | `CREDIT_MANAGE` | — | partner-web |
 | POST | `/b2b-accounts/{accountId}/credit/override` | `overrideCreditLimit` | `CREDIT_OVERRIDE` | — | partner-web |
-| GET | `/billing-statements` | `listBillingStatements` | `—` | — | guest-app, guest-web |
-| GET | `/billing-statements/{statementId}` | `getBillingStatement` | `—` | — | guest-app, guest-web |
+| GET | `/billing-statements` | `listBillingStatements` | `ORDER_VIEW` | — | guest-app, guest-web |
+| GET | `/billing-statements/{statementId}` | `getBillingStatement` | `ORDER_VIEW` | — | guest-app, guest-web |
 | GET | `/bulk-group-assisted` | `listBulkGroupAssisted` | `ORDER_VIEW` | — | ticvai-web |
 | GET | `/buyer-checkout-inventory` | `listBuyerCheckoutInventory` | `ORDER_VIEW` | — | ticvai-web |
 | GET | `/buyer-purchase-resale` | `listBuyerPurchaseResale` | `ORDER_VIEW` | — | ticvai-web |
@@ -1049,14 +1049,14 @@ Accreditation is the opposite of ticketing, and that is why it cannot live in it
 | GET | `/accreditation-access-profiles` | `listAccessProfiles` | `ACCREDITATION_VIEW` | — | venue-management-web |
 | PUT | `/accreditation-access-profiles` | `setAccessProfile` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
 | POST | `/accreditation-access-profiles/preview` | `previewAccessImpact` | `ACCREDITATION_CONFIGURE` | — | venue-management-web |
-| GET | `/accreditation-applications` | `listAccreditationApplications` | `ACCREDITATION_VIEW` | — | venue-management-web |
-| POST | `/accreditation-applications` | `createAccreditationApplication` | `ACCREDITATION_APPLY` | — | venue-management-web |
-| POST | `/accreditation-applications/{applicationId}/decide` | `decideAccreditationApplication` | `ACCREDITATION_APPROVE` | — | venue-management-web |
+| GET | `/accreditation-applications` | `listAccreditationApplications` | `ACCREDITATION_VIEW` | — | accreditation-web, venue-management-web |
+| POST | `/accreditation-applications` | `createAccreditationApplication` | `ACCREDITATION_APPLY` | — | accreditation-web, venue-management-web |
+| POST | `/accreditation-applications/{applicationId}/decide` | `decideAccreditationApplication` | `ACCREDITATION_APPROVE` | — | accreditation-web, venue-management-web |
 | GET | `/accreditation-audit` | `listAccreditationAudit` | `ACCREDITATION_VIEW` | — | venue-management-web |
-| GET | `/accreditation-credentials` | `listAccreditationCredentials` | `ACCREDITATION_VIEW` | — | venue-management-web |
-| POST | `/accreditation-credentials` | `issueAccreditationCredential` | `ACCREDITATION_ISSUE` | — | venue-management-web |
+| GET | `/accreditation-credentials` | `listAccreditationCredentials` | `ACCREDITATION_VIEW` | — | accreditation-web, venue-management-web |
+| POST | `/accreditation-credentials` | `issueAccreditationCredential` | `ACCREDITATION_ISSUE` | — | accreditation-web, venue-management-web |
 | POST | `/accreditation-credentials/{credentialId}/replace` | `replaceAccreditationCredential` | `ACCREDITATION_ISSUE` | — | — |
-| POST | `/accreditation-documents` | `submitAccreditationDocument` | `ACCREDITATION_APPLY` | — | venue-management-web |
+| POST | `/accreditation-documents` | `submitAccreditationDocument` | `ACCREDITATION_APPLY` | — | accreditation-web, venue-management-web |
 | POST | `/accreditation-documents/{documentId}/verify` | `verifyAccreditationDocument` | `ACCREDITATION_APPROVE` | — | venue-management-web |
 | GET | `/accreditation-holders` | `listAccreditationHolders` | `ACCREDITATION_VIEW` | — | venue-management-web |
 | GET | `/accreditation-holders/{holderId}` | `getAccreditationHolder` | `ACCREDITATION_VIEW` | — | venue-management-web |
@@ -2152,7 +2152,7 @@ A bookable resource is a specific object checked out to a named guest and return
 | PUT | `/resources/{resourceId}/dependencies` | `setResourceDependencies` | `RESOURCE_CONFIGURE` | — | venue-management-web |
 | GET | `/resources/{resourceId}/hierarchy` | `getResourceHierarchy` | `RESOURCE_VIEW` | — | venue-management-web |
 | PUT | `/resources/{resourceId}/hierarchy` | `setResourceHierarchy` | `RESOURCE_MANAGE` | — | venue-management-web |
-| GET | `/resources/{resourceId}/qualifications` | `getResourceQualifications` | `RESOURCE_VIEW` | — | — |
+| GET | `/resources/{resourceId}/qualifications` | `getResourceQualifications` | `RESOURCE_VIEW` | — | venue-management-web |
 | PUT | `/resources/{resourceId}/qualifications` | `setResourceQualifications` | `RESOURCE_MANAGE` | — | venue-management-web |
 | GET | `/resources/{resourceId}/schedule` | `getResourceSchedule` | `RESOURCE_VIEW` | — | venue-management-web |
 | PUT | `/resources/{resourceId}/schedule` | `setResourceSchedule` | `RESOURCE_CONFIGURE` | — | venue-management-web |

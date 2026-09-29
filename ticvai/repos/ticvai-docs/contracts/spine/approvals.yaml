@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Approvals
   version: 1.0.0
-  x-ticvai-screen-count: 45
+  x-ticvai-screen-count: 43
   x-ticvai-module: 11 — Approval Workflows and Governance
   x-ticvai-platforms:
   - P04 POS
@@ -96,8 +96,6 @@ paths:
         - "P09 ADM-145 Promotion Approval Inbox"
         - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
         - "P09 ADM-351 Approval API Management"
-        - "P11 ACC-006 Reviewer Queue"
-        - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-audience:
       - staff
       - public
@@ -385,7 +383,6 @@ paths:
         - "P08 BO-940 Manager Mobile Approval Center"
         - "P09 ADM-145 Promotion Approval Inbox"
         - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
-        - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-audience:
       - staff
       - public
@@ -994,9 +991,6 @@ paths:
   /accreditation-badges:
     get:
       operationId: listAccreditationBadges
-      x-ticvai-consumed-by:
-        - "P11 ACC-005 Accreditation Badge"
-        - "P11 ACC-008 Credential Register"
       x-ticvai-audience:
       - staff
       summary: Badges issued and their state
@@ -1027,8 +1021,6 @@ paths:
                   $ref: '#/components/schemas/AccreditationBadge'
     post:
       operationId: issueAccreditationBadge
-      x-ticvai-consumed-by:
-        - "P11 ACC-005 Accreditation Badge"
       x-ticvai-audience:
       - staff
       summary: Issue a badge

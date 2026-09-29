@@ -1,6 +1,6 @@
 # Database migrations for the first release
 
-**363 tables in 33 migrations.** Every table the first release reads or writes, plus every table their foreign keys reach. The DDL for all of them already exists in `backend/`; each migration takes its schema's tables from there, with the matching foreign keys, indexes and row-level security, and a ROLLBACK section tested in CI (`backend/MIGRATIONS.md`). Generated; do not edit.
+**371 tables in 33 migrations.** Every table the first release reads or writes, plus every table their foreign keys reach. The DDL for all of them already exists in `backend/`; each migration takes its schema's tables from there, with the matching foreign keys, indexes and row-level security, and a ROLLBACK section tested in CI (`backend/MIGRATIONS.md`). Generated; do not edit.
 
 Each migration only references tables created by the ones above it. Keys that would point forward are added by the last migration.
 
@@ -9,29 +9,29 @@ Each migration only references tables created by the ones above it. Keys that wo
 | Order | File | Task | Database | Schema | Tables | Columns | References | Assignee | Points |
 |---|---|---|---|---|---|---|---|---|---|
 | 0 | `V0001__baseline.sql` | MIG-BASELINE | both | (baseline) | 0 | 0 |  | Hrushikant Patkar | 3 |
-| 1 | `V0002__control.sql` | MIG-CONTROL | control | control | 8 | 191 |  | Hrushikant Patkar | 8 |
+| 1 | `V0002__control.sql` | MIG-CONTROL | control | control | 8 | 191 |  | Tanmay Dukhande | 8 |
 | 2 | `V0003__tenancy.sql` | MIG-TENANCY | tenant | tenancy | 1 | 12 |  | Hrushikant Patkar | 1 |
 | 3 | `V0004__transport.sql` | MIG-TRANSPORT | tenant | transport | 10 | 93 |  | Hrushikant Patkar | 8 |
 | 4 | `V0005__pricing.sql` | MIG-PRICING | tenant | pricing | 3 | 36 | catalogue | Pranay Shinde | 2 |
-| 5 | `V0006__subscription.sql` | MIG-SUBSCRIPTION | tenant | subscription | 4 | 34 | platform | Hrushikant Patkar | 2 |
+| 5 | `V0006__subscription.sql` | MIG-SUBSCRIPTION | tenant | subscription | 4 | 34 | platform | Tanmay Dukhande | 2 |
 | 6 | `V0007__pii.sql` | MIG-PII | tenant | pii | 4 | 45 | access, marketing | Pranay Shinde | 2 |
 | 7 | `V0008__games.sql` | MIG-GAMES | tenant | games | 2 | 15 | pii, platform | Hrushikant Patkar | 2 |
-| 8 | `V0009__identity.sql` | MIG-IDENTITY | tenant | identity | 10 | 77 | pii, platform | Pranay Shinde | 5 |
+| 8 | `V0009__identity.sql` | MIG-IDENTITY | tenant | identity | 11 | 87 | pii, platform | Pranay Shinde | 5 |
 | 9 | `V0010__approvals.sql` | MIG-APPROVALS | tenant | approvals | 5 | 72 | identity | Hrushikant Patkar | 3 |
-| 10 | `V0011__reporting.sql` | MIG-REPORTING | tenant | reporting | 11 | 122 | identity, platform | Hrushikant Patkar | 8 |
-| 11 | `V0012__ai.sql` | MIG-AI | tenant | ai | 10 | 142 | identity, pii, platform | Tanmay Dukhande | 8 |
-| 12 | `V0013__assets.sql` | MIG-ASSETS | tenant | assets | 6 | 69 | identity, platform | Hrushikant Patkar | 5 |
+| 10 | `V0011__reporting.sql` | MIG-REPORTING | tenant | reporting | 13 | 137 | identity, platform | Hrushikant Patkar | 8 |
+| 11 | `V0012__ai.sql` | MIG-AI | tenant | ai | 10 | 142 | identity, pii, platform | Hrushikant Patkar | 8 |
+| 12 | `V0013__assets.sql` | MIG-ASSETS | tenant | assets | 7 | 74 | identity, platform | Hrushikant Patkar | 5 |
 | 13 | `V0014__resources.sql` | MIG-RESOURCES | tenant | resources | 7 | 85 | identity, orders, pii, platform | Hrushikant Patkar | 5 |
 | 14 | `V0015__wallet.sql` | MIG-WALLET | tenant | wallet | 19 | 161 | identity, orders, pii, platform | Pranay Shinde | 8 |
 | 15 | `V0016__whitelabel.sql` | MIG-WHITELABEL | tenant | whitelabel | 19 | 152 | identity, platform, promotions | Tanmay Dukhande | 8 |
 | 16 | `V0017__workforce.sql` | MIG-WORKFORCE | tenant | workforce | 1 | 17 | identity, platform | Hrushikant Patkar | 2 |
-| 17 | `V0018__platform.sql` | MIG-PLATFORM | tenant | platform | 13 | 137 | access, approvals, inventory, ledger | Hrushikant Patkar | 8 |
-| 18 | `V0019__ledger.sql` | MIG-LEDGER | tenant | ledger | 10 | 112 | catalogue, identity, platform | Pranay Shinde | 5 |
-| 19 | `V0020__inventory.sql` | MIG-INVENTORY | tenant | inventory | 10 | 156 | identity, ledger, platform | Hrushikant Patkar | 8 |
+| 17 | `V0018__platform.sql` | MIG-PLATFORM | tenant | platform | 15 | 143 | access, approvals, inventory, ledger | Hrushikant Patkar | 8 |
+| 18 | `V0019__ledger.sql` | MIG-LEDGER | tenant | ledger | 10 | 112 | catalogue, identity, platform | Hrushikant Patkar | 5 |
+| 19 | `V0020__inventory.sql` | MIG-INVENTORY | tenant | inventory | 10 | 156 | identity, ledger, platform | Pranay Shinde | 8 |
 | 20 | `V0021__maintenance.sql` | MIG-MAINTENANCE | tenant | maintenance | 4 | 121 | access, identity, inventory, platform | Hrushikant Patkar | 5 |
 | 21 | `V0022__promotions.sql` | MIG-PROMOTIONS | tenant | promotions | 18 | 200 | ledger, orders, pii, platform | Pranay Shinde | 8 |
 | 22 | `V0023__seating.sql` | MIG-SEATING | tenant | seating | 6 | 62 | catalogue, identity, pii, platform | Pranay Shinde | 5 |
-| 23 | `V0024__fnb.sql` | MIG-FNB | tenant | fnb | 27 | 269 | catalogue, identity, pii, platform, seating | Hrushikant Patkar | 8 |
+| 23 | `V0024__fnb.sql` | MIG-FNB | tenant | fnb | 29 | 277 | catalogue, identity, pii, platform, seating | Hrushikant Patkar | 8 |
 | 24 | `V0025__catalogue.sql` | MIG-CATALOGUE | tenant | catalogue | 39 | 694 | access, identity, ledger, pii, platform, seating | Pranay Shinde | 8 |
 | 25 | `V0026__venuemap.sql` | MIG-VENUEMAP | tenant | venuemap | 6 | 69 | access, assets, catalogue, platform, resources | Hrushikant Patkar | 3 |
 | 26 | `V0027__orders.sql` | MIG-ORDERS | tenant | orders | 31 | 384 | access, catalogue, identity, ledger, pii, platform | Tanmay Dukhande | 8 |
@@ -87,6 +87,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-IDENTITY | `identity.platform_staff_grant` | 9 | scope_path |  | 1 | 0 | used by the first release |
 | MIG-IDENTITY | `identity.principal` | 9 | none |  | 23 | 2 | used by the first release |
 | MIG-IDENTITY | `identity.principal_credential` | 2 | none |  | 2 | 2 | used by the first release |
+| MIG-IDENTITY | `identity.refresh_token` | 10 | none |  | 1 | 2 | used by the first release |
 | MIG-IDENTITY | `identity.role` | 8 | none |  | 6 | 1 | used by the first release |
 | MIG-APPROVALS | `approvals.decision` | 13 | none |  | 2 | 1 | used by the first release |
 | MIG-APPROVALS | `approvals.delegation` | 10 | scope_path |  | 4 | 2 | used by the first release |
@@ -99,10 +100,12 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-REPORTING | `reporting.dashboard_tile` | 8 | none |  | 4 | 2 | used by the first release |
 | MIG-REPORTING | `reporting.dashboard_view` | 5 | venue_id |  | 0 | 1 | used by the first release |
 | MIG-REPORTING | `reporting.execution` | 15 | none |  | 1 | 1 | used by the first release |
-| MIG-REPORTING | `reporting.report_column` | 8 | none |  | 4 | 2 | used by the first release |
-| MIG-REPORTING | `reporting.report_definition` | 16 | scope_path |  | 5 | 2 | used by the first release |
-| MIG-REPORTING | `reporting.report_filter` | 7 | none |  | 4 | 2 | used by the first release |
-| MIG-REPORTING | `reporting.report_parameter` | 7 | none |  | 4 | 1 | used by the first release |
+| MIG-REPORTING | `reporting.natural_language_query` | 8 | scope_path |  | 0 | 2 | used by the first release |
+| MIG-REPORTING | `reporting.report_column` | 8 | none |  | 6 | 4 | used by the first release |
+| MIG-REPORTING | `reporting.report_definition` | 16 | scope_path |  | 7 | 4 | used by the first release |
+| MIG-REPORTING | `reporting.report_definition_version` | 7 | scope_path |  | 1 | 2 | used by the first release |
+| MIG-REPORTING | `reporting.report_filter` | 7 | none |  | 6 | 4 | used by the first release |
+| MIG-REPORTING | `reporting.report_parameter` | 7 | none |  | 6 | 3 | used by the first release |
 | MIG-REPORTING | `reporting.schedule` | 15 | none |  | 0 | 0 | referenced by reporting.execution |
 | MIG-AI | `ai.activity` | 22 | scope_path |  | 0 | 4 | used by the first release |
 | MIG-AI | `ai.chunk_ref` | 2 | none |  | 2 | 0 | used by the first release |
@@ -117,6 +120,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-ASSETS | `assets.asset_version` | 11 | scope_path |  | 0 | 1 | used by the first release |
 | MIG-ASSETS | `assets.media_asset` | 25 | venue_id |  | 9 | 3 | used by the first release |
 | MIG-ASSETS | `assets.media_collection` | 7 | venue_id |  | 2 | 1 | used by the first release |
+| MIG-ASSETS | `assets.media_collection_member` | 5 | none |  | 1 | 1 | used by the first release |
 | MIG-ASSETS | `assets.media_fingerprint` | 7 | scope_path |  | 0 | 2 | used by the first release |
 | MIG-ASSETS | `assets.media_upload` | 12 | venue_id |  | 2 | 1 | used by the first release |
 | MIG-ASSETS | `assets.media_usage` | 7 | none |  | 3 | 1 | used by the first release |
@@ -175,12 +179,14 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PLATFORM | `platform.outlet` | 9 | venue_id | yes | 8 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.region_settings` | 12 | none |  | 4 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board` | 6 | venue_id | yes | 3 | 2 | used by the first release |
+| MIG-PLATFORM | `platform.sale_board_page` | 4 | none |  | 1 | 2 | used by the first release |
+| MIG-PLATFORM | `platform.sale_board_tile` | 2 | none |  | 1 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.scope` | 8 | none |  | 10 | 2 | used by the first release |
-| MIG-PLATFORM | `platform.tenant` | 2 | none |  | 0 | 0 | referenced by ai.policy |
+| MIG-PLATFORM | `platform.tenant` | 2 | none |  | 0 | 0 | referenced by subscription.contract |
 | MIG-PLATFORM | `platform.venue_settings` | 28 | venue_id |  | 4 | 1 | used by the first release |
 | MIG-PLATFORM | `platform.workstation` | 17 | scope_path | yes | 7 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.account` | 15 | none |  | 3 | 2 | used by the first release |
-| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by ledger.posting |
+| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by ledger.event_budget |
 | MIG-LEDGER | `ledger.event_budget` | 8 | none |  | 1 | 0 | used by the first release |
 | MIG-LEDGER | `ledger.fiscal_period` | 9 | none |  | 1 | 0 | used by the first release |
 | MIG-LEDGER | `ledger.fx_provider_assignment` | 6 | scope_path |  | 1 | 1 | used by the first release |
@@ -192,13 +198,13 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.goods_receipt` | 11 | none |  | 3 | 2 | used by the first release |
 | MIG-INVENTORY | `inventory.goods_receipt_line` | 11 | none |  | 2 | 2 | used by the first release |
 | MIG-INVENTORY | `inventory.item` | 26 | venue_id | yes | 4 | 3 | used by the first release |
-| MIG-INVENTORY | `inventory.location` | 7 | venue_id | yes | 0 | 0 | referenced by platform.outlet |
+| MIG-INVENTORY | `inventory.location` | 7 | venue_id | yes | 0 | 0 | referenced by inventory.stock_batch |
 | MIG-INVENTORY | `inventory.movement` | 17 | none |  | 0 | 1 | used by the first release |
 | MIG-INVENTORY | `inventory.purchase_order` | 29 | scope_path |  | 0 | 0 | referenced by inventory.goods_receipt |
 | MIG-INVENTORY | `inventory.requisition` | 20 | venue_id | yes | 0 | 0 | referenced by inventory.purchase_order |
 | MIG-INVENTORY | `inventory.serialised_item` | 9 | none |  | 1 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_batch` | 10 | none |  | 1 | 0 | used by the first release |
-| MIG-INVENTORY | `inventory.supplier` | 16 | scope_path |  | 0 | 0 | referenced by maintenance.asset |
+| MIG-INVENTORY | `inventory.supplier` | 16 | scope_path |  | 0 | 0 | referenced by inventory.item |
 | MIG-MAINTENANCE | `maintenance.asset` | 29 | venue_id | yes | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.incident` | 26 | venue_id | yes | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection` | 14 | venue_id | yes | 0 | 0 | referenced by maintenance.work_order |
@@ -231,6 +237,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-FNB | `fnb.corrective_action` | 13 | scope_path |  | 4 | 4 | used by the first release |
 | MIG-FNB | `fnb.course_rule` | 7 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-FNB | `fnb.delivery_location` | 11 | venue_id | yes | 3 | 0 | used by the first release |
+| MIG-FNB | `fnb.delivery_location_outlet` | 3 | none |  | 2 | 0 | used by the first release |
 | MIG-FNB | `fnb.delivery_policy` | 16 | scope_path |  | 4 | 1 | used by the first release |
 | MIG-FNB | `fnb.dining_table` | 8 | none |  | 9 | 3 | used by the first release |
 | MIG-FNB | `fnb.kitchen_exception` | 9 | none |  | 1 | 2 | used by the first release |
@@ -239,9 +246,10 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-FNB | `fnb.kitchen_ticket_line` | 14 | none |  | 7 | 1 | used by the first release |
 | MIG-FNB | `fnb.location_session` | 10 | venue_id |  | 2 | 1 | used by the first release |
 | MIG-FNB | `fnb.menu` | 8 | none |  | 6 | 3 | used by the first release |
-| MIG-FNB | `fnb.menu_item` | 15 | none |  | 8 | 4 | used by the first release |
+| MIG-FNB | `fnb.menu_item` | 15 | none |  | 9 | 5 | used by the first release |
+| MIG-FNB | `fnb.menu_item_modifier` | 5 | none |  | 1 | 1 | used by the first release |
 | MIG-FNB | `fnb.menu_section` | 5 | none |  | 5 | 3 | used by the first release |
-| MIG-FNB | `fnb.modifier_group` | 6 | scope_path |  | 3 | 1 | used by the first release |
+| MIG-FNB | `fnb.modifier_group` | 6 | scope_path |  | 4 | 1 | used by the first release |
 | MIG-FNB | `fnb.modifier_option` | 7 | none |  | 3 | 1 | used by the first release |
 | MIG-FNB | `fnb.order_fulfilment` | 10 | scope_path |  | 0 | 1 | used by the first release |
 | MIG-FNB | `fnb.reservation_table` | 4 | none |  | 4 | 2 | used by the first release |

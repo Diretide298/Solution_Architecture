@@ -21,8 +21,8 @@ scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
   operations: 172
-  inAFlow: 53
-  percent: 31%
+  inAFlow: 55
+  percent: 32%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -40,7 +40,7 @@ schemas:
   tables: 28
   stores:
   - postgres
-  largestTable: approvals.workflow_instance
+  largestTable: approvals.request
 - schema: accreditation
   tables: 14
   stores:
@@ -481,7 +481,7 @@ operationsByContract:
     permission: WORKSTATION_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 4
   - operation: deployConfigurationProfile
     verb: POST
     path: /configuration-profiles/{profileId}/deploy
@@ -688,7 +688,7 @@ operationsByContract:
     scope: venue
     permission: SCOPE_VIEW
     offline: true
-    reads: 1
+    reads: 3
     writes: 0
   - operation: listWorkstations
     verb: GET
@@ -833,7 +833,7 @@ operationsByContract:
     permission: WORKSTATION_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 4
 - contract: workforce
   count: 45
   operations:
@@ -2033,13 +2033,15 @@ tables:
   columns: 4
   store: postgres
   parent: platform.sale_board
-  writtenBy: []
+  writtenBy:
+  - tenancy
   foreignWriters: null
 - table: platform.sale_board_tile
   columns: 2
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - tenancy
   foreignWriters: null
 - table: platform.schema_version
   columns: 0
@@ -2646,6 +2648,9 @@ screens:
 - P09:ADM-582 POS, Kiosk & Terminal Assignment Manager\t52
 - P09:ADM-584 Payment Server & Terminal Connectivity Manager\t54
 - P09:ADM-587 Terminal Health, Maintenance & Incident Center\t57
+- P11:ACC-002 Registration Form
+- P11:ACC-003 Application Review & Submit
+- P11:ACC-004 Application Status Tracking
 - P11:ACC-005 Accreditation Badge
 - P11:ACC-006 Reviewer Queue
 - P11:ACC-007 Reviewer Application Detail

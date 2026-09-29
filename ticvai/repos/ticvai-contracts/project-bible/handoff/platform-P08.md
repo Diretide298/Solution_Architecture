@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1186 |
-| Operations | 1361 |
+| Operations | 1362 |
 | Contracts | 32 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 188 |
+| Operations with no screen | 189 |
 | Waves | wave1 60 · wave2 86 · wave3 1040 |
 
 ## Gaps
 
-### 188 operations with no screen here
+### 189 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -38,6 +38,8 @@
 | `approveMatrixMultiLevel` | approvals | PUT | Approval Matrix & Multi-Level Approval Configuration |
 | `approveRoleAuthorityDelegation` | approvals | PUT | Roles, Authority, Delegation & Approval Limits |
 | `approveUnifiedDecision` | approvals | PUT | Unified Approval Inbox & Decision Workspace |
+| `issueAccreditationBadge` | approvals | POST | Issue a badge |
+| `listAccreditationBadges` | approvals | GET | Badges issued and their state |
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
@@ -58,9 +60,7 @@
 | `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
 | `listMenuSchedules` | fnb | GET | What is scheduled to go live, and when |
 | `listMenuVersions` | fnb | GET | Every published version of a menu |
-| `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
-| `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
-| … | | | 148 more |
+| … | | | 149 more |
 
 ### 8 modules split across waves
 
@@ -1141,7 +1141,7 @@
 | `BO-854` | Resource Management Command Center | Rentals | 3 | 3 | yes |
 | `BO-855` | Resource Type Configuration | Rentals | 3 | 3 | yes |
 | `BO-856` | Resource Category Management | Rentals | 3 | 3 | yes |
-| `BO-857` | Resource Creation & Profile | Rentals | 3 | 5 | yes |
+| `BO-857` | Resource Creation & Profile | Rentals | 3 | 6 | yes |
 | `BO-858` | Configurable Attribute Builder | Rentals | 3 | 2 | yes |
 | `BO-859` | Resource Hierarchy & Parent–Child Relationships | Rentals | 3 | 2 | yes |
 | `BO-860` | Resource Dependency Rules | Rentals | 3 | 2 | yes |

@@ -9,7 +9,7 @@
   "foreignKeys": 675,
   "indexes": 2494,
   "tablesWritten": 979,
-  "relationships": 2586,
+  "relationships": 2603,
   "states": 186,
   "events": 30,
   "flows": 96,
@@ -45,7 +45,7 @@
   },
   {
    "link": "Operations declaring a permission",
-   "done": 2282,
+   "done": 2284,
    "total": 2405,
    "percent": 95,
    "note": "the checklist a grant screen renders is built from these"
@@ -59,23 +59,23 @@
   },
   {
    "link": "Operations reaching a screen",
-   "done": 2187,
+   "done": 2186,
    "total": 2405,
    "percent": 91,
    "note": "sync, webhook and job operations legitimately have none"
   },
   {
    "link": "Screens naming an operation",
-   "done": 2334,
+   "done": 2337,
    "total": 2440,
    "percent": 96,
    "note": "the rest are static, navigation shells or workshop-blocked"
   },
   {
    "link": "Tables reached by an operation",
-   "done": 964,
+   "done": 983,
    "total": 983,
-   "percent": 98,
+   "percent": 100,
    "note": "a table nothing reaches is a missing operation or a table that should not exist"
   },
   {
@@ -87,9 +87,9 @@
   }
  ],
  "boundaries": {
-  "edgesTotal": 2586,
-  "insideOneService": 1554,
-  "crossingTwoServices": 1021,
+  "edgesTotal": 2603,
+  "insideOneService": 1570,
+  "crossingTwoServices": 1022,
   "endpointNotOwned": 11,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
@@ -231,7 +231,7 @@
    "operations": 274,
    "tables": 119,
    "screens": 53,
-   "operationsOnAScreen": 263,
+   "operationsOnAScreen": 264,
    "edgesOut": 92,
    "edgesIn": 37
   },
@@ -279,7 +279,7 @@
    "operations": 172,
    "tables": 98,
    "screens": 71,
-   "operationsOnAScreen": 154,
+   "operationsOnAScreen": 152,
    "edgesOut": 78,
    "edgesIn": 296
   },
@@ -365,7 +365,7 @@
    "screens": 31,
    "operationsOnAScreen": 46,
    "edgesOut": 16,
-   "edgesIn": 3
+   "edgesIn": 4
   },
   {
    "service": "AiService",
@@ -376,7 +376,7 @@
    "tables": 16,
    "screens": 21,
    "operationsOnAScreen": 21,
-   "edgesOut": 12,
+   "edgesOut": 13,
    "edgesIn": 4
   },
   {
@@ -432,10 +432,10 @@
   {
    "contract": "approvals",
    "operations": 49,
-   "onAScreen": 45,
+   "onAScreen": 43,
    "withLineage": 48,
    "withPermission": 49,
-   "percentOnAScreen": 92
+   "percentOnAScreen": 88
   },
   {
    "contract": "assets",
@@ -522,7 +522,7 @@
    "operations": 215,
    "onAScreen": 196,
    "withLineage": 214,
-   "withPermission": 197,
+   "withPermission": 199,
    "percentOnAScreen": 91
   },
   {
@@ -584,10 +584,10 @@
   {
    "contract": "resources",
    "operations": 61,
-   "onAScreen": 60,
+   "onAScreen": 61,
    "withLineage": 61,
    "withPermission": 61,
-   "percentOnAScreen": 98
+   "percentOnAScreen": 100
   },
   {
    "contract": "retail",
@@ -745,7 +745,7 @@
    "operator": "venue",
    "screens": 1186,
    "screensWithOperations": 1178,
-   "distinctOperations": 1361,
+   "distinctOperations": 1362,
    "percentWithOperations": 99
   },
   {
@@ -777,9 +777,9 @@
    "targetApp": "ticvai-control",
    "operator": "public",
    "screens": 8,
-   "screensWithOperations": 4,
-   "distinctOperations": 4,
-   "percentWithOperations": 50
+   "screensWithOperations": 7,
+   "distinctOperations": 6,
+   "percentWithOperations": 88
   },
   {
    "code": "P12",
@@ -854,10 +854,10 @@
   "requirementsGapContract": 5,
   "requirementsGapDecision": 0,
   "requirementsPartial": 62,
-  "operationsNoScreen": 218,
-  "screensNoOperation": 106,
+  "operationsNoScreen": 219,
+  "screensNoOperation": 103,
   "operationsNoLineage": 6,
-  "tablesNotReached": 19,
+  "tablesNotReached": 0,
   "permissionsWithoutLabel": 70,
   "capabilityPairs": 266,
   "modulesWithCapabilities": 33

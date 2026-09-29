@@ -42,7 +42,7 @@ schemas:
   tables: 27
   stores:
   - postgres
-  largestTable: payments.fee_rule
+  largestTable: payments.payment_attempt
 operationsByContract:
 - contract: orders
   count: 215
@@ -379,7 +379,7 @@ operationsByContract:
     verb: GET
     path: /billing-statements/{statementId}
     scope: tenant
-    permission: null
+    permission: ORDER_VIEW
     offline: false
     reads: 3
     writes: 0
@@ -563,7 +563,7 @@ operationsByContract:
     verb: GET
     path: /billing-statements
     scope: tenant
-    permission: null
+    permission: ORDER_VIEW
     offline: false
     reads: 3
     writes: 0

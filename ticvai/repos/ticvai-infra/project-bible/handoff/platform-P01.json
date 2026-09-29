@@ -167,11 +167,11 @@
    "operations": 6
   },
   {
-   "contract": "white-label",
+   "contract": "queue",
    "operations": 5
   },
   {
-   "contract": "queue",
+   "contract": "white-label",
    "operations": 5
   },
   {
@@ -179,19 +179,19 @@
    "operations": 4
   },
   {
-   "contract": "wallet",
-   "operations": 4
-  },
-  {
    "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "retail",
-   "operations": 3
+   "contract": "wallet",
+   "operations": 4
   },
   {
    "contract": "venue-map",
+   "operations": 3
+  },
+  {
+   "contract": "retail",
    "operations": 3
   },
   {
