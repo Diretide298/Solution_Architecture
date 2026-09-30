@@ -29,8 +29,10 @@ Reads and writes are stored as `path`, `dir/*` (the directory's direct children)
 need, and must never skip one it did.
 
     python3 tools/refresh-manifest.py rebuild [--wt-dir DIR] [--include-working]
-        trace a full refresh in a throwaway worktree (via refresh-safe.sh) and write
-        handoff/refresh-manifest.json. About an hour; never touches the main tree otherwise.
+        trace a full refresh of HEAD in a throwaway worktree (refresh-safe.sh --trace
+        --head-only) and write handoff/refresh-manifest.json. About 40 minutes; nothing else in
+        the main tree is touched. Rebuild whenever refresh.sh gains, loses or reorders a step
+        (`select` refuses a manifest traced against a different step list).
     python3 tools/refresh-manifest.py steps               the steps parsed from refresh.sh
     python3 tools/refresh-manifest.py select PATH...      the steps a change to PATH reaches
     python3 tools/refresh-manifest.py classify PATH...    derived-only vs authored, per path
@@ -59,8 +61,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REFRESH = os.path.join(ROOT, "tools", "refresh.sh")
 MANIFEST = os.path.join(ROOT, "handoff", "refresh-manifest.json")
 
-# A directory with at least this many files read (or written) by one step is recorded as `dir/*`.
-COLLAPSE_AT = 12
+# A directory is recorded as `dir/*` when one step reads (or writes) at least COLLAPSE_AT of its
+# files and they are most of it (COLLAPSE_SHARE), or at least COLLAPSE_ALWAYS of them. Sixteen
+# platform files in a handoff/ of three hundred stay sixteen paths; a screens/ read in full is
+# `screens/*`.
+COLLAPSE_AT, COLLAPSE_SHARE, COLLAPSE_ALWAYS = 12, 0.6, 200
+# A list longer than this is widened, deepest crowded directory first, into `dir/**` entries --
+# the mirror steps touch nine thousand paths, and a scoped run needs the shape, not the census.
+GLOB_BUDGET = 80
+# Copies, whatever reads them: derive-mirrors and sync-project-bible compare each copy before
+# overwriting it, which the trace records as a read, but "project-bible/ is a copy, not a source".
+DERIVED_ROOTS = ("repos/*/project-bible/**", "repos/ticvai-docs/**")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -337,56 +348,135 @@ def _is_noise(rel):
     return "__pycache__" in parts or rel.endswith((".pyc", ".pyo")) or "/.git/" in "/" + rel + "/"
 
 
+_SUBDIRS = {}
+_NFILES = {}
+
+
+def _nfiles(full):
+    if full not in _NFILES:
+        try:
+            _NFILES[full] = sum(1 for e in os.scandir(full) if e.is_file())
+        except OSError:
+            _NFILES[full] = 0
+    return _NFILES[full]
+
+
+def _subdirs(full):
+    if full not in _SUBDIRS:
+        try:
+            _SUBDIRS[full] = [e.name for e in os.scandir(full) if e.is_dir()
+                              and e.name not in ("__pycache__", ".git")]
+        except OSError:
+            _SUBDIRS[full] = None
+    return _SUBDIRS[full]
+
+
+def _ancestors(p):
+    while p:
+        p = p.rsplit("/", 1)[0] if "/" in p else ""
+        yield p
+
+
 def collapse(files, dirs, pkg, at=COLLAPSE_AT):
     """Exact files + listed dirs -> sorted globs (`path`, `dir/*`, `dir/**`). Always widens."""
     dirset = set(dirs)
     by_parent = defaultdict(list)
     for f in files:
-        by_parent[f.rsplit("/", 1)[0] if "/" in f else ""].append(f)
+        by_parent[_parent(f)].append(f)
     for parent, fs in by_parent.items():
-        if len(fs) >= at:
+        n = len(fs)
+        if n >= COLLAPSE_ALWAYS or n >= at and                 n >= COLLAPSE_SHARE * _nfiles(os.path.join(pkg, parent) if parent else pkg):
             dirset.add(parent)
-    exact = sorted(f for f in files
-                   if (f.rsplit("/", 1)[0] if "/" in f else "") not in dirset)
     # A listed directory whose every subdirectory (at trace time) is also covered is a subtree.
-    tree = set()
+    memo, tree = {}, set()
 
     def covered(d):
-        if d in tree:
-            return True
+        if d in memo:
+            return memo[d]
+        memo[d] = False                                    # recursion guard
         if d not in dirset:
             return False
-        full = os.path.join(pkg, d) if d else pkg
-        try:
-            subs = [e.name for e in os.scandir(full) if e.is_dir() and e.name != "__pycache__"
-                    and e.name != ".git"]
-        except OSError:
+        subs = _subdirs(os.path.join(pkg, d) if d else pkg)
+        if subs is None:
             return False
-        ok = all(covered((d + "/" if d else "") + s) for s in subs)
+        ok = all([covered((d + "/" if d else "") + x) for x in subs])
         if ok and subs:
             tree.add(d)
+        memo[d] = ok
         return ok
 
-    for d in sorted(dirset, key=lambda x: x.count("/")):
+    for d in sorted(dirset, key=lambda x: x.count("/"), reverse=True):
         covered(d)
     globs = set()
     for d in dirset:
-        # drop anything already inside a subtree
-        anc = d
-        inside = False
-        while anc:
-            anc = anc.rsplit("/", 1)[0] if "/" in anc else ""
-            if anc in tree:
-                inside = True
-                break
-        if d in tree and not inside:
-            globs.add((d + "/**") if d else "**")
-        elif not inside and d not in tree:
-            globs.add((d + "/*") if d else "*")
-    for f in exact:
-        if not any(match(f, g) for g in globs if g.endswith("*")):
-            globs.add(f)
+        if any(x in tree for x in _ancestors(d)):
+            continue
+        globs.add(((d + "/**") if d else "**") if d in tree else ((d + "/*") if d else "*"))
+    for f in files:
+        if _parent(f) in dirset or any(x in tree for x in _ancestors(f)):
+            continue
+        globs.add(f)
+    return budget(globs)
+
+
+def budget(globs, limit=GLOB_BUDGET):
+    """Widen a long list: the deepest directory holding 10+ entries becomes `dir/**`, repeatedly."""
+    globs = set(globs)
+    while len(globs) > limit:
+        under = defaultdict(int)
+        for g in globs:
+            k, p = _kind(g)
+            for a in _ancestors(p if k == "file" else p + "/x"):
+                if a:
+                    under[a] += 1
+        cands = [a for a, c in under.items() if c >= 10] or                 [max(under, key=lambda a: under[a])] if under else []
+        if not cands:
+            break
+        a = max(cands, key=lambda a: (a.count("/"), under[a]))
+        globs = {g for g in globs if not _under(_kind(g)[1], a)} | {a + "/**"}
     return sorted(globs)
+
+
+class GlobSet:
+    """A set of manifest globs that answers "does any of these overlap X" without a pairwise
+    scan -- derive-mirrors alone reads and writes tens of thousands of paths."""
+
+    def __init__(self, globs):
+        self.files, self.dirs, self.trees = set(), set(), set()
+        for g in globs:
+            k, p = _kind(g.lower())
+            (self.files if k == "file" else self.dirs if k == "dir" else self.trees).add(p)
+        self.file_parents = {_parent(f) for f in self.files}
+        self.tree_parents = {_parent(t) for t in self.trees if t}
+        self.all_sorted = sorted(self.files | self.dirs | self.trees)
+
+    def _any_under(self, t):
+        if t == "":
+            return bool(self.all_sorted)
+        import bisect
+        i = bisect.bisect_left(self.all_sorted, t)
+        while i < len(self.all_sorted):
+            x = self.all_sorted[i]
+            if x == t or x.startswith(t + "/"):
+                return True
+            if x > t + "/￿":
+                break
+            i += 1
+        return False
+
+    def hits(self, g):
+        k, p = _kind(g.lower())
+        if any(a in self.trees for a in _ancestors(p)) or p in self.trees:
+            return True
+        if k == "file":
+            return p in self.files or _parent(p) in self.dirs
+        if k == "dir":
+            return p in self.dirs or p in self.file_parents or p in self.tree_parents
+        # a subtree: anything inside it, or a listing of the directory that holds it
+        return self._any_under(p) or (p != "" and _parent(p) in self.dirs)
+
+    def overlaps(self, globs):
+        return any(self.hits(g) for g in globs)
 
 
 def _kind(p):
@@ -576,16 +666,25 @@ def build(trace_dir, pkg, commit, out_path, parsed):
         # A resolved path the trace never saw is a branch the traced run did not take: a write
         # made only when there is something to add, a fallback file. Added -- wider is safe --
         # and it costs confidence.
-        static_only_r = sorted(x for x in s_reads - s_writes
-                               if not any(match(x, g) for g in traced_r + traced_w))
-        static_only_w = sorted(x for x in s_writes if not any(match(x, g) for g in traced_w))
+        seen_rw, seen_w = GlobSet(traced_r + traced_w), GlobSet(traced_w)
+        static_only_r = sorted(x for x in s_reads - s_writes if not seen_rw.hits(x))
+        static_only_w = sorted(x for x in s_writes if not seen_w.hits(x))
         static_only = static_only_r + ["(write) " + x for x in static_only_w]
         read_globs = sorted(set(collapse(reads | src_reads, lists, pkg)) | set(static_only_r))
         write_globs = sorted(set(traced_w) | set(static_only_w))
-        for d in deleted:
-            if not any(match(d, g) for g in write_globs):
-                write_globs.append(d)
+        wg = GlobSet(write_globs)
+        write_globs += [d for d in deleted if not wg.hits(d)]
         external = {e for e in external if not _is_noise(e)}
+        # files this step opened AND wrote: an in-place edit or an additive register, whose old
+        # content survives the step -- the mark of an authored file (classify, below)
+        self_reads = collapse({w for w in writes if w in reads}, set(), pkg)
+        assumed = False
+        if not writes and dyn_w and not static_only_w and traces.get(n):
+            # It writes through paths built at run time and had nothing to do when traced. Assume
+            # it may rewrite anything it reads (outside tools/): wider, so never a skipped step.
+            write_globs = sorted(g for g in read_globs if not g.startswith("tools/"))
+            self_reads = list(write_globs)
+            assumed = True
         why = []
         if not traces.get(n):
             conf = "low"
@@ -593,9 +692,10 @@ def build(trace_dir, pkg, commit, out_path, parsed):
         elif untraced:
             conf = "low"
             why.append("%d file(s) changed that the hook did not see written" % len(untraced))
-        elif not writes and dyn_w and not static_only_w:
+        elif assumed:
             conf = "low"
-            why.append("writes through a path built at run time, and wrote nothing when traced")
+            why.append("writes through a path built at run time and wrote nothing when traced; "
+                       "its writes are assumed to be everything it reads")
         elif static_only or shells or external:
             conf = "medium"
             if static_only_r:
@@ -623,6 +723,7 @@ def build(trace_dir, pkg, commit, out_path, parsed):
             "tools": st["tools"],
             "reads": sorted(set(read_globs)),
             "writes": sorted(set(write_globs)),
+            "self_reads": sorted(set(self_reads)),
             "changed_in_trace": len(changed or ()),
             "confidence": conf,
             "why": why,
@@ -634,14 +735,11 @@ def build(trace_dir, pkg, commit, out_path, parsed):
         })
 
     # feedback: a step reading what a later step writes (the previous run's output)
+    wsets = {r["step"]: GlobSet(r["writes"]) for r in rows}
     for r in rows:
-        fb = []
-        for later in rows:
-            if later["step"] <= r["step"]:
-                continue
-            if any(match(a, b) for a in r["reads"] for b in later["writes"]):
-                fb.append(later["step"])
-        r["reads_output_of_later_steps"] = fb
+        r["reads_output_of_later_steps"] = [
+            later["step"] for later in rows
+            if later["step"] > r["step"] and wsets[later["step"]].overlaps(r["reads"])]
 
     doc = {
         "generated_by": "tools/refresh-manifest.py",
@@ -665,6 +763,7 @@ def build(trace_dir, pkg, commit, out_path, parsed):
             "steps_reading_later_outputs": sum(1 for r in rows if r["reads_output_of_later_steps"]),
             "traced_seconds": sum(r["seconds"] or 0 for r in rows),
         },
+        "derived_roots": list(DERIVED_ROOTS),
         "post": ["tools/run-checks.py (every checker; judged by refresh-safe.sh against "
                  "tools/refresh-safe-baseline.json)",
                  "audit-transitions coverage line", "tools/ coverage block"],
@@ -712,28 +811,39 @@ def select(manifest, changed):
     live = list(changed)
     picked, why = [], {}
     for r in manifest["steps"]:
-        hit = next(((c, g) for c in live for g in r["reads"] if match(c, g)), None)
-        if hit:
+        rs = GlobSet(r["reads"])
+        c = next((c for c in live if rs.hits(c)), None)
+        if c is not None:
+            g = next((g for g in r["reads"] if match(c, g)), "?")
             picked.append(r["step"])
-            why[r["step"]] = hit
+            why[r["step"]] = (c, g)
             live.extend(r["writes"])
     return picked, why
 
 
 def classify(manifest, paths):
-    """derived-only: written by a step and read by no step at or before its first writer -- so
-    the pipeline never consumes its old content and regenerating it loses nothing. Everything
-    else (screens, contracts, hand-kept handoff files, anything unknown) is authored."""
+    """`derived`: a step writes it and no step that writes it opened it first -- so its old
+    content does not survive a refresh, and a refresh from HEAD regenerates it (the mirrors are
+    derived by rule, DERIVED_ROOTS). `authored`: nothing writes it (docs, sources, anything
+    unknown), or a writer edits it in place or adds to it (screens, contracts, the lineage, the
+    id register), so an uncommitted edit would change what the refresh produces.
+
+    A derived file an EARLIER step reads (the previous run's screen-index, read by
+    derive-relationships) is still derived: a refresh from HEAD reads HEAD's copy, which is what a
+    refresh of the committed package means."""
+    roots = [r.lower()[:-3] + "/*" if r.endswith("/**") else r.lower()
+             for r in manifest.get("derived_roots") or DERIVED_ROOTS]
+    sets = [(GlobSet(r["writes"]), GlobSet(r.get("self_reads") or [])) for r in manifest["steps"]]
     out = {}
     for p in paths:
-        writers = [r["step"] for r in manifest["steps"] if any(match(p, g) for g in r["writes"])]
-        if not writers:
-            out[p] = "authored"
+        if any(fnmatch.fnmatch(p.lower(), r) for r in roots):     # fnmatch's * crosses "/"
+            out[p] = "derived"
             continue
-        first = writers[0]
-        read_before = [r["step"] for r in manifest["steps"]
-                       if r["step"] <= first and any(match(p, g) for g in r["reads"])]
-        out[p] = "authored" if read_before else "derived"
+        writers = [sr for w, sr in sets if w.hits(p)]
+        if not writers or any(sr.hits(p) for sr in writers):
+            out[p] = "authored"
+        else:
+            out[p] = "derived"
     return out
 
 
@@ -844,8 +954,9 @@ def main():
                "--skip-checks", "--manifest-out", MANIFEST]
         if a.wt_dir:
             cmd += ["--wt-dir", a.wt_dir]
-        if a.include_working:
-            cmd.append("--include-working")
+        # HEAD unless told otherwise: the shape of the pipeline is what is being measured, and
+        # somebody's half-made edit in the main tree is not part of it
+        cmd.append("--include-working" if a.include_working else "--head-only")
         return subprocess.call(cmd)
 
     ap.print_help()

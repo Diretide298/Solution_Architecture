@@ -272,7 +272,7 @@ def cmd_judge(pkg, baseline_path, log_path, tail_path=""):
     base = bdoc.get("checkers", {})
     detail = [c for c in checks if c in base and c not in report_only]
     others = [c for c in checks if c not in detail]
-    env = dict(os.environ, PYTHONIOENCODING="utf8")
+    env = dict(os.environ, PYTHONIOENCODING="utf8", PYTHONUNBUFFERED="1")
     log = open(log_path, "w", encoding="utf-8")
     lock = threading.Lock()
     results = {}
