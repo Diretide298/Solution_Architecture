@@ -211,3 +211,92 @@ Otherwise Premium. Confluent only if the client already has a Confluent contract
   (`broker_self_hosted = false` in the Terraform cell module) and adds a private endpoint in
   `snet-private-endpoints`. The cost workbook prices the self-run cluster (VMs and P10 disks) until the client
   answers.
+
+---
+
+## Amendment — the decision pack: analysis and recommendation, 1 October 2026
+
+**Status unchanged: Proposed until the client answers (by Monday 12 October). Recommendation unchanged and now
+argued in full: RabbitMQ on CloudAMQP, three nodes with PrivateLink, in Azure UAE North, $396–696 a month.**
+Source: `docs/active/broker-decision-pack.md` (a one-page summary for the client, then an engineering appendix).
+
+### What the analysis found
+
+- **Ordering and exactly-once effect do not separate the brokers.** Both give per-aggregate order through the
+  ordering key; the consumer's `sequence` check makes a delayed retry safe on either; the outbox and the inbox
+  (ADR-0058) give a once-only database effect on either. Kafka's own exactly-once covers Kafka-to-Kafka only
+  and adds nothing for a Postgres effect.
+- **Retries and dead letters do.** RabbitMQ does them by configuration (dead-letter exchange, delay queue,
+  `x-delivery-limit` on quorum queues). On Kafka they are our consumer-wrapper code, and on Event Hubs
+  Standard the 10-topic limit forces one shared retry topic.
+- **Flash-sale peak, from the package's own figures** (`sizing.json`, `burst-scope.json`, the burst model):
+  60,000 seats sold in 20 minutes is 6,270 requests/s, about 285 buyers/s, **about 2,850 events/s published
+  and 7,400 deliveries/s** (10 events and 26 deliveries a buyer, derived from the catalogue). This is more
+  than this ADR's "low thousands", because of fan-out. **Load-test target: 10,000 deliveries/s**, which also
+  picks the CloudAMQP plan ($297 or $597, plus $99 PrivateLink).
+- **Event Hubs Standard at that peak:** coarse topics give the `commerce` topic 17 consuming contexts (limit
+  20 consumer groups), each reading every commerce event: about 34,000 reads/s, **17–26 TUs of egress out of
+  40**, pre-scaled before the sale and scaled down by our own job. Workable, with thin headroom. Premium
+  removes the limit at about $1,072.
+- **Finding, independent of the broker: the relay is the first ceiling.** ADR-0058's one loop per tenant
+  database at 200 rows every 100 ms tops out near **2,000 events/s**, below the 2,270–2,850 a single-tenant
+  flash sale produces. Proposed to the ADR-0058 owner: poll again at once on a full batch, a larger batch in
+  the burst environment, and relay lag measured in the same load test.
+- **Replay** is Kafka's real advantage, and it is needed in one place only: outside subscribers re-reading the
+  live stream. Nobody has asked for that. Audit, reporting rebuilds, AI training and dead-letter replay come
+  from the database, the outbox's monthly partitions and Blob. Event Hubs keeps 7 days (Standard) or 90
+  (Premium) anyway. If live replay is wanted later, a RabbitMQ stream or a Kafka side feed from the relay
+  gives it without a broker swap.
+- **Multi-region:** one broker per region. Nothing crosses regions through the broker (ADR-0010's contract
+  does). **Venues:** RabbitMQ in 1 CPU and 1 GB whichever cloud broker is chosen. Store-and-forward is
+  `syncOrders` with server-side re-pricing (ADR-0013), not a broker bridge.
+- **Residency:** RabbitMQ on our AKS and Event Hubs keep everything in UAE North. CloudAMQP's control plane is
+  outside the UAE: its score depends on 84codes' written confirmation that backups, definitions and logs stay
+  in UAE North. Without it, RabbitMQ on our AKS.
+- **Skills:** the skills matrix has no messaging column (nobody rated), Kubernetes at 2 at most (team average
+  0.3), Azure at 3 at most. This favours a managed broker, and the one with fewer new concepts.
+- **Cost:** every option but Confluent is within $700 a month of the others, 5–9% of the HA production month
+  (about $8,050). Cost does not decide it.
+
+### Decision matrix (weights sum to 100; scores 1–5; weighted out of 5)
+
+| CloudAMQP | RabbitMQ on AKS | Event Hubs Standard | Event Hubs Premium | Confluent Enterprise |
+|---:|---:|---:|---:|---:|
+| **4.35** | 4.00 | 3.50 | 3.40 | 3.10 |
+
+Criteria and weights: ordering, retries and dead letters 20; operations and skills 20; time to the 23 October
+proof 15; residency 10; one broker with the venues 10; cost 10; flash-sale headroom 5; replay 5; lock-in 5.
+RabbitMQ stays first when replay's weight is doubled and when the venue criterion is dropped. Kafka leads only
+if live broker replay for outside subscribers becomes the leading requirement and on-premise consistency
+stops mattering.
+
+### Additions to the decision above
+
+- **The kernel interface has two roles under one name.** The starter's `IEventPublisher` enqueues to the outbox
+  inside the caller's transaction; this ADR and ADR-0058 also have the relay publish to the broker through it.
+  Modules keep `IEventPublisher`. The relay and the consumer wrapper use a separate broker-side interface
+  (publish a batch with an ordering key; subscribe by consumer name and event names; settle as `Ack`,
+  `RetryLater`, `DeadLetter` or `Halt`), and only its adapter knows the broker. The starter's
+  `IIntegrationEvent` still lacks `aggregateId`, `sequence` and `scopePath`. For PLATFORM-OUTBOX.
+- **One broker-agnostic contract-test suite** runs against every adapter in CI.
+- **16 shards per consumer** on RabbitMQ (or 16 partitions on Kafka) to start. Change only with the consumer
+  drained.
+- **A republish-from-outbox tool** (by tenant and time range) is needed on either broker, to recover a lost
+  broker and to replay. It is not in the plan yet.
+- **Migration path, if the other broker is needed later:** the second adapter behind the same contract tests;
+  the relay publishes to both; consumers move one at a time, with the inbox absorbing duplicates and the
+  sequence check covering order; stop the old publisher; roll back by re-pointing a consumer. About two
+  sprints of platform work, and no module changes.
+
+### What we need from the client by 12 October
+
+The choice; if RabbitMQ, consent to CloudAMQP as a sub-processor subject to the residency confirmation (or
+RabbitMQ on our AKS); who holds the contract; whether anyone needs replay from the broker, how far back and
+for whom; the monthly budget line; and whether the broker falls under the 99.99% commitment (client email of
+30 September, item 3). Without an answer by 12 October we proceed on the recommendation.
+
+### Revisit
+
+Outside subscribers want live replay (add a stream, not a swap). Sustained deliveries above about 25,000/s or
+ten times the fan-out (Kafka through the migration path). CloudAMQP plan and shard count after three months of
+production metrics. Self-running costs more than four engineer-days a month (move to CloudAMQP).
