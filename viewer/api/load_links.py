@@ -9,8 +9,14 @@ bulk when the file was built, so the rows go straight in.
 Safe to run again: the table's UNIQUE (project, kind, id, system, key) turns a repeat into a no-op, and a link
 someone made by hand is never touched. Dry run unless --apply. Stop the ADAM API first or not; SQLite waits for it.
 
+A link already there gets the file's cached ticket columns (subject, status, type, assignee) when the file carries
+them, so a plan change such as a new assignee reaches ADAM's link lists too. --remove takes a JSON file whose
+"tickets" object is keyed by OpenProject ids (tools/op-delete-rejected.rb's rejected.json): every OpenProject link
+to those tickets is removed, because the tickets no longer exist.
+
   python3 load_links.py adam-links.json --email you@example.com             # dry run
   python3 load_links.py adam-links.json --email you@example.com --apply
+  python3 load_links.py adam-links.json --email you@example.com --remove rejected.json --apply
 """
 from __future__ import annotations
 
@@ -29,6 +35,7 @@ def main() -> int:
     ap.add_argument("--email", required=True, help="the ADAM account the links are recorded as made by")
     ap.add_argument("--db", default=os.environ.get("TICVAI_DB", str(Path(__file__).parent / "ticvai.db")))
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--remove", help="JSON file with a 'tickets' object keyed by OpenProject ids whose links go")
     a = ap.parse_args()
 
     data = json.loads(Path(a.file).read_text(encoding="utf-8"))
@@ -49,8 +56,15 @@ def main() -> int:
     existing = set(conn.execute("SELECT target_kind, target_id, external_key FROM artefact_link "
                                 "WHERE project_id = ? AND external_system = 'openproject'", (project[0],)))
     new = [l for l in data["links"] if (l["kind"], l["id"], l["key"]) not in existing]
+    cached = data.get("cached")
+    old = [l for l in data["links"] if cached and (l["kind"], l["id"], l["key"]) in existing]
+    gone = sorted(json.loads(Path(a.remove).read_text(encoding="utf-8"))["tickets"]) if a.remove else []
+    drop = conn.execute(
+        f"SELECT COUNT(*) FROM artefact_link WHERE project_id = ? AND external_system = 'openproject' "
+        f"AND external_key IN ({','.join('?' * len(gone))})", (project[0], *gone)).fetchone()[0] if gone else 0
     print(f"ADAM project {project[0]} ({project[1]}), as {account[1] or a.email}: {len(data['links'])} links in the "
           f"file, {len(data['links']) - len(new)} already there, {len(new)} to add ({before} links in the project now)"
+          f"; cached ticket columns refreshed on {len(old)}; {drop} links to {len(gone)} deleted tickets to remove"
           f"; database {a.db}")
     if not a.apply:
         print("dry run: nothing written. Add --apply to load.")
@@ -65,8 +79,17 @@ def main() -> int:
             [(project[0], l["kind"], l["id"], l["key"], l.get("url", ""), l.get("subject", ""), l.get("status", ""),
               l.get("type", ""), l.get("assignee", ""), now if data.get("cached") else "", now, account[0])
              for l in new])
+        conn.executemany(
+            "UPDATE artefact_link SET cached_subject = ?, cached_status = ?, cached_type = ?, cached_assignee = ?, "
+            "synced_at = ? WHERE project_id = ? AND target_kind = ? AND target_id = ? "
+            "AND external_system = 'openproject' AND external_key = ?",
+            [(l.get("subject", ""), l.get("status", ""), l.get("type", ""), l.get("assignee", ""), now,
+              project[0], l["kind"], l["id"], l["key"]) for l in old])
+        if gone:
+            conn.execute(f"DELETE FROM artefact_link WHERE project_id = ? AND external_system = 'openproject' "
+                         f"AND external_key IN ({','.join('?' * len(gone))})", (project[0], *gone))
     after = conn.execute("SELECT COUNT(*) FROM artefact_link WHERE project_id = ?", (project[0],)).fetchone()[0]
-    print(f"done: {after - before} links added; {after} in the project")
+    print(f"done: {len(new)} links added, {len(old)} refreshed, {drop} removed; {after} in the project")
     return 0
 
 
