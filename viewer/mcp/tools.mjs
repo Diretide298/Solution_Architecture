@@ -812,17 +812,27 @@ export const TOOLS = [
       // written on adam_table.
       const mine = (backend.tables ?? []).filter((t) => t.module === hit.name);
 
+      // **Kept short per table, because the count is what grows.** Marketing
+      // reached 130 tables and 60 KB with no essay in it — every row was ~470
+      // characters of which the service name, nulls and a 300-character reason
+      // were most. The service is said once when every table shares it, empty
+      // fields are left out, and the reason is cut to its opening; adam_table
+      // has the whole of it.
+      const services = [...new Set(mine.map((t) => t.service).filter(Boolean))];
+      const shared = services.length === 1 ? services[0] : null;
+
       return {
         found: true,
         module: hit,
+        ...(shared ? { service: shared } : {}),
         tables: mine.map((t) => ({
           name: t.name,
           columns: t.columns,
-          derivedFrom: t.derivedFrom,
-          service: t.service,
-          migration: t.migration,
+          ...(t.derivedFrom ? { derivedFrom: t.derivedFrom } : {}),
+          ...(!shared && t.service ? { service: t.service } : {}),
+          ...(t.migration ? { migration: t.migration } : {}),
           ...(t.storageOnly
-            ? { storageOnly: true, storageReason: trim(t.storageReason) }
+            ? { storageOnly: true, storageReason: trim(String(t.storageReason ?? '').replace(/^storage only\s*—\s*/i, ''), 120) }
             : {}),
         })),
         next: 'pass one of those names to adam_table for its columns, keys and the whole reason',
@@ -847,6 +857,12 @@ export const TOOLS = [
             'Show the subtasks rather than only counting them. They are fetched either way; '
             + 'this decides whether they are put in front of the person.',
         },
+        limit: {
+          type: 'number',
+          description:
+            'How many tickets to show, from the top of the build order (default 30, at most 50). '
+            + '`total` always says how many there are.',
+        },
       },
     },
     async run(client, args = {}) {
@@ -860,7 +876,13 @@ export const TOOLS = [
       if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
 
       const board = answer.data;
-      const items = board.items ?? [];
+      // **The top of the order, not the whole of it.** Once the plan was assigned, one person held
+      // hundreds of tickets and the board came back at 364 KB — three times the ceiling, so the
+      // answer was a refusal. The order is the build order, so the first rows are the ones to do
+      // next; the rest are counted, not dropped silently.
+      const limit = Math.min(Math.max(Math.trunc(Number(args?.limit)) || 30, 1), 50);
+      const all = board.items ?? [];
+      const items = all.slice(0, limit);
 
       // **The table is the answer, and it is deliberately five columns.** The
       // board used to hand back every field OpenProject knows about every
@@ -898,6 +920,11 @@ export const TOOLS = [
       return {
         found: board.total > 0,
         total: board.total,
+        shown: items.length,
+        ...(all.length > items.length
+          ? { more: `${all.length - items.length} more after these in the build order`
+              + (limit < 50 ? '; pass a larger `limit` (up to 50) to see more of them' : '') }
+          : {}),
         // Kept, because an empty board reads as "nothing assigned to me" and
         // the truth may be "nothing has been loaded into the project yet".
         ...(board.note ? { note: board.note } : {}),
@@ -916,8 +943,10 @@ export const TOOLS = [
         ...(wanted ? {} : { subtasksHeld: Object.keys(held).length }),
         touches: touching,
         display: wanted
-          ? 'Show `rows` as a markdown table using `columns`, then the subtasks under their ticket.'
-          : 'Show `rows` as a markdown table using `columns`, and nothing else. Do not list the '
+          ? 'Show `rows` as a markdown table using `columns`, then the subtasks under their ticket. '
+            + 'If `more` is present, say it in one line under the table.'
+          : 'Show `rows` as a markdown table using `columns`, and if `more` is present say it in one '
+            + 'line under the table; nothing else. Do not list the '
             + 'subtasks or the touched artefacts, and do not summarise them — the `subtasks` '
             + 'column already gives the count. Call this tool again with subtasks: true if the '
             + 'person asks to see them.',

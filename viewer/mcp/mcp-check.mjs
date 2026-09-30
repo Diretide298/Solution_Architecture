@@ -477,8 +477,18 @@ if (!viewerUp) {
   } else if (typeof board.total === 'number') {
     pass(`adam_board answers — ${board.total} open item(s)`);
     if (board.total === 0 && board.note) pass('and an empty board explains itself');
+    // A board longer than the page says how many it left out, rather than
+    // reading as the whole of somebody's work.
+    if (board.total > board.shown) {
+      if (board.more) pass(`and shows the first ${board.shown}, saying ${board.total - board.shown} more follow`);
+      else fail('a cut board says how many it left out', JSON.stringify(board).slice(0, 200));
+    }
 
-    const first = board.items?.[0]?.key;
+    // `rows`, not `items`: the tool has answered with the five-column table
+    // since it stopped passing OpenProject's records through, and reading
+    // `items` here found nothing and skipped everything below as "nothing
+    // assigned" on a board that had tickets.
+    const first = board.rows?.[0]?.ticket;
     if (first) {
       const wp = parse(await mcp.send('tools/call', { name: 'adam_work', arguments: { key: first } }));
       if (wp.found && wp.workPackage?.subject) pass(`adam_work(#${first}) — "${wp.workPackage.subject}"`);
