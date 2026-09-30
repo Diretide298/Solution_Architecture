@@ -40,12 +40,25 @@
  * The first read of a session - often an adam_pull - regularly met a 502 while the
  * service behind the proxy woke up, and every retry by hand worked (audit R018: 7 of
  * 7 runs). Only gateway statuses: anything the service itself said is an answer.
+ *
+ * A connection that drops before any status is the same event one step earlier —
+ * the service restarting under a deploy, or the network blinking — so it is retried
+ * too. Callers only pass reads here. When it still fails, the error carries its
+ * cause: a bare "fetch failed" (seen on adam_board, 30 September) cannot tell a
+ * reset from a DNS miss from a timeout, and each sends somebody somewhere else.
  */
 async function retryGateway(request, tries = 3) {
   let answer;
   for (let i = 0; i < tries; i += 1) {
-    answer = await request();
-    if (![502, 503, 504].includes(answer.status)) return answer;
+    try {
+      answer = await request();
+      if (![502, 503, 504].includes(answer.status)) return answer;
+    } catch (error) {
+      if (i === tries - 1) {
+        const cause = error.cause?.code ?? error.cause?.message;
+        throw new Error(`${error.message}${cause ? ` (${cause})` : ''} after ${tries} tries`, { cause: error });
+      }
+    }
     await new Promise((resolve) => setTimeout(resolve, 800 * (i + 1)));
   }
   return answer;
