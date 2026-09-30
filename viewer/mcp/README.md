@@ -193,11 +193,12 @@ building.
 | `adam_work` | `key` | one work package, live, plus the artefacts it touches |
 | `adam_links` | `kind`, `id` | what work is scheduled against one artefact |
 | `adam_link` | `kind`, `id`, `key` — or `remove` + `linkId` | **writes**: records that a work package is about an artefact |
-| `adam_pull` | `key` (or nothing, for the whole board), `dir`, `limit` | **writes local files**: `.adam/work/<key>/` and `.adam/board.md` |
+| `adam_pull` | `key` (or nothing, for the whole board), `dir`, `limit` | **writes local files**: `.adam/work/<key>/` and `.adam/board.md`; pins the ticket to the release served, and writes `spec-diff.md` when a later release changed it |
+| `adam_repin` | `key`, `dir`, `breaking`, `note` | moves your pin to the release served ("take the change") and pulls again. Changes nothing in OpenProject |
 | `adam_propose` | `key`, and `status` / `percentDone` / `comment` | the change that would be made, and a one-use code. **Changes nothing** |
 | `adam_apply` | `key`, `proposal`, `dir` | **changes OpenProject**, as you, with that code — after you said yes |
-| `adam_changes` | none, or `id`, `status`, `kind` + `target`, `ticket` | the project's change requests; one in full |
-| `adam_draft_change` | `kind`, `target`, `title`, `problem`, `evidence`, `options`, `recommendation`, `blocking`, `ticket` | a draft and a `draft` code, plus open requests already on that artefact — **files nothing** |
+| `adam_changes` | none, or `id`, `status`, `kind` + `target`, `ticket`; or `from` / `to` release tags | the project's change requests; one in full; or the release notes between two tags |
+| `adam_draft_change` | `kind`, `target`, `title`, `problem`, `evidence`, `options`, `recommendation`, `blocking`, `ticket`, and the intake: `source` (default developer), `sourceRef`, `approver`, `triage`, `when`, `artefacts`, `contractImpact`, `effortPoints`, `clientSignoff` | a draft and a `draft` code, plus open requests already on that artefact — **files nothing** |
 | `adam_raise_change` | `draft` | **files the change request in ADAM** (CR-007) — after you said yes |
 
 **Change requests.** When the package contradicts itself, is wrong, or lacks what a ticket needs,
@@ -208,6 +209,25 @@ CR-007". They are internal — a client account neither reads nor files them —
 ADAM's **Changes** page (`/changes.html`) by an admin or a reviewer on the project, never by the
 person who raised it unless they are an admin: open → accepted or rejected (a rejection needs a
 reason) → done, with what fixed it. The page exports what it shows as CSV.
+
+**Releases (C2, C9).** ADAM serves the package at its newest release tag (`r1`, `r2`, … in the
+package repository; `viewer/lib/releases.mjs`), not at whatever the working tree holds. The first
+`adam_pull` of a ticket records the tag in force as your pin on it. A later pull, once ADAM serves a
+newer tag, compares every artefact the ticket is linked to between the pin and the served tag — the
+same records the tools return, at each tag — keeps the linked files at the pinned release, and says
+in README.md what changed, with the diffs in `spec-diff.md`. You either take the change
+(`adam_repin`) or raise a change request and keep building against the pin. A breaking contract
+change listed in `docs/active/breaking-changes.yaml` since the pin makes the re-pin **required** for
+a ticket that produces the operation (linked to it, its contract or its service) or consumes it
+(linked to a screen or journey that calls it). `adam_board` shows each ticket's pin as `r1 -> r2`
+when the served release has moved on.
+
+**Change request intake (C8).** A draft carries where the change came from (`source`: minutes,
+answer, design, developer, audit, and `sourceRef`, the line that finds it again — a developer's
+defaults to the ticket), who approved it, its triage class (clarification, scope, defect) and when
+(now, later), every artefact it touches, its contract impact (none, additive, breaking), the change
+in effort in points, and the client's sign-off — required when the source is minutes. A breaking
+impact needs an approver. The request also records the release the person raising it was on.
 
 Start with `adam_search` when you have a name but not a kind. A miss returns candidate spellings
 rather than an empty result — a wrong id is usually a wrong spelling of a right one.

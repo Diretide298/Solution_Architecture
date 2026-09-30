@@ -48,6 +48,8 @@ const RESERVED = new Set(['projects', 'api', 'pkg', 'health']);
  * @property {string} contracts the contracts folder inside it, relative
  * @property {boolean} active   false hides it without deleting the entry
  * @property {string|null} note why it is here, for the listing
+ * @property {string|null} packageRef  latest | working | r<N>; null means latest
+ * @property {string} releases  absolute path of the folder release tags export to
  */
 
 /**
@@ -65,7 +67,14 @@ const RESERVED = new Set(['projects', 'api', 'pkg', 'health']);
  * @returns {Promise<{projects: Project[], defaultId: string|null, problems: string[]}>}
  */
 export async function loadProjects(viewerDir) {
-  const file = path.join(viewerDir, 'projects.json');
+  // TICVAI_PROJECTS points at another registry, for a harness — the same variable
+  // the accounts service reads, so the two halves agree on which file it is. Roots
+  // and release folders resolve against the folder the registry is in, which for
+  // the usual file is the viewer directory, so nothing changes for it.
+  const file = process.env.TICVAI_PROJECTS
+    ? path.resolve(process.env.TICVAI_PROJECTS)
+    : path.join(viewerDir, 'projects.json');
+  const registryDir = path.dirname(file);
   const problems = [];
 
   let doc = null;
@@ -98,7 +107,7 @@ export async function loadProjects(viewerDir) {
     }
     seen.add(id);
 
-    const root = path.resolve(viewerDir, String(entry?.root ?? ''));
+    const root = path.resolve(registryDir, String(entry?.root ?? ''));
     const there = await stat(root).catch(() => null);
     if (!there?.isDirectory()) {
       problems.push(`${id}: ${root} is not a directory — the package will not be served`);
@@ -112,6 +121,13 @@ export async function loadProjects(viewerDir) {
       contracts: String(entry?.contracts ?? 'contracts'),
       active: entry?.active !== false,
       note: entry?.note ?? null,
+      // Which state of the package to serve: `latest` (the newest r<N> release
+      // tag, or the working tree while there is none), `working`, or one tag.
+      // ADAM_PACKAGE_REF overrides it for every project. See lib/releases.mjs.
+      packageRef: entry?.packageRef ? String(entry.packageRef) : null,
+      // Where each release tag's tree is exported to, beside the viewer so the
+      // same relative path means the same thing on a workstation and the server.
+      releases: path.resolve(registryDir, String(entry?.releases ?? `.releases/${id}`)),
     });
   }
 
@@ -125,5 +141,5 @@ export async function loadProjects(viewerDir) {
   }
   if (!defaultId) defaultId = projects.find((p) => p.active)?.id ?? null;
 
-  return { projects, defaultId, problems };
+  return { projects, defaultId, problems, registryDir };
 }

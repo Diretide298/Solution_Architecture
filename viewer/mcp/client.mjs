@@ -325,6 +325,23 @@ export class ViewerClient {
   }
 
   /**
+   * A package route read once, uncached, with its status: `release` (which tag
+   * is served) and `release-diff` (what changed between two). Neither is worth
+   * holding — `release` is a few hundred bytes and `release-diff` is asked once
+   * per pull — and a 404 from an older viewer without them is an answer the
+   * caller relays ("this viewer does not serve releases"), not a failure.
+   *
+   * `params` may be an array of pairs, for a key given more than once.
+   */
+  async packageJson(route, params) {
+    await this.#resolveProject();
+    const answer = await this.#send(this.url(route, params), route);
+    let data = null;
+    try { data = await answer.json(); } catch { /* an empty body is an answer */ }
+    return { status: answer.status, ok: answer.ok, data };
+  }
+
+  /**
    * One file's source, as text. `/api/file` answers prose, not JSON.
    *
    * Not held: files are small and there are thousands, so caching them would

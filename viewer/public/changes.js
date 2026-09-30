@@ -268,6 +268,18 @@ function card(c) {
       return wrap;
     })() : null,
     block('Recommendation', c.recommendation),
+    // Intake (C8): where it came from, what kind of change, what it costs.
+    // Absent on a request raised before intake existed, and then not drawn.
+    block('Intake', [
+      c.source && `Source: ${c.source}${c.sourceRef ? ` - ${c.sourceRef}` : ''}`,
+      c.clientSignoff && `Client sign-off: ${c.clientSignoff}`,
+      c.approver && `Approved by: ${c.approver}`,
+      c.triage && `Triage: ${c.triage}${c.when ? `, ${c.when}` : ''}`,
+      c.contractImpact && `Contract impact: ${c.contractImpact}`,
+      c.effortPoints != null && `Effort change: ${c.effortPoints > 0 ? '+' : ''}${c.effortPoints} points`,
+      c.artefacts?.length && `Also touches: ${c.artefacts.join(', ')}`,
+      c.raisedTag && `Raised against release ${c.raisedTag}`,
+    ].filter(Boolean).join('\n'), true),
     c.resolvedAt ? block(`${STATUS[c.status] ?? 'Settled'} by ${c.resolvedBy ?? '?'} · ${fmt(c.resolvedAt)}`,
       [c.resolution, c.resolvedRef && `Fixed by: ${c.resolvedRef}`].filter(Boolean).join('\n') || '-') : null,
   ]) if (part) body.append(part);

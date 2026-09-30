@@ -1,5 +1,5 @@
 /**
- * The twenty-two tools, and where each gets its answer.
+ * The twenty-three tools, and where each gets its answer.
  *
  * **Nine read the package.** They are selectors over bulk payloads, not
  * proxies: there is no `/api/screen?id=BO-102`, so a layer is fetched whole,
@@ -23,9 +23,12 @@
  * caller. `adam_links` and `adam_link` read and write the one thing neither
  * system can hold on its own: which artefact a work package is about.
  *
- * **Three are about doing the work.** `adam_pull` saves a ticket and everything
+ * **Four are about doing the work.** `adam_pull` saves a ticket and everything
  * it is linked to as files under `.adam/` in the developer's folder, so Claude
  * reads what it needs from disk instead of holding it all in the conversation.
+ * It also pins the ticket to the release tag ADAM serves (r1, r2, …) and, when
+ * a later release changed what the ticket touches, writes the pinned version
+ * and the diff; `adam_repin` takes the change.
  * `adam_propose` works out a change to a work package — status, % done, a
  * comment — and sends nothing; `adam_apply` sends it, with the code the proposal
  * returned, after the person has said yes. The change is made as the person,
@@ -227,8 +230,9 @@ async function workFolder(dir) {
 // Kept across pulls: the developer's own notes and the log of applied changes.
 const KEEP = new Set(['notes.md', 'log.md']);
 
-/** Which tool answers for each kind of linked artefact, and with what. */
-function lookupFor(kind, id) {
+/** Which tool answers for each kind of linked artefact, and with what. Exported
+ *  for lib/release-diff.mjs, which asks the same tools about an older release. */
+export function lookupFor(kind, id) {
   // operation and schema ids name their contract: `access#listPasses`,
   // `access:Pass`. Without one there is nothing to aim at but a search.
   const ref = /^(.+)[#:](.+)$/.exec(String(id));
@@ -268,15 +272,94 @@ function commentsSection(comments) {
   return out;
 }
 
-function ticketReadme(wp, files, missing, when, decisions = []) {
+/** One line naming the release a pull is from, for the README's header. */
+function releaseLine(release) {
+  if (!release?.available) return '';
+  if (!release.current) return 'none yet - ADAM is serving the package\'s working tree';
+  if (release.stale) return `pinned at ${release.pin}; ADAM now serves ${release.current}`;
+  return `${release.current}${release.recorded ? ' (pinned by this pull)' : ' (your pin)'}`;
+}
+
+/**
+ * The section a stale pin earns: what changed, whether the re-pin is required,
+ * and the two ways forward. The whole diff goes in spec-diff.md.
+ */
+function releaseSection(release) {
+  if (!release?.stale) return '';
+  const { pin, current, diff } = release;
+  let out = `\n## Spec changed since you pulled at ${pin} (now ${current})\n\n`;
+  if (!diff) {
+    return `${out}ADAM serves ${current} and you pulled this ticket at ${pin}, but the difference could `
+      + `not be read (${release.diffError ?? 'no answer'}). The files below are ${current}. Ask whoever `
+      + 'runs ADAM before taking the change.\n';
+  }
+  const breaking = diff.breaking ?? [];
+  if (breaking.length) {
+    out += `**Re-pin required.** ${breaking.length === 1 ? 'A breaking contract change' : `${breaking.length} breaking contract changes`} `
+      + `in ${current} ${breaking.length === 1 ? 'touches' : 'touch'} this ticket, and the producer and the consumer of an `
+      + 'operation have to build against the same release:\n\n';
+    for (const b of breaking) {
+      out += `- **${b.id || 'unnamed'}**: \`${b.contract ? `${b.contract}#` : ''}${b.operation}\` - ${b.reason || 'no reason given'}`
+        + `${b.approvedBy ? ` (approved by ${b.approvedBy})` : ''}. This ticket is the **${b.role}**, via ${b.via}.\n`;
+    }
+    out += `\nRun adam_repin before building further; it moves this ticket to ${current} and pulls it again.\n\n`;
+  }
+  const changed = (diff.artefacts ?? []).filter((a) => ['changed', 'added', 'removed'].includes(a.status));
+  const same = (diff.artefacts ?? []).filter((a) => a.status === 'unchanged').length;
+  if (changed.length) {
+    out += `What changed (${changed.length}):\n\n`;
+    for (const a of changed) {
+      out += `- ${a.kind} \`${a.id}\`: ${a.status === 'changed' ? `+${a.added} -${a.removed} lines`
+        : a.status === 'added' ? `new in ${current} (not in ${pin})` : `gone from ${current}`}\n`;
+    }
+    out += `\n${same} unchanged. Every diff is in [spec-diff.md](spec-diff.md).\n`;
+  } else {
+    out += `None of the artefacts this ticket is linked to changed between ${pin} and ${current}`
+      + `${breaking.length ? ', but the breaking change above still applies' : ''}.\n`;
+  }
+  out += `\nThe linked files below are **${pin}**, the release you are pinned to`
+    + `${changed.some((a) => a.status === 'added') ? ` (a file new in ${current} is ${current})` : ''}.\n\n`;
+  out += breaking.length
+    ? 'If the change is wrong for this ticket, raise a change request as well (adam_draft_change, source developer), but re-pin first.\n'
+    : `Either take the change - adam_repin moves this ticket to ${current} and pulls it again - or, if it `
+      + 'is wrong for this ticket, raise a change request (adam_draft_change, source developer) and keep '
+      + `building against ${pin}.\n`;
+  return out;
+}
+
+function specDiff(wp, release, when) {
+  const { pin, current, diff } = release;
+  let out = `# #${wp.key}: what changed between ${pin} and ${current}\n\nWritten ${when} by adam_pull. `
+    + 'Each diff is of the record ADAM hands you for that artefact (the file beside this one), '
+    + `${pin} on the minus side and ${current} on the plus side.\n`;
+  for (const b of diff.breaking ?? []) {
+    out += `\n> **Breaking - re-pin required:** ${b.id || 'unnamed'} \`${b.contract ? `${b.contract}#` : ''}${b.operation}\`: `
+      + `${b.reason || 'no reason given'}${b.approvedBy ? ` (approved by ${b.approvedBy})` : ''}; this ticket is the ${b.role}, via ${b.via}.\n`;
+  }
+  for (const a of diff.artefacts ?? []) {
+    out += `\n## ${a.kind} \`${a.id}\` - ${a.status}\n\n`;
+    if (a.status === 'changed') out += `\`\`\`diff\n${a.diff}\n\`\`\`\n`;
+    else if (a.status === 'not-compared') out += `${a.note ?? 'Not compared.'}\n`;
+    else if (a.status === 'unchanged') out += 'No change.\n';
+    else if (a.status === 'added') out += `Not in ${pin}; the file is ${current}.\n`;
+    else if (a.status === 'removed') out += `In ${pin}, gone from ${current}.\n`;
+    else out += `Found in neither release.\n`;
+  }
+  return out;
+}
+
+function ticketReadme(wp, files, missing, when, decisions = [], release = null) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
   out += line('Project', wp.project) + line('Type', wp.type) + line('Status', wp.status)
     + line('Milestone', wp.version) + line('Priority', wp.priority) + line('Assignee', wp.assignee)
     + line('Start', wp.startDate) + line('Due', wp.dueDate)
-    + line('% done', wp.percentDone) + line('OpenProject', wp.url);
+    + line('% done', wp.percentDone) + line('OpenProject', wp.url)
+    + line('Release', releaseLine(release));
   out += `\nPulled ${when} by the ADAM connector. Status and dates are a copy from then; `
-    + 'run adam_pull again for the current ones.\n\n';
+    + 'run adam_pull again for the current ones.\n';
+  out += releaseSection(release);
+  out += '\n';
   out += `## Description\n\n${wp.description || '_No description in OpenProject._'}\n`;
   if (wp.descriptionTrimmed) out += '\n_Longer in OpenProject - open the link above for the rest._\n';
   out += commentsSection(wp.comments);
@@ -323,11 +406,74 @@ function ticketReadme(wp, files, missing, when, decisions = []) {
   return out;
 }
 
+/**
+ * The release side of a pull (council C2 and C9).
+ *
+ * Records the pin — the tag ADAM is serving, the first time this person pulls
+ * this ticket — and when the served release has moved on since, asks the viewer
+ * what changed in the ticket's artefacts between the two. Asked in slices, so a
+ * ticket linked to a hundred screens does not become one URL longer than a proxy
+ * will take.
+ *
+ * Never the reason a pull fails: an ADAM without releases answers 404 here, and
+ * the pull goes on exactly as it did before, saying nothing about releases.
+ */
+async function releaseFor(client, key, touches) {
+  const pinned = await client.service(`/api/work-packages/${encodeURIComponent(key)}/pin`, {
+    method: 'POST', body: { project_id: (await client.projectId()) ?? '', reason: 'pull' },
+  });
+  if (!pinned.ok) {
+    return { available: false, why: pinned.data?.detail ?? `HTTP ${pinned.status}` };
+  }
+  const state = pinned.data ?? {};
+  const release = {
+    available: true,
+    pin: state.pin?.tag ?? null,
+    current: state.current?.tag ?? null,
+    recorded: Boolean(state.recorded),
+    stale: Boolean(state.stale),
+  };
+  if (!release.stale) return release;
+
+  const compared = touches.filter((t) => t.kind !== 'adr');
+  const merged = { artefacts: [], breaking: [] };
+  const seen = new Map();
+  for (let at = 0; at < Math.max(compared.length, 1); at += 40) {
+    const slice = compared.slice(at, at + 40);
+    const answer = await client.packageJson('release-diff', [
+      ['from', release.pin], ['to', release.current], ['records', '1'],
+      ...slice.map((t) => ['touch', `${t.kind}:${t.id}`]),
+    ]).catch((error) => ({ ok: false, status: 0, data: { error: error.message } }));
+    if (!answer.ok) {
+      release.diffError = answer.data?.error ?? `HTTP ${answer.status}`;
+      return release;
+    }
+    merged.artefacts.push(...(answer.data.artefacts ?? []));
+    // Every slice sees every breaking entry; a consumer found in any slice wins.
+    for (const b of answer.data.breaking ?? []) {
+      const k = b.id || `${b.contract}#${b.operation}`;
+      if (!seen.has(k) || (b.role === 'consumer' && seen.get(k).role !== 'consumer')) seen.set(k, b);
+    }
+    if (answer.data.breakingFileError) merged.breakingFileError = answer.data.breakingFileError;
+  }
+  merged.breaking = [...seen.values()];
+  merged.repinRequired = merged.breaking.length > 0;
+  release.diff = merged;
+  return release;
+}
+
 async function pullOne(client, key, base, when) {
   const answer = await client.service(`/api/work-packages/${encodeURIComponent(key)}?${await scoped(client)}`);
   if (answer.status === 428) return { key, needsSetup: true, error: answer.data?.detail };
   if (!answer.ok) return { key, error: answer.data?.detail ?? `HTTP ${answer.status}` };
   const { workPackage: wp, touches = [] } = answer.data;
+  const release = await releaseFor(client, wp.key, touches)
+    .catch((error) => ({ available: false, why: error.message }));
+  // The pinned release's record for each artefact, when the pin is behind: the
+  // developer builds against what they pulled until they take the change.
+  const pinnedRecords = new Map((release.diff?.artefacts ?? [])
+    .filter((a) => a.was && a.was.found !== false)
+    .map((a) => [`${a.kind}:${a.id}`, a.was]));
 
   const folder = path.join(base, 'work', safeName(wp.key));
   await mkdir(folder, { recursive: true });
@@ -343,16 +489,29 @@ async function pullOne(client, key, base, when) {
   const decisions = touches.filter((t) => t.kind === 'adr').map((t) => t.id);
   for (const { kind, id } of touches) {
     if (kind === 'adr') continue;
-    const [toolName, args] = lookupFor(kind, id);
-    const result = await BY_NAME.get(toolName).run(client, args).catch((error) => ({ found: false, error: error.message }));
     const file = `${safeName(kind)}-${safeName(id)}.json`;
-    await writeFile(path.join(folder, file), json(trimForPull({ kind, id, from: toolName, ...result })));
-    if (result.found === false) missing.push({ kind, id });
+    const pinned = pinnedRecords.get(`${kind}:${id}`);
+    let record;
+    if (pinned) {
+      record = { ...pinned, release: release.pin };
+    } else {
+      const [toolName, args] = lookupFor(kind, id);
+      const result = await BY_NAME.get(toolName).run(client, args).catch((error) => ({ found: false, error: error.message }));
+      record = { kind, id, from: toolName, ...(release.current ? { release: release.current } : {}), ...result };
+    }
+    await writeFile(path.join(folder, file), json(trimForPull(record)));
+    if (record.found === false) missing.push({ kind, id });
     files.push({ kind, id, file });
   }
 
-  await writeFile(path.join(folder, 'ticket.json'), json({ pulledAt: when, workPackage: wp, touches }));
-  await writeFile(path.join(folder, 'README.md'), ticketReadme(wp, files, missing, when, decisions));
+  if (release.stale && release.diff) {
+    await writeFile(path.join(folder, 'spec-diff.md'), specDiff(wp, release, when));
+  }
+  await writeFile(path.join(folder, 'ticket.json'), json({
+    pulledAt: when, workPackage: wp, touches,
+    ...(release.available ? { release: { pin: release.pin, current: release.current, stale: release.stale } } : {}),
+  }));
+  await writeFile(path.join(folder, 'README.md'), ticketReadme(wp, files, missing, when, decisions, release));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
@@ -361,6 +520,17 @@ async function pullOne(client, key, base, when) {
     key: wp.key, subject: wp.subject, status: wp.status, milestone: wp.version || null,
     due: wp.dueDate || null, folder, linked: files.length, notFound: missing.length,
     ...(Array.isArray(wp.comments) ? { comments: wp.comments.length } : {}),
+    ...(release.available ? { release: {
+      pinned: release.pin,
+      current: release.current,
+      stale: release.stale,
+      ...(release.diff ? {
+        changed: (release.diff.artefacts ?? []).filter((a) => ['changed', 'added', 'removed'].includes(a.status)).length,
+        repinRequired: release.diff.repinRequired,
+        breaking: release.diff.breaking.map((b) => `${b.id || b.operation} (${b.role})`),
+      } : {}),
+      ...(release.diffError ? { diffError: release.diffError } : {}),
+    } } : {}),
   };
 }
 
@@ -376,9 +546,11 @@ function boardReadme(pulled, project, when) {
     + "plan's build order. Each ticket has a folder under work/ with its description and "
     + 'everything it is linked to.\n';
   for (const [name, tickets] of groups) {
-    out += `\n## ${name}\n\n| Ticket | Status | Due | Linked | Folder |\n|---|---|---|---|---|\n`;
+    out += `\n## ${name}\n\n| Ticket | Status | Due | Linked | Release | Folder |\n|---|---|---|---|---|---|\n`;
     for (const t of tickets) {
-      out += `| #${t.key} ${t.subject.replace(/\|/g, '/')} | ${t.status} | ${t.due ?? ''} | ${t.linked} | [work/${safeName(t.key)}](work/${safeName(t.key)}/README.md) |\n`;
+      const r = t.release;
+      const pin = !r ? '' : r.stale ? `${r.pinned} -> ${r.current}${r.repinRequired ? ' (re-pin required)' : ''}` : (r.current ?? '');
+      out += `| #${t.key} ${t.subject.replace(/\|/g, '/')} | ${t.status} | ${t.due ?? ''} | ${t.linked} | ${pin} | [work/${safeName(t.key)}](work/${safeName(t.key)}/README.md) |\n`;
     }
   }
   const failed = pulled.filter((t) => t.error);
@@ -892,6 +1064,9 @@ export const TOOLS = [
       // of, where it has got to, when it is due.
       // In the order the server gives, which is the order the work is finished in: what you have
       // started, then the plan's build order (see /api/board/mine). Never re-sorted here.
+      // The release column only once there is a release. `r1 -> r2` is a ticket
+      // pulled at r1 while ADAM serves r2: pulling it again shows what changed.
+      const served = board.release?.tag ?? null;
       const rows = items.map((t) => ({
         order: t.buildOrder ?? '',
         ticket: t.key,
@@ -901,6 +1076,7 @@ export const TOOLS = [
         due: t.dueDate ?? '',
         percent: t.percentDone ?? 0,
         subtasks: (t.subtasks ?? []).length,
+        ...(served ? { release: t.pin ? (t.pinStale ? `${t.pin} -> ${served}` : t.pin) : '' } : {}),
       }));
 
       // Held back rather than left out. Fetching them costs nothing extra —
@@ -931,7 +1107,14 @@ export const TOOLS = [
         // Which OpenProject project this board is read from, so "nothing
         // assigned" is never mistaken for "nothing assigned anywhere".
         ...(board.openproject ? { openprojectProject: board.openproject } : {}),
-        columns: ['order', 'ticket', 'task', 'module', 'status', 'due'],
+        columns: served
+          ? ['order', 'ticket', 'task', 'module', 'status', 'due', 'release']
+          : ['order', 'ticket', 'task', 'module', 'status', 'due'],
+        ...(served ? {
+          release: served,
+          releaseNote: `ADAM serves ${served}. A release like r1 -> ${served} means you pulled that ticket at r1 `
+            + 'and the spec may have changed since: pull it again (adam_pull) to see the diff. Blank is not pulled yet.',
+        } : {}),
         orderedBy: "what you have started first, then the plan's build order; the same every time",
         rows,
         // Said when it is false, so a column of dashes is read as "could not
@@ -946,7 +1129,8 @@ export const TOOLS = [
           ? 'Show `rows` as a markdown table using `columns`, then the subtasks under their ticket. '
             + 'If `more` is present, say it in one line under the table.'
           : 'Show `rows` as a markdown table using `columns`, and if `more` is present say it in one '
-            + 'line under the table; nothing else. Do not list the '
+            + 'line under the table; if any `release` reads "rN -> rM", say in one line that those '
+            + 'tickets were pulled at an older release and a pull shows what changed; nothing else. Do not list the '
             + 'subtasks or the touched artefacts, and do not summarise them — the `subtasks` '
             + 'column already gives the count. Call this tool again with subtasks: true if the '
             + 'person asks to see them.',
@@ -1250,7 +1434,10 @@ export const TOOLS = [
       'Save a ticket and everything it is linked to as files in the working folder, under '
       + '.adam/work/<ticket>/: README.md (the ticket, its milestone and description, and a list of '
       + 'the files, then the comment thread, oldest first), ticket.json, one file per linked screen, journey, contract, table, service, '
-      + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. With no `key`, pulls '
+      + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. The first pull pins '
+      + 'the ticket to the release tag ADAM serves (r1, r2, …); when a later release changed what it touches, '
+      + 'the files stay at the pinned release, README.md says what changed and spec-diff.md has the diffs, and '
+      + '`release.repinRequired` is true when a breaking contract change makes adam_repin required. With no `key`, pulls '
       + 'every open ticket assigned to you and writes .adam/board.md grouped by milestone. **Use '
       + 'this at the start of work on a ticket**, then read the files you need instead of holding '
       + 'everything in the conversation. Always pass `dir`: the absolute path of the folder you are '
@@ -1271,13 +1458,29 @@ export const TOOLS = [
         const one = await pullOne(client, String(key).replace(/^#/, ''), base, when);
         if (one.needsSetup) return { found: false, needsSetup: true, error: one.error };
         if (one.error) return { found: false, error: one.error };
+        const r = one.release;
+        let next = one.linked
+          ? 'Read README.md first, then the linked files it lists as you need them.'
+          : unlinkedHint({ subject: one.subject });
+        if (r?.stale && r.repinRequired) {
+          next = `Tell the person first: a breaking contract change in ${r.current} requires this ticket to `
+            + `move off ${r.pinned} (${r.breaking.join(', ')}). Show them the "Spec changed" section of `
+            + 'README.md, then run adam_repin with breaking: true once they have read it. This is required, '
+            + 'not a choice; a change request can be raised as well if the change is wrong for the ticket.';
+        } else if (r?.stale && r.diffError) {
+          next = `The ticket was pulled at ${r.pinned} and ADAM serves ${r.current}, but the diff could not be `
+            + `read (${r.diffError}). Tell the person, then read README.md.`;
+        } else if (r?.stale) {
+          next = `Tell the person the spec changed since they pulled at ${r.pinned} (now ${r.current}): `
+            + `${r.changed} linked artefact${r.changed === 1 ? '' : 's'} changed, listed in README.md with the `
+            + 'diffs in spec-diff.md. Ask whether to take the change (adam_repin) or raise a change request '
+            + `(adam_draft_change, source developer) and keep building against ${r.pinned}. ${next}`;
+        }
         return {
           found: true,
           ...one,
           read: path.join(one.folder, 'README.md'),
-          next: one.linked
-            ? 'Read README.md first, then the linked files it lists as you need them.'
-            : unlinkedHint({ subject: one.subject }),
+          next,
         };
       }
 
@@ -1299,6 +1502,58 @@ export const TOOLS = [
           ? { more: `${answer.data.total - items.length} more assigned; raise limit or pull them by key` }
           : {}),
         ...(answer.data.note ? { note: answer.data.note } : {}),
+      };
+    },
+  },
+
+  {
+    name: 'adam_repin',
+    description:
+      'Move your pin on a ticket to the release ADAM is serving - "take the change". adam_pull pins a '
+      + 'ticket to the release tag it was first pulled at and, when a later release changed what the ticket '
+      + 'touches, lists the changes (README.md, spec-diff.md). Call this when the person accepts them, or '
+      + 'with `breaking: true` when the pull said a breaking contract change makes the re-pin required. The '
+      + 'ticket is then pulled again, so its files are the new release. Changes nothing in OpenProject.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Work package number, e.g. 6046' },
+        dir: { type: 'string', description: 'Absolute path of the folder you are working in, to pull it again' },
+        breaking: {
+          type: 'boolean',
+          description: 'true when the pull said a breaking contract change requires the re-pin',
+        },
+        note: { type: 'string', description: 'Optional: why, in a line - kept in the pin history' },
+      },
+      required: ['key'],
+    },
+    async run(client, { key, dir, breaking = false, note = '' }) {
+      const number = String(key ?? '').replace(/^#/, '');
+      const answer = await client.service(`/api/work-packages/${encodeURIComponent(number)}/pin`, {
+        method: 'POST',
+        body: { project_id: (await client.projectId()) ?? '', reason: breaking ? 'breaking' : 'accept', note },
+      });
+      if (!answer.ok) return { ok: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+      const state = answer.data;
+      const was = state.log?.[0]?.from || null;
+      const result = {
+        ok: true,
+        moved: Boolean(state.recorded),
+        pinned: state.pin?.tag ?? null,
+        ...(state.recorded && was ? { from: was } : {}),
+        ...(state.note ? { note: state.note } : {}),
+      };
+      if (!state.recorded || !dir) {
+        return { ...result, next: state.recorded ? 'Pull the ticket again (adam_pull) for the files at the new release.' : undefined };
+      }
+      const base = await workFolder(dir);
+      const when = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+      const again = await pullOne(client, number, base, when);
+      return {
+        ...result,
+        pulled: again.error ? { error: again.error } : { folder: again.folder, linked: again.linked, release: again.release },
+        next: `Pinned at ${result.pinned}; the files under .adam/work/${number}/ are that release now. `
+          + 'Read README.md again before going on.',
       };
     },
   },
@@ -1416,7 +1671,8 @@ export const TOOLS = [
       'The change requests raised against this ADAM project: places where the package (a contract, '
       + 'table, screen, journey or decision) was found wrong, contradictory or missing something. '
       + 'With `id` (CR-007), one in full. Otherwise a list, narrowed by `status`, `kind` + `target`, '
-      + 'or `ticket`. **Check this before drafting a new one** - somebody may have raised it already - '
+      + 'or `ticket`. With `from` and/or `to` (release tags), the release notes: what was settled between '
+      + 'two releases, with a markdown note. **Check this before drafting a new one** - somebody may have raised it already - '
       + 'and before building against an artefact that has an open or accepted request.',
     inputSchema: {
       type: 'object',
@@ -1426,10 +1682,36 @@ export const TOOLS = [
         kind: { type: 'string', description: 'Artefact kind, e.g. operation, schema, table, screen, flow' },
         target: { type: 'string', description: 'Artefact id, e.g. identity#requestGuestCode' },
         ticket: { type: 'string', description: 'OpenProject work package number' },
+        from: {
+          type: 'string',
+          description: 'Release notes: the change requests settled (accepted or done) after this release tag, e.g. r1',
+        },
+        to: {
+          type: 'string',
+          description: 'Release notes: up to this release tag; default the one ADAM serves',
+        },
       },
     },
-    async run(client, { id, status, kind, target, ticket } = {}) {
+    async run(client, { id, status, kind, target, ticket, from, to } = {}) {
       const project = (await client.projectId()) ?? '';
+      if (from || to) {
+        const query = new URLSearchParams({ project_id: project });
+        if (from) query.set('from', from);
+        if (to) query.set('to', to);
+        const answer = await client.service(`/api/changes/release-notes?${query}`);
+        if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+        const notes = answer.data;
+        return {
+          found: notes.total > 0,
+          from: notes.from, to: notes.to, basis: notes.basis, total: notes.total,
+          items: notes.items.map((c) => ({
+            id: c.id, status: c.status, title: c.title, target: c.target, source: c.source,
+            sourceRef: c.sourceRef, triage: c.triage, contractImpact: c.contractImpact,
+            effortPoints: c.effortPoints, resolvedAt: c.resolvedAt, resolvedRef: c.resolvedRef,
+          })),
+          markdown: notes.markdown,
+        };
+      }
       if (id) {
         const answer = await client.service(
           `/api/changes/${encodeURIComponent(id)}?${new URLSearchParams({ project_id: project })}`);
@@ -1450,6 +1732,9 @@ export const TOOLS = [
         items: items.map((c) => ({
           id: c.id, status: c.status, title: c.title, target: c.target,
           blocking: c.blocking, ticket: c.ticket, raisedBy: c.raisedBy, raisedAt: c.raisedAt,
+          ...(c.source ? { source: c.source } : {}),
+          ...(c.triage ? { triage: c.triage } : {}),
+          ...(c.contractImpact ? { contractImpact: c.contractImpact } : {}),
         })),
         ...(items.length ? {} : { note: 'No change requests match. Nothing has been raised for this yet.' }),
       };
@@ -1477,6 +1762,29 @@ export const TOOLS = [
         recommendation: { type: 'string', description: 'Which option you would pick and why, if any' },
         blocking: { type: 'boolean', description: 'true when the ticket cannot be finished until it is settled' },
         ticket: { type: 'string', description: 'The OpenProject work package it came up in' },
+        // ---- intake (C8) ----
+        source: {
+          type: 'string', enum: ['developer', 'minutes', 'answer', 'design', 'audit'],
+          description: 'Where the change came from. Default developer: a gap found while building a ticket.',
+        },
+        sourceRef: {
+          type: 'string',
+          description: 'The line that finds the source again: "MoM 30 Sep, item 4", a question id, an audit '
+            + 'finding. For a developer gap it defaults to the ticket.',
+        },
+        approver: { type: 'string', description: 'Who agreed the change should be made. Required when contractImpact is breaking.' },
+        triage: { type: 'string', enum: ['clarification', 'scope', 'defect'], description: 'What kind of change it is, if known' },
+        when: { type: 'string', enum: ['now', 'later'], description: 'Whether it is needed for the current release or can wait' },
+        artefacts: { type: 'array', items: { type: 'string' }, description: 'Every other artefact id it touches, beyond target' },
+        contractImpact: {
+          type: 'string', enum: ['none', 'additive', 'breaking'],
+          description: 'What it does to a contract: nothing, a compatible addition, or a breaking change',
+        },
+        effortPoints: { type: 'number', description: 'Change in effort, in points, signed (3, -1, 0.5)' },
+        clientSignoff: {
+          type: 'string',
+          description: 'Who on the client side signed it off, and where. Required when source is minutes.',
+        },
       },
       required: ['kind', 'target', 'title', 'problem'],
     },
@@ -1494,6 +1802,16 @@ export const TOOLS = [
           recommendation: args.recommendation ?? '',
           blocking: Boolean(args.blocking),
           ticket: String(args.ticket ?? '').replace(/^#/, ''),
+          // A developer's connector files a developer's gap unless told otherwise.
+          source: args.source ?? 'developer',
+          source_ref: args.sourceRef ?? '',
+          approver: args.approver ?? '',
+          triage: args.triage ?? '',
+          when: args.when ?? '',
+          artefacts: Array.isArray(args.artefacts) ? args.artefacts.map(String) : [],
+          contract_impact: args.contractImpact ?? '',
+          effort_points: typeof args.effortPoints === 'number' ? args.effortPoints : null,
+          client_signoff: args.clientSignoff ?? '',
         },
       });
       if (!answer.ok) {

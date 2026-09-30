@@ -25,6 +25,17 @@ failure policies, every view tab and every toggle explain themselves on hover �
 own descriptions where there is one (`screens/_components.yaml`, the workbook's "why it is
 separate", an event consumer's purpose) and from a built-in glossary otherwise.
 
+## Which state of the package
+
+On a workstation with no release tag, the working tree, as it always was. Once the package
+repository has release tags (`r1`, `r2`, …), **the newest tag**: it is exported once into
+`.releases/<project>/<tag>/` beside the viewer (`lib/releases.mjs`) and read from there, and the
+working tree's unreleased edits are not shown. `ADAM_PACKAGE_REF=working` (or `packageRef` in
+`projects.json`) shows the working tree again while editing the package; `ADAM_PACKAGE_REF=r2`
+serves one tag. `/pkg/<project>/release` says which is being served, and
+`/pkg/<project>/release-diff?from=r1&to=r2&touch=kind:id` is what `/ticket` uses to show a developer
+what changed in their ticket's artefacts since they pulled it (`lib/release-diff.mjs`).
+
 ## Four layers
 
 The top-left switch picks which part of the system is on screen. **Contracts sit near the middle
@@ -388,6 +399,8 @@ above 60 they arrive a page at a time on a button that says how many are left.
 | `lib/migrations.mjs` | the versioned SQL — tables, keys, partitioning, row security |
 | `lib/relationships.mjs` | `handoff/relationships.csv` — the stated relationships and their kind |
 | `lib/domain.mjs` | `states/` and `events/`, cross-checked against each other and the contracts |
+| `lib/releases.mjs` | release tags: which tree to serve, and exporting a tag's tree once |
+| `lib/release-diff.mjs` | what changed in a ticket's artefacts between two tags, and which breaking changes force a re-pin |
 | `server.mjs` | static server, `/api/index`, `/api/detail`, `/api/journeys`, `/api/domain`, `/api/backend`, `/api/file`, `/api/tree`, SSE — gzipped |
 | `public/graph.js` | canvas node-link renderer — force-directed, or placed and directed for Spine |
 | `public/structure.js` | tree and nested block renderers |

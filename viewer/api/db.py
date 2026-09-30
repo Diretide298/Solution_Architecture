@@ -362,6 +362,34 @@ CREATE TABLE IF NOT EXISTS change_request (
   resolved_ref   TEXT    NOT NULL DEFAULT '',
   resolved_by    INTEGER REFERENCES account(id),
   resolved_at    TEXT,
+  -- ---- intake (council C8, 1 October) ----------------------------------
+  -- Where the change came from and what it costs, recorded when it is raised
+  -- so a release note and a re-plan can be read off the rows. Every one is
+  -- blank on a request raised before intake existed, and blank is shown as
+  -- "not stated", never guessed.
+  --
+  -- source: minutes | answer | design | developer | audit. `source_ref` is the
+  -- line that finds it again: "MoM 30 Sep, item 4", "#20354 at r2".
+  source          TEXT    NOT NULL DEFAULT '',
+  source_ref      TEXT    NOT NULL DEFAULT '',
+  -- Who agreed the change should be made. Required for a breaking contract change.
+  approver        TEXT    NOT NULL DEFAULT '',
+  -- triage: clarification | scope | defect; triage_when: now | later.
+  triage          TEXT    NOT NULL DEFAULT '',
+  triage_when     TEXT    NOT NULL DEFAULT '',
+  -- JSON list of every artefact id it touches, beyond the one `target`.
+  artefact_ids    TEXT    NOT NULL DEFAULT '[]',
+  -- none | additive | breaking. A breaking one also goes in
+  -- docs/active/breaking-changes.yaml, which is what moves tickets' pins.
+  contract_impact TEXT    NOT NULL DEFAULT '',
+  -- Change in effort, in points, signed. Null is "not estimated", not zero.
+  effort_points   REAL,
+  -- Who on the client's side signed it off, and where. Required when the
+  -- source is meeting minutes: a minute is what was said, not what was agreed.
+  client_signoff  TEXT    NOT NULL DEFAULT '',
+  -- The release tag in force for whoever raised it: their ticket's pin when it
+  -- came from one, otherwise the tag being served. Blank before any release.
+  raised_tag      TEXT    NOT NULL DEFAULT '',
   UNIQUE (project_id, number)
 );
 CREATE INDEX IF NOT EXISTS change_request_by_target
@@ -384,6 +412,54 @@ CREATE TABLE IF NOT EXISTS change_draft (
   expires_at  TEXT    NOT NULL,
   filed_at    TEXT
 );
+
+-- Which release of the package a person is building a ticket against (council
+-- C2 and C9, 1 October).
+--
+-- ADAM serves the package at its newest release tag, r1, r2, … (see
+-- viewer/lib/releases.mjs), and the first `/ticket` pull records the tag in
+-- force here. From then on the pull shows what changed between this tag and the
+-- one being served, and the developer either accepts (re-pins to the served
+-- tag) or raises a change request. A breaking contract change makes the re-pin
+-- required for the ticket that produces or consumes that operation.
+--
+-- **Per person and ticket, not per ticket.** Two people on one ticket may have
+-- pulled it at different releases, and each builds from what they pulled. The
+-- tag is never supplied by the caller: a pull records the tag the viewer says
+-- it is serving (<releases>/served.json), and a re-pin moves to that tag.
+CREATE TABLE IF NOT EXISTS ticket_pin (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id    INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  project_id    TEXT    NOT NULL,
+  -- The OpenProject work package number.
+  external_key  TEXT    NOT NULL,
+  tag           TEXT    NOT NULL,
+  commit_sha    TEXT    NOT NULL DEFAULT '',
+  -- The first pull, which never moves; `updated_at` is the last re-pin.
+  pinned_at     TEXT    NOT NULL,
+  updated_at    TEXT    NOT NULL,
+  UNIQUE (account_id, project_id, external_key)
+);
+CREATE INDEX IF NOT EXISTS ticket_pin_by_ticket ON ticket_pin(project_id, external_key);
+
+-- Every move of a pin, append-only: the first pull, each accepted change, each
+-- re-pin a breaking change forced. "Who was building against what, when" is the
+-- question a defect report asks weeks later, and the current row alone cannot
+-- answer it.
+CREATE TABLE IF NOT EXISTS ticket_pin_log (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id    INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  project_id    TEXT    NOT NULL,
+  external_key  TEXT    NOT NULL,
+  from_tag      TEXT    NOT NULL DEFAULT '',
+  to_tag        TEXT    NOT NULL,
+  -- pull | accept | breaking
+  reason        TEXT    NOT NULL,
+  note          TEXT    NOT NULL DEFAULT '',
+  at            TEXT    NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ticket_pin_log_by_ticket
+  ON ticket_pin_log(project_id, external_key, id);
 
 -- A credential this service holds on somebody's behalf, encrypted.
 --
@@ -876,6 +952,10 @@ CREATE INDEX IF NOT EXISTS change_request_by_slice
   ON change_request(project_id, tag, platform, status);
 CREATE INDEX IF NOT EXISTS change_request_unpicked
   ON change_request(project_id, status, picked_at);
+
+-- The release note: what was settled between two tags' dates.
+CREATE INDEX IF NOT EXISTS change_request_settled
+  ON change_request(project_id, status, resolved_at);
 """
 
 # The project every row that predates projects belongs to.
@@ -1182,6 +1262,28 @@ def init() -> None:
             # existing table. The constraint on the fresh schema above is the
             # one that matters from here on.
             cur.execute("ALTER TABLE change_request ADD COLUMN child_by INTEGER")
+
+        # ---- change request intake (council C8) -----------------------------
+        #
+        # Every column blank or null on a request that predates it, which is
+        # what they are: nobody was asked where it came from. Nothing is
+        # backfilled — a guessed source on an old request would read as a
+        # recorded one.
+        have = {row[1] for row in cur.execute("PRAGMA table_info(change_request)")}
+        for column, ddl in (
+            ("source", "TEXT NOT NULL DEFAULT ''"),
+            ("source_ref", "TEXT NOT NULL DEFAULT ''"),
+            ("approver", "TEXT NOT NULL DEFAULT ''"),
+            ("triage", "TEXT NOT NULL DEFAULT ''"),
+            ("triage_when", "TEXT NOT NULL DEFAULT ''"),
+            ("artefact_ids", "TEXT NOT NULL DEFAULT '[]'"),
+            ("contract_impact", "TEXT NOT NULL DEFAULT ''"),
+            ("effort_points", "REAL"),
+            ("client_signoff", "TEXT NOT NULL DEFAULT ''"),
+            ("raised_tag", "TEXT NOT NULL DEFAULT ''"),
+        ):
+            if column not in have:
+                cur.execute(f"ALTER TABLE change_request ADD COLUMN {column} {ddl}")
 
         have = {row[1] for row in cur.execute("PRAGMA table_info(wp_proposal)")}
         if "status_closes" not in have:

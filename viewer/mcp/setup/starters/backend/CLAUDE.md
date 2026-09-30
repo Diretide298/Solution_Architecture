@@ -65,6 +65,12 @@ ADAM is connected for this folder. It holds the contracts, tables and screens; O
    rather than guessing a name or a shape.
    **Read its Comments section too**, the newest last: a clarification or QA's reason for sending
    it back overrides the description where they differ - say so when it does.
+   **Read its Release line too.** ADAM serves the package at a release tag (r1, r2, …) and the first
+   pull pins the ticket to it. If README.md says **Spec changed since you pulled at rA (now rB)**,
+   stop and tell the person: the linked files are still the pinned release, `spec-diff.md` has the
+   diffs, and they choose between taking the change (`adam_repin`) and raising a change request.
+   **Re-pin required** - a breaking contract change on an operation this ticket produces or
+   consumes - is not a choice: say so, then `adam_repin` with `breaking: true` before building.
 2. Build exactly what the ticket and its linked artefacts describe. Nothing outside the ticket.
 3. Add tests for the success case and each error the contract lists. `dotnet test` must pass.
 4. `adam_propose` the ticket: **Ready for QA**, 100% (see the statuses below; never Closed), and a 2-4 line comment on what was built and
@@ -96,7 +102,11 @@ lacks something the ticket needs, **do not settle it in code** - not even with a
 
 1. `adam_changes` for the artefact: somebody may have raised it already. If so, name that CR.
 2. Otherwise `adam_draft_change`: quote the conflicting passages in `evidence`, list the `options`,
-   say which you would pick in `recommendation`, set `blocking` and the `ticket`.
+   say which you would pick in `recommendation`, set `blocking` and the `ticket`. The intake goes
+   with it: `source` is `developer` (the reference defaults to the ticket) unless the person says
+   it came from minutes, a client answer, a design or an audit - then `sourceRef`, and for minutes
+   `clientSignoff`; `triage` and `when` if known; other `artefacts` it touches; `contractImpact`
+   (none, additive, breaking - breaking needs an `approver`); `effortPoints` if the estimate moves.
 3. Show the draft and **wait for a yes** before `adam_raise_change`.
 4. If it blocks the ticket, offer to propose the ticket **On hold** with "Blocked by CR-<n>".
    Build whatever the question does not touch.

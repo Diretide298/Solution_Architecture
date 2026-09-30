@@ -129,7 +129,8 @@ apt-get update -qq
 # sqlite3 is for the nightly snapshot, which uses `.backup` rather than cp —
 # a plain copy of a live database opens and is wrong, which is worse than a
 # file that fails to open.
-apt-get install -y -qq python3 python3-venv python3-pip curl ca-certificates rsync sqlite3
+# git is for the release exports below: a tag is read out of the checkout.
+apt-get install -y -qq python3 python3-venv python3-pip curl ca-certificates rsync sqlite3 git
 
 # Node 22 or newer: the viewer uses node:sqlite and getSetCookie(), and neither
 # exists on the 18 that Debian ships.
@@ -228,6 +229,7 @@ rsync -a --delete \
   --exclude 'api/ticvai.db-shm' \
   --exclude 'api/ticvai.db-wal' \
   --exclude '.versions' \
+  --exclude '.releases' \
   --exclude 'public/offline.html' \
   "$REPO/" "$APP_DIR/viewer/"
 
@@ -294,6 +296,24 @@ PYROOTS
   done <<< "$PKG_ROOTS"
   chown -R "$APP_USER:$APP_USER" "$APP_DIR"
 fi
+
+# ── release tags ────────────────────────────────────────────────────────────
+#
+# ADAM serves a package at its newest release tag (r1, r2, …), not at whatever
+# the working tree holds (council C2, lib/releases.mjs). The deployed viewer has
+# no .git, so the tags are exported here, from the checkout, into
+# $APP_DIR/viewer/.releases/<project>/<tag>/ — once per tag, since a tag does not
+# change, with unchanged files hard-linked to the previous export. The rsync
+# above excludes .releases so --delete cannot take the exports away.
+#
+# No tag yet is not an error: the viewer serves the working-tree copy above,
+# exactly as before, and says so. A tag that fails to export stops the deploy,
+# because the viewer would otherwise go on serving the previous release while
+# everybody believed the new one was out.
+say "Release tags"
+node "$REPO/deploy/export-releases.mjs" --source "$REPO" --viewer "$APP_DIR/viewer" \
+  || die "a release tag could not be exported. The previous exports are untouched; fix this and deploy again."
+[[ -d "$APP_DIR/viewer/.releases" ]] && chown -R "$APP_USER:$APP_USER" "$APP_DIR/viewer/.releases"
 
 # ── the packages ────────────────────────────────────────────────────────────
 #
@@ -627,6 +647,20 @@ cannot run, and an empty list would pass it silently."
  deploy/nginx/adamapi.ainfinite.ai."
   note "nginx forwards every package route server.mjs owns"
 fi
+
+# Which release each package is being served at, as the viewer decided it on
+# start (it writes served.json before it builds anything). Said here so the
+# person deploying reads "serving r3" or "working tree" rather than assuming.
+for served in "$APP_DIR"/viewer/.releases/*/served.json; do
+  [[ -f "$served" ]] || continue
+  note "$(python3 - "$served" <<'PYSERVED'
+import json, sys
+d = json.load(open(sys.argv[1], encoding="utf-8"))
+what = ("release %s (%s)" % (d.get("tag"), (d.get("commit") or "")[:10])) if d.get("mode") == "tag" else "the working tree"
+print("%s is served at %s%s" % (d.get("project"), what, (" - " + d["problem"]) if d.get("problem") else ""))
+PYSERVED
+)"
+done
 
 # The gate, asserted rather than assumed. TICVAI_NO_GATE serves the whole
 # package to anyone who asks; it exists for a workstation and must never be set

@@ -38,6 +38,34 @@ The first run pauses once to ask for a password for the admin account. It does
 not take one as a flag, because a password given as an argument sits in the
 shell history and in `ps` for as long as the command runs.
 
+## Release tags: what the viewer serves
+
+Since 1 October (council C2) ADAM serves each package at its **newest release tag** — `r1`, `r2`,
+… in the repository — and not at whatever the checkout's working tree holds, so the spec stops
+moving under a developer every time somebody saves a file. A release is a tag:
+
+```
+git tag -a r3 -m "r3" && git push origin r3 && git push github r3
+```
+
+The deployed viewer has no `.git`, so the deploy exports each tag from the checkout into
+`/srv/ticvai/viewer/.releases/<project>/<tag>/` (`deploy/export-releases.mjs`, the same code the
+viewer uses on a workstation). A tag is exported once and never rewritten; a file unchanged since
+an earlier release is a hard link to it, so a release costs what changed. The mirrors under
+`repos/<repo>/` are left out apart from `.github`, `terraform`, `apps` and `openapi` — they are
+generated copies of the package, 4 GB of its 4.8, and carry the same tag in their own repositories.
+The rsync of the viewer excludes `.releases`, so `--delete` cannot take the exports away.
+
+On start the viewer serves the newest exported tag and writes `served.json` beside the exports; the
+deploy prints it (`ticvai is served at release r3 (…)`). While there is no tag it serves the
+working-tree copy in `/srv/ticvai/ticvai`, exactly as before. `packageRef` on a project in
+`projects.json` (or `ADAM_PACKAGE_REF` in the environment) overrides the choice: `latest` (the
+default), `working`, or one tag such as `r2` to roll back. A new tag is a deploy: the viewer decides
+at start and does not watch an export.
+
+The accounts service reads `served.json` to record the tag a `/ticket` pull saw, and `index.json`
+to date tags for the release notes. See `api/README.md`.
+
 ## What ends up running
 
 Two processes, two ports, kept alive by PM2.

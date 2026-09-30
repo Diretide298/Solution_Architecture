@@ -31,6 +31,7 @@
     "ask": [
       "mcp__adam__adam_apply",
       "mcp__adam__adam_raise_change",
+      "mcp__adam__adam_repin",
       "mcp__adam__adam_link",
       "Bash(git push:*)"
     ],

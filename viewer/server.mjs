@@ -38,6 +38,9 @@ import { buildCicd } from './lib/cicd.mjs';
 import { buildChronology } from './lib/build.mjs';
 import { buildUiux } from './lib/uiux.mjs';
 import { buildSearch } from './lib/search.mjs';
+import { splitDetail } from './lib/detail.mjs';
+import { resolveRelease, writeServed, describeRelease, releaseRoot, TAG as RELEASE_TAG } from './lib/releases.mjs';
+import { buildView, diffTicket } from './lib/release-diff.mjs';
 // The connector's own manifest, so the two sides compute the build the same
 // way rather than agreeing by coincidence.
 import { buildOf as connectorBuild, filesOf as connectorFiles } from './mcp/version.mjs';
@@ -213,7 +216,16 @@ function newPackage(project) {
   return {
     id: project.id,
     name: project.name,
+    // What is read. The working tree, or a release tag's export — decided at
+    // startup from packageRef (lib/releases.mjs) and fixed for the life of the
+    // process: a new tag is a deploy, and a deploy restarts this.
     root: project.root,
+    /** the package as registered: the working tree, and the repository tags come from */
+    sourceRoot: project.root,
+    /** which release is served, from resolveRelease; `mode` is 'tag' or 'working' */
+    release: null,
+    /** tag -> Promise<view> of an older release, for diffs; the last one only */
+    views: new Map(),
     contracts: project.contracts,
     index: null,
     indexSlim: null,
@@ -292,27 +304,8 @@ function resolveRoute(pathname) {
 // and the client merges them back into the node it already has. What arrives
 // at boot is what the tree, the graph and the search need — names, kinds,
 // files and counts — and nothing that only a detail view will ask for.
-// Held out of the slim index and served per contract: an operation's parameters,
-// responses and request body are what `adam_contract` with `operation` returns.
-const DETAIL_FIELDS = ['description', 'properties', 'parameters', 'responses', 'requestBody', 'body', 'security', 'extensions'];
-
-function splitDetail(full) {
-  const slim = { ...full, nodes: [] };
-  const byFile = new Map();
-  for (const node of full.nodes) {
-    const lean = {};
-    const heavy = {};
-    for (const [key, value] of Object.entries(node)) {
-      if (DETAIL_FIELDS.includes(key)) heavy[key] = value;
-      else lean[key] = value;
-    }
-    slim.nodes.push(lean);
-    if (!Object.keys(heavy).length) continue;
-    if (!byFile.has(node.file)) byFile.set(node.file, {});
-    byFile.get(node.file)[node.id] = heavy;
-  }
-  return { slim, byFile };
-}
+// DETAIL_FIELDS and splitDetail live in lib/detail.mjs, which a release view
+// shares.
 
 /**
  * Rebuild one package.
@@ -1013,6 +1006,69 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
+    // ── which release this is, and what changed between two ─────────────
+    //
+    // `release` is the tag being served and every other one, so a connector can
+    // say which state of the package a pulled file is from. Small, and never
+    // cached: it changes only on a restart, and a stale answer here is the one
+    // mistake the whole release arrangement exists to prevent.
+    if (route === 'release') {
+      return send(res, 200, JSON.stringify({
+        project: pkg.id, ...describeRelease(pkg.release),
+      }), MIME['.json']);
+    }
+
+    // One ticket's artefacts at two tags: `from` (its pin) and `to` (default:
+    // the tag being served), with `touch=kind:id` for each linked artefact and
+    // `records=1` to carry both records back. See lib/release-diff.mjs.
+    if (route === 'release-diff') {
+      const release = pkg.release;
+      const from = url.searchParams.get('from') ?? '';
+      const to = url.searchParams.get('to') || release.tag || '';
+      const bad = (status, error) => send(res, status, JSON.stringify({ error }), MIME['.json']);
+      if (!RELEASE_TAG.test(from) || !RELEASE_TAG.test(to)) {
+        return bad(400, 'from and to are release tags, r1 and up'
+          + (release.mode === 'tag' ? '' : ' — and this package is being served from its working tree, with no tag to compare against'));
+      }
+      const touches = url.searchParams.getAll('touch').slice(0, 300).map((t) => {
+        const at = t.indexOf(':');
+        return at > 0 ? { kind: t.slice(0, at).toLowerCase(), id: t.slice(at + 1) } : null;
+      }).filter((t) => t && t.id);
+      const viewOf = async (tag) => {
+        if (tag === release.tag && release.mode === 'tag') {
+          if (!pkg.index) await refreshIndex(pkg, 'on demand');
+          return pkg;
+        }
+        if (!pkg.views.has(tag)) {
+          pkg.views.set(tag, (async () => {
+            const root = await releaseRoot(release, pkg.sourceRoot, tag);
+            return root ? buildView(root, pkg.contracts) : null;
+          })().catch((error) => { pkg.views.delete(tag); throw error; }));
+          // One only: a view of the TICVAI package is ~2.5 s to build and a few
+          // hundred MB to hold, and pins cluster on the release before the one
+          // served, so the one kept is nearly always the one asked for.
+          while (pkg.views.size > 1) pkg.views.delete(pkg.views.keys().next().value);
+        }
+        return pkg.views.get(tag);
+      };
+      const [older, newer] = await Promise.all([viewOf(from), viewOf(to)]);
+      const gone = [[from, older], [to, newer]].filter(([, v]) => !v).map(([t]) => t);
+      if (gone.length) {
+        return bad(409, `${gone.join(' and ')} ${gone.length > 1 ? 'are' : 'is'} not available here: `
+          + 'not a release tag of this package, or not exported and no repository to export it from');
+      }
+      const tagInfo = (tag) => {
+        const r = release.releases.find((x) => x.tag === tag);
+        return { tag, commit: r?.commit ?? null, taggedAt: r?.taggedAt ?? null };
+      };
+      const answer = await diffTicket({
+        older, newer, touches, records: url.searchParams.get('records') === '1',
+      });
+      return send(res, 200, JSON.stringify({
+        project: pkg.id, from: tagInfo(from), to: tagInfo(to), served: release.tag, ...answer,
+      }), MIME['.json']);
+    }
+
     if (route === 'index') {
       if (!pkg.index) await refreshIndex(pkg, 'on demand');
       const { index, indexSlim } = pkg;
@@ -1517,6 +1573,31 @@ defaultProjectId = registry.defaultId;
 for (const project of registry.projects) {
   if (project.active) packages.set(project.id, newPackage(project));
 }
+
+// ---- which release each package serves ---------------------------------------
+// Before anything is built, because it decides the root everything is built
+// from. The newest r<N> tag by default; the working tree while there is none, or
+// when packageRef / ADAM_PACKAGE_REF says `working`. What was chosen is written
+// to <releases>/served.json, which is how the accounts service learns the tag a
+// `/ticket` pull records.
+for (const pkg of packages.values()) {
+  const project = registry.projects.find((p) => p.id === pkg.id);
+  try {
+    pkg.release = await resolveRelease(project, {
+      log: (line) => console.log(`[${pkg.id}] ${line}`),
+    });
+  } catch (error) {
+    pkg.release = {
+      mode: 'working', tag: null, commit: null, taggedAt: null, root: project.root,
+      ref: project.packageRef ?? 'latest', releasesDir: project.releases, releases: [],
+      repo: null, problem: `could not resolve a release: ${error.message}; serving the working tree`,
+    };
+  }
+  pkg.root = pkg.release.root;
+  if (pkg.release.problem) console.warn(`[${pkg.id}] ${pkg.release.problem}`);
+  await writeServed(project, pkg.release)
+    .catch((error) => console.warn(`[${pkg.id}] could not write served.json: ${error.message}`));
+}
 if (!packages.size) {
   console.warn('[projects] nothing is registered — every package read will 404');
 }
@@ -1545,6 +1626,11 @@ const WATCHABLE = /\.(ya?ml|xlsx|md|html?|json|csv)$/i;
 const watching = new Map();
 for (const pkg of packages.values()) {
   const watched = [];
+  // A release tag's export never changes, so there is nothing to watch.
+  if (pkg.release?.mode === 'tag') {
+    watching.set(pkg.id, watched);
+    continue;
+  }
   // The contracts folder is per package, so it comes off the package rather
   // than off a flag that could only ever describe one of them.
   for (const dir of [pkg.contracts, ...WATCH_DIRS]) {
@@ -1569,6 +1655,9 @@ server.listen(args.port, args.host, () => {
   console.log(`\n  Adam package viewer  →  ${url}`);
   for (const pkg of packages.values()) {
     console.log(`  ${pkg.id.padEnd(14)} ${pkg.root}`);
+    console.log(`  ${''.padEnd(14)} ${pkg.release?.mode === 'tag'
+      ? `release ${pkg.release.tag} (${String(pkg.release.commit ?? '').slice(0, 10)})`
+      : `working tree${pkg.release?.note ? ` — ${pkg.release.note}` : ''}`}`);
     console.log(`  ${''.padEnd(14)} /pkg/${pkg.id}/… · watching `
       + `${(watching.get(pkg.id) ?? []).length} folders`
       + `${pkg.id === defaultProjectId ? ' · answers /api/* as well' : ''}`);

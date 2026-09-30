@@ -148,6 +148,38 @@ to *see*:
 | lead | `unpicked-in-scope` — their own platforms only. They can read every request; being told about all of them would make the bell useless in a week. |
 | everybody else | nothing. The changes page still shows all of it. |
 
+## Releases, pins and change request intake
+
+Plan item 1D (council C2, C9 and C8, 1 October).
+
+**The tag in force is the viewer's to say.** The viewer serves each package at its newest release
+tag, `r1`, `r2`, … (`viewer/lib/releases.mjs`), and on start writes what it chose to
+`<releases>/served.json`, beside `<releases>/index.json` listing every tag with its date.
+`<releases>` is the project's `releases` entry in `projects.json`, `.releases/<id>` beside it when
+there is none; `api/releases.py` reads both files and nothing else about the package.
+
+**A pin is per person and ticket** (`ticket_pin`, and `ticket_pin_log` for every move). The first
+`/ticket` pull records the tag in `served.json`; the caller never supplies one, so a pin says what
+was actually served. While the viewer serves its working tree there is no tag and nothing is
+recorded — the pull says so. A re-pin (`accept`, or `breaking` when a breaking contract change made
+it required) moves the pin to the tag in force. The connector works out what changed and whether the
+re-pin is required, from the viewer's `release-diff`; this service only holds the pin.
+
+**Intake.** A change request carries `source` (minutes, answer, design, developer, audit) with
+`source_ref`, the line that finds it again; `approver`; `triage` (clarification, scope, defect) and
+`when` (now, later); `artefact_ids`; `contract_impact` (none, additive, breaking);
+`effort_points`, signed; `client_signoff`; and `raised_tag`, the release the person raising it was
+on (their pin on the ticket, else the tag served). All optional at the door, so every caller from
+before still files — but once a source is given the rest of what it needs is required: a reference
+for any source but a developer's (which defaults to `#<ticket>`, and otherwise is the person and
+moment the row already records), the client's sign-off for minutes, and an approver for a breaking
+change. The connector always sends a source, `developer` by default. The
+ticket filed from a request carries its intake in its description.
+
+**Release notes** are the requests accepted or done after `from` was tagged and no later than `to`,
+compared as instants (git writes the tagger's offset, this service writes UTC). `to` defaults to
+the tag served; no `from` means everything up to `to`.
+
 ## Why invites rather than signup
 
 Restricting signup to `@softlabsgroup.com` only checks the address a stranger
@@ -208,6 +240,10 @@ verdict on an artefact is simply its newest row.
 | `DELETE /api/scopes/{id}` | **owner only.** Take one back. |
 | `POST /api/changes/import/preview` | admin only. What an edited change request file would settle. Writes nothing. |
 | `POST /api/changes/import/apply` | admin only. Settles it, on the preview's checksum. |
+| `GET /api/work-packages/{key}/pin` | the release tag you pulled a ticket at, the one being served, and the pin's history |
+| `POST /api/work-packages/{key}/pin` | `reason: pull` records the tag in force if there is no pin; `accept` / `breaking` move it to the tag in force |
+| `POST /api/changes/{n}/intake` | complete or correct a request's intake. Whoever may settle it, or its raiser while open |
+| `GET /api/changes/release-notes` | `from` / `to` release tags: the requests settled (accepted or done) between them, with a markdown note |
 
 A target is `operation`, `table`, `screen` or `board`. A verdict is `approved`,
 `rejected` or `needs-work`.
@@ -302,6 +338,18 @@ on a lead's platform before asserting they are told about it — without that th
 assertion passes against a lead who is told nothing at all, which is the wrong
 product and the easiest way for a check like this to look green while the bell
 is broken.
+
+`release-check.mjs` — 70 assertions over release tags, ticket pins, the diff since a pin and
+change request intake. **Self-contained**: it builds a throwaway git repository with tags `r1` and
+`r2` and an unreleased edit on top, starts its own stand-in OpenProject, accounts service and viewer
+on ports 8871-8873, and restarts the viewer the way a deploy does — working tree, then r1, then r2.
+It asserts the working tree is never what a tag serves, that the second export links rather than
+copies, that a breaking change makes the re-pin required for the producer and the consumer and for
+nobody else, and that the release note is exactly what was settled between the two tags.
+
+```bash
+node api/release-check.mjs
+```
 
 `changes-import-check.mjs` — 52 assertions over the change request round trip,
 most of them about the half that does not write: a rejection with no reason, a

@@ -32,7 +32,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from . import db, decisions, llm, netaddr, openproject, secrets, security
+from . import db, decisions, llm, netaddr, openproject, releases, secrets, security
 
 app = FastAPI(
     title="TICVAI viewer — accounts and validation",
@@ -2002,6 +2002,113 @@ def read_work_package(
     return {"workPackage": found, "touches": [_link_row(r)["target"] for r in rows]}
 
 
+# ── which release a ticket is being built against ────────────────────
+#
+# ADAM serves the package at its newest release tag (viewer/lib/releases.mjs).
+# The first `/ticket` pull records the tag in force; every pull after that shows
+# what changed between it and the tag being served; the developer either accepts
+# the change — moves the pin to the served tag — or raises a change request. A
+# breaking contract change makes the move required for the tickets that produce
+# or consume that operation. The connector works out which (it holds the diff);
+# this holds the pin and its history.
+#
+# **The tag is never the caller's to say.** A pull records the tag in
+# served.json and a re-pin moves to it. A pin somebody could set to anything
+# would not say what they were building against.
+
+PIN_REASONS = ("pull", "accept", "breaking")
+
+
+class PinIn(BaseModel):
+    project_id: str = ""
+    # `pull` records the tag in force if there is no pin yet and otherwise
+    # changes nothing; `accept` and `breaking` move the pin to the tag in force.
+    reason: str = "pull"
+    note: str = Field(default="", max_length=1000)
+
+
+def _pin_state(account_id: int, project: str, number: str) -> dict:
+    row = db.one(
+        "SELECT * FROM ticket_pin WHERE account_id = ? AND project_id = ? AND external_key = ?",
+        (account_id, project, number))
+    current = releases.served(project)
+    pin = None if not row else {
+        "tag": row["tag"], "commit": row["commit_sha"],
+        "pinnedAt": row["pinned_at"], "updatedAt": row["updated_at"],
+    }
+    log = db.all_rows(
+        "SELECT from_tag, to_tag, reason, note, at FROM ticket_pin_log "
+        "WHERE account_id = ? AND project_id = ? AND external_key = ? ORDER BY id DESC LIMIT 20",
+        (account_id, project, number))
+    return {
+        "ticket": number,
+        "project": project,
+        "pin": pin,
+        # None while the viewer serves its working tree: there is no release to
+        # pin to, and a pull then says so rather than recording nothing silently.
+        "current": current,
+        "stale": bool(pin and current and pin["tag"] != current["tag"]),
+        "log": [{"from": r["from_tag"], "to": r["to_tag"], "reason": r["reason"],
+                 "note": r["note"], "at": r["at"]} for r in log],
+    }
+
+
+@app.get("/api/work-packages/{key}/pin")
+def read_pin(key: str, project_id: str = Query(default=""),
+             account: dict = Depends(require_account)):
+    """The release this person pulled the ticket at, and the one being served."""
+    number = _work_package_key(key)
+    project = _readable_project(account, project_id)
+    return _pin_state(account["id"], project, number)
+
+
+@app.post("/api/work-packages/{key}/pin")
+def set_pin(key: str, body: PinIn, account: dict = Depends(require_account)):
+    """Record the tag a ticket was pulled at, or move it to the tag in force.
+
+    No OpenProject read: the pull that calls this has just read the work
+    package, and a pin is this person's own note about their own work — it
+    changes nothing anybody else sees.
+    """
+    number = _work_package_key(key)
+    project = _readable_project(account, body.project_id)
+    reason = body.reason.strip().lower()
+    if reason not in PIN_REASONS:
+        raise HTTPException(400, f"reason is one of {', '.join(PIN_REASONS)}.")
+    current = releases.served(project)
+    if not current:
+        return {**_pin_state(account["id"], project, number), "recorded": False,
+                "note": "ADAM is serving the package's working tree, not a release tag, so there "
+                        "is nothing to pin to yet. The first release (r1) starts pinning."}
+    row = db.one(
+        "SELECT * FROM ticket_pin WHERE account_id = ? AND project_id = ? AND external_key = ?",
+        (account["id"], project, number))
+    if reason == "pull" and row:
+        return {**_pin_state(account["id"], project, number), "recorded": False}
+    if reason != "pull" and row and row["tag"] == current["tag"]:
+        return {**_pin_state(account["id"], project, number), "recorded": False,
+                "note": f"Already pinned at {current['tag']}, the release being served."}
+
+    now = security.stamp()
+    with db.cursor(commit=True) as cur:
+        if row:
+            cur.execute(
+                "UPDATE ticket_pin SET tag = ?, commit_sha = ?, updated_at = ? WHERE id = ?",
+                (current["tag"], current["commit"], now, row["id"]))
+        else:
+            # OR IGNORE: two pulls of one ticket at once record one pin, not an error.
+            cur.execute(
+                "INSERT OR IGNORE INTO ticket_pin (account_id, project_id, external_key, tag, "
+                "commit_sha, pinned_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (account["id"], project, number, current["tag"], current["commit"], now, now))
+        cur.execute(
+            "INSERT INTO ticket_pin_log (account_id, project_id, external_key, from_tag, to_tag, "
+            "reason, note, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (account["id"], project, number, row["tag"] if row else "", current["tag"],
+             reason, body.note.strip(), now))
+    return {**_pin_state(account["id"], project, number), "recorded": True}
+
+
 # **A board reads in the order the work is finished in, and the same way every time.** It used to come
 # back newest-updated first, so a comment, a push or a status change elsewhere reshuffled it, and a
 # pull of "my next 15" pulled a different 15 on each ask. The order now:
@@ -2099,6 +2206,13 @@ def my_board(
     items = _completion_order(items, by_key)
     position = {item["key"]: n for n, item in enumerate(items, 1)}
 
+    # The release each ticket was pulled at, by this person. One query; a ticket
+    # never pulled has none, which the board shows as blank rather than guessing.
+    pins = {row["external_key"]: row["tag"] for row in db.all_rows(
+        "SELECT external_key, tag FROM ticket_pin WHERE account_id = ? AND project_id = ?",
+        (account["id"], scope["project"]))}
+    served = releases.served(scope["project"])
+
     def dressed(item: dict) -> dict:
         module = _module_of(item["key"], by_key) if tree_read else None
         return {
@@ -2106,6 +2220,11 @@ def my_board(
             # Its place in the order above, counted from 1, so the reader can see the board is ordered.
             "position": position[item["key"]],
             "touches": touching.get(item["key"], []),
+            # The tag this person pulled it at, and whether the served release
+            # has moved on since — the cue to pull it again and read the diff.
+            "pin": pins.get(item["key"]),
+            "pinStale": bool(served and pins.get(item["key"])
+                             and pins[item["key"]] != served["tag"]),
             # The top of the tree, which is the epic or module this is from.
             # Null when the ticket is itself top-level, which is a real answer.
             "module": None if not module else {
@@ -2124,6 +2243,8 @@ def my_board(
         # Said out loud when the tree could not be read, so a board where every
         # module reads "none" is not mistaken for a project with no epics.
         "modulesKnown": tree_read,
+        # The release tag ADAM is serving, or None for the working tree.
+        "release": served,
         "openproject": {
             "id": scope["pmsId"],
             "identifier": scope["pmsIdentifier"],
@@ -3917,6 +4038,34 @@ class ChangeIn(BaseModel):
     # means. See _clean_change.
     tag: str = Field(default="", max_length=20)
     platform: str = Field(default="", max_length=20)
+    # ---- intake (council C8). All optional here, so every caller that filed a
+    # request before intake existed still can; the rules that tie them together
+    # are in _clean_intake. The connector always sends `source`.
+    source: str = Field(default="", max_length=20)
+    source_ref: str = Field(default="", max_length=300)
+    approver: str = Field(default="", max_length=200)
+    triage: str = Field(default="", max_length=20)
+    when: str = Field(default="", max_length=10)
+    artefacts: List[str] = Field(default_factory=list, max_length=50)
+    contract_impact: str = Field(default="", max_length=20)
+    effort_points: Optional[float] = None
+    client_signoff: str = Field(default="", max_length=300)
+
+
+class IntakeIn(BaseModel):
+    """The intake of a request already filed, completed or corrected by whoever
+    triages it. A field left out (None) is left as it is."""
+    project_id: str = ""
+    source: Optional[str] = Field(default=None, max_length=20)
+    source_ref: Optional[str] = Field(default=None, max_length=300)
+    approver: Optional[str] = Field(default=None, max_length=200)
+    triage: Optional[str] = Field(default=None, max_length=20)
+    when: Optional[str] = Field(default=None, max_length=10)
+    artefacts: Optional[List[str]] = Field(default=None, max_length=50)
+    contract_impact: Optional[str] = Field(default=None, max_length=20)
+    effort_points: Optional[float] = None
+    clear_effort: bool = False
+    client_signoff: Optional[str] = Field(default=None, max_length=300)
 
 
 class FileIn(BaseModel):
@@ -3994,6 +4143,111 @@ def _clean_change(body: ChangeIn) -> dict:
     }
 
 
+# ── intake: where a change came from, and what it costs ──────────────
+#
+# Council C8, 1 October: a change reaches the package through one door, the
+# propose-then-confirm request, and the door records its provenance. Where it
+# came from and the line that finds it again; who approved it; whether it is a
+# clarification, a change of scope or a defect, and whether it is for now or
+# later; every artefact it touches; whether it changes a contract compatibly or
+# not; what it does to the effort; and, when it came out of a meeting, who on
+# the client's side signed it off — a minute records what was said, not what
+# was agreed.
+
+SOURCES = ("minutes", "answer", "design", "developer", "audit")
+TRIAGE_CLASSES = ("clarification", "scope", "defect")
+TRIAGE_WHEN = ("now", "later")
+CONTRACT_IMPACTS = ("none", "additive", "breaking")
+
+
+def _clean_intake(values: dict, ticket: str = "") -> dict:
+    """Checks the intake fields together. `values` holds the raw strings.
+
+    Blank everywhere is allowed and stays blank — the page files without them,
+    and so did everything before 1 October. Once a source is given, the rest of
+    what that source needs is required: a reference line for any source but a
+    developer (whose defaults to the ticket), a client sign-off for minutes, and
+    an approver for a breaking contract change.
+    """
+    def word(name: str, allowed: tuple) -> str:
+        value = str(values.get(name) or "").strip().lower()
+        if value and value not in allowed:
+            raise HTTPException(400, f"{name} is one of {', '.join(allowed)}, or left out.")
+        return value
+
+    source = word("source", SOURCES)
+    triage = word("triage", TRIAGE_CLASSES)
+    when = word("when", TRIAGE_WHEN)
+    impact = word("contract_impact", CONTRACT_IMPACTS)
+    ref = str(values.get("source_ref") or "").strip()
+    if source == "developer" and not ref and ticket:
+        ref = f"#{ticket}"
+    # A developer's gap is found by the person filing it, whose name and moment
+    # the row already records; every other source is somewhere else, and the
+    # line that finds it again is the whole of its provenance.
+    if source and source != "developer" and not ref:
+        raise HTTPException(400, (
+            "Say where it came from: source_ref is the line that finds it again — "
+            "'MoM 30 Sep, item 4', a question id, a board, an audit finding, a ticket."))
+    approver = str(values.get("approver") or "").strip()
+    if impact == "breaking" and not approver:
+        raise HTTPException(400, (
+            "A breaking contract change needs an approver: it moves every producer and "
+            "consumer of the operation onto the new release, and somebody has to have agreed that."))
+    signoff = str(values.get("client_signoff") or "").strip()
+    if source == "minutes" and not signoff:
+        raise HTTPException(400, (
+            "A change from meeting minutes needs the client's sign-off — who agreed it and "
+            "where. A minute records what was said, not what was agreed."))
+    effort = values.get("effort_points")
+    if effort is not None:
+        try:
+            effort = round(float(effort), 2)
+        except (TypeError, ValueError):
+            raise HTTPException(400, "effort_points is a number of points, signed: 3, -2, 0.5.")
+        if effort != effort or abs(effort) > 1000:
+            raise HTTPException(400, "effort_points is between -1000 and 1000.")
+    artefacts = []
+    for item in values.get("artefacts") or []:
+        text = str(item or "").strip()
+        if not text:
+            continue
+        if len(text) > 300:
+            raise HTTPException(400, "Keep each artefact id under 300 characters.")
+        if text not in artefacts:
+            artefacts.append(text)
+    return {
+        "source": source, "source_ref": ref, "approver": approver,
+        "triage": triage, "triage_when": when, "artefact_ids": artefacts,
+        "contract_impact": impact, "effort_points": effort, "client_signoff": signoff,
+    }
+
+
+def _raised_tag(account_id: int, project: str, ticket: str) -> str:
+    """The release the person raising it was on: their pin on the ticket it came
+    out of, otherwise the tag being served, otherwise nothing yet."""
+    if ticket:
+        row = db.one(
+            "SELECT tag FROM ticket_pin WHERE account_id = ? AND project_id = ? AND external_key = ?",
+            (account_id, project, ticket))
+        if row:
+            return row["tag"]
+    served = releases.served(project)
+    return served["tag"] if served else ""
+
+
+def _clean_change_with_intake(body: ChangeIn, account: dict, project: str) -> dict:
+    fields = _clean_change(body)
+    fields.update(_clean_intake({
+        "source": body.source, "source_ref": body.source_ref, "approver": body.approver,
+        "triage": body.triage, "when": body.when, "artefacts": body.artefacts,
+        "contract_impact": body.contract_impact, "effort_points": body.effort_points,
+        "client_signoff": body.client_signoff,
+    }, fields["ticket"]))
+    fields["raised_tag"] = _raised_tag(account["id"], project, fields["ticket"])
+    return fields
+
+
 _CHANGE_SELECT = (
     "SELECT c.*, r.name AS raised_by_name, r.email AS raised_by_email, "
     "s.name AS resolved_by_name, p.name AS picked_by_name "
@@ -4054,7 +4308,26 @@ def _change_row(row) -> dict:
         "resolvedRef": row["resolved_ref"],
         "resolvedBy": row["resolved_by_name"],
         "resolvedAt": row["resolved_at"],
+        # Intake (C8). Blank on a request raised before it existed.
+        "source": row["source"],
+        "sourceRef": row["source_ref"],
+        "approver": row["approver"],
+        "triage": row["triage"],
+        "when": row["triage_when"],
+        "artefacts": _json_list(row["artefact_ids"]),
+        "contractImpact": row["contract_impact"],
+        "effortPoints": row["effort_points"],
+        "clientSignoff": row["client_signoff"],
+        "raisedTag": row["raised_tag"],
     }
+
+
+def _json_list(value) -> list:
+    try:
+        found = json.loads(value or "[]")
+    except ValueError:
+        return []
+    return found if isinstance(found, list) else []
 
 
 def _open_on_target(project: str, kind: str, target: str) -> list:
@@ -4070,17 +4343,27 @@ def _file_change(project: str, fields: dict, account: dict, via: str) -> dict:
     # The number and the row in one statement, so two filings at once cannot
     # take the same number.
     with db.cursor(commit=True) as cur:
+        # The intake columns with .get: a draft kept from before intake existed
+        # carries none of them, and filing it after the deploy must still work.
         cur.execute(
             "INSERT INTO change_request (project_id, number, target_kind, target_id, title, "
             "problem, evidence, options, recommendation, blocking, external_key, status, "
-            "raised_by, raised_at, raised_via, tag, platform) "
-            "SELECT ?, COALESCE(MAX(number), 0) + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ? "
+            "raised_by, raised_at, raised_via, tag, platform, source, source_ref, approver, "
+            "triage, triage_when, artefact_ids, contract_impact, effort_points, client_signoff, "
+            "raised_tag) "
+            "SELECT ?, COALESCE(MAX(number), 0) + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?, "
+            "?, ?, ?, ?, ?, ?, ?, ?, ?, ? "
             "FROM change_request WHERE project_id = ?",
             (project, fields["target_kind"], fields["target_id"], fields["title"],
              fields["problem"], fields["evidence"], json.dumps(fields["options"]),
              fields["recommendation"], int(fields["blocking"]), fields["ticket"],
              account["id"], security.stamp(), via,
-             fields.get("tag", ""), fields.get("platform", ""), project),
+             fields.get("tag", ""), fields.get("platform", ""),
+             fields.get("source", ""), fields.get("source_ref", ""), fields.get("approver", ""),
+             fields.get("triage", ""), fields.get("triage_when", ""),
+             json.dumps(fields.get("artefact_ids") or []), fields.get("contract_impact", ""),
+             fields.get("effort_points"), fields.get("client_signoff", ""),
+             fields.get("raised_tag", ""), project),
         )
         new_id = cur.lastrowid
     return _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (new_id,)))
@@ -4276,6 +4559,137 @@ def overdue_changes(project_id: str = Query(default=""),
     return {"project": project, "afterDays": PICK_SLA_DAYS, "total": len(out), "items": out}
 
 
+def _instant(stamp: Optional[str]):
+    """An ISO 8601 stamp as an aware datetime. git writes the tagger's offset
+    (+05:30) and this service writes UTC, so they are compared as instants, never
+    as text."""
+    if not stamp:
+        return None
+    try:
+        # git may write UTC as `Z`, which Python 3.9's fromisoformat refuses.
+        found = security.parse(stamp[:-1] + "+00:00" if stamp.endswith("Z") else stamp)
+    except (ValueError, TypeError):
+        return None
+    return found if found.tzinfo else found.replace(tzinfo=security.now().tzinfo)
+
+
+@app.get("/api/changes/release-notes")
+def release_notes(project_id: str = Query(default=""),
+                  from_tag: str = Query(default="", alias="from"),
+                  to_tag: str = Query(default="", alias="to"),
+                  account: dict = Depends(require_account)):
+    """The change requests settled between two release tags: the release note.
+
+    **Settled means accepted or done**, at a moment after the earlier tag was
+    made and no later than the later one — what went into the package in that
+    release. `to` defaults to the tag being served; leaving out `from` means
+    everything up to `to`. Tag dates come from the viewer's release index
+    (<releases>/index.json), so a tag the viewer has not seen is refused rather
+    than dated by guesswork.
+    """
+    scope = _change_project(account, project_id)
+    project = scope["project"]
+    known = releases.tags(project)
+    by_tag = {t["tag"]: t for t in known}
+    served = releases.served(project)
+    to = to_tag.strip() or (served["tag"] if served else "") or (known[-1]["tag"] if known else "")
+    start = from_tag.strip()
+    if not to:
+        raise HTTPException(409, "There is no release tag yet, so there is nothing to write a release note for.")
+    for tag in (start, to):
+        if tag and tag not in by_tag:
+            raise HTTPException(404, (
+                f"{tag} is not a release tag ADAM knows for '{project}'. Known: "
+                f"{', '.join(by_tag) or 'none'}."))
+    if start and releases.tag_number(start) >= releases.tag_number(to):
+        raise HTTPException(400, f"from ({start}) has to be an earlier release than to ({to}).")
+    low = _instant(by_tag[start]["taggedAt"]) if start else None
+    high = _instant(by_tag[to]["taggedAt"])
+    if high is None or (start and low is None):
+        raise HTTPException(409, "A release tag has no date in the release index; export it again.")
+
+    items = []
+    for row in db.all_rows(
+            _CHANGE_SELECT + " WHERE c.project_id = ? AND c.status IN ('accepted', 'done') "
+            "AND c.resolved_at IS NOT NULL ORDER BY c.resolved_at, c.number", (project,)):
+        at = _instant(row["resolved_at"])
+        if at is None or at > high or (low is not None and at <= low):
+            continue
+        items.append(_change_row(row))
+
+    def line(c: dict) -> str:
+        bits = [c["status"]]
+        if c["source"]:
+            bits.append(f"{c['source']}: {c['sourceRef']}" if c["sourceRef"] else c["source"])
+        if c["triage"]:
+            bits.append(c["triage"] + (f", {c['when']}" if c["when"] else ""))
+        if c["contractImpact"] and c["contractImpact"] != "none":
+            bits.append(f"contract {c['contractImpact']}")
+        if c["effortPoints"] is not None:
+            bits.append(f"effort {c['effortPoints']:+g} pts")
+        return f"- **{c['id']}** {c['title']} ({'; '.join(bits)})"
+
+    heading = f"# Release {to}" + (f" (since {start})" if start else "")
+    markdown = "\n".join([heading, "",
+                          f"{len(items)} change request{'s' if len(items) != 1 else ''} settled"
+                          + (f" after {start}" if start else "") + f", up to {to}.", ""]
+                         + [line(c) for c in items]) + "\n"
+    return {
+        "project": project,
+        "from": by_tag.get(start) if start else None,
+        "to": by_tag[to],
+        "basis": "accepted or done, settled after `from` was tagged and no later than `to`",
+        "total": len(items),
+        "items": items,
+        "markdown": markdown,
+    }
+
+
+@app.post("/api/changes/{number}/intake")
+def update_intake(number: str, body: IntakeIn, account: dict = Depends(require_account)):
+    """Complete or correct a request's intake. Whoever may settle it, or the
+    person who raised it while it is still open.
+
+    Triage is usually the lead's to decide, not the developer's who found the
+    gap, so the fields can be filled in after filing; the same rules apply to
+    the result as to a new request.
+    """
+    scope = _change_project(account, body.project_id)
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    scopes = _scopes_of(account["id"], scope["project"])
+    own_open = row["raised_by"] == account["id"] and row["status"] == "open"
+    if not (own_open or _may_settle_change(account, scope["role"], scopes, row)):
+        raise HTTPException(403, (
+            f"{number}'s intake is for whoever settles it, or for the person who raised it "
+            f"while it is open."))
+
+    def given(new, old):
+        return old if new is None else new
+
+    merged = _clean_intake({
+        "source": given(body.source, row["source"]),
+        "source_ref": given(body.source_ref, row["source_ref"]),
+        "approver": given(body.approver, row["approver"]),
+        "triage": given(body.triage, row["triage"]),
+        "when": given(body.when, row["triage_when"]),
+        "artefacts": given(body.artefacts, _json_list(row["artefact_ids"])),
+        "contract_impact": given(body.contract_impact, row["contract_impact"]),
+        "effort_points": None if body.clear_effort else given(body.effort_points, row["effort_points"]),
+        "client_signoff": given(body.client_signoff, row["client_signoff"]),
+    }, row["external_key"])
+    db.write(
+        "UPDATE change_request SET source = ?, source_ref = ?, approver = ?, triage = ?, "
+        "triage_when = ?, artefact_ids = ?, contract_impact = ?, effort_points = ?, "
+        "client_signoff = ? WHERE id = ?",
+        (merged["source"], merged["source_ref"], merged["approver"], merged["triage"],
+         merged["triage_when"], json.dumps(merged["artefact_ids"]), merged["contract_impact"],
+         merged["effort_points"], merged["client_signoff"], row["id"]))
+    return {"ok": True, "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],)))}
+
+
 def _days_since(stamp: str) -> int:
     try:
         return max(0, (security.now() - security.parse(stamp)).days)
@@ -4371,7 +4785,8 @@ def read_change(number: str, project_id: str = Query(default=""),
 def raise_change(body: ChangeIn, account: dict = Depends(require_account)):
     """Raise one from the viewer: the person is the one writing it, so no draft."""
     scope = _change_project(account, body.project_id)
-    return {"ok": True, "change": _file_change(scope["project"], _clean_change(body), account, "viewer")}
+    fields = _clean_change_with_intake(body, account, scope["project"])
+    return {"ok": True, "change": _file_change(scope["project"], fields, account, "viewer")}
 
 
 @app.post("/api/changes/drafts")
@@ -4382,7 +4797,7 @@ def draft_change(body: ChangeIn, account: dict = Depends(require_account)):
     before it is filed.
     """
     scope = _change_project(account, body.project_id)
-    fields = _clean_change(body)
+    fields = _clean_change_with_intake(body, account, scope["project"])
     code = security.new_token()
     now = security.now()
     db.write(
@@ -4533,6 +4948,29 @@ def _ticket_text(row) -> str:
                      + "\n".join(f"- {str(o).strip()}" for o in options if str(o).strip()))
     if row["recommendation"].strip():
         parts.append(f"**Recommended**\n\n{row['recommendation'].strip()}")
+    # The intake, when there is one. A request raised before intake existed
+    # reads exactly as it did.
+    intake = []
+    if row["source"]:
+        intake.append(f"- Source: {row['source']}" + (f" — {row['source_ref']}" if row["source_ref"] else ""))
+    if row["triage"]:
+        intake.append(f"- Triage: {row['triage']}" + (f", {row['triage_when']}" if row["triage_when"] else ""))
+    if row["contract_impact"]:
+        intake.append(f"- Contract impact: {row['contract_impact']}"
+                      + (f" (approved by {row['approver']})" if row["approver"] else ""))
+    elif row["approver"]:
+        intake.append(f"- Approved by: {row['approver']}")
+    if row["effort_points"] is not None:
+        intake.append(f"- Effort change: {row['effort_points']:+g} points")
+    if row["client_signoff"]:
+        intake.append(f"- Client sign-off: {row['client_signoff']}")
+    touched = _json_list(row["artefact_ids"])
+    if touched:
+        intake.append(f"- Artefacts: {', '.join(touched)}")
+    if row["raised_tag"]:
+        intake.append(f"- Raised against release {row['raised_tag']}")
+    if intake:
+        parts.append("**Intake**\n\n" + "\n".join(intake))
     where = (f"{TAG_LABEL.get(row['tag'], row['tag'])}"
              + (f" · {row['platform']}" if row["platform"] else "")) if row["tag"] else ""
     tail = f"Raised in ADAM as CR-{row['number']:03d}"
