@@ -56,6 +56,26 @@ NEW_QUESTIONS = [
     ("Tax documents", "VAT return",
      "Do you confirm the VAT 201 box layout, and how sales are attributed to each emirate?", "a",
      "VAT 201 figures prepared by the platform; sales attributed by the venue's location.", "Your tax adviser"),
+    # 1 October: from the ADRs decided that day (0060 availability, 0062 e-invoicing, 0063 encryption and keys).
+    ("Tax documents", "B2C e-invoices",
+     "Are e-invoices to consumers (B2C) outside the first phase of the UAE mandate for you, so only B2B invoices "
+     "go through the provider at launch? (ADR-0062)", "b",
+     "B2B invoices go through the provider; B2C receipts are issued by the platform and can be switched to the "
+     "provider per venue when your mandate covers them.", "Your finance team"),
+    ("Availability", "What 99.99% covers",
+     "Which services does the 99.99% availability commitment cover: the whole platform, or the guest purchase "
+     "and admission path only? And do you accept a separate target per tier (for example 99.99% for purchase and "
+     "admission, 99.9% for back office and reporting)? (ADR-0060)", "a",
+     "Purchase and admission are designed to 99.99%; back office, reporting and AI to 99.9%.", "Your IT owner"),
+    ("Availability", "Zone-redundant hosting cost",
+     "99.99% needs zone-redundant hosting in UAE North: about USD 8,050 a month against about USD 4,530 without "
+     "it. Do you accept that cost for production? (ADR-0060, the Azure cost sheet)", "a",
+     "Production is costed zone-redundant; pre-production is not.", "Your budget owner"),
+    ("Guest data", "Where face templates are stored",
+     "Where may face templates be stored: only inside the facial-reader vendor's system at the venue, or also in "
+     "the platform in UAE North (encrypted, with a key per tenant)? (ADR-0063)", "a",
+     "Templates stay with the reader vendor; the platform keeps only a reference and the guest's consent.",
+     "Your data protection officer"),
     ("Guest data", "Face capture on a notice",
      "May a guest be enrolled for Face Tag on a displayed notice alone, with no action from them, under the "
      "UAE PDPL?", "a",
