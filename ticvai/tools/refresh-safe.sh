@@ -1,30 +1,38 @@
 #!/usr/bin/env bash
 # Run tools/refresh.sh in a throwaway git worktree, check it, and only then bring it home.
 #
-# **Council item C1 (1 October).** A refresh rewrites a few thousand files over about an hour.
+# **Council item C1 (1 October).** A refresh rewrites a few thousand files (38 minutes traced on
+# 1 October, then about 16 minutes of checks, check-package alongside).
 # Run in the main tree, an interrupted or failing refresh leaves it half-derived -- the screens
 # rewritten and the index not, the mirrors one run behind -- while designers and agents are
 # reading it. So the refresh runs somewhere else:
 #
 #   1. refuse if ticvai/ holds uncommitted AUTHORED changes (listed), unless --include-working,
-#      which copies them into the worktree. Uncommitted DERIVED files (a step writes them and no
-#      step reads them first -- tools/refresh-manifest.py classify) are regenerated, not refused.
+#      which copies them into the worktree. Uncommitted DERIVED files (a step writes them and does
+#      not edit them in place; the mirrors -- tools/refresh-manifest.py classify) are regenerated,
+#      not refused. With no manifest, everything uncommitted counts as authored.
 #   2. `git worktree add --detach` at HEAD, under the worktree dir (not inside the repository);
 #      the gitignored inputs some tools read (_dump/, the large design files under sources/) are
 #      copied in; every file's mtime is set to one instant so check-package's staleness rule
 #      measures the refresh, not the order git checked files out in.
 #   3. run refresh.sh there -- a copy generated from it by tools/refresh-manifest.py, identical
-#      except that it cds into the worktree and leaves run-checks to step 4.
+#      except that it cds into the worktree, leaves run-checks to step 4, and captures the verdict
+#      of refresh.sh's closing tools/ coverage block instead of exiting on it.
 #   4. run every checker in run-checks.py and judge against tools/refresh-safe-baseline.json:
-#      a gating checker may fail only with error lines the baseline already names. check-bindings
-#      and the other REPORT_ONLY checkers never gate. No NEW failure = pass.
+#      a gating checker may fail only with error lines the baseline already names (check-package:
+#      the two build-readiness-21-september.md errors; check-authored-inputs: the seven stale
+#      inputs); the tools/ coverage block only on the tools the baseline lists. check-bindings and
+#      the other REPORT_ONLY checkers never gate. No NEW failure = pass.
 #   5. on pass only: copy the worktree's changes to ticvai/ in the main tree -- added, modified
 #      and deleted files, never gitignored files, never repos/*/.git -- after checking that
 #      nothing the refresh changed was also changed in the main tree meanwhile (conflict: nothing
 #      is copied), and that no authored input moved under it (drift: nothing is copied unless
 #      --allow-drift). Files the refresh rewrote identically get the worktree's mtime too.
-#   6. always: the worktree is removed (trap on EXIT/INT/TERM, which also kills the running
+#   6. always: the worktree is removed (trap on EXIT/INT/TERM/HUP, which also kills the running
 #      step's process tree). A run killed so hard the trap never ran is removed by the next run.
+#      Stop a run with Ctrl-C or `kill -TERM <pid>`: a run started in the background BY A SCRIPT
+#      has SIGINT ignored from birth (a bash rule for asynchronous commands), so only TERM reaches
+#      it there.
 #
 # **--changed PATH... runs only the steps downstream of PATH** (council item C15), using
 # handoff/refresh-manifest.json (C13): a step runs when it reads something changed, and what it
@@ -35,6 +43,16 @@
 #     **  RELEASE TAG. The manifest is measured from one traced run: a branch that run did   **
 #     **  not take, or a step whose confidence is low, can be missed by --changed.           **
 #     ****************************************************************************************
+#
+# **--changed assumes HEAD's derived files are a full refresh of HEAD's inputs.** Where commits
+# since the last full refresh changed inputs (a contract committed without a refresh), pass
+# --since <that commit> so those paths count as changed too -- otherwise the checks fail on the
+# unrefreshed inputs (seen 1 October: a screen-scoped run on a HEAD holding four new, never-
+# refreshed contract operations failed check-package and eight other gates, and did not merge).
+#
+# Most of the refresh is downstream of the screens: a change to one screen file still reaches 43
+# of the 61 steps (about 90% of the traced time). The saving is real for contracts-only, docs,
+# handoff and tool changes; for screens it is small.
 #
 # Usage (from anywhere; paths in --changed are relative to ticvai/, the repo, or absolute):
 #
@@ -47,12 +65,14 @@
 #                                                      is still refused on any conflict or drift.
 #   bash tools/refresh-safe.sh --changed screens/P08-venue-back-office.yaml
 #   bash tools/refresh-safe.sh --no-merge              run and judge, never touch the main tree
-#   bash tools/refresh-safe.sh --trace --no-merge --skip-checks --manifest-out handoff/refresh-manifest.json
-#                                                      rebuild the manifest (refresh-manifest.py rebuild)
+#   bash tools/refresh-safe.sh --trace --head-only --no-merge --skip-checks --manifest-out handoff/refresh-manifest.json
+#                                                      rebuild the manifest (= refresh-manifest.py rebuild)
 #   options: --wt-dir DIR (default $REFRESH_SAFE_WT, else $TMPDIR/ticvai-refresh-safe)
 #            --allow-drift   merge even though authored inputs changed in the main tree meanwhile
 #            --quiet         print step banners only, not every tool's output
 #            --steps 1,5,9   run exactly these refresh steps (numbers from `refresh-manifest.py steps`)
+#            --since REF     with --changed: also treat every ticvai/ path that differs between REF
+#                            and HEAD as changed (REF = the last commit whose outputs were fully refreshed)
 #            --keep-worktree debugging only: leave the worktree (and the trace) for inspection;
 #                            the next run removes it. Never merges.
 #
@@ -88,7 +108,7 @@ done
 [ -n "$PY" ] || die "no working Python found"
 
 INCLUDE_WORKING=0; IGNORE_UNTRACKED=0; HEAD_ONLY=0; MERGE=1; TRACE=0; SKIP_CHECKS=0; ALLOW_DRIFT=0; QUIET=0
-MANIFEST_OUT=""; CHANGED=(); STEPS_ARG=""; KEEP_WT=0
+MANIFEST_OUT=""; CHANGED=(); STEPS_ARG=""; KEEP_WT=0; SINCE=""
 WT_BASE="${REFRESH_SAFE_WT:-${TMPDIR:-${TEMP:-/tmp}}/ticvai-refresh-safe}"
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -107,6 +127,7 @@ while [ $# -gt 0 ]; do
     --wt-dir) shift; [ $# -gt 0 ] || die "--wt-dir needs a directory"; WT_BASE="$1" ;;
     --quiet) QUIET=1 ;;
     --keep-worktree) KEEP_WT=1 ;;
+    --since) shift; [ $# -gt 0 ] || die "--since needs a commit"; SINCE="$1" ;;
     --steps) shift; [ $# -gt 0 ] || die "--steps needs a list"; STEPS_ARG="$1" ;;
     -h|--help) sed -n '2,/^{$/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 0 ;;
     *) die "unknown option: $1 (see --help)" ;;
@@ -539,8 +560,18 @@ fi
 
 STEPS="${STEPS_ARG:-all}"
 [ -z "$STEPS_ARG" ] || [ ${#CHANGED[@]} -eq 0 ] || die "--steps and --changed do not combine"
+[ -z "$SINCE" ] || [ ${#CHANGED[@]} -gt 0 ] || die "--since goes with --changed"
 if [ ${#CHANGED[@]} -gt 0 ]; then
   echo "2. scoped run: steps downstream of ${CHANGED[*]}"
+  if [ -n "$SINCE" ]; then
+    git -C "$REPO" rev-parse --verify --quiet "$SINCE^{commit}" >/dev/null || die "--since: no such commit: $SINCE"
+    mapfile -t _since < <(git -C "$REPO" -c core.quotepath=off diff --name-only --no-renames "$SINCE" HEAD -- "$PKG_REL")
+    echo "  --since $SINCE: ${#_since[@]} path(s) under $PKG_REL/ changed between it and HEAD, added"
+    CHANGED+=("${_since[@]}")
+  else
+    echo "  (assumes HEAD's outputs are a full refresh of its inputs; if commits since then changed"
+    echo "   inputs, pass --since <last fully refreshed commit> or run in full)"
+  fi
   [ -f "$MAIN_MANIFEST" ] || { echo "refresh-safe: no $MAIN_MANIFEST -- build it (python3 tools/refresh-manifest.py rebuild) or run in full" >&2; exit 2; }
   set +e
   ( cd "$PKG_MAIN" && "$PY" tools/refresh-manifest.py select "${CHANGED[@]}" ) | sed 's/^/  /'
