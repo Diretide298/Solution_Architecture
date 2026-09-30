@@ -9,8 +9,8 @@
           setup.cmd          what the developer runs
           uninstall.cmd
           README.txt
-          docs\              the TICVAI plan, backend build plan, build readiness,
-                             client questions and design-gap response
+          docs\              the TICVAI build plan and development plan, how tickets
+                             are ordered, build readiness and the decisions register
           adam-connector\   the connector (server.mjs, client.mjs, tools.mjs,
                              mcp-check.mjs), setup.ps1, and starters\ - the
                              backend and frontend skeletons and the coding
@@ -66,20 +66,21 @@ try {
     }
 
     # The TICVAI documents a developer reads before starting: what is being
-    # built, in what order, and what is ready. Copied as they are from the
-    # repository root; a missing one stops the build rather than shipping a
-    # zip without it.
+    # built, in what order, and what is ready. Taken from the package itself
+    # (ticvai/), where every refresh regenerates them, not from copies at the
+    # repository root: the root copies were retired on 29 September and a zip
+    # built from them shipped yesterday's plan. A missing one stops the build
+    # rather than shipping a zip without it.
     $docs = Join-Path $top 'docs'
     New-Item -ItemType Directory -Force -Path $docs | Out-Null
-    foreach ($name in
-        'TICVAI - Backend Build Plan.xlsx',
-        'TICVAI - Build Readiness.md',
-        'TICVAI - Build Readiness.xlsx',
-        'TICVAI - Client Questions.xlsx',
-        'TICVAI - Design Gap Response (23 September).md',
-        'TICVAI - Development Plan (POS, Guest App, White Labelling).md',
-        'TICVAI - Development Plan (POS, Guest App, White Labelling).xlsx') {
-        Copy-Item -LiteralPath (Join-Path $Repo $name) -Destination $docs
+    $pkg = Join-Path $Repo 'ticvai'
+    foreach ($pair in @(
+        @('handoff\TICVAI - Build Plan.xlsx', 'TICVAI - Build Plan.xlsx'),
+        @('docs\active\development-plan.md', 'TICVAI - Development Plan.md'),
+        @('handoff\service-docs\TICKET-STRUCTURE.md', 'TICVAI - How tickets are ordered and linked.md'),
+        @('handoff\TICVAI - Build Readiness.xlsx', 'TICVAI - Build Readiness.xlsx'),
+        @('handoff\TICVAI - Decisions Register.xlsx', 'TICVAI - Decisions Register.xlsx'))) {
+        Copy-Item -LiteralPath (Join-Path $pkg $pair[0]) -Destination (Join-Path $docs $pair[1])
     }
 
     # Which build this is, so "which version do you have" has an answer.
