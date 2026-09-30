@@ -242732,6 +242732,126 @@
 "status": "New",
 "type": "Sub Task",
 "assignee": "Sanket Keluskar"
+},
+{
+"key": "21793",
+"kind": "operation",
+"id": "wallet#transferWalletBalance",
+"url": "https://pms.softlabsgroup.in/work_packages/21793",
+"subject": "[BE] WalletService: transferWalletBalance",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "21793",
+"kind": "service",
+"id": "WalletService",
+"url": "https://pms.softlabsgroup.in/work_packages/21793",
+"subject": "[BE] WalletService: transferWalletBalance",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "21793",
+"kind": "table",
+"id": "pii.subject",
+"url": "https://pms.softlabsgroup.in/work_packages/21793",
+"subject": "[BE] WalletService: transferWalletBalance",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "21793",
+"kind": "table",
+"id": "wallet.wallet",
+"url": "https://pms.softlabsgroup.in/work_packages/21793",
+"subject": "[BE] WalletService: transferWalletBalance",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "21793",
+"kind": "table",
+"id": "wallet.wallet_transaction",
+"url": "https://pms.softlabsgroup.in/work_packages/21793",
+"subject": "[BE] WalletService: transferWalletBalance",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "21793",
+"kind": "screen",
+"id": "GST-071",
+"url": "https://pms.softlabsgroup.in/work_packages/21793",
+"subject": "[BE] WalletService: transferWalletBalance",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "21793",
+"kind": "screen",
+"id": "WEB-021",
+"url": "https://pms.softlabsgroup.in/work_packages/21793",
+"subject": "[BE] WalletService: transferWalletBalance",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "21794",
+"kind": "operation",
+"id": "orders#updateGroupBooking",
+"url": "https://pms.softlabsgroup.in/work_packages/21794",
+"subject": "[BE] OrderService: updateGroupBooking",
+"status": "New",
+"type": "Task",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "21794",
+"kind": "service",
+"id": "OrderService",
+"url": "https://pms.softlabsgroup.in/work_packages/21794",
+"subject": "[BE] OrderService: updateGroupBooking",
+"status": "New",
+"type": "Task",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "21794",
+"kind": "table",
+"id": "orders.group_booking",
+"url": "https://pms.softlabsgroup.in/work_packages/21794",
+"subject": "[BE] OrderService: updateGroupBooking",
+"status": "New",
+"type": "Task",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "21794",
+"kind": "table",
+"id": "pii.subject",
+"url": "https://pms.softlabsgroup.in/work_packages/21794",
+"subject": "[BE] OrderService: updateGroupBooking",
+"status": "New",
+"type": "Task",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "21794",
+"kind": "screen",
+"id": "BO-026",
+"url": "https://pms.softlabsgroup.in/work_packages/21794",
+"subject": "[BE] OrderService: updateGroupBooking",
+"status": "New",
+"type": "Task",
+"assignee": "Chinmay Patkar"
 }
 ]
 }
