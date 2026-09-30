@@ -92,6 +92,8 @@ def main() -> int:
 
     def touches(key):
         base, _, part = key.partition("#")
+        if base not in rows:  # out of the plan (tools/op-retire.py closes or parks it): nothing to link
+            return []
         r = rows[base]
         if r["track"] == "Backend" and r["type"] == "Task":
             ops = [part] if part else (r["subject"].split(": ", 1)[1].split(", ") if ": " in r["subject"] else [])
