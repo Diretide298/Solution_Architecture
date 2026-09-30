@@ -1,5 +1,7 @@
 # POS
 
+> **One working file for the whole app** (decided 30 September): `return/TICVAI POS.dc.html` in this folder. Every batch below adds its screens to that one file.
+
 The venue's point of sale on terminal and tablet (P04), with the Kitchen Display at the pass and the stations (P15). Sells offline.
 
 **Run order:** Block A batches first, in the order each section below lists them. Special folders that belong to this app: none.
@@ -51,10 +53,12 @@ Block A first: batches with a new or changed screen, then the rest of Block A. T
 Paste this into the Claude Design session with the batch folder and the reference file linked. Fill in the batch id.
 
 ```
-Build batch <BATCH ID> of TICVAI POS: the till (P04) and the kitchen display (P15). Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/TICVAI_POS_Terminal_client_approved.html`. This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. Save one fragment per screen to wireframes/incoming/<BATCH ID>/<screen id>.html (lower-case id, root element id="<screen id>", no <html>, <head>, <body> or <script>, over 200 bytes), then one working file, return/<BATCH ID>.dc.html, where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
+Build batch <BATCH ID> of TICVAI POS: the till (P04) and the kitchen display (P15). Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/TICVAI_POS_Terminal_client_approved.html`. This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. Add this batch's screens to the one working file for the whole app, handoff/design-batches/apps/2-pos/return/TICVAI POS.dc.html (create it with the first batch; every later batch extends the same file and keeps every earlier screen working, with one shared navigation, one shared seeded dataset and one look), where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
 ```
 
 ### When it comes back
+
+When a batch is back, tell Claude Code "batch <BATCH ID> is in the POS file". Claude Code captures each of that batch's screens from `return/TICVAI POS.dc.html` as a frame (by its `#<screen id>` link), imports the frames, and refreshes the boards:
 
 ```bash
 python tools/import-design-frames.py <BATCH ID> wireframes/incoming/<BATCH ID> --apply

@@ -1,5 +1,8 @@
 # Venue Management in Claude Design: how to run it
 
+> **Superseded on 30 September for the return route:** Claude Design now builds **one working file per app**, not one per batch or per screen. See `handoff/design-batches/README.md` and the app folders in `handoff/design-batches/apps/`. The rest of this page still applies.
+
+
 > **Purpose:** wireframe every Venue Management (P08) and CMS (P13) screen, batch by batch  
 > **Owner:** Chinmay  
 > **Status:** Ready 29 September 2026. Batches exported by `tools/export-design-batch.py`

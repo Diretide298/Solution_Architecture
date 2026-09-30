@@ -1,5 +1,8 @@
 # Running Claude Design overnight
 
+> **Superseded on 30 September for the return route:** Claude Design now builds **one working file per app**, not one per batch or per screen. See `handoff/design-batches/README.md` and the app folders in `handoff/design-batches/apps/`. The rest of this page still applies.
+
+
 **163 batches, 19 done.** P04 is locked as the client-approved prototype. P01 came back on
 10 September: 46 frames, nothing refused on import, 45 of the 46 carrying seeded values rather
 than blank rows. **That dump is the proof the loop works, and it is now the house style.**

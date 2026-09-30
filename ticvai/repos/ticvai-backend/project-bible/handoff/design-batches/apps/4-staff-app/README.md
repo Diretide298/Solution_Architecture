@@ -1,5 +1,7 @@
 # Staff App
 
+> **One working file for the whole app** (decided 30 September): `return/TICVAI Staff App.dc.html` in this folder. Every batch below adds its screens to that one file.
+
 The venue staff's mobile app for operations on the floor (P06).
 
 **Run order:** Block A batches first, in the order each section below lists them. Special folders that belong to this app: none.
@@ -53,10 +55,12 @@ Block A first: batches with a new or changed screen, then the rest of Block A. T
 Paste this into the Claude Design session with the batch folder and the reference file linked. Fill in the batch id.
 
 ```
-Build batch <BATCH ID> of TICVAI Venue Staff, mobile shell. Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf` and `sources/designs/TICVAI_POS_Terminal_client_approved.html`. This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. Save one fragment per screen to wireframes/incoming/<BATCH ID>/<screen id>.html (lower-case id, root element id="<screen id>", no <html>, <head>, <body> or <script>, over 200 bytes), then one working file, return/<BATCH ID>.dc.html, where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
+Build batch <BATCH ID> of TICVAI Venue Staff, mobile shell. Read BRIEF.md in the batch folder first, then BUNDLE.md (screens, operations, schemas, permissions); BRIEF.md outranks this prompt. Match the look of `sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf` and `sources/designs/TICVAI_POS_Terminal_client_approved.html`. This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. Add this batch's screens to the one working file for the whole app, handoff/design-batches/apps/4-staff-app/return/TICVAI Staff App.dc.html (create it with the first batch; every later batch extends the same file and keeps every earlier screen working, with one shared navigation, one shared seeded dataset and one look), where every screen opens from #<screen id> in its main populated state and every declared state opens from #<screen id>?state=<state>. Seed realistic UAE data from schemas.json (AED, venues, staff names), never lorem ipsum. Gate every control that needs a permission. Never show an operation id, field name, permission key or screen id as text. If a screen needs something the bundle does not have, draw it greyed with a short note and list it in return/FINDINGS.md; never invent an endpoint.
 ```
 
 ### When it comes back
+
+When a batch is back, tell Claude Code "batch <BATCH ID> is in the Staff App file". Claude Code captures each of that batch's screens from `return/TICVAI Staff App.dc.html` as a frame (by its `#<screen id>` link), imports the frames, and refreshes the boards:
 
 ```bash
 python tools/import-design-frames.py <BATCH ID> wireframes/incoming/<BATCH ID> --apply

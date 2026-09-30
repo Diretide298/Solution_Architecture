@@ -1,6 +1,8 @@
 # Claude Design hand-off: start here
 
 > **Updated:** 30 September 2026, after the 29 September pass.
+> **Return route (decided 30 September): one working file per app.** Each app folder under `apps/` has `return/<app>.dc.html`; every batch of that app extends the same file. Claude Code captures the screens from it as frames. The B2B options (two files, one per option) and the demo site are separate, because they are not apps.
+>
 > **What is here:** one folder per design batch (`BRIEF.md` and `BUNDLE.md`), one folder per app under `apps/` (six apps: Guest App, POS, Scanner, Staff App, Venue Management, TICVAI main controller; each README covers the screen sets that make up the app), and three special folders.
 > **How a session runs:** `VENUE-MANAGEMENT.md` (one session per batch) and `docs/active/claude-design-runbook.md` (the standing prompt and the import).
 

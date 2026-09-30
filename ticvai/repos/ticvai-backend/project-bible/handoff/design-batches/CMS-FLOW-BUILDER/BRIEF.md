@@ -153,7 +153,7 @@ A fictional UAE tenant, for example "Coastal Aqua" (water park, Abu Dhabi) and a
 
 ## Deliverable
 
-1. `return/CMS-FLOW-BUILDER.dc.html`: one self-contained working file. Each screen opens from `#cms-102`, `#cms-103`, `#cms-101`, `#cms-104` and so on, already populated; each declared state from `#<id>?state=<state>`. The element holding a screen carries `data-screen-label="<SCREEN ID> <Screen name>"`. No external requests except Google Fonts.
+1. **Into the Venue Management app file**, `handoff/design-batches/apps/5-venue-management/return/TICVAI Venue Management.dc.html` (one working file for the whole app, decided 30 September; create it if this is the first batch). Each screen opens from `#cms-102`, `#cms-103`, `#cms-101`, `#cms-104` and so on, already populated; each declared state from `#<id>?state=<state>`. The element holding a screen carries `data-screen-label="<SCREEN ID> <Screen name>"`. No external requests except Google Fonts.
 2. One fragment per screen in `wireframes/incoming/CMS-FLOW-BUILDER/<screen id>.html` (no `<html>`, `<head>`, `<body>` or `<script>`; root `id` is the screen id in lower case). These import with `tools/import-design-frames.py` against the batches `P13-white-label-01`, `-02` and `-03`.
 3. `return/FINDINGS.md`: anything the bundle lacks. Draw it greyed with a short note. Never invent an endpoint.
 
