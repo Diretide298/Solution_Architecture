@@ -27,24 +27,45 @@ author = (ENV["AUTHOR"] && (User.find_by(login: ENV["AUTHOR"]) || User.find_by(m
 abort("author not found: no active user named Chinmay Parab; run with AUTHOR=<his login>") unless author
 version_col = WorkPackage.column_names.include?("version_id") ? :version_id : :fixed_version_id
 
+# A parent is either already in OpenProject (parent_id) or made earlier in this same file (parent_key only): on
+# 30 September 706 of 1,268 new tickets hung under a new task or feature, and looking only for an existing parent
+# would have made them all without one. A new parent is resolved when the run reaches it (:pending here).
+earlier = Set.new
 plan = items.map do |e|
-  parent = WorkPackage.find_by(id: e["parent_id"])
-  abort("#{e['key']}: parent ##{e['parent_id']} not found") if e["parent_id"] && !parent
-  abort("#{e['key']}: parent ##{parent.id} is not in project #{PROJECT_ID}") if parent && parent.project_id != PROJECT_ID
-  found = parent && parent.children.where(subject: e["subject"]).order(:id).first
+  if e["parent_id"]
+    parent = WorkPackage.find_by(id: e["parent_id"])
+    abort("#{e['key']}: parent ##{e['parent_id']} not found") unless parent
+    abort("#{e['key']}: parent ##{parent.id} is not in project #{PROJECT_ID}") if parent.project_id != PROJECT_ID
+    found = parent.children.where(subject: e["subject"]).order(:id).first
+  elsif e["parent_key"]
+    abort("#{e['key']}: parent #{e['parent_key']} is neither in OpenProject nor made earlier in this file") unless earlier.include?(e["parent_key"])
+    parent, found = :pending, nil
+  else
+    parent = nil
+    found = WorkPackage.where(project_id: PROJECT_ID, subject: e["subject"]).order(:id).detect { |w| w.parent.nil? }
+  end
+  earlier << e["key"]
   [e, parent, found]
 end
 missing_users = items.flat_map { |e| [e["assignee"], e["responsible"]] }.compact.uniq - users.keys
 puts "OpenProject #{OpenProject::VERSION}: #{items.size} in the file, #{plan.count { |_, _, f| f }} already there, " \
      "#{plan.count { |_, _, f| !f }} to make"
 puts "users not found (left empty): #{missing_users.join(', ')}" if missing_users.any?
-plan.each { |e, parent, f| puts "  #{f ? "there ##{f.id}" : 'make'}  #{e['key']}  under ##{parent&.id}" }
+plan.each do |e, parent, f|
+  under = parent == :pending ? "#{e['parent_key']} (made in this run)" : (parent ? "##{parent.id}" : "the project")
+  puts "  #{f ? "there ##{f.id}" : 'make'}  #{e['key']}  under #{under}"
+end
 exit unless apply
 
 quiet = defined?(Journal::NotificationConfiguration) ? Journal::NotificationConfiguration.method(:with) : nil
 created = {}
 started = Time.now
 plan.each do |e, parent, found|
+  if parent == :pending
+    pid = created[e["parent_key"]] or abort("#{e['key']}: its parent #{e['parent_key']} was not made")
+    parent = WorkPackage.find(pid)
+    found = parent.children.where(subject: e["subject"]).order(:id).first
+  end
   if found
     created[e["key"]] = found.id
     next
