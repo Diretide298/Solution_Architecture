@@ -47,6 +47,11 @@ CHECKS = [
     # 1 October (plan item 1C, C3): after the tag r1 the baseline migrations are frozen; a table change is
     # a new forward migration. check-key-stability (C4) and check-contract-compat also compare with r1.
     "check-migration-freeze",
+    # 1 October (plan item 1F, C12): the audit-class guards (audit/ticvai/ROOT-CLASSES.md). Each fails
+    # only on a member not in handoff/audit-baseline.json; --update-baseline after a fix tightens it.
+    "check-ticket-text", "check-screen-wiring", "check-navigation", "check-contract-shapes",
+    "check-ddl-conventions", "check-contract-storage", "check-starter-fit", "check-glossary-terms",
+    "check-wireframe-coverage",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
