@@ -187,7 +187,7 @@ appendix sections B, C and D, risks R3 and R8). All three hold whichever broker 
 **The problem.** The decision above reads up to 200 rows a poll and polls every 100 ms while rows are
 found. That caps one tenant database at **200 / 0.1 s = 2,000 events a second, less the publish time**
 (about 1,500–1,700 once a cycle's own 20–35 ms is added). A flash sale is one tenant in one database
-(ADR-0035) and publishes **2,270 events a second at the burst design load and 2,850 at the 20-minute
+(ADR-0035, amended 3 September) and publishes **2,270 events a second at the burst design load and 2,850 at the 20-minute
 on-sale peak** (the pack, section C: 10 events a buyer at 227–285 buyers a second). The relay, not the
 broker, would be the first ceiling.
 
@@ -197,7 +197,7 @@ broker, would be the first ceiling.
   waits the busy interval (100 ms). An empty poll backs off, doubling, to the idle interval (2 s).
   Unchanged: one loop per tenant database under its lease, so one publisher per tenant, and order holds.
 - **The batch size is configuration, not code**: `Relay:BatchSize`, **200 in the shared cells, 1,000 in
-  the flash-sale burst environment** (set in the burst environment's warming state, ADR-0035), at most
+  the flash-sale burst environment** (set in the burst environment's warming state, ADR-0035 as amended 3 September), at most
   5,000. The intervals are `Relay:BusyInterval` and `Relay:IdleInterval`. The starter carries the rule
   as `RelayOptions` and `RelayPacing` (`TICVAI.Infrastructure/Messaging`), with tests.
 - **The broker adapter awaits confirms for the batch together**, not one round trip per message

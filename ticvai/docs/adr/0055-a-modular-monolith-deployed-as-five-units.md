@@ -50,7 +50,7 @@ decision below keeps both as separate deployables.
 | `access` | Access | 15.3% | Gate hot path, flat high rate, offline package. The same module code builds the venue edge node |
 | `operations` | F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform (subscription, platform-ops, public-api), CrossRegion | 34.6% | Back office and engagement. Nothing that takes money waits on it |
 | `ticvai-ai` | AI (Python) | 1.1% | ADR-0020. Unchanged, three process groups |
-| `workers` | Outbox relay (ADR-0058), event consumers for every module, scheduled jobs | — | Background work scales on queue depth, not on requests |
+| `workers` | Outbox relay (ADR-0058, amended 1 October), event consumers for every module, scheduled jobs | — | Background work scales on queue depth, not on requests |
 
 **The ownership rule is rewritten so that it is true and testable.**
 

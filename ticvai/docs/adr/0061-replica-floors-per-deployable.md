@@ -37,7 +37,7 @@ deployable.**
 | `commerce` | 3 | One per zone. The sale path must survive a zone loss without a cold start |
 | `access` (cloud side) | 2 | The gate decides locally (ADR-0013); the cloud side can lose one replica |
 | `operations` | 2 | Back office tolerates a short scale-out |
-| `workers` | 2 | Relay leases fail over between replicas (ADR-0058) |
+| `workers` | 2 | Relay leases fail over between replicas (ADR-0058, amended 1 October) |
 | `ticvai-ai` real-time | 2 (3 in large cells, as AI design 4.3 asks) | Fraud and recommendations fail open anyway |
 | `ticvai-ai` interactive | 1 | Assistants tolerate a short outage |
 | `ticvai-ai` batch | 0 | Scales from zero on queue depth |
