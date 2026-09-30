@@ -44,6 +44,9 @@ CHECKS = [
     "audit-screen-estate", "audit-uncontrolled-values", "index-sources", "check-contract-compat",
     # 30 September: a plan change must not make a second OpenProject ticket for work that has one.
     "check-key-stability",
+    # 1 October (plan item 1C, C3): after the tag r1 the baseline migrations are frozen; a table change is
+    # a new forward migration. check-key-stability (C4) and check-contract-compat also compare with r1.
+    "check-migration-freeze",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
