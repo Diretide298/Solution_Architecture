@@ -56,6 +56,33 @@ NEW_QUESTIONS = [
     ("Tax documents", "VAT return",
      "Do you confirm the VAT 201 box layout, and how sales are attributed to each emirate?", "a",
      "VAT 201 figures prepared by the platform; sales attributed by the venue's location.", "Your tax adviser"),
+    # 1 October: from the 30 September revision feedback on the guest builds (CLIENT-RESPONSE-30SEP).
+    ("Group booking", "Supervisors",
+     "Your build lists supervisors separately and free. How many supervisors come free per group (per N guests), "
+     "and is that per group ticket?", "a",
+     "Supervisors are a separate, free guest type, up to 1 per 10 guests, counted on the group request.", "Your commercial team"),
+    ("Group booking", "Group types",
+     "Your build shows School, Corporate, Tour operator and Community groups; the platform has general, school, "
+     "corporate and party. Do tour operator and community become their own types, or map to general?", "b",
+     "Tour operator and community are added as their own group types.", "Your commercial team"),
+    ("Group booking", "Minimum group size",
+     "Each group ticket card shows a minimum group size. Is the minimum set per group ticket (product), and what "
+     "are the values?", "b",
+     "Each group ticket carries its own minimum, default 10.", "Your commercial team"),
+    ("Group booking", "Water-park groups by session",
+     "Your build has a water-park group pick a session first; group requests today take a date only. Are water-park "
+     "groups booked into a session?", "b",
+     "Group requests take a date and, for session-based products, a session.", "Your operations team"),
+    ("Guest safety", "Swim ability",
+     "The swim answer now changes what is offered: all swimmers see everything, some get a 'swim vests needed' counter, "
+     "and none see a cheaper splash-and-river pass without slides. Is the vest an add-on product, and is the "
+     "splash-and-river pass a separate product only non-swimmers are offered?", "a",
+     "The answer filters products ('Help me choose'); the vest is an add-on; the splash-and-river pass is its own product.",
+     "Your operations and safety team"),
+    ("Transport", "Popular routes card",
+     "The popular routes cards need a starting fare, a featured order and an image or badge per route. Should "
+     "these be set per route in the back office?", "c",
+     "Routes carry a featured order and an image; the starting fare is computed from the lowest fare.", "Your transport team"),
     # 1 October: from the ADRs decided that day (0060 availability, 0062 e-invoicing, 0063 encryption and keys).
     ("Tax documents", "B2C e-invoices",
      "Are e-invoices to consumers (B2C) outside the first phase of the UAE mandate for you, so only B2B invoices "
