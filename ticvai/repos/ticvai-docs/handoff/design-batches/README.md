@@ -1,7 +1,7 @@
 # Claude Design hand-off: start here
 
 > **Updated:** 30 September 2026, after the 29 September pass.
-> **What is here:** one folder per design batch (`BRIEF.md` and `BUNDLE.md`), one folder per platform under `platforms/`, and three special folders.
+> **What is here:** one folder per design batch (`BRIEF.md` and `BUNDLE.md`), one folder per app under `apps/` (six apps: Guest App, POS, Scanner, Staff App, Venue Management, TICVAI main controller; each README covers the screen sets that make up the app), and three special folders.
 > **How a session runs:** `VENUE-MANAGEMENT.md` (one session per batch) and `docs/active/claude-design-runbook.md` (the standing prompt and the import).
 
 ## Where to start for each app
@@ -10,21 +10,21 @@ Each platform folder says what the app is, who uses it, the reference design to 
 
 | platform | folder | screens | Block A screens | frames | client-verified |
 |---|---|---|---|---|---|
-| P01 Guest web | [`platforms/P01-guest-web`](platforms/P01-guest-web/README.md) | 50 | 50 | 49 | 48 |
-| P02 Guest app, mobile | [`platforms/P02-guest-app-mobile`](platforms/P02-guest-app-mobile/README.md) | 77 | 77 | 77 | 77, but on the old Mobile v2 build |
-| P04 POS + P15 kitchen display | [`platforms/P04-P15-pos-and-kds`](platforms/P04-P15-pos-and-kds/README.md) | 40 | 40 | 30 | 23 |
-| P05 Guest kiosk | [`platforms/P05-guest-kiosk`](platforms/P05-guest-kiosk/README.md) | 17 | 0 | 0 | 0 |
-| P06 Venue staff app | [`platforms/P06-venue-staff-app`](platforms/P06-venue-staff-app/README.md) | 96 | 3 | 0 | 0 |
-| P07 Venue scanner | [`platforms/P07-venue-scanner`](platforms/P07-venue-scanner/README.md) | 11 | 0 | 0 | 0 |
-| P08 Venue management | [`platforms/P08-venue-management`](platforms/P08-venue-management/README.md) | 1,186 | 66 | 0 | 0 |
-| P09 TICVAI web console | [`platforms/P09-ticvai-web-console`](platforms/P09-ticvai-web-console/README.md) | 676 | 44 | 0 | 0 |
-| P10 Partner reseller portal | [`platforms/P10-partner-reseller-portal`](platforms/P10-partner-reseller-portal/README.md) | 51 | 0 | 0 | 0 |
-| P11 Accreditation web | [`platforms/P11-accreditation-web`](platforms/P11-accreditation-web/README.md) | 8 | 0 | 0 | 0 |
-| P12 Venue support | [`platforms/P12-venue-support`](platforms/P12-venue-support/README.md) | 28 | 1 | 0 | 0 |
-| P13 Venue CMS | [`platforms/P13-venue-cms`](platforms/P13-venue-cms/README.md) | 103 | 25 | 0 | 0 |
-| P14 Developer portal | [`platforms/P14-developer-portal`](platforms/P14-developer-portal/README.md) | 8 | 3 | 0 | 0 |
-| P16 Venue analytics | [`platforms/P16-venue-analytics`](platforms/P16-venue-analytics/README.md) | 70 | 4 | 0 | 0 |
-| P17 TICVAI sign-up | [`platforms/P17-ticvai-signup`](platforms/P17-ticvai-signup/README.md) | 24 | 0 | 0 | 0 |
+| P01 Guest web | [`apps/1-guest-app`](apps/1-guest-app/README.md) | 50 | 50 | 49 | 48 |
+| P02 Guest app, mobile | [`apps/1-guest-app`](apps/1-guest-app/README.md) | 77 | 77 | 77 | 77, but on the old Mobile v2 build |
+| P04 POS + P15 kitchen display | [`apps/2-pos`](apps/2-pos/README.md) | 40 | 40 | 30 | 23 |
+| P05 Guest kiosk | [`apps/1-guest-app`](apps/1-guest-app/README.md) | 17 | 0 | 0 | 0 |
+| P06 Venue staff app | [`apps/4-staff-app`](apps/4-staff-app/README.md) | 96 | 3 | 0 | 0 |
+| P07 Venue scanner | [`apps/3-scanner`](apps/3-scanner/README.md) | 11 | 0 | 0 | 0 |
+| P08 Venue management | [`apps/5-venue-management`](apps/5-venue-management/README.md) | 1,186 | 66 | 0 | 0 |
+| P09 TICVAI web console | [`apps/6-ticvai-controller`](apps/6-ticvai-controller/README.md) | 676 | 44 | 0 | 0 |
+| P10 Partner reseller portal | [`B2B-OPTIONS`](B2B-OPTIONS/P10-BATCHES.md) | 51 | 0 | 0 | 0 |
+| P11 Accreditation web | [`apps/5-venue-management`](apps/5-venue-management/README.md) | 8 | 0 | 0 | 0 |
+| P12 Venue support | [`apps/5-venue-management`](apps/5-venue-management/README.md) | 28 | 1 | 0 | 0 |
+| P13 Venue CMS | [`apps/5-venue-management`](apps/5-venue-management/README.md) | 103 | 25 | 0 | 0 |
+| P14 Developer portal | [`apps/6-ticvai-controller`](apps/6-ticvai-controller/README.md) | 8 | 3 | 0 | 0 |
+| P16 Venue analytics | [`apps/5-venue-management`](apps/5-venue-management/README.md) | 70 | 4 | 0 | 0 |
+| P17 TICVAI sign-up | [`apps/6-ticvai-controller`](apps/6-ticvai-controller/README.md) | 24 | 0 | 0 | 0 |
 
 "Block A" is the first 35 working days of the build, from Monday 5 October: the screens with a front-end task in phase 1 of `handoff/service-docs/tasks.csv`. "Client-verified" means the frame is a capture of a client-approved prototype.
 
@@ -35,10 +35,10 @@ Run top to bottom. Within a platform, its README gives the batch order.
 ### 1. Block A
 
 1. **P13 CMS flow builder**: [`CMS-FLOW-BUILDER/`](CMS-FLOW-BUILDER/BRIEF.md). CMS-101 to CMS-104 as one flow, with the step screens they open. Then the P13 Block A batches: `P13-white-label-03`, `-01`, `-02`, `WS41`.
-2. **P02 Mobile v4 changes**: see [`platforms/P02-guest-app-mobile`](platforms/P02-guest-app-mobile/README.md). First re-capture the 17 screens that are views in Mobile App v4 (a capture job, not a design batch). Then draw the 19 changed screens v4 has no view for, in the v4 look.
-3. **P01 WEB-050 and the changed screens**: [`P01-discovery-browse-01`](P01-discovery-browse-01/) (WEB-050 Plan Your Visit, from the Visit Planner), then the P01 batches with changed screens. See [`platforms/P01-guest-web`](platforms/P01-guest-web/README.md).
+2. **P02 Mobile v4 changes**: see [`apps/1-guest-app`](apps/1-guest-app/README.md). First re-capture the 17 screens that are views in Mobile App v4 (a capture job, not a design batch). Then draw the 19 changed screens v4 has no view for, in the v4 look.
+3. **P01 WEB-050 and the changed screens**: [`P01-discovery-browse-01`](P01-discovery-browse-01/) (WEB-050 Plan Your Visit, from the Visit Planner), then the P01 batches with changed screens. See [`apps/1-guest-app`](apps/1-guest-app/README.md).
 4. **P15 kitchen display**: [`P15-kitchen-01`](P15-kitchen-01/). P04 is locked; the client-approved terminal is its design.
-5. **P08 set-up screens**: the 38 P08 Block A batches, set-up screens first. See [`platforms/P08-venue-management`](platforms/P08-venue-management/README.md).
+5. **P08 set-up screens**: the 38 P08 Block A batches, set-up screens first. See [`apps/5-venue-management`](apps/5-venue-management/README.md).
 6. **The rest of Block A**: P09 (23 batches), P16 (3), P06 (2), P12 (1), P14 (1). Each platform README lists them.
 
 ### 2. B2B options
