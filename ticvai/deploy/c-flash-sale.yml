@@ -133,7 +133,7 @@ services:
   # **The event broker (ADR-0057, proposed).** rabbitmq (local/venue-local); cloud broker: client's
   # choice. The client chooses RabbitMQ or Kafka for the cloud; development and the venue-local
   # profile run RabbitMQ either way (ADR-0046 needs it on-premise). Modules never talk to it
-  # directly: the outbox relay in `workers` publishes through the kernel's IEventPublisher, and
+  # directly: a module enqueues through IOutbox, the relay in `workers` publishes through IBrokerPublisher, and
   # every consumer records what it handled in its tenant database's inbox (ADR-0058).
   rabbitmq:
     image: rabbitmq:4-management-alpine

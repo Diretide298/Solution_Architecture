@@ -54,7 +54,18 @@
     "SETUP-HOSTS"
    ],
    "subject": "Outbox, relay and inbox behind the kernel broker interface, on a local RabbitMQ",
-   "detail": "The transactional outbox per tenant database; one relay per region in the workers host, with a lease and a polling loop per tenant database, and an inbox per tenant database for exactly-once handling (ADR-0058); publishing and consuming only through the kernel interface (IEventPublisher, IEventSubscriber). The broker per ADR-0057 is the client's choice between RabbitMQ and Kafka: build behind the kernel interface on a local RabbitMQ until they answer, with ordering per aggregate by an ordering key and dead letters drained into platform.dead_letter. A relay-lag dashboard and alert per tenant database (SD-030, SD-031, SD-032). Done when: an event written in a transaction reaches its consumer once, survives a relay restart and a redelivery, a poison message lands in platform.dead_letter, and relay lag shows on the dashboard and alerts when unpublished rows are older than 60 seconds."
+   "detail": "The transactional outbox per tenant database; one relay per region in the workers host, with a lease and a polling loop per tenant database, and an inbox per tenant database for exactly-once handling (ADR-0058); modules enqueue through IOutbox inside their own transaction, the relay publishes through IBrokerPublisher and consumers subscribe through IEventSubscriber (ADR-0058 amendment, 1 October); the relay drains a full batch at once and its batch size is configuration (Relay:BatchSize, 1,000 in the flash-sale environment). The broker per ADR-0057 is the client's choice between RabbitMQ and Kafka: build behind the kernel interface on a local RabbitMQ until they answer, with ordering per aggregate by an ordering key and dead letters drained into platform.dead_letter. A relay-lag dashboard and alert per tenant database (SD-030, SD-031, SD-032). Done when: an event written in a transaction reaches its consumer once, survives a relay restart and a redelivery, a poison message lands in platform.dead_letter, and relay lag shows on the dashboard and alerts when unpublished rows are older than 60 seconds."
+  },
+  {
+   "key": "PLATFORM-REPUBLISH",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-OUTBOX"
+   ],
+   "subject": "Republish from the outbox by tenant and time range",
+   "detail": "The recovery path for a lost broker (ADR-0058 amendment, 1 October; the DR design in ADR-0060 relies on it): republishOutbox, listOutboxRepublishes, getOutboxRepublish and cancelOutboxRepublish in the operations host, carried out by the relay in workers with a keyset cursor over the outbox, published_at left untouched and live batches first; one job per tenant (control.outbox_republish). Done when: after a simulated broker loss, a republish of one tenant's last hour redelivers every event once to each consumer, the inbox drops the duplicates, and a second request for the same tenant while one runs is refused with 409."
   },
   {
    "key": "PLATFORM-SAGA-PAID",
