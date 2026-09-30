@@ -45944,11 +45944,115 @@ screens:
         label: Replay dead letter
         operation: replayDeadLetter
         provenance: contract platform-ops.yaml POST /dead-letters/{deadLetterId}/replay
+    - name: republishes
+      slot: collection
+      notes: '**Republish from the outbox** (ADR-0058, amended 1 October). Here until it has a screen of its
+        own: after a broker loss or a DR failover the messages the broker held are gone, and the dead letters
+        are where an operator is already looking when that happens.'
+      components:
+      - kind: selectField
+        label: Republish status
+        operation: listOutboxRepublishes
+        notes: Sends `?status=` to `listOutboxRepublishes`.
+        provenance: contract platform-ops.yaml GET /outbox-republishes
+      - kind: textField
+        label: Tenant
+        operation: listOutboxRepublishes
+        notes: Sends `?tenantId=` to `listOutboxRepublishes`.
+        provenance: contract platform-ops.yaml GET /outbox-republishes
+      - kind: dataTable
+        label: Outbox republishes, newest first
+        bindsTo: OutboxRepublish
+        columns:
+        - OutboxRepublish.tenantId
+        - OutboxRepublish.from
+        - OutboxRepublish.to
+        - OutboxRepublish.eventNames
+        - OutboxRepublish.status
+        - OutboxRepublish.cursorAt
+        - OutboxRepublish.rowsPublished
+        - OutboxRepublish.requestedBy
+        - OutboxRepublish.requestedAt
+        operation: listOutboxRepublishes
+        provenance: contract platform-ops.yaml GET /outbox-republishes
+    - name: republishDetail
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected republish and its progress
+        bindsTo: OutboxRepublish
+        columns:
+        - OutboxRepublish.id
+        - OutboxRepublish.tenantId
+        - OutboxRepublish.from
+        - OutboxRepublish.to
+        - OutboxRepublish.eventNames
+        - OutboxRepublish.reason
+        - OutboxRepublish.status
+        - OutboxRepublish.cursorAt
+        - OutboxRepublish.rowsPublished
+        - OutboxRepublish.lastError
+        - OutboxRepublish.requestedBy
+        - OutboxRepublish.requestedAt
+        - OutboxRepublish.startedAt
+        - OutboxRepublish.finishedAt
+        operation: getOutboxRepublish
+        notes: Refetched while the republish is `queued` or `running`, so `cursorAt` and `rowsPublished` move.
+        provenance: contract platform-ops.yaml GET /outbox-republishes/{republishId}
+    - name: republishActions
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Republish from the outbox
+        operation: republishOutbox
+        permission: PLATFORM_CELL_MANAGE
+        notes: Opens `formRepublishOutbox`.
+        provenance: contract platform-ops.yaml POST /outbox-republishes
+      - kind: destructiveButton
+        label: Cancel republish
+        operation: cancelOutboxRepublish
+        permission: PLATFORM_CELL_MANAGE
+        notes: Only on a `queued` or `running` republish. Opens `confirmCancelOutboxRepublish`.
+        provenance: contract platform-ops.yaml POST /outbox-republishes/{republishId}/cancel
+  overlays:
+  - id: formRepublishOutbox
+    component: modal
+    trigger: Republish from the outbox
+    body: '**Collects what `republishOutbox` sends before it is called.** Required: `tenantId`, `from`, `to`
+      (`from` before `to`, `to` no later than now) and `reason` (up to 500 characters). Optional:
+      `eventNames`, catalogue names; empty means every event. **Says how to choose `from`**: when the oldest
+      message the lost broker still held was published; if unknown, the time of the loss minus one hour, or
+      the start of any consumer halt then in progress, whichever is earlier. Too early costs duplicates the
+      inboxes skip; too late loses events. A `409` names the republish the tenant already has; a `422` names
+      the oldest `from` the hot outbox still holds. Dismissing sends nothing.'
+    confirm:
+      label: Republish
+      operation: republishOutbox
+    dismiss:
+      label: Cancel
+      discards:
+      - tenantId
+      - from
+      - to
+      - eventNames
+      - reason
+    provenance: contract platform-ops.yaml POST /outbox-republishes
+  - id: confirmCancelOutboxRepublish
+    component: confirmDialog
+    trigger: Cancel republish
+    body: '**Names the tenant, the range and how far it has got** (`cursorAt`, `rowsPublished`). The relay
+      stops after the batch in flight and keeps the cursor, so a new request can start where this one
+      stopped. A republish that has already finished is refused `409` `republish-finished`.'
+    confirm:
+      label: Cancel republish
+      operation: cancelOutboxRepublish
+    provenance: contract platform-ops.yaml POST /outbox-republishes/{republishId}/cancel
   states:
     loading: The dead letters list.
     error: Could not load. Names which read failed and leaves the dead letters untouched.
-    emptyFirstRun: No dead letters yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
+    emptyFirstRun: No dead letters yet. **Offers no create action for them** — this screen declares no operation
+      that makes one — and says so rather than showing an empty table. The republish list below it keeps
+      its own action, `republishOutbox`.
     emptyNoResults: Nothing matches the filter on consumer, since and the dead letters are still there.
       Names the active filter and offers to clear it.
     emptyNoAccess: Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires,
@@ -45965,6 +46069,27 @@ screens:
     trigger: onAction
     invalidates:
     - listDeadLetters
+  - operationId: listOutboxRepublishes
+    contract: platform-ops
+    purpose: Every outbox republish asked for, newest first, with how far each has got
+    trigger: onLoad
+  - operationId: getOutboxRepublish
+    contract: platform-ops
+    purpose: Follow one republish while it runs
+    trigger: onAction
+  - operationId: republishOutbox
+    contract: platform-ops
+    purpose: Send one tenant database's outbox rows for a time range to the broker again
+    trigger: onAction
+    invalidates:
+    - listOutboxRepublishes
+  - operationId: cancelOutboxRepublish
+    contract: platform-ops
+    purpose: Stop a republish after its current batch, keeping the cursor
+    trigger: onAction
+    invalidates:
+    - listOutboxRepublishes
+    - getOutboxRepublish
   entryState:
     params:
     - name: deadLetterId
@@ -45985,7 +46110,9 @@ screens:
     board: wireframes/P09 TICVAI Web.dc.html#adm-318
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+    to the ones that matter is work a person still owes this screen. The four outbox republish operations
+    (ADR-0058, amended 1 October) were added on 1 October 2026 and sit here until republish has a screen of
+    its own.
 - id: ADM-319
   name: Approval Workflow Library
   module: Platform

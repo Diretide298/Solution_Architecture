@@ -63,9 +63,19 @@ resource "azurerm_postgresql_flexible_server" "primary" {
   backup_retention_days        = var.backup_retention_days
   geo_redundant_backup_enabled = var.geo_redundant_backup_enabled
 
-  high_availability {
-    mode                      = local.is_dedicated ? "ZoneRedundant" : "SameZone"
-    standby_availability_zone = local.is_dedicated ? "2" : null
+  # Zone-redundant on every tier in production (ADR-0060, decided 1 October 2026). Until then the
+  # shared tier was SameZone while the LLD promised zone-redundant; a shared cell holds every tenant
+  # in it, so a zone loss there is the larger outage, not the smaller one. Pre-production runs
+  # without a standby (database_high_availability = false). UAE Central has no zone-redundant HA
+  # (infra answers, 30 September): a production cell there cannot be stood up until it does.
+  zone = "1"
+
+  dynamic "high_availability" {
+    for_each = var.database_high_availability ? [1] : []
+    content {
+      mode                      = "ZoneRedundant"
+      standby_availability_zone = "2"
+    }
   }
 
   maintenance_window {

@@ -69,6 +69,12 @@ variable "enable_reporting_replica" {
   description = "Dedicated lag-tolerant replica. Reporting must never touch OLTP replicas."
 }
 
+variable "database_high_availability" {
+  type        = bool
+  default     = true
+  description = "Zone-redundant standby for the primary, on every tier (ADR-0060, 1 October 2026). false only for pre-production."
+}
+
 variable "backup_retention_days" {
   type    = number
   default = 35
@@ -157,6 +163,38 @@ variable "broker_nodes" {
 variable "zones" {
   type    = list(string)
   default = ["1", "2", "3"]
+}
+
+# Replica floors per deployable (ADR-0055 five units, ADR-0061 floors, accepted 1 October 2026). A floor
+# is survivability, not load: enough replicas to lose one zone and keep serving. Above it each deployable
+# autoscales on requests per second (ADR-0032); there is no maximum here. The bootstrap Helm values read
+# this output (replica_floors) as each Deployment's minReplicas. The same numbers are DEPLOYABLE_FLOORS and
+# AI_PROCESS_GROUP_FLOORS in ticvai/tools/derive-sizing.py; change both together. A large cell sets
+# ai-realtime to 3 (AI design 4.3). A burst environment does not use these: its floor is the expected
+# peak (ADR-0035).
+variable "replica_floors" {
+  type = map(number)
+  default = {
+    "commerce"       = 3 # one per zone: the sale path survives a zone loss without a cold start
+    "access"         = 2 # cloud side only; the gate decides locally (ADR-0013)
+    "operations"     = 2 # back office tolerates a short scale-out
+    "workers"        = 2 # relay leases fail over between replicas (ADR-0058)
+    "ai-realtime"    = 2 # fraud scoring, recommendations; fail open
+    "ai-interactive" = 1 # assistants tolerate a short outage
+    "ai-batch"       = 0 # scales from zero on queue depth
+  }
+  description = "Minimum replicas per deployable (ADR-0061): 12 in a small cell."
+  validation {
+    condition = (
+      length(setsubtract(["commerce", "access", "operations", "workers", "ai-realtime", "ai-interactive", "ai-batch"], keys(var.replica_floors))) == 0
+      && lookup(var.replica_floors, "commerce", 0) >= 3
+      && lookup(var.replica_floors, "workers", 0) >= 2
+      && lookup(var.replica_floors, "access", 0) >= 2
+      && lookup(var.replica_floors, "operations", 0) >= 2
+      && alltrue([for v in values(var.replica_floors) : v >= 0])
+    )
+    error_message = "replica_floors names all seven units (commerce, access, operations, workers, ai-realtime, ai-interactive, ai-batch); commerce is at least 3 (one per zone) and access, operations and workers at least 2 (ADR-0061)."
+  }
 }
 
 variable "create_network" {

@@ -1457,6 +1457,11 @@ def main() -> int:
         for e in ex.get("epics") or []:
             task(e["key"], "", "Epic", e["subject"], e["detail"], 1, area=e.get("area", "backend"))
         for t_ in ex.get("tasks") or []:
+            # **A task for a later block is recorded, not ticketed** (1 October): the ADRs of that day name
+            # build work for B1 (the waiting room, the admission rule evaluators), kept beside the Block A
+            # tasks so it is not lost, and cut into tickets when that block is planned.
+            if str(t_.get("block") or "A") != "A":
+                continue
             is_ai = t_["epic"] == "AI-ENGINE"
             pts = "" if is_ai else int(t_["points"])
             who = t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else "")

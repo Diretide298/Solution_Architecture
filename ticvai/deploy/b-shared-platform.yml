@@ -12,8 +12,10 @@
 # not by isolation. **This is the trade and it should be stated to a tenant, not assumed.**
 # **Scaling**: Catalogue and Order autoscale on RPS. Nothing else needs to.
 #
-# **Replica floors are 2 for every service, and that is not derived from load.**
-# It is survivability: one replica means a deploy or a crash is an outage.
+# **Replica floors are survivability, not load** (ADR-0061, accepted 1 October 2026): one replica
+# means a deploy or a crash is an outage, and with three zones two replicas of the sale path lose half
+# of it to one zone. So the five `commerce` modules below run 3, one per zone, and everything else 2.
+# The per-deployable floors are in `x-ticvai-replica-floors` below.
 #
 # **The load does not need more.** A medium cell at 2,265 RPS peak implies 2 Order replicas and
 # 1 of everything else - the autoscaler covers the rest, and under normal operation it has all
@@ -50,6 +52,22 @@
 # replaced, and it was still here in all seven configs after the ADR was accepted.
 
 
+# **Replica floors per deployable (ADR-0061, accepted 1 October 2026).** A floor is survivability:
+# enough replicas to lose one zone and keep serving. It is set per unit of deployment (ADR-0055: the
+# 17 modules ship as five units), not per module, and above it each unit autoscales on requests per
+# second (ADR-0032). Compose runs each module as its own container, so the block below states what a
+# cell is stood up at; the Terraform cell module carries the same numbers as `replica_floors` for the
+# Helm values, and tools/derive-sizing.py as DEPLOYABLE_FLOORS. Change all three together.
+x-ticvai-replica-floors:
+  commerce: 3          # one per zone; identity, tenancy, catalogue, order, ledger, wallet
+  access: 2            # cloud side only; the gate decides locally (ADR-0013)
+  operations: 2        # back office and engagement
+  workers: 2           # relay leases fail over (ADR-0058, amended 1 October); no container here yet
+  ai-realtime: 2       # 3 in a large cell (AI design 4.3)
+  ai-interactive: 1
+  ai-batch: 0          # scales from zero on queue depth
+  total-small-cell: 12
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -82,7 +100,7 @@ services:
   # choice. The client chooses RabbitMQ or Kafka for the cloud; development and the venue-local
   # profile run RabbitMQ either way (ADR-0046 needs it on-premise). Modules never talk to it
   # directly: a module enqueues through IOutbox, the relay in `workers` publishes through IBrokerPublisher, and
-  # every consumer records what it handled in its tenant database's inbox (ADR-0058).
+  # every consumer records what it handled in its tenant database's inbox (ADR-0058, amended 1 October).
   rabbitmq:
     image: rabbitmq:4-management-alpine
     labels:
@@ -116,7 +134,7 @@ services:
     - pgbouncer
     - redis
     deploy:
-      replicas: 2
+      replicas: 3
       resources:
         limits:
           cpus: '2'
@@ -134,7 +152,7 @@ services:
     - pgbouncer
     - redis
     deploy:
-      replicas: 2
+      replicas: 3
       resources:
         limits:
           cpus: '2'
@@ -152,7 +170,7 @@ services:
     - pgbouncer
     - redis
     deploy:
-      replicas: 2
+      replicas: 3
       resources:
         limits:
           cpus: '2'
@@ -188,7 +206,7 @@ services:
     - pgbouncer
     - redis
     deploy:
-      replicas: 2
+      replicas: 3
       resources:
         limits:
           cpus: '2'
@@ -512,7 +530,7 @@ services:
     - pgbouncer
     - redis
     deploy:
-      replicas: 2
+      replicas: 3
       resources:
         limits:
           cpus: '1'

@@ -1351,6 +1351,252 @@ paths:
                 $ref: '#/components/schemas/DeadLetter'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /outbox-republishes:
+    post:
+      operationId: republishOutbox
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      summary: Republish one tenant database's outbox rows for a time range
+      description: '**ADR-0058, amended 1 October (section 3).** When the broker is lost or rebuilt, or a
+        DR failover starts an empty broker in the other region (ADR-0060), every message it held and no
+        consumer had settled is gone. The outbox still has every row. This asks the relay loop holding the
+        tenant''s lease to read that tenant database''s outbox rows with `created_at` in `[from, to)`,
+        optionally only some event names, in `(created_at, id)` order and batches of `Relay:BatchSize`,
+        and publish them through `IBrokerPublisher` **whether or not they were published before**. Every
+        consumer''s inbox skips what it already handled.
+
+
+        - **`published_at` is not touched**: the first publication stays on record.
+
+        - **Live events come first**: the loop alternates one republish batch with each live batch.
+
+        - **`from` must be early enough**: the moment the oldest message still held by the lost broker was
+        published; when unknown, the time of the loss minus one hour, or the start of any consumer halt then
+        in progress, whichever is earlier. Too early costs duplicates the inboxes absorb; too late loses
+        events.
+
+        - **`from` < `to` <= now**, else the shared `400` `validation`; so is an event name that is not in
+        the catalogue.
+
+        - **One republish per tenant at a time** (`409` `republish-in-progress`). A cancelled or failed job
+        keeps its cursor, so a new request can start where it stopped.
+
+        - **Only the hot outbox**: a range reaching into a monthly partition already archived to Blob
+        (ADR-0047, ADR-0056) is refused (`422` `outbox-range-archived`).
+
+        - **Recorded** in `control.outbox_republish` and in the audit trail. Carried out by the relay in the
+        `workers` deployable; this operation only queues the job.
+
+        '
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutboxRepublishRequest'
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Queued. Follow it with `getOutboxRepublish` until it is `completed`, `failed` or
+            `cancelled`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutboxRepublish'
+          links:
+            pollRepublish:
+              operationId: getOutboxRepublish
+              parameters:
+                republishId: $response.body#/id
+              description: Progress of the queued republish.
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          description: 'The tenant already has a republish `queued` or `running` (`republish-in-progress`;
+            `detail` names it), or the `Idempotency-Key` was used for a different request
+            (`idempotency-conflict`).
+
+            '
+          x-ticvai-problem-types:
+          - republish-in-progress
+          - idempotency-conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`from` is older than the oldest hot outbox partition: that part of the range is
+            archived to Blob and republishing from the archive is not built (`outbox-range-archived`;
+            `detail` names the oldest `from` that would be accepted).
+
+            '
+          x-ticvai-problem-types:
+          - outbox-range-archived
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    get:
+      operationId: listOutboxRepublishes
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      summary: Outbox republishes, newest first
+      description: ADR-0058 (amended 1 October). Every republish asked for, newest first by `requestedAt`
+        with the id as the tiebreak, so an operator after a failover sees each promoted tenant's job and
+        how far it has got.
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: tenantId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - queued
+          - running
+          - completed
+          - failed
+          - cancelled
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Republishes, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OutboxRepublish'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /outbox-republishes/{republishId}:
+    parameters:
+    - name: republishId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getOutboxRepublish
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      summary: One republish and its progress
+      description: ADR-0058 (amended 1 October). Progress is `status`, `cursorAt` (the `created_at` of the
+        last row published) and `rowsPublished`.
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The republish
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutboxRepublish'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /outbox-republishes/{republishId}/cancel:
+    parameters:
+    - name: republishId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: cancelOutboxRepublish
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
+      summary: Stop a republish after its current batch
+      description: ADR-0058 (amended 1 October). The relay stops after the batch in flight and **keeps the
+        cursor**, so a new request can start where this one stopped. A queued job is cancelled before it
+        starts.
+      tags:
+      - platform-ops
+      x-ticvai-permission: PLATFORM_CELL_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Cancelled, or cancelling once the batch in flight is confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutboxRepublish'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The republish has already `completed`, `failed` or been `cancelled`
+            (`republish-finished`), or the `Idempotency-Key` was used for a different request
+            (`idempotency-conflict`).
+
+            '
+          x-ticvai-problem-types:
+          - republish-finished
+          - idempotency-conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waf-policies:
     get:
       operationId: listWafRules
@@ -2683,6 +2929,139 @@ components:
         createdAt:
           type: string
           format: date-time
+    OutboxRepublishRequest:
+      type: object
+      x-ticvai-persistence: none — request body
+      description: '**What a person asks to republish** (ADR-0058, amended 1 October). One tenant
+        database, a half-open range of `created_at`, optionally some event names, and why.'
+      required:
+      - tenantId
+      - from
+      - to
+      - reason
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+          description: The tenant whose database's outbox is read (`control.tenant`).
+        from:
+          type: string
+          format: date-time
+          description: 'Inclusive. **Early enough**: when the oldest message still held by the lost broker
+            was published; when unknown, the time of the loss minus one hour, or the start of any consumer
+            halt then in progress, whichever is earlier. Must be before `to`.'
+        to:
+          type: string
+          format: date-time
+          description: Exclusive. No later than now; after a DR failover, the time of the request.
+        eventNames:
+          type: array
+          description: Catalogue event names (`events/`) to republish; absent means every event. An unknown
+            name is the shared `400` `validation`.
+          items:
+            type: string
+        reason:
+          type: string
+          maxLength: 500
+          description: Why, for the audit trail (e.g. "broker rebuilt after DR failover to the secondary
+            region").
+    OutboxRepublish:
+      type: object
+      x-ticvai-persistence: control.outbox_republish
+      description: '**One republish of a tenant database''s outbox** (ADR-0058, amended 1 October). A job
+        row in the regional control database beside the relay lease table `control.outbox_relay`. The relay
+        loop holding the tenant''s lease carries it out, alternating one republish batch with each live
+        batch, and moves `cursorAt` as it goes. **At most one `queued` or `running` per tenant.** A
+        cancelled or failed job keeps its cursor, so a new request can start where it stopped. The rows
+        republished keep their `published_at`.'
+      required:
+      - id
+      - tenantId
+      - from
+      - to
+      - reason
+      - status
+      - rowsPublished
+      - requestedBy
+      - requestedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenantId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.tenant
+          description: The tenant whose database's outbox is republished.
+        from:
+          type: string
+          format: date-time
+          x-ticvai-column: range_starts_at
+          description: Inclusive start of the outbox `created_at` range.
+        to:
+          type: string
+          format: date-time
+          x-ticvai-column: range_ends_at
+          description: Exclusive end of the outbox `created_at` range.
+        eventNames:
+          type: array
+          nullable: true
+          description: The event names asked for; null means every event.
+          items:
+            type: string
+        reason:
+          type: string
+          maxLength: 500
+        status:
+          type: string
+          readOnly: true
+          enum:
+          - queued
+          - running
+          - completed
+          - failed
+          - cancelled
+          description: '`queued` until the lease holder picks it up; `completed` when the cursor reaches
+            `to`; `failed` with `lastError` after the relay''s retry budget; `cancelled` by
+            `cancelOutboxRepublish`.'
+        cursorAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: How far it has got, the `created_at` of the last row published (with the row id as
+            the keyset tiebreak, held by the relay). Null until the first batch.
+        rowsPublished:
+          type: integer
+          minimum: 0
+          default: 0
+          readOnly: true
+        lastError:
+          type: string
+          nullable: true
+          readOnly: true
+        requestedBy:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-column: requested_by_principal_id
+          description: The staff principal who asked.
+        requestedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: Set on `completed`, `failed` or `cancelled`.
   securitySchemes:
     bearerAuth:
       type: http

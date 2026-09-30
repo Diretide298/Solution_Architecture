@@ -40,6 +40,11 @@ output "backup_storage_account" {
   value = azurerm_storage_account.backups.name
 }
 
+output "replica_floors" {
+  description = "Minimum replicas per deployable (ADR-0061), for the bootstrap Helm values."
+  value       = var.replica_floors
+}
+
 output "kubernetes_cluster_id" {
   value = try(azurerm_kubernetes_cluster.cell[0].id, null)
 }

@@ -321,6 +321,10 @@ Actions 1–5 stand. Action 4's KERNEL-RELAY takes the drain loop and the batch 
 10. [ ] Package, **platform-ops contract** (served by the `operations` host; carried out by the relay in
     `workers`): add the republish operations below, the `control.outbox_republish` table derived from
     them, and a task in the development plan, **PLATFORM-REPUBLISH, 3 pts**, after KERNEL-RELAY.
+    **Authored 1 October**: the four operations and `OutboxRepublish`/`OutboxRepublishRequest` in
+    `contracts/satellite/platform-ops.yaml`, on P09 ADM-318 until republish has a screen of its own, the state
+    model `states/outbox-republish.yaml`, and hand-mapped lineage; `control.outbox_republish` is derived at the
+    next refresh.
 
     | Operation | Method and path | Permission | Notes |
     |---|---|---|---|

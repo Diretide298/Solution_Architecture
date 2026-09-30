@@ -72557,5 +72557,106 @@
    "redis"
   ],
   "note": "New (M18-15). The order.created consumer; idempotent on order id + channel + purpose; attaches to marketing.guest_profile on a GuestMatchPolicy match."
+ },
+ "republishOutbox": {
+  "contract": "platform-ops",
+  "verb": "POST",
+  "path": "/outbox-republishes",
+  "reads": [
+   "control.outbox_republish",
+   "platform.outbox"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.outbox_republish",
+   "platform.audit_record"
+  ],
+  "routing": "",
+  "scope": "platform",
+  "perm": "PLATFORM_CELL_MANAGE",
+  "offline": false,
+  "summary": "Republish one tenant database's outbox rows for a time range",
+  "source": "hand-mapped 1 October (ADR-0058 amendment, republish)",
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "audience": [
+   "staff"
+  ]
+ },
+ "listOutboxRepublishes": {
+  "contract": "platform-ops",
+  "verb": "GET",
+  "path": "/outbox-republishes",
+  "reads": [
+   "control.outbox_republish"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_CELL_VIEW",
+  "offline": false,
+  "summary": "Outbox republishes, newest first",
+  "source": "hand-mapped 1 October (ADR-0058 amendment, republish)",
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "audience": [
+   "staff"
+  ]
+ },
+ "getOutboxRepublish": {
+  "contract": "platform-ops",
+  "verb": "GET",
+  "path": "/outbox-republishes/{republishId}",
+  "reads": [
+   "control.outbox_republish"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_CELL_VIEW",
+  "offline": false,
+  "summary": "One republish and its progress",
+  "source": "hand-mapped 1 October (ADR-0058 amendment, republish)",
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "audience": [
+   "staff"
+  ]
+ },
+ "cancelOutboxRepublish": {
+  "contract": "platform-ops",
+  "verb": "POST",
+  "path": "/outbox-republishes/{republishId}/cancel",
+  "reads": [
+   "control.outbox_republish"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.outbox_republish",
+   "platform.audit_record"
+  ],
+  "routing": "",
+  "scope": "platform",
+  "perm": "PLATFORM_CELL_MANAGE",
+  "offline": false,
+  "summary": "Stop a republish after its current batch",
+  "source": "hand-mapped 1 October (ADR-0058 amendment, republish)",
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "audience": [
+   "staff"
+  ]
  }
 }
